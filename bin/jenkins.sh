@@ -9,9 +9,6 @@ virtualenv $env_dir
 #install requirements
 pip install -r requirements.txt
 
-#install test only requirements
-pip install -r requirements_test.txt
-
 ./test.sh
 
 test_pass=$?
