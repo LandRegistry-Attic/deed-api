@@ -10,4 +10,4 @@ port="${<%=@module_name.upcase%>_GUNICORN_PORT:-8000}"
 host="${<%=@module_name.upcase%>_GUNICORN_HOST:-0.0.0.0}"
 
 
-gunicorn -b $host:$port --pid /var/run/<%=@module_name%>/<%=@module_name%>.pid "app:create_manager().app"
+gunicorn -b $host:$port --pid /var/run/<%=@module_name%>/<%=@module_name%>.pid "application:app"
