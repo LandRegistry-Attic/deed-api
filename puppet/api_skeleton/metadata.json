@@ -1,0 +1,11 @@
+{
+  "name": "dm_api_skeleton",
+  "version": "0.0.1",
+  "author": "Land Registry Charges team",
+  "summary": "Install the DM Api Skeleton.",
+  "license": "MIT",
+  "source": "https://github.com/LandRegistry/dm-api-skeleton",
+  "project_page": "https://github.com/LandRegistry/dm-api-skeleton",
+  "issues_url": "https://github.com/LandRegistry/dm-api-skeleton",
+  "dependencies": [{"name": "puppetlabs/vcsrepo"}]
+}
