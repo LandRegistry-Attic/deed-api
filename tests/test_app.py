@@ -11,5 +11,5 @@ class TestRoutes(unittest.TestCase):
     def test_health(self):
         self.assertEqual((self.app.get('/health')).status, '200 OK')
 
-    def test_helloworld(self):
-        self.assertEqual((self.app.get('/helloworld')).status, '301 MOVED PERMANENTLY')
+    def test_deed(self):
+        self.assertEqual((self.app.get('/deed')).status, '301 MOVED PERMANENTLY')

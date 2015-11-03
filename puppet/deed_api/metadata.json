@@ -1,0 +1,11 @@
+{
+  "name": "dm-deed-api",
+  "version": "0.0.1",
+  "author": "Land Registry Charges team",
+  "summary": "Install the DM Deed API.",
+  "license": "MIT",
+  "source": "https://github.com/LandRegistry/dm-deed-api",
+  "project_page": "https://github.com/LandRegistry/dm-deed-api",
+  "issues_url": "https://github.com/LandRegistry/dm-deed-api",
+  "dependencies": [{"name": "puppetlabs/vcsrepo"}]
+}

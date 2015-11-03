@@ -1,8 +1,8 @@
 # Install and configure the Flask Api Skeleton
-class api_skeleton (
-    $port = '9010',
+class deed_api (
+    $port = '9020',
     $host = '0.0.0.0',
-    $source = 'https://github.com/LandRegistry/dm-api-skeleton',
+    $source = 'https://github.com/LandRegistry/dm-deed-api',
     $branch_or_revision = 'master',
     $subdomain = 'api',
     $domain = undef,
