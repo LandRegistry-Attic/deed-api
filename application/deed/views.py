@@ -5,6 +5,6 @@ deed = Blueprint('deed', __name__,
                     template_folder='templates',
                     static_folder='static')
 
-@helloworld.route('/')
+@deed.route('/')
 def deedmain():
     return "deed route"
