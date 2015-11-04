@@ -1,3 +1,5 @@
 export SETTINGS="config.DevelopmentConfig"
 
-py.test --junitxml=TEST-flask-app-medium.xml --cov-report term-missing --cov application tests
+mkdir -p test-reports
+
+py.test --junitxml=test-reports/TEST-dm-deed-api.xml --cov-report term-missing --cov application tests
