@@ -1,5 +1,4 @@
 from application import db
-from sqlalchemy import Column, Integer
 from sqlalchemy.dialects.postgresql import JSON
 import copy
 import uuid
