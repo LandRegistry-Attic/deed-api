@@ -54,6 +54,7 @@ class deed_api (
       File["/opt/${module_name}/bin/run.sh"],
       File["/etc/systemd/system/${module_name}.service"],
       File["/var/run/${module_name}"],
+      Standard_env::Db::Postgres[$module_name],
     ],
   }
 
@@ -65,6 +66,11 @@ class deed_api (
     group   => $group,
     notify  => Service['nginx'],
   }
+
+  standard_env::db::postgres { $module_name:
+   user     => $owner,
+   password => $owner,
+ }
 
   if $environment == 'development' {
     standard_env::dev_host { $subdomain: }

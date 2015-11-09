@@ -1,4 +1,4 @@
-from application.db import db
+from application import db
 from sqlalchemy import Column, Integer
 from sqlalchemy.dialects.postgresql import JSON
 import copy
@@ -20,4 +20,4 @@ class Deed(db.Model):
         return str(uuid.uuid4().hex[:6]).lower()
 
     def get_json_doc(self):
-        return copy.deepcopy(self.JSON)
+        return copy.deepcopy(self.json_doc)
