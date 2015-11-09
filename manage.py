@@ -1,9 +1,7 @@
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
-import os
 
 
-from application.deed import model
 from application import app, db
 
 app.config.from_pyfile("config.py")

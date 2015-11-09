@@ -1,7 +1,6 @@
 from application import app
 from application.deed.model import Deed
 import unittest
-import os, re
 
 
 class TestRoutes(unittest.TestCase):
