@@ -8,7 +8,7 @@ class Deed(db.Model):
     __tablename__ = 'deed'
 
     id = db.Column(db.Integer, primary_key=True)
-    json_doc = db.Column(JSON)
+    deed = db.Column(JSON)
 
     def save(self):
         db.session.add(self)
