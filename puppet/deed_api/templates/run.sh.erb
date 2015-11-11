@@ -9,5 +9,11 @@ pip3 install -r requirements.txt
 port="${<%=@module_name.upcase%>_GUNICORN_PORT:-8000}"
 host="${<%=@module_name.upcase%>_GUNICORN_HOST:-0.0.0.0}"
 
+upgrade_success="python3 manage.py db upgrade"
 
-gunicorn -b $host:$port --pid /var/run/<%=@module_name%>/<%=@module_name%>.pid "application:app"
+if $upgrade_success; then
+  gunicorn -b $host:$port --pid /var/run/<%=@module_name%>/<%=@module_name%>.pid "application:app"
+else
+  echo "Database migration failed!!! Exiting"
+  exit 1
+fi
