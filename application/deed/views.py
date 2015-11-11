@@ -1,7 +1,8 @@
 from application.deed.model import Deed
-from flask import request, abort, url_for
+from flask import request, abort
 from flask import Blueprint
 from flask.ext.api import status
+
 
 deed = Blueprint('deed', __name__,
                  template_folder='templates',
@@ -27,7 +28,3 @@ def create():
     except Exception as inst:
         print(str(type(inst)) + ":" + str(inst))
         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@deed.route('/test')
-def test(id):
-    return 200
