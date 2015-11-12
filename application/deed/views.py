@@ -22,7 +22,6 @@ def create():
             }
         }
 
-
         deed.deed = json_doc
         try:
             deed.save()
