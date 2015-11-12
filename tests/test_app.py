@@ -27,6 +27,6 @@ class TestRoutes(unittest.TestCase):
     def test_create(self):
         payload = json.dumps(DeedHelper._json_doc)
         response = self.app.post('/deed/', data=payload,
-            headers={"Content-Type":"application/json"})
+                                 headers={"Content-Type": "application/json"})
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
