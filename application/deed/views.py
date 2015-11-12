@@ -4,12 +4,12 @@ from flask import Blueprint
 from flask.ext.api import status
 
 
-deed = Blueprint('deed', __name__,
-                 template_folder='templates',
-                 static_folder='static')
+deed_bp = Blueprint('deed', __name__,
+                    template_folder='templates',
+                    static_folder='static')
 
 
-@deed.route('/', methods=['POST'])
+@deed_bp.route('/', methods=['POST'])
 def create():
     deed = Deed()
     deed_json = request.get_json()

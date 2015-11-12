@@ -4,6 +4,7 @@ from tests.helper import DeedHelper
 from flask.ext.api import status
 import unittest
 import json
+import mock
 
 
 class TestRoutes(unittest.TestCase):
@@ -24,7 +25,8 @@ class TestRoutes(unittest.TestCase):
         test_token = test_deed.generate_token()
         self.assertTrue(len(test_token) == 6)
 
-    def test_create(self):
+    @mock.patch('application.deed.model.Deed')
+    def test_create(self, mock_Deed):
         payload = json.dumps(DeedHelper._json_doc)
         response = self.app.post('/deed/', data=payload,
                                  headers={"Content-Type": "application/json"})

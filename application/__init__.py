@@ -6,9 +6,9 @@ db = SQLAlchemy(app)
 
 # Register routes after establishing the db prevents improperly loaded modules
 # caused from circular imports
-from .deed.views import deed
+from .deed.views import deed_bp
 app.config.from_pyfile("config.py")
-app.register_blueprint(deed, url_prefix='/deed')
+app.register_blueprint(deed_bp, url_prefix='/deed')
 
 
 @app.route("/health")
