@@ -25,7 +25,7 @@ class TestRoutes(unittest.TestCase):
         test_token = test_deed.generate_token()
         self.assertTrue(len(test_token) == 6)
 
-    @mock.patch('application.deed.model.Deed')
+    @mock.patch('application.deed.model.Deed.save')
     def test_create(self, mock_Deed):
         payload = json.dumps(DeedHelper._json_doc)
         response = self.app.post('/deed/', data=payload,
