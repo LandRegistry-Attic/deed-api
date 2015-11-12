@@ -9,6 +9,7 @@ Flask-SQLAlchemy==2.0
 gunicorn==19.3.0
 itsdangerous==0.24
 Jinja2==2.8
+jsonschema==2.5.1
 Mako==1.0.3
 MarkupSafe==0.23
 mock==1.0.1

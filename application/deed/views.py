@@ -2,6 +2,8 @@ from application.deed.model import Deed
 from flask import request, abort
 from flask import Blueprint
 from flask.ext.api import status
+from jsonschema import validate  # type: ignore
+from jsonschema.validators import validator_for  # type: ignore
 import re
 
 
