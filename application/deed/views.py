@@ -16,7 +16,7 @@ def create():
 
     json_doc = {
         "deed": {
-            "title-number": deed_json['title-number']
+            "title_number": deed_json['title_number']
         }
     }
 

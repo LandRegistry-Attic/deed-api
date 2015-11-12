@@ -1,2 +1,2 @@
 class DeedHelper:
-    _json_doc = {"title-number": "DN100"}
+    _json_doc = {"title_number": "DN100"}
