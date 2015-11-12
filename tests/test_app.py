@@ -32,3 +32,10 @@ class TestRoutes(unittest.TestCase):
                                  headers={"Content-Type": "application/json"})
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_invalid_title_format(self):
+        payload = json.dumps(DeedHelper._invalid_title)
+        response = self.app.post('/deed/', data=payload,
+                                 headers={"Content-Type": "application/json"})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

@@ -10,7 +10,7 @@ class Deed(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     deed = db.Column(JSON)
 
-    def save(self):
+    def save(self):  # pragma: no cover
         db.session.add(self)
         db.session.commit()
 
