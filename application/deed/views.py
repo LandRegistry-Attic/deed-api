@@ -39,7 +39,6 @@ def create():
             url = request.base_url + str(deed.id)
             return url, status.HTTP_201_CREATED
         except Exception as inst:
-            print(str(type(inst)) + ":" + str(inst))
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:
         abort(status.HTTP_400_BAD_REQUEST)
