@@ -2,7 +2,7 @@ from application.deed.model import Deed
 from flask import request, abort
 from flask import Blueprint
 from flask.ext.api import status
-from jsonschema.validators import validator_for  # type: ignore
+from jsonschema.validators import validator_for
 import re
 import os
 import json
@@ -38,7 +38,7 @@ def create():
             deed.save()
             url = request.base_url + str(deed.id)
             return url, status.HTTP_201_CREATED
-        except Exception as inst:
+        except Exception:
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:
         abort(status.HTTP_400_BAD_REQUEST)
