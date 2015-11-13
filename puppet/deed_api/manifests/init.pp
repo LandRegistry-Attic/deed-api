@@ -4,7 +4,7 @@ class deed_api (
     $host = '0.0.0.0',
     $source = 'https://github.com/LandRegistry/dm-deed-api',
     $branch_or_revision = 'master',
-    $subdomain = 'api',
+    $subdomain = 'deedapi',
     $domain = undef,
     $owner = 'vagrant',
     $group = 'vagrant'

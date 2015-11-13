@@ -8,9 +8,9 @@ class Deed(db.Model):
     __tablename__ = 'deed'
 
     id = db.Column(db.Integer, primary_key=True)
-    json_doc = db.Column(JSON)
+    deed = db.Column(JSON)
 
-    def save(self):
+    def save(self):  # pragma: no cover
         db.session.add(self)
         db.session.commit()
 

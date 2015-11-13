@@ -1,0 +1,16 @@
+{
+ "definitions": {
+     "title_number": {
+       "pattern": "^([A-Z]{0,3}[1-9][0-9]{0,5}|[0-9]{1,6}[ZT])$",
+       "type": "string"
+     }
+  },
+  "properties": {
+    "title_number": {
+      "$ref": "#/definitions/title_number"
+    }
+  },
+  "required": ["title_number"],
+  "type": "object",
+  "additionalProperties": false
+}
