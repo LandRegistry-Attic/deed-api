@@ -12,6 +12,5 @@
   },
   "required": ["title_number"],
   "type": "object",
-  "maxProperties": 1,
   "additionalProperties": false
 }
