@@ -7,12 +7,23 @@ import re
 import os
 import json
 
-
 deed_bp = Blueprint('deed', __name__,
                     template_folder='templates',
                     static_folder='static')
 
 _title_validator = None
+
+
+@deed_bp.route('/<deed_reference>', methods=['GET'])
+def get_deed(deed_reference):
+    result = Deed.query.filter_by(id=int(deed_reference)).first()
+
+    if result is None:
+        abort(status.HTTP_404_NOT_FOUND)
+    else:
+        result.deed['id'] = result.id
+
+    return json.dumps(result.deed), status.HTTP_200_OK
 
 
 @deed_bp.route('/', methods=['POST'])
@@ -27,13 +38,8 @@ def create():
         abort(status.HTTP_400_BAD_REQUEST)
 
     if validate_title_number(deed_json['title_number']):
-        json_doc = {
-            "deed": {
-                "title_number": deed_json['title_number']
-            }
-        }
 
-        deed.deed = json_doc
+        deed.deed = deed_json
         try:
             deed.save()
             url = request.base_url + str(deed.id)
@@ -64,5 +70,6 @@ def _create_title_validator():
     validator = validator_for(schema)
     validator.check_schema(schema)
     return validator(schema)
+
 
 _title_validator = _create_title_validator()

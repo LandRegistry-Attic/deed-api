@@ -1,6 +1,6 @@
 from application import app
 from application.deed.model import Deed
-from tests.helper import DeedHelper
+from tests.helper import DeedHelper, DeedModelMock
 from flask.ext.api import status
 import unittest
 import json
@@ -39,3 +39,20 @@ class TestRoutes(unittest.TestCase):
                                  headers={"Content-Type": "application/json"})
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @mock.patch('application.deed.model.Deed.query', autospec=True)
+    def test_get_endpoint(self, mock_query):
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = DeedModelMock()
+
+        response = self.app.get('/deed/1')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue("DN100" in response.data.decode())
+
+    @mock.patch('application.deed.model.Deed.query', autospec=True)
+    def test_get_endpoint_not_found(self, mock_query):
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = None
+
+        response = self.app.get('/deed/1')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
