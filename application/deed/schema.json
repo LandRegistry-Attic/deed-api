@@ -19,7 +19,8 @@
            },
            "required": [
                "surname","forename"
-           ]
+           ],
+           "additionalProperties": false
        }
   },
   "properties": {
