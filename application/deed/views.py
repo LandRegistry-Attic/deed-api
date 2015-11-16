@@ -16,12 +16,14 @@ _title_validator = None
 
 @deed_bp.route('/<deed_reference>')
 def get_deed(deed_reference):
-    deed = Deed.query.filter_by(id=deed_reference).first()
-    if deed is None:
+    result = Deed.query.filter_by(id=int(deed_reference)).first()
+
+    if result is None:
         abort(status.HTTP_404_NOT_FOUND)
     else:
-        deed.json_doc['id'] = deed.id
-    return deed.json_doc
+        result.deed['deed']['id'] = result.id
+
+    return json.dumps(result.deed['deed']), status.HTTP_200_OK
 
 
 @deed_bp.route('/', methods=['POST'])
