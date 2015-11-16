@@ -39,6 +39,14 @@ def create():
 
     if validate_title_number(deed_json['title_number']):
 
+        print (deed_json)
+        json_doc = {
+            "deed": {
+                "title_number": deed_json['title_number'],
+                "borrowers": deed_json['borrowers']
+            }
+        }
+
         deed.deed = deed_json
         try:
             deed.save()
