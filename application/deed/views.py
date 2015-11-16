@@ -21,9 +21,9 @@ def get_deed(deed_reference):
     if result is None:
         abort(status.HTTP_404_NOT_FOUND)
     else:
-        result.deed['deed']['id'] = result.id
+        result.deed['id'] = result.id
 
-    return json.dumps(result.deed['deed']), status.HTTP_200_OK
+    return json.dumps(result.deed), status.HTTP_200_OK
 
 
 @deed_bp.route('/', methods=['POST'])
@@ -38,13 +38,8 @@ def create():
         abort(status.HTTP_400_BAD_REQUEST)
 
     if validate_title_number(deed_json['title_number']):
-        json_doc = {
-            "deed": {
-                "title_number": deed_json['title_number']
-            }
-        }
 
-        deed.deed = json_doc
+        deed.deed = deed_json
         try:
             deed.save()
             url = request.base_url + str(deed.id)
