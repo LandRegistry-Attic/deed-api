@@ -27,7 +27,6 @@ def create():
         abort(status.HTTP_400_BAD_REQUEST)
 
     if validate_title_number(deed_json['title_number']):
-        print (deed_json)
         json_doc = {
             "deed": {
                 "title_number": deed_json['title_number'],
