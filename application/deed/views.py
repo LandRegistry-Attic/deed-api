@@ -14,7 +14,7 @@ deed_bp = Blueprint('deed', __name__,
 _title_validator = None
 
 
-@deed_bp.route('/<deed_reference>')
+@deed_bp.route('/<deed_reference>', methods=['GET'])
 def get_deed(deed_reference):
     result = Deed.query.filter_by(id=int(deed_reference)).first()
 
