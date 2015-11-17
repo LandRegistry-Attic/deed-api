@@ -10,7 +10,7 @@ from the database, converting to JSON and returns as an endpoint.
 - [Usage](#usage)
 - [Getting Started](#getting-started)
 - [Changing the migration](#changing-the-migration)
-- [Current Deed Schema](#current-schema)
+- [Current Schema](#current-schema)
 
 ## Usage
 ```
@@ -52,7 +52,7 @@ python manage.py db revision --autogenerate
 
 > For some helpful documentation on using alembic go [here](alembic.md)
 
-## Current Deed Schema
+## Current Schema
 
 The Deed requires a title_number and at least 1 borrower
 
