@@ -3,7 +3,7 @@
 The Deed API is a JSON API which stores deed objects.
 
 This API holds the functionality for creating the migrating tables, getting data
-from the database, converting to JSON and returns as an endpoint.
+from the database and putting a new JSON deed onto a database that returns an endpoint to that deed.
 
 ### Contents
 
@@ -27,18 +27,7 @@ post    /deed                       # Create a deed by posting a json object ref
 ```
 pip install -r requirements.txt
 ```
-
-3. Export your database URI
-```
-export DATABASE_URI=postgresql://username:password@localhost/database
-```
-
-4. To run the migration run the command
-```
-python manage.py db upgrade head
-```
-
-5. To run the application run the command
+3. To run the application run the command
 ```
 source run.sh
 ```
@@ -54,7 +43,7 @@ python manage.py db revision --autogenerate
 
 ## Current Schema
 
-The Deed requires a title_number and at least 1 borrower
+The Deed requires a title number and at least 1 borrower
 
 ### Deed
 
