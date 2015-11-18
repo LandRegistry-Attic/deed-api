@@ -1,5 +1,5 @@
 class DeedModelMock:
-    uid = "ABC1234"
+    token = "ABC1234"
     deed = {"title_number": "DN100"}
 
 
