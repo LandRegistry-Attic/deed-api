@@ -42,7 +42,7 @@ def create():
         deed.deed = deed_json
         try:
             deed.save()
-            url = request.base_url + str(deed.id)
+            url = request.base_url + str(deed.uid)
             return url, status.HTTP_201_CREATED
         except Exception as e:
             print("Database Exception - %s" % e)
