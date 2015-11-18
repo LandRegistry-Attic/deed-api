@@ -45,7 +45,7 @@ class TestRoutes(unittest.TestCase):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = DeedModelMock()
 
-        response = self.app.get('/deed/1')
+        response = self.app.get('/deed/AB1234')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue("DN100" in response.data.decode())
 
@@ -54,5 +54,5 @@ class TestRoutes(unittest.TestCase):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = None
 
-        response = self.app.get('/deed/1')
+        response = self.app.get('/deed/CD3456')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

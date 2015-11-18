@@ -1,6 +1,6 @@
 class DeedModelMock:
-    id = 1
-    deed = {"deed": {"title_number": "DN100", "id": 1}}
+    uid = "ABC1234"
+    deed = {"title_number": "DN100"}
 
 
 class DeedHelper:
