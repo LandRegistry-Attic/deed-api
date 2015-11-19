@@ -18,7 +18,7 @@ from the database and putting a new JSON deed onto a database that returns an en
 ```
 get     /health                     # test endpoint for the application
 get     /deed/<id_>                 # get a deed with an id in the URL
-post    /deed                       # Create a deed by posting a json object reflecting the schema
+post    /deed/                       # Create a deed by posting a json object reflecting the schema
 
 ```
 > [schema](#current-schema) for post
