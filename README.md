@@ -9,7 +9,9 @@ from the database and putting a new JSON deed onto a database that returns an en
 
 - [Usage](#usage)
 - [Getting Started](#getting-started)
-- [Changing the migration](#changing-the-migration)
+- [Migration](#migration)
+- [Unit tests](#unit-tests)
+- [Acceptance tests](#acceptance-tests)
 - [Current Schema](#current-schema)
 
 ## Usage
@@ -32,14 +34,34 @@ pip install -r requirements.txt
 source run.sh
 ```
 
-## Changing the migration
-All you have to do is change/create the related model and run the command
+## Migration
+
+Run the Migration
+```
+python manage.py db upgrade
+```
+
+Add a migration
 
 ```
 python manage.py db revision --autogenerate
 ```
 
 > For some helpful documentation on using alembic go [here](alembic.md)
+
+## Unit tests
+
+Run the unit tests
+
+```
+source test.sh
+```
+
+## Acceptance tests
+
+See, the following link for information on how to run the acceptance tests:-
+
+[Acceptance Tests](https://github.com/LandRegistry/dm-acceptance-tests)
 
 ## Current Schema
 
