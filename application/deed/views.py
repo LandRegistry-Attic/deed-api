@@ -40,6 +40,7 @@ def create():
     if validate_title_number(deed_json['title_number']):
 
         deed.deed = deed_json
+        deed.token = Deed.generate_token()
         try:
             deed.save()
             url = request.base_url + str(deed.token)
