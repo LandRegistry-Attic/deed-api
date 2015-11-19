@@ -9,6 +9,8 @@ import mock
 
 class TestRoutes(unittest.TestCase):
 
+    DEED_ENDPOINT = "/deed/"
+
     def setUp(self):
         app.config.from_pyfile("config.py")
         self.app = app.test_client()
@@ -28,14 +30,14 @@ class TestRoutes(unittest.TestCase):
     @mock.patch('application.deed.model.Deed.save')
     def test_create(self, mock_Deed):
         payload = json.dumps(DeedHelper._json_doc)
-        response = self.app.post('/deed/', data=payload,
+        response = self.app.post(self.DEED_ENDPOINT, data=payload,
                                  headers={"Content-Type": "application/json"})
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_invalid_title_format(self):
         payload = json.dumps(DeedHelper._invalid_title)
-        response = self.app.post('/deed/', data=payload,
+        response = self.app.post(self.DEED_ENDPOINT, data=payload,
                                  headers={"Content-Type": "application/json"})
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -45,7 +47,7 @@ class TestRoutes(unittest.TestCase):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = DeedModelMock()
 
-        response = self.app.get('/deed/1')
+        response = self.app.get(self.DEED_ENDPOINT + 'AB1234')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue("DN100" in response.data.decode())
 
@@ -54,5 +56,5 @@ class TestRoutes(unittest.TestCase):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = None
 
-        response = self.app.get('/deed/1')
+        response = self.app.get(self.DEED_ENDPOINT + 'CD3456')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

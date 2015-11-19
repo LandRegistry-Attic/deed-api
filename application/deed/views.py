@@ -16,12 +16,12 @@ _title_validator = None
 
 @deed_bp.route('/<deed_reference>', methods=['GET'])
 def get_deed(deed_reference):
-    result = Deed.query.filter_by(id=int(deed_reference)).first()
+    result = Deed.query.filter_by(token=str(deed_reference)).first()
 
     if result is None:
         abort(status.HTTP_404_NOT_FOUND)
     else:
-        result.deed['id'] = result.id
+        result.deed['token'] = result.token
 
     return json.dumps(result.deed), status.HTTP_200_OK
 
@@ -42,7 +42,7 @@ def create():
         deed.deed = deed_json
         try:
             deed.save()
-            url = request.base_url + str(deed.id)
+            url = request.base_url + str(deed.token)
             return url, status.HTTP_201_CREATED
         except Exception as e:
             print("Database Exception - %s" % e)
