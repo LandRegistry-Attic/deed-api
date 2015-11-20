@@ -28,6 +28,7 @@ def get_deed(deed_reference):
 def create():
     deed = Deed()
     deed_json = request.get_json()
+    borrowerService = Borrower()
 
     error_count, error_message = validate_helper(deed_json)
 
@@ -35,8 +36,27 @@ def create():
         return error_message, status.HTTP_400_BAD_REQUEST
     else:
         deed.deed = deed_json
+
+        json_doc = {
+            "title_number": deed_json['title_number'],
+            "borrowers": []
+            }
+
         deed.token = Deed.generate_token()
         try:
+            for borrower in deed_json['borrowers']:
+                borrower_doc = {
+                    "id": "",
+                    "forename": borrower['forename'],
+                    "middle_name": borrower['middle_name'],
+                    "surname": borrower['surname']
+                }
+
+                borrower_doc["id"] = borrowerService.extractBorrower(borrower)
+                json_doc['borrowers'].append(borrower_doc)
+
+            deed.deed = json_doc
+
             deed.save()
             url = request.base_url + str(deed.token)
             return url, status.HTTP_201_CREATED
