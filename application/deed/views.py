@@ -4,6 +4,7 @@ from flask import request, abort
 from flask import Blueprint
 from flask.ext.api import status
 import json
+from application.borrower.server import Borrower
 
 
 deed_bp = Blueprint('deed', __name__,
