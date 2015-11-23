@@ -72,7 +72,15 @@ def create():
 def date_validator(borrowers):
         for borrower in borrowers:
                 try:
-                    datetime.datetime.strptime(borrower['dob'], '%d/%m/%Y')
+                    borrower_date = datetime.datetime.strptime(
+                        borrower['dob'], '%d/%m/%Y')
+
+                    date_now = datetime.datetime.now()
+
+                    if borrower_date > date_now:
+                        print("Date cannot be in the future")
+                        abort(status.HTTP_400_BAD_REQUEST)
+
                 except Exception as e:
                     print("Invalid Date - %s" % e)
                     abort(status.HTTP_400_BAD_REQUEST)
