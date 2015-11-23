@@ -46,7 +46,7 @@ def create():
         deed.token = Deed.generate_token()
 
         date_check = functools.reduce(validation_checks,
-                                    deed_json['borrowers'], False)
+                                      deed_json['borrowers'], False)
 
         if date_check:
             abort(status.HTTP_400_BAD_REQUEST)
