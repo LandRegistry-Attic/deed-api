@@ -4,7 +4,7 @@ from flask import request, abort
 from flask import Blueprint
 from flask.ext.api import status
 import json
-from application.borrower.server import Borrower
+from application.borrower.server import BorrowerService
 import functools
 
 
@@ -29,7 +29,7 @@ def get_deed(deed_reference):
 def create():
     deed = Deed()
     deed_json = request.get_json()
-    borrowerService = Borrower()
+    borrowerService = BorrowerService()
 
     error_count, error_message = validate_helper(deed_json)
 

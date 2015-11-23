@@ -1,9 +1,9 @@
-from application.borrower.model import BorrowerModel
+from application.borrower.model import Borrower
 
 
-class Borrower:
+class BorrowerService:
     def extractBorrower(self, borrower):
-        borrowerModel = BorrowerModel()
+        borrowerModel = Borrower()
         borrowerModel.forename = borrower['forename']
 
         if 'middle_name' in borrower:

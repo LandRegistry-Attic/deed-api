@@ -1,7 +1,7 @@
 from application import db
 
 
-class BorrowerModel(db.Model):
+class Borrower(db.Model):
     __tablename__ = 'borrower'
 
     id = db.Column(db.Integer, primary_key=True)
