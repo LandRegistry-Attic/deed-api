@@ -5,6 +5,9 @@ The Deed API is a JSON API which stores deed objects.
 This API holds the functionality for creating the migrating tables, getting data
 from the database and putting a new JSON deed onto a database that returns an endpoint to that deed.
 
+The API also holds the functionality to capture personal information provided and save it in a
+separate table to be used at a later date for matching.
+
 ### Contents
 
 - [Usage](#usage)
