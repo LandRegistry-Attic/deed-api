@@ -5,10 +5,16 @@ class Borrower:
     def extractBorrower(self, borrower):
         borrowerModel = BorrowerModel()
         borrowerModel.forename = borrower['forename']
-        borrowerModel.middlename = borrower['middle_name']
+
+        if 'middle_name' in borrower:
+            borrowerModel.middlename = borrower['middle_name']
+
         borrowerModel.surname = borrower['surname']
         borrowerModel.dob = borrower['dob']
-        borrowerModel.gender = borrower['gender']
+
+        if 'gender' in borrower:
+            borrowerModel.gender = borrower['gender']
+
         borrowerModel.phonenumber = borrower['phone_number']
         borrowerModel.address = borrower['address']
 
