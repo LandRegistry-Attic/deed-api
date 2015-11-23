@@ -1,11 +1,11 @@
 from application.deed.model import Deed
-from application.deed.utils import validate_helper
+from application.deed.utils import validate_helper, validation_checks
 from flask import request, abort
 from flask import Blueprint
 from flask.ext.api import status
 import json
 from application.borrower.server import Borrower
-import datetime
+import functools
 
 
 deed_bp = Blueprint('deed', __name__,
@@ -45,7 +45,11 @@ def create():
 
         deed.token = Deed.generate_token()
 
-        date_validator(deed_json['borrowers'])
+        date_check = functools.reduce(validation_checks,
+                                    deed_json['borrowers'], False)
+
+        if date_check:
+            abort(status.HTTP_400_BAD_REQUEST)
 
         try:
             for borrower in deed_json['borrowers']:
@@ -67,20 +71,3 @@ def create():
         except Exception as e:
             print("Database Exception - %s" % e)
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-def date_validator(borrowers):
-        for borrower in borrowers:
-                try:
-                    borrower_date = datetime.datetime.strptime(
-                        borrower['dob'], '%d/%m/%Y')
-
-                    date_now = datetime.datetime.now()
-
-                    if borrower_date > date_now:
-                        print("Date cannot be in the future")
-                        abort(status.HTTP_400_BAD_REQUEST)
-
-                except Exception as e:
-                    print("Invalid Date - %s" % e)
-                    abort(status.HTTP_400_BAD_REQUEST)
