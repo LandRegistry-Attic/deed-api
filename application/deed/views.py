@@ -5,6 +5,7 @@ from flask import Blueprint
 from flask.ext.api import status
 import json
 from application.borrower.server import Borrower
+import datetime
 
 
 deed_bp = Blueprint('deed', __name__,
@@ -43,6 +44,9 @@ def create():
             }
 
         deed.token = Deed.generate_token()
+
+        date_validator(deed_json['borrowers'])
+
         try:
             for borrower in deed_json['borrowers']:
                 borrower_doc = {
@@ -63,3 +67,12 @@ def create():
         except Exception as e:
             print("Database Exception - %s" % e)
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+def date_validator(borrowers):
+        for borrower in borrowers:
+                try:
+                    datetime.datetime.strptime(borrower['dob'], '%d/%m/%Y')
+                except Exception as e:
+                    print("Invalid Date - %s" % e)
+                    abort(status.HTTP_400_BAD_REQUEST)
