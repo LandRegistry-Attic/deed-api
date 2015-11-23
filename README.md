@@ -87,10 +87,26 @@ The Deed requires a title number and at least 1 borrower
                },
                "middle_name": {
                    "type": "string"
+               },
+               "dob": {
+                 "type": "string",
+                 "pattern": "^(0?[1-9]|[12][0-9]|3[01])[\\/\\-](0?[1-9]|1[012])[\/\\-]\\d{4}$"
+               },
+               "gender": {
+                 "type": "string",
+                 "pattern": "^[MFU]{1}"
+               },
+             "phone_number": {
+               "type": "string",
+               "pattern": "^(07[\\d]{8,12}|447[\\d]{7,11})$"
+             },
+           "address":{
+                 "type": "string",
+                 "pattern": "(GIR 0AA|[A-PR-UWYZ]([0-9][0-9A-HJKPS-UW]?|[A-HK-Y][0-9][0-9ABEHMNPRV-Y]?) [0-9][ABD-HJLNP-UW-Z]{2})"
                }
            },
            "required": [
-               "surname","forename"
+               "surname","forename", "dob", "phone_number", "address"
            ],
            "additionalProperties": false
        }
@@ -113,7 +129,11 @@ The Deed requires a title number and at least 1 borrower
   "required": ["title_number", "borrowers"],
   "type": "object",
   "additionalProperties": false
+
+
+
 }
+
 ```
 
 e.g.
@@ -122,13 +142,20 @@ e.g.
     "title_number": "DN100",
     "borrowers": [
         {
-            "forename": "fred",
-            "middle_name": "joe",
-            "surname": "bloggs"
+            "forename": "lisa",
+            "middle_name": "ann",
+            "surname": "bloggette",
+            "address": "example address with postcode, PL14 3JR",
+            "dob": "23/01/1986",
+            "phone_number": "07502154062"
         },
         {
-            "forename": "lisa",
-            "surname": "bloggette"
+            "forename": "frank",
+            "middle_name": "ann",
+            "surname": "bloggette",
+            "address": "Example address with postcode, PL14 3JR",
+            "dob": "23/01/1986",
+            "phone_number": "07502154062"
         }
     ]
 }
