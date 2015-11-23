@@ -30,20 +30,20 @@ def _create_title_validator():
     return validator(schema)
 
 
-def validation_checks(result, borrower):
+def valid_dob(result, date_string):
     try:
-        if result:
-            return result
+        if not result:
+            return False
 
         borrower_date = datetime.datetime.strptime(
-            borrower['dob'], '%d/%m/%Y')
+            date_string, '%d/%m/%Y')
 
         if borrower_date > datetime.datetime.now():
-            return True
+            return False
 
-        return False
-    except:
         return True
+    except:
+        return False
 
 
 _title_validator = _create_title_validator()

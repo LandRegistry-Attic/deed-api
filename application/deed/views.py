@@ -1,5 +1,5 @@
 from application.deed.model import Deed
-from application.deed.utils import validate_helper, validation_checks
+from application.deed.utils import validate_helper, valid_dob
 from flask import request, abort
 from flask import Blueprint
 from flask.ext.api import status
@@ -45,10 +45,10 @@ def create():
 
         deed.token = Deed.generate_token()
 
-        date_check = functools.reduce(validation_checks,
-                                      deed_json['borrowers'], False)
+        dob_list = list(map(lambda x: x['dob'], deed_json['borrowers']))
+        valid_dob_result = functools.reduce(valid_dob, dob_list, True)
 
-        if date_check:
+        if not valid_dob_result:
             abort(status.HTTP_400_BAD_REQUEST)
 
         try:
