@@ -13,6 +13,6 @@ class Borrower(db.Model):
     phonenumber = db.Column(db.String, nullable=False)
     address = db.Column(db.String, nullable=False)
 
-    def save(self):  # pragma: no cover
+    def save(self):
         db.session.add(self)
         db.session.commit()
