@@ -1,0 +1,153 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Deeds API",
+        "description": "Land Registry Deed API",
+        "version": "1.0.0"
+    },
+    "host": "api.landregistry.gov.uk",
+    "schemes": [
+        "https"
+    ],
+    "basePath": "/v1",
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/deed": {
+            "post": {
+                "summary": "Deed",
+                "operationId": "addDeed",
+                "description": "The post Deed endpoint creates a new deed based on the JSON provided.\nThe reponse will return a URL that can retrieve the created deed. \n",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Deed_Application"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "URL to the GET endpoint for the deed is returned on successful creation.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request due to invalid schema. Response will include 1 or more schema errors\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/deed/{deed_reference}": {
+            "get": {
+                "summary": "Deed",
+                "description": "The Deed endpoint returns details of a specific deed based on the unique deed reference.\nThe response includes the Title Number, Property information, Borrower(s) information and deed information.\n",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "deed_reference",
+                        "in": "path",
+                        "description": "Unique reference of the deed.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "Deeds"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A specific deed is returned",
+                        "schema": {
+                            "$ref": "#/definitions/Operative_Deed"
+                        }
+                    },
+                    "404": {
+                        "description": "Deed not found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Deed_Application": {
+            "type": "object",
+            "properties": {
+                "title_number": {
+                    "type": "string",
+                    "description": "Unique Land Registry identifier for the registered estate."
+                },
+                "borrowers": {
+                    "type": "array",
+                    "description": "A list of borrowers.",
+                    "items": {
+                        "$ref": "#/definitions/Borrower"
+                    }
+                }
+            }
+        },
+        "Operative_Deed": {
+            "type": "object",
+            "properties": {
+                "deed": {
+                    "type": "object",
+                    "description": "Unique deed, consisting of property, borrower and charge information as well as clauses for the deed.",
+                    "properties": {
+                        "title_number": {
+                            "type": "string",
+                            "description": "Unique Land Registry identifier for the registered estate."
+                        },
+                        "borrowers": {
+                            "type": "array",
+                            "description": "A list of borrowers.",
+                            "items": {
+                                "$ref": "#/definitions/Borrower"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "Borrower": {
+            "type": "object",
+            "properties": {
+                "forename": {
+                    "type": "string"
+                },
+                "middle_name": {
+                    "type": "string"
+                },
+                "surname": {
+                    "type": "string"
+                }
+            }
+        },
+        "Error": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
