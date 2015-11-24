@@ -132,11 +132,7 @@ The Deed requires a title number and at least 1 borrower
   "required": ["title_number", "borrowers"],
   "type": "object",
   "additionalProperties": false
-
-
-
 }
-
 ```
 
 e.g.
