@@ -71,71 +71,11 @@ See, the following link for information on how to run the acceptance tests:-
 The Deed requires a title number and at least 1 borrower
 
 ### Deed
-
+The schema can be found below
 ```
-{
- "definitions": {
-     "title_number": {
-       "pattern": "^([A-Z]{0,3}[1-9][0-9]{0,5}|[0-9]{1,6}[ZT])$",
-       "type": "string"
-     },
-   "PrivateIndividualName": {
-           "type": "object",
-           "properties": {
-               "surname": {
-                   "type": "string"
-               },
-               "forename": {
-                   "type": "string"
-               },
-               "middle_name": {
-                   "type": "string"
-               },
-               "dob": {
-                 "type": "string",
-                 "pattern": "^(0?[1-9]|[12][0-9]|3[01])[\\/\\-](0?[1-9]|1[012])[\/\\-]\\d{4}$"
-               },
-               "gender": {
-                 "type": "string",
-                 "pattern": "^[MFU]{1}"
-               },
-             "phone_number": {
-               "type": "string",
-               "pattern": "^(07[\\d]{8,12}|447[\\d]{7,11})$"
-             },
-           "address":{
-                 "type": "string",
-                 "pattern": "(GIR 0AA|[A-PR-UWYZ]([0-9][0-9A-HJKPS-UW]?|[A-HK-Y][0-9][0-9ABEHMNPRV-Y]?) [0-9][ABD-HJLNP-UW-Z]{2})"
-               }
-           },
-           "required": [
-               "surname","forename", "dob", "phone_number", "address"
-           ],
-           "additionalProperties": false
-       }
-  },
-  "properties": {
-    "title_number": {
-      "$ref": "#/definitions/title_number"
-    },
-    "borrowers":{
-      "type": "array",
-      "minItems": 1,
-      "items": [
-        {
-          "type": "object",
-          "$ref": "#/definitions/PrivateIndividualName"
-        }
-      ]
-    }
-  },
-  "required": ["title_number", "borrowers"],
-  "type": "object",
-  "additionalProperties": false
-}
+https://github.com/LandRegistry/dm-deed-api/blob/develop/application/deed/schema.json
 ```
-
-e.g.
+Example payload:
 ```
 {
     "title_number": "DN100",
