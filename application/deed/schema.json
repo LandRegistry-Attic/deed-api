@@ -57,7 +57,4 @@
   "required": ["title_number", "borrowers"],
   "type": "object",
   "additionalProperties": false
-
-
-
 }

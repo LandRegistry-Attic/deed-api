@@ -2,7 +2,7 @@ from application.borrower.model import Borrower
 
 
 class BorrowerService:
-    def extractBorrower(self, borrower):
+    def saveBorrower(self, borrower):
         borrowerModel = Borrower()
         borrowerModel.forename = borrower['forename']
 

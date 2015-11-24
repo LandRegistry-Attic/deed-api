@@ -53,15 +53,15 @@ def create():
 
         try:
             for borrower in deed_json['borrowers']:
-                borrower_doc = {
+                borrower_json = {
                     "id": "",
                     "forename": borrower['forename'],
                     "middle_name": borrower['middle_name'],
                     "surname": borrower['surname']
                 }
 
-                borrower_doc["id"] = borrowerService.extractBorrower(borrower)
-                json_doc['borrowers'].append(borrower_doc)
+                borrower_json["id"] = borrowerService.saveBorrower(borrower)
+                json_doc['borrowers'].append(borrower_json)
 
             deed.deed = json_doc
 
