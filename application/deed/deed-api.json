@@ -125,6 +125,13 @@
         },
         "Borrower": {
             "type": "object",
+            "required": [
+                "surname",
+                "forename",
+                "dob",
+                "phone_number",
+                "address"
+            ],
             "properties": {
                 "forename": {
                     "type": "string"
@@ -133,6 +140,18 @@
                     "type": "string"
                 },
                 "surname": {
+                    "type": "string"
+                },
+                "dob": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "address": {
                     "type": "string"
                 }
             }
