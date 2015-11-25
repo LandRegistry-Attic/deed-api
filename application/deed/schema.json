@@ -22,7 +22,7 @@
                },
                "gender": {
                  "type": "string",
-                 "pattern": "^[MFU]{1}"
+                 "pattern": "^[MFU]$"
                },
              "phone_number": {
                "type": "string",
@@ -46,12 +46,11 @@
     "borrowers":{
       "type": "array",
       "minItems": 1,
-      "items": [
+      "items":
         {
-          "type": "object",
           "$ref": "#/definitions/PrivateIndividualName"
         }
-      ]
+
     }
   },
   "required": ["title_number", "borrowers"],
