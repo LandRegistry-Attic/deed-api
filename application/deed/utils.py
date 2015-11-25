@@ -30,7 +30,7 @@ def _create_title_validator():
     return validator(schema)
 
 
-def valid_dob(result, date_string):
+def valid_dob(result, date_string, index):
     try:
         if not result:
             return False
@@ -45,5 +45,7 @@ def valid_dob(result, date_string):
     except:
         return False
 
+def is_unique_list(list):
+    return len(dict.fromkeys(list, 0)) == len(list)
 
 _title_validator = _create_title_validator()

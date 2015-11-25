@@ -1,12 +1,11 @@
 from application.deed.model import Deed
-from application.deed.utils import validate_helper, valid_dob
+from application.deed.utils import validate_helper, valid_dob, is_unique_list
 from flask import request, abort
 from flask import Blueprint
 from flask.ext.api import status
 import json
 from application.borrower.server import BorrowerService
-import functools
-
+from underscore import _
 
 deed_bp = Blueprint('deed', __name__,
                     template_folder='templates',
@@ -45,10 +44,18 @@ def create():
 
         deed.token = Deed.generate_token()
 
-        dob_list = list(map(lambda x: x['dob'], deed_json['borrowers']))
-        valid_dob_result = functools.reduce(valid_dob, dob_list, True)
+        valid_dob_result = _(deed_json['borrowers']).chain()\
+            .map(lambda x, *a: x['dob'])\
+            .reduce(valid_dob, True).value()
 
         if not valid_dob_result:
+            abort(status.HTTP_400_BAD_REQUEST)
+
+        phone_number_list = _(deed_json['borrowers']).chain()\
+            .map(lambda x, *a: x['phone_number'])\
+            .value()
+
+        if not is_unique_list(phone_number_list):
             abort(status.HTTP_400_BAD_REQUEST)
 
         try:

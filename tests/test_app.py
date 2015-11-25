@@ -30,6 +30,15 @@ class TestRoutes(unittest.TestCase):
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     def test_create(self, mock_Borrower, mock_Deed):
+        payload = json.dumps(DeedHelper._invalid_phone_numbers)
+        response = self.app.post(self.DEED_ENDPOINT, data=payload,
+                                 headers={"Content-Type": "application/json"})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @mock.patch('application.borrower.model.Borrower.save')
+    @mock.patch('application.deed.model.Deed.save')
+    def test_create(self, mock_Borrower, mock_Deed):
         payload = json.dumps(DeedHelper._json_doc)
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
                                  headers={"Content-Type": "application/json"})
