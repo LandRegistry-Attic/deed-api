@@ -32,7 +32,7 @@
              },
            "address":{
                  "type": "string",
-                 "pattern": "(GIR 0AA|[A-PR-UWYZ]([0-9][0-9A-HJKPS-UW]?|[A-HK-Y][0-9][0-9ABEHMNPRV-Y]?) [0-9][ABD-HJLNP-UW-Z]{2})"
+                 "pattern": "(GIR\s?0AA|[A-Pa-pR-Ur-uWwYyZz]([0-9][0-9A-Ha-hJjKkPpS-Us-uWw]?|[A-Ha-hK-Yk-y][0-9][0-9AaBbEeHhMmNnPpRrV-Yv-y]?)\s?[0-9][AaBbD-Hd-hJjLlNnP-Up-uW-Zw-z]{2})"
                }
            },
            "required": [
