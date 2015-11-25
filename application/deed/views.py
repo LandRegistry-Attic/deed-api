@@ -63,9 +63,11 @@ def create():
                 borrower_json = {
                     "id": "",
                     "forename": borrower['forename'],
-                    "middle_name": borrower['middle_name'],
                     "surname": borrower['surname']
                 }
+
+                if borrower['middle_name']:
+                    borrower_json['middle_name'] = borrower['middle_name']
 
                 borrower_json["id"] = borrowerService.saveBorrower(borrower)
                 json_doc['borrowers'].append(borrower_json)
