@@ -45,6 +45,7 @@ def valid_dob(result, date_string, index):
     except:
         return False
 
+
 def is_unique_list(list):
     return len(dict.fromkeys(list, 0)) == len(list)
 
