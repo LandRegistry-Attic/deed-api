@@ -85,7 +85,7 @@ class DeedHelper:
         }
     ]}
 
-    _invalid_banks_on_required_fields = {"borrowers": [
+    _invalid_blanks_on_required_fields = {"borrowers": [
         {
             "forename": "lisa",
             "middle_name": "ann",

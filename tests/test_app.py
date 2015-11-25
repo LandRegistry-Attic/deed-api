@@ -48,7 +48,7 @@ class TestRoutes(unittest.TestCase):
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     def test_create_with_invalid_blanks(self, mock_Borrower, mock_Deed):
-        payload = json.dumps(DeedHelper._invalid_banks_on_required_fields)
+        payload = json.dumps(DeedHelper._invalid_blanks_on_required_fields)
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
                                  headers={"Content-Type": "application/json"})
 
