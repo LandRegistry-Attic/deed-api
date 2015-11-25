@@ -8,10 +8,12 @@
            "type": "object",
            "properties": {
                "surname": {
-                   "type": "string"
+                   "type": "string",
+                   "pattern": "^[A-z]+$"
                },
                "forename": {
-                   "type": "string"
+                   "type": "string",
+                    "pattern": "^[A-z]+$"
                },
                "middle_name": {
                    "type": "string"
