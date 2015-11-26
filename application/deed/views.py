@@ -66,7 +66,7 @@ def create():
                     "surname": borrower['surname']
                 }
 
-                if borrower['middle_name']:
+                if 'middle_name' in borrower:
                     borrower_json['middle_name'] = borrower['middle_name']
 
                 borrower_json["id"] = borrowerService.saveBorrower(borrower)
