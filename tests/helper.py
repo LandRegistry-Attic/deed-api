@@ -11,7 +11,7 @@ class DeedHelper:
                 "forename": "lisa",
                 "middle_name": "ann",
                 "surname": "bloggette",
-                "gender": "M",
+                "gender": "Male",
                 "address": "test address with postcode, PL14 3JR",
                 "dob": "23/01/1986",
                 "phone_number": "07502154062"
@@ -20,7 +20,7 @@ class DeedHelper:
                 "forename": "frank",
                 "middle_name": "ann",
                 "surname": "bloggette",
-                "gender": "M",
+                "gender": "Female",
                 "address": "Test Address With Postcode, PL14 3JR",
                 "dob": "23/01/1986",
                 "phone_number": "07502154061"
