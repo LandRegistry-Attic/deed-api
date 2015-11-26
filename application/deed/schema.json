@@ -28,7 +28,7 @@
                },
              "phone_number": {
                "type": "string",
-               "pattern": "^(07[\d]{9})$"
+               "pattern": "^(07[\\d]{9})$"
              },
            "address":{
                  "type": "string",
