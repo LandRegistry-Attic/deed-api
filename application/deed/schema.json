@@ -23,16 +23,16 @@
                  "pattern": "^(0[1-9]|[12][0-9]|3[01])[\\/\\-](0[1-9]|1[012])[\/\\-]\\d{4}$"
                },
                "gender": {
-                 "type": "string",
-                 "pattern": "^[MFU]$"
-               },
+               "type": "string",
+               "enum": ["Male", "Female", "Not Specified"]
+             },
              "phone_number": {
                "type": "string",
                "pattern": "^(07[\\d]{9})$"
              },
            "address":{
                  "type": "string",
-                 "pattern": "[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][A-Z-245 [CIKMOV]]{2}"
+                 "pattern": "(GIR 0AA|[A-PR-UWYZ]([0-9][0-9A-HJKPS-UW]?|[A-HK-Y][0-9][0-9ABEHMNPRV-Y]?) [0-9][ABD-HJLNP-UW-Z]{2})"
                }
            },
            "required": [
