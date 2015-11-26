@@ -1,6 +1,7 @@
 import os
 from jsonschema.validators import validator_for
 import json
+import datetime
 
 
 def validate_helper(json_to_validate):
@@ -28,5 +29,24 @@ def _create_title_validator():
     validator.check_schema(schema)
     return validator(schema)
 
+
+def valid_dob(result, date_string, index):
+    try:
+        if not result:
+            return False
+
+        borrower_date = datetime.datetime.strptime(
+            date_string, '%d/%m/%Y')
+
+        if borrower_date > datetime.datetime.now():
+            return False
+
+        return True
+    except:
+        return False
+
+
+def is_unique_list(list):
+    return len(dict.fromkeys(list, 0)) == len(list)
 
 _title_validator = _create_title_validator()

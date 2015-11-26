@@ -5,6 +5,9 @@ The Deed API is a JSON API which stores deed objects.
 This API holds the functionality for creating the migrating tables, getting data
 from the database and putting a new JSON deed onto a database that returns an endpoint to that deed.
 
+The API also holds the functionality to capture personal information provided and save it in a
+separate table to be used at a later date for matching.
+
 ### Contents
 
 - [Usage](#usage)
@@ -68,67 +71,30 @@ See, the following link for information on how to run the acceptance tests:-
 The Deed requires a title number and at least 1 borrower
 
 ### Deed
-
+The schema can be found below
 ```
-{
- "definitions": {
-     "title_number": {
-       "pattern": "^([A-Z]{0,3}[1-9][0-9]{0,5}|[0-9]{1,6}[ZT])$",
-       "type": "string"
-     },
-   "PrivateIndividualName": {
-           "type": "object",
-           "properties": {
-               "surname": {
-                   "type": "string"
-               },
-               "forename": {
-                   "type": "string"
-               },
-               "middle_name": {
-                   "type": "string"
-               }
-           },
-           "required": [
-               "surname","forename"
-           ],
-           "additionalProperties": false
-       }
-  },
-  "properties": {
-    "title_number": {
-      "$ref": "#/definitions/title_number"
-    },
-    "borrowers":{
-      "type": "array",
-      "minItems": 1,
-      "items": [
-        {
-          "type": "object",
-          "$ref": "#/definitions/PrivateIndividualName"
-        }
-      ]
-    }
-  },
-  "required": ["title_number", "borrowers"],
-  "type": "object",
-  "additionalProperties": false
-}
+https://github.com/LandRegistry/dm-deed-api/blob/develop/application/deed/schema.json
 ```
-
-e.g.
+Example payload:
 ```
 {
     "title_number": "DN100",
     "borrowers": [
         {
-            "forename": "fred",
-            "middle_name": "joe",
-            "surname": "bloggs"
+            "forename": "lisa",
+            "middle_name": "ann",
+            "surname": "bloggette",
+            "address": "example address with postcode, PL14 3JR",
+            "dob": "23/01/1986",
+            "phone_number": "07502154062"
         },
         {
-            "forename": "lisa",
-            "surname": "bloggette"
+            "forename": "frank",
+            "middle_name": "ann",
+            "surname": "bloggette",
+            "address": "Example address with postcode, PL14 3JR",
+            "dob": "23/01/1986",
+            "phone_number": "07502154062"
         }
     ]
 }

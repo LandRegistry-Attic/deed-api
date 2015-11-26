@@ -27,13 +27,32 @@ class TestRoutes(unittest.TestCase):
         test_token = test_deed.generate_token()
         self.assertTrue(len(test_token) == 6)
 
+    @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
-    def test_create(self, mock_Deed):
+    def test_create(self, mock_Borrower, mock_Deed):
+        payload = json.dumps(DeedHelper._invalid_phone_numbers)
+        response = self.app.post(self.DEED_ENDPOINT, data=payload,
+                                 headers={"Content-Type": "application/json"})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @mock.patch('application.borrower.model.Borrower.save')
+    @mock.patch('application.deed.model.Deed.save')
+    def test_create_with_invalid(self, mock_Borrower, mock_Deed):
         payload = json.dumps(DeedHelper._json_doc)
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
                                  headers={"Content-Type": "application/json"})
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    @mock.patch('application.borrower.model.Borrower.save')
+    @mock.patch('application.deed.model.Deed.save')
+    def test_create_with_invalid_blanks(self, mock_Borrower, mock_Deed):
+        payload = json.dumps(DeedHelper._invalid_blanks_on_required_fields)
+        response = self.app.post(self.DEED_ENDPOINT, data=payload,
+                                 headers={"Content-Type": "application/json"})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_title_format(self):
         payload = json.dumps(DeedHelper._invalid_title)

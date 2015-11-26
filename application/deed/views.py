@@ -1,10 +1,11 @@
 from application.deed.model import Deed
-from application.deed.utils import validate_helper
+from application.deed.utils import validate_helper, valid_dob, is_unique_list
 from flask import request, abort
 from flask import Blueprint
 from flask.ext.api import status
 import json
-
+from application.borrower.server import BorrowerService
+from underscore import _
 
 deed_bp = Blueprint('deed', __name__,
                     template_folder='templates',
@@ -27,6 +28,7 @@ def get_deed(deed_reference):
 def create():
     deed = Deed()
     deed_json = request.get_json()
+    borrowerService = BorrowerService()
 
     error_count, error_message = validate_helper(deed_json)
 
@@ -34,8 +36,44 @@ def create():
         return error_message, status.HTTP_400_BAD_REQUEST
     else:
         deed.deed = deed_json
+
+        json_doc = {
+            "title_number": deed_json['title_number'],
+            "borrowers": []
+            }
+
         deed.token = Deed.generate_token()
+
+        valid_dob_result = _(deed_json['borrowers']).chain()\
+            .map(lambda x, *a: x['dob'])\
+            .reduce(valid_dob, True).value()
+
+        if not valid_dob_result:
+            abort(status.HTTP_400_BAD_REQUEST)
+
+        phone_number_list = _(deed_json['borrowers']).chain()\
+            .map(lambda x, *a: x['phone_number'])\
+            .value()
+
+        if not is_unique_list(phone_number_list):
+            abort(status.HTTP_400_BAD_REQUEST)
+
         try:
+            for borrower in deed_json['borrowers']:
+                borrower_json = {
+                    "id": "",
+                    "forename": borrower['forename'],
+                    "surname": borrower['surname']
+                }
+
+                if 'middle_name' in borrower:
+                    borrower_json['middle_name'] = borrower['middle_name']
+
+                borrower_json["id"] = borrowerService.saveBorrower(borrower)
+                json_doc['borrowers'].append(borrower_json)
+
+            deed.deed = json_doc
+
             deed.save()
             url = request.base_url + str(deed.token)
             return url, status.HTTP_201_CREATED
