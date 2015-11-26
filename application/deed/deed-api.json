@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Deeds API",
+    "title": "Deed API",
     "description": "Land Registry Deed API",
     "version": "1.0.0"
   },
@@ -65,7 +65,7 @@
           }
         ],
         "tags": [
-          "Deeds"
+          "Deed"
         ],
         "responses": {
           "200": {
