@@ -1,5 +1,6 @@
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
+import json
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
@@ -13,4 +14,4 @@ app.register_blueprint(deed_bp, url_prefix='/deed')
 
 @app.route("/health")
 def check_status():
-    return "Status OK"
+    return json.dumps({"Status": "OK"})
