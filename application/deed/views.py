@@ -39,6 +39,7 @@ def create():
 
         json_doc = {
             "title_number": deed_json['title_number'],
+            "md_ref": deed_json['md_ref'],
             "borrowers": []
             }
 
