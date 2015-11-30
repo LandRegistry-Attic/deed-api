@@ -6,6 +6,7 @@ class DeedModelMock:
 class DeedHelper:
     _json_doc = {
         "title_number": "DN100",
+        "md_ref": "e-MD12344",
         "borrowers": [
             {
                 "forename": "lisa",
@@ -30,6 +31,7 @@ class DeedHelper:
 
     _invalid_title = {
         "title_number": "BBBB12313212BB",
+        "md_ref": "mortgageref",
         "borrowers": [
             {
                 "forename": "fred",
