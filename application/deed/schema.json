@@ -62,7 +62,7 @@
 
     }
   },
-  "required": ["title_number", "borrowers"],
+  "required": ["title_number", "borrowers", "md_ref"],
   "type": "object",
   "additionalProperties": false
 }
