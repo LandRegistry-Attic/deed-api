@@ -4,15 +4,6 @@ from application import db
 from flask.ext.script import Manager
 
 
-# def with_context(test):
-#     @wraps(test)
-#     def _wrapped_test(self):
-#         with self.app.app_context():
-#             with self.app.test_request_context():
-#                 test(self)
-#     return _wrapped_test
-
-
 def with_client(test):
     @wraps(test)
     def _wrapped_test(self):
