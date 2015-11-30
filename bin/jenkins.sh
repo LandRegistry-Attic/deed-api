@@ -9,9 +9,9 @@ virtualenv $env_dir
 #install requirements
 pip install -r requirements.txt
 
-./test.sh
+./unit_test.sh
 
-test_pass=$?
+unit_test_pass=$?
 
 ./run_linting.sh
 
@@ -20,6 +20,6 @@ python_linting=$?
 coverage xml
 coverage -rm
 
-e_code=$((test_pass + python_linting))
+e_code=$((unit_test_pass + python_linting))
 
 exit $e_code
