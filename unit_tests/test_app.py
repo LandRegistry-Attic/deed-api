@@ -1,6 +1,6 @@
 from application import app
 from application.deed.model import Deed
-from tests.helper import DeedHelper, DeedModelMock
+from unit_tests.helper import DeedHelper, DeedModelMock
 from flask.ext.api import status
 import unittest
 import json
