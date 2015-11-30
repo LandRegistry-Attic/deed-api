@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "disable_existing_loggers": false,
+  "formatters": {
+    "default": {
+      "format": "%(asctime)s level=[%(levelname)s] logger=[%(name)s] thread=[%(threadName)s] message=[%(message)s] exception=[%(exc_info)s]"
+    }
+  },
+  "filters": {
+    "exclude_auditing": {
+    }
+  },
+  "handlers": {
+    "log_file": {
+      "class": "logging.handlers.RotatingFileHandler",
+      "formatter": "default",
+      "maxBytes": 1000000,
+      "filename": "deed-api-dm.log",
+      "filters": ["exclude_auditing"]
+    },
+    "console": {
+      "class": "logging.StreamHandler",
+      "formatter": "default",
+      "stream": "ext://sys.stdout"
+    }
+  },
+  "loggers": {
+    "application": {
+    }
+  },
+  "root": {
+    "level": "INFO",
+    "handlers": [
+      "log_file",
+      "console"
+    ]
+  }
+}
