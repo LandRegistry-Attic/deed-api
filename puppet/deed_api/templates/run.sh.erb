@@ -9,7 +9,14 @@ pip3 install -r requirements.txt
 port="${<%=@module_name.upcase%>_GUNICORN_PORT:-8000}"
 host="${<%=@module_name.upcase%>_GUNICORN_HOST:-0.0.0.0}"
 
+integration_tests_pass="./integration_test.sh"
+
 upgrade_success="python3 manage.py db upgrade"
+
+if ! $integration_tests_pass; then
+  echo "Integration tests failed!!! Exiting"
+  exit 1
+fi
 
 if $upgrade_success; then
   gunicorn -b $host:$port --pid /var/run/<%=@module_name%>/<%=@module_name%>.pid "application:app"
