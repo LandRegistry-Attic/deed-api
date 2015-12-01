@@ -18,6 +18,7 @@ class TestDeedRoutes(unittest.TestCase):
         valid_deed = json.loads(
             '{'
             '   "title_number": "DN100",'
+            '   "md_ref": "e-MD123G",'
             '   "borrowers": ['
             '       {'
             '           "forename": "lisa",'
@@ -65,24 +66,26 @@ class TestDeedRoutes(unittest.TestCase):
     @with_client
     def test_deed_without_borrowers(self, client):
 
-        valid_deed = json.loads(
+        deed_without_borrowers = json.loads(
             '{'
             '   "title_number": "DN100",'
+            '   "md_ref": "e-MD123G",'
             '   "borrowers": ['
             '   ]'
             '}'
         )
 
         create_deed = client.post('/deed/',
-                                  data=json.dumps(valid_deed),
+                                  data=json.dumps(deed_without_borrowers),
                                   headers={'content-type': 'application/json'})
         self.assertEqual(create_deed.status_code, 400)
 
     @with_client
     def test_deed_without_title(self, client):
 
-        valid_deed = json.loads(
+        deed_without_title_number = json.loads(
             '{'
+            '   "md_ref": "e-MD123G",'
             '   "borrowers": ['
             '       {'
             '           "forename": "lisa",'
@@ -107,7 +110,7 @@ class TestDeedRoutes(unittest.TestCase):
         )
 
         create_deed = client.post('/deed/',
-                                  data=json.dumps(valid_deed),
+                                  data=json.dumps(deed_without_title_number),
                                   headers={'content-type': 'application/json'})
 
         self.assertEqual(create_deed.status_code, 400)
@@ -115,9 +118,10 @@ class TestDeedRoutes(unittest.TestCase):
     @with_client
     def test_deed_with_missing_borrower_properties(self, client):
 
-        valid_deed = json.loads(
+        deed_with_invalid_borrower = json.loads(
             '{'
             '   "title_number": "DN100",'
+            '   "md_ref": "e-MD123G",'
             '   "borrowers": ['
             '       {'
             '           "forename": "lisa"'
@@ -127,7 +131,42 @@ class TestDeedRoutes(unittest.TestCase):
         )
 
         create_deed = client.post('/deed/',
-                                  data=json.dumps(valid_deed),
+                                  data=json.dumps(deed_with_invalid_borrower),
+                                  headers={'content-type': 'application/json'})
+
+        self.assertEqual(create_deed.status_code, 400)
+
+    @with_client
+    def test_deed_without_md_ref(self, client):
+
+        deed_without_md_ref = json.loads(
+            '{'
+            '   "title_number": "DN100",'
+            '   "borrowers": ['
+            '       {'
+            '           "forename": "lisa",'
+            '           "middle_name": "ann",'
+            '           "surname": "bloggette",'
+            '           "gender": "Male",'
+            '           "address": "test address with postcode, PL14 3JR",'
+            '           "dob": "23/01/1986",'
+            '           "phone_number": "07502154062"'
+            '       },'
+            '       {'
+            '           "forename": "frank",'
+            '           "middle_name": "ann",'
+            '           "surname": "bloggette",'
+            '           "gender": "Female",'
+            '           "address": "Test Address With Postcode, PL14 3JR",'
+            '           "dob": "23/01/1986",'
+            '           "phone_number": "07502154061"'
+            '       }'
+            '   ]'
+            '}'
+        )
+
+        create_deed = client.post('/deed/',
+                                  data=json.dumps(deed_without_md_ref),
                                   headers={'content-type': 'application/json'})
 
         self.assertEqual(create_deed.status_code, 400)
