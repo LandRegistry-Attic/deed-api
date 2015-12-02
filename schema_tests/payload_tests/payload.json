@@ -332,6 +332,246 @@
 
          ]
          }, "description": "first borrower has space in surname", "expected": 1
+    },
+    { "payload": {
+         "title_number": "DT567568",
+          "md_ref":"e-MD12345",
+         "borrowers": [
+            {
+                "forename": "Amanda",
+                "middle_name": "Elizabeth",
+                "surname": "Smythe",
+                "gender": "Female",
+                "address": "1 The High Street Highley CR0 9YH",
+                "dob": "21/09/1976",
+                "phone_number": "07507154077"
+            },
+            {
+                "forename": "Paul",
+                "middle_name": "",
+                "surname": "Smy the",
+                "gender": "Not Specified",
+                "address": "1 The High Street Highley PL6 7TG",
+                "dob": "21/08/2015",
+                "phone_number": "07507154057"
+            },
+            {
+                "forename": "Paul",
+                "middle_name": "",
+                "surname": "Smyt he",
+                "gender": "Male",
+                "address": "1 The High Street Highley PL6 7TG",
+                "dob": "21/08/2015",
+                "phone_number": "07507154078"
+            }
+
+         ]
+         }, "description": "second and third borrowers has space in surname", "expected": 2
+    },
+    { "payload": {
+         "title_number": "DT567568",
+          "md_ref":"e-MD12345",
+         "borrowers": [
+            {
+                "forename": "Amanda",
+                "middle_name": "Elizabeth",
+                "surname": "Smythe",
+                "gender": "Female",
+                "address": "1 The High Street Highley CR0 9YH",
+                "dob": "21/09/1976",
+                "phone_number": "07507154077"
+            },
+            {
+                "forename": "Paul",
+                "middle_name": "",
+                "surname": "Smythe",
+                "gender": "Not Specified",
+                "address": "1 The High Street Highley PL6 7TG",
+                "dob": "21/08/2015",
+                "phone_number": "07507154057"
+            },
+            {
+                "forename": "Paul",
+                "middle_name": "",
+                "surname": "Smythe",
+                "gender": "Male",
+                "address": "1 The High Street Highley PL6 7TG",
+                "dob": "21/08/2015",
+                "phone_number": "07507154078"
+            }
+
+         ]
+         }, "description": "optional middle_name field can be missing", "expected": 0
+    },
+    { "payload": {
+         "title_number": "DT567568",
+          "md_ref":"e-MD12345",
+         "borrowers": [
+            {
+                "forename": "Amanda",
+                "middle_name": "Elizabeth",
+                "surname": "Smythe",
+                "gender": "Female",
+                "address": "1 The High Street Highley CR0 9YH",
+                "dob": "21/09/1976",
+                "phone_number": "07507154077"
+            },
+            {
+                "forename": "Paul",
+                "middle_name": "",
+                "gender": "Not Specified",
+                "address": "1 The High Street Highley PL6 7TG",
+                "dob": "21/08/2015",
+                "phone_number": "07507154057"
+            },
+            {
+                "forename": "Paul",
+                "middle_name": "",
+                "gender": "Male",
+                "address": "1 The High Street Highley PL6 7TG",
+                "dob": "21/08/2015",
+                "phone_number": "07507154078"
+            }
+
+         ]
+         }, "description": "required surname cannot be missing", "expected": 2
+    },
+    { "payload": {
+         "title_number": "DT567568",
+          "md_ref":"e-MD12345",
+         "borrowers": [
+            {
+                "forename": "Amanda",
+                "middle_name": "Elizabeth",
+                "surname": "Smythe",
+                "gender": "Female",
+                "address": "1 The High Street Highley CR0 9YH",
+                "dob": "21/09/1976",
+                "phone_number": "07507154077"
+            },
+            {
+                "forename": "Paul",
+                "middle_name": "",
+                "gender": "Not Specified",
+                "address": "1 The High Street Highley PL6 7TG",
+                "dob": "21/08/2015",
+                "phone_number": "07507154057"
+            },
+            {
+                "forename": "Paul",
+                "middle_name": "",
+                "gender": "Male",
+                "surname":"",
+                "address": "1 The High Street Highley PL6 7TG",
+                "dob": "21/08/2015",
+                "phone_number": "07507154078"
+            }
+
+         ]
+         }, "description": "required surname cannot be missing or blank", "expected": 2
+    },
+    { "payload": {
+          "md_ref":"e-MD12345",
+         "borrowers": [
+            {
+                "forename": "Amanda",
+                "middle_name": "Elizabeth",
+                "surname": "Smythe",
+                "gender": "Female",
+                "address": "1 The High Street Highley CR0 9YH",
+                "dob": "21/09/1976",
+                "phone_number": "07507154077"
+            },
+            {
+                "forename": "Paul",
+                "middle_name": "",
+                "surname": "Smythe",
+                "gender": "Not Specified",
+                "address": "1 The High Street Highley PL6 7TG",
+                "dob": "21/08/2015",
+                "phone_number": "07507154057"
+            },
+            {
+                "forename": "Paul",
+                "middle_name": "",
+                "surname": "Smythe",
+                "gender": "Male",
+                "address": "1 The High Street Highley PL6 7TG",
+                "dob": "21/08/2015",
+                "phone_number": "07507154078"
+            }
+
+         ]
+         }, "description": "title_number must be present", "expected": 1
+    },
+    { "payload": {
+          "md_ref":"e-MD12345",
+          "title_number":"DN12345",
+         "borrowers": [
+            {
+                "forename": "Amanda",
+                "middle_name": "Elizabeth",
+                "surname": "Smythe",
+                "gender": "Female",
+                "address": "1 The High Street Highley CR0 9YH",
+                "dob": "21/09/1976",
+                "phone_number": "07507154077"
+            }
+
+         ]
+         }, "description": "just one borrower", "expected": 0
+    },
+    { "payload": {
+          "title_number":"DN12345",
+         "borrowers": [
+            {
+                "forename": "Amanda",
+                "middle_name": "Elizabeth",
+                "surname": "Smythe",
+                "gender": "Female",
+                "address": "1 The High Street Highley CR0 9YH",
+                "dob": "21/09/1976",
+                "phone_number": "07507154077"
+            }
+
+         ]
+         }, "description": "mdref is missing", "expected": 1
+    },
+    { "payload": {
+          "md_ref":"e-MD12345",
+          "title_number":"DN12345",
+         "borrowers": [
+            {
+                "forename": "Amanda",
+                "middle_name": "Elizabeth",
+                "surname": "Smythe",
+                "gender": "Female",
+                "address": "1 The High Street Highley CR0 9YH",
+                "dob": "21/09/1976",
+                "phone_number": "07507154077",
+                "extra":"some extra data"
+            }
+
+         ]
+         }, "description": "extra property data is not allowed", "expected": 1
+    },
+    { "payload": {
+          "md_ref":"e-MD12345",
+          "title_number":"DN12345",
+          "extra2":"some extra property data",
+          "borrowers": [
+            {
+                "forename": "Amanda",
+                "middle_name": "Elizabeth",
+                "surname": "Smythe",
+                "gender": "Female",
+                "address": "1 The High Street Highley CR0 9YH",
+                "dob": "21/09/1976",
+                "phone_number": "07507154077"
+            }
+
+         ]
+         }, "description": "extra property data is not allowed", "expected": 1
     }
   ]
 }
