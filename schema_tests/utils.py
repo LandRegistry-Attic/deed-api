@@ -17,7 +17,7 @@ def down_one_level(schema, key, context):
 # schema is a json obj/dict
 # path - contains the string path to a dict attribute
 # with '/' separators e.g. /root/sub_ele/child1/attr_name
-def get_from_schema(schema, path):
+def get_obj_by_path(schema, path):
     return _.reduce(path.strip("/").split("/"), down_one_level, schema)
 
 
