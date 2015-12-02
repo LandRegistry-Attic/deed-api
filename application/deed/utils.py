@@ -79,4 +79,12 @@ def get_obj_by_path(schema, path):
     return _.reduce(path.strip("/").split("/"), down_one_level, schema)
 
 
+def load_json_file(file_path):
+    with open(file_path, 'rt') as file:
+        json_data = json.load(file)
+
+    return json_data
+
+
+
 _title_validator = _create_title_validator()

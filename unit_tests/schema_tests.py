@@ -1,21 +1,27 @@
 from underscore import _
 from application.deed.utils import validate_helper,\
-    call_once_only, get_obj_by_path
-from schema_tests.utils import load_json_file, is_valid_regex
+    call_once_only, get_obj_by_path, load_json_file
 import os
 import sys
-
+import re
 
 @call_once_only
 def get_test_data():
-    return load_json_file(os.getcwd() +
-                          "/schema_tests/payload_tests/payload.json")
+    return load_json_file(os.getcwd() + "/unit_tests/schema_tests.json")
 
 
 @call_once_only
 def get_schema():
     return load_json_file(os.getcwd() +
                           get_obj_by_path(get_test_data(), "schema"))
+
+
+def is_valid_regex(value, *context):
+    matches = re.match(value["pattern"], value["payload"]) is not None
+    print("Pass: %s, Checking: '%s' matches: '%s' exp: %s got: %s desc: %s"
+          % (matches == value["expected"], value["payload"], value["pattern"],
+             value["expected"], matches, value["description"]))
+    return matches == value["expected"]
 
 
 def verify_pattern(element, key, obj, idx):
@@ -49,7 +55,7 @@ def verify_against_schema(element, key, obj):
     return error_count == element["expected"]
 
 
-def run_checks():
+def run_schema_checks():
 
     print("\nStarting schema tests")
     print("---------------------\n")
@@ -67,5 +73,5 @@ def run_checks():
     return pattern_results and payload_results
 
 if __name__ == "__main__":
-    res = 0 if run_checks() else 1
+    res = 0 if run_schema_checks() else 1
     sys.exit(res)

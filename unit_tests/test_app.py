@@ -2,6 +2,7 @@ from application import app
 from application.deed.model import Deed
 from unit_tests.helper import DeedHelper, DeedModelMock
 from flask.ext.api import status
+from unit_tests.schema_tests import run_schema_checks
 import unittest
 import json
 import mock
@@ -77,3 +78,7 @@ class TestRoutes(unittest.TestCase):
 
         response = self.app.get(self.DEED_ENDPOINT + 'CD3456')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_schema_checks(self):
+
+        self.assertTrue(run_schema_checks())
