@@ -86,5 +86,4 @@ def load_json_file(file_path):
     return json_data
 
 
-
 _title_validator = _create_title_validator()

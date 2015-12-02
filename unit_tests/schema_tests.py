@@ -5,6 +5,7 @@ import os
 import sys
 import re
 
+
 @call_once_only
 def get_test_data():
     return load_json_file(os.getcwd() + "/unit_tests/schema_tests.json")
