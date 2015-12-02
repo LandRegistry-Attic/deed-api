@@ -9,12 +9,14 @@ def down_one_level(schema, key, context):
         res = schema[key]
         return res
     except:
-        print("ACCESS ERROR:\nCurrent location in schema: %s\n with key: %s \ncaused exception %s." % (schema, key, sys.exc_info()[0]))
+        print("ACCESS ERROR:\nlocation in schema: %s\n with key: %s \n%s."
+              % (schema, key, sys.exc_info()[0]))
         raise
 
 
 # schema is a json obj/dict
-# path - contains the string path to a dict attribute with '/' separators e.g. /root/sub_ele/child1/attr_name
+# path - contains the string path to a dict attribute
+# with '/' separators e.g. /root/sub_ele/child1/attr_name
 def get_from_schema(schema, path):
     return _.reduce(path.strip("/").split("/"), down_one_level, schema)
 
@@ -28,8 +30,7 @@ def load_json_file(file_name):
 
 def is_valid_regex(value, *context):
     matches = re.match(value["pattern"], value["payload"]) is not None
-    print("Pass: %s, Checking: '%s' matches: '%s' expected: %s got: %s description: %s" %
-                                                                    (matches == value["expected"],
-                                                                      value["payload"],value["pattern"],
-                                                                    value["expected"], matches, value["description"]))
+    print("Pass: %s, Checking: '%s' matches: '%s' exp: %s got: %s desc: %s"
+          % (matches == value["expected"], value["payload"], value["pattern"],
+             value["expected"], matches, value["description"]))
     return matches == value["expected"]
