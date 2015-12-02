@@ -49,4 +49,14 @@ def valid_dob(result, date_string, index):
 def is_unique_list(list):
     return len(dict.fromkeys(list, 0)) == len(list)
 
+
+def call_once_only(func):
+    def decorated(*args, **kwargs):
+        try:
+            return decorated._once_result
+        except AttributeError:
+            decorated._once_result = func(*args, **kwargs)
+            return decorated._once_result
+    return decorated
+
 _title_validator = _create_title_validator()

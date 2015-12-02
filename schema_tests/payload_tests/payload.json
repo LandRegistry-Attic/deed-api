@@ -1,0 +1,339 @@
+{
+  "schema": "/application/deed/schema.json",
+  "description": "validation of deed application",
+  "test_patterns": {
+    "surname": {
+      "pattern_path": "/definitions/PrivateIndividualName/properties/surname",
+      "payload_tests": [
+        {
+          "payload": "",
+          "expected": false,
+          "description": "must not be blank"
+        },
+        {
+          "payload": "bloggs",
+          "expected": true,
+          "description": "valid name"
+        },
+        {
+          "payload": "surname with",
+          "expected": false,
+          "description": "names do not have spaces in"
+        },
+        {
+          "payload": "names_can_be_reaaly_reaaly_very__very_extremely_long",
+          "expected": true,
+          "description": "names can be long"
+        }
+      ]},
+    "forename":{
+      "pattern_path": "/definitions/PrivateIndividualName/properties/forename",
+      "payload_tests": [
+        {
+          "payload": "",
+          "expected": false,
+          "description": "must not be blank"
+        },
+        {
+          "payload": "joe",
+          "expected": true,
+          "description": "valid name"
+        },
+        {
+          "payload": "first name",
+          "expected": false,
+          "description": "names do not have spaces in"
+        },
+        {
+          "payload": "names_can_be_reaaly_reaaly_very__very_extremely_long",
+          "expected": true,
+          "description": "names can be long"
+        }
+      ]
+    },
+    "dob":{
+      "pattern_path": "/definitions/PrivateIndividualName/properties/dob",
+      "payload_tests": [
+        {
+          "payload": "",
+          "expected": false,
+          "description": "must not be blank"
+        },
+        {
+          "payload": "01/02/1975",
+          "expected": true,
+          "description": "valid date"
+        },
+        {
+          "payload": "1/2/1975",
+          "expected": false,
+          "description": "invalid date"
+        }
+      ]
+    },
+    "gender":{
+      "pattern_path": "/definitions/PrivateIndividualName/properties/gender",
+      "payload_tests": [
+        {
+          "payload": "Male",
+          "expected": true,
+          "description": "check 'Male' is ok"
+        },
+        {
+          "payload": "Female",
+          "expected": true,
+          "description": "check 'Female' is ok"
+        },
+        {
+          "payload": "Not Specified",
+          "expected": true,
+          "description": "check 'Not Specified' is ok"
+        },
+        {
+          "payload": "something else",
+          "expected": false,
+          "description": "other values are not OK"
+        },
+        {
+          "payload": "",
+          "expected": false,
+          "description": "blank is not ok"
+        }
+      ]
+    },
+    "phone_number":{
+      "pattern_path": "/definitions/PrivateIndividualName/properties/phone_number",
+      "payload_tests": [
+        {
+          "payload": "",
+          "expected": false,
+          "description": "must not be blank"
+        },
+        {
+          "payload": "07234243401",
+          "expected": true,
+          "description": "valid phone numbers start with 07"
+        },
+        {
+          "payload": "082342323401",
+          "expected": false,
+          "description": "does not start with 07 (but right length)"
+        },
+        {
+          "payload": "072342334",
+          "expected": false,
+          "description": "starts with 07 but too short"
+        },
+        {
+          "payload": "082342323143",
+          "expected": false,
+          "description": "starts with 07 but too long"
+        },
+        {
+          "payload": "0723 4243401",
+          "expected": false,
+          "description": "starts with 07 but has a space"
+        },
+        {
+          "payload": "0723 424340",
+          "expected": false,
+          "description": "starts with 07 but has a space"
+        }
+      ]
+    },
+    "address":{
+      "pattern_path": "/definitions/PrivateIndividualName/properties/address",
+      "payload_tests": [
+        {
+          "payload": "",
+          "expected": false,
+          "description": "must not be blank"
+        },
+        {
+          "payload": "PL21 0AQ",
+          "expected": true,
+          "description": "valid post code"
+        },
+        {
+          "payload": "PL21 0CC",
+          "expected": false,
+          "description": "invalid end characters"
+        },
+        {
+          "payload": "PL 0AQ",
+          "expected": false,
+          "description": "invalid start of code"
+        },
+        {
+          "payload": "PL21 0KK",
+          "expected": false,
+          "description": "invalid end characters"
+        },
+        {
+          "payload": "PL210AQ",
+          "expected": false,
+          "description": "must have a space"
+        },
+        {
+          "payload": "PL21 ABC",
+          "expected": false,
+          "description": "Second part must start with a number"
+        }
+      ]
+    },
+    "md_ref":{
+      "pattern_path": "/definitions/md_ref",
+      "payload_tests": [
+        {
+          "payload": "",
+          "expected": false,
+          "description": "must not be blank"
+        },
+        {
+          "payload": "e-MD12345",
+          "expected": true,
+          "description": "valid md ref"
+        },
+        {
+          "payload": "x-XX12345",
+          "expected": false,
+          "description": "must start with e-MD"
+        },
+        {
+          "payload": "e-MD1234",
+          "expected": false,
+          "description": "must have 5 digits"
+        },
+        {
+          "payload": "e-MD12 45",
+          "expected": false,
+          "description": "cannot have spaces"
+        }
+      ]
+    },
+    "title_number":{
+      "pattern_path": "/definitions/title_number",
+      "payload_tests": [
+        {
+          "payload": "",
+          "expected": false,
+          "description": "must not be blank"
+        },
+        {
+          "payload": "DN1234",
+          "expected": true,
+          "description": "valid title number"
+        },
+        {
+          "payload": "12345",
+          "expected": true,
+          "description": "option start characters must start with a 1"
+        },
+        {
+          "payload": "022222",
+          "expected": false,
+          "description": "must start with a 1-9 after initial chars"
+        },
+        {
+          "payload": "DN02222",
+          "expected": false,
+          "description": "must start with a 1-9 after initial chars"
+        },
+        {
+          "payload": "DN02222",
+          "expected": false,
+          "description": "must start with a 1-9 after initial chars"
+        },
+        {
+          "payload": "1234Z",
+          "expected": true,
+          "description": "can end with Z"
+        },
+        {
+          "payload": "1234T",
+          "expected": true,
+          "description": "can end with t"
+        },
+        {
+          "payload": "DN1234T",
+          "expected": false,
+          "description": "can end with t only when no starting alphas"
+        }
+      ]
+    }
+  },
+  "test_payloads": [
+    { "payload": {
+         "title_number": "DT567568",
+          "md_ref":"e-MD12345",
+         "borrowers": [
+            {
+                "forename": "Amanda",
+                "middle_name": "Elizabeth",
+                "surname": "Smythe",
+                "gender": "Female",
+                "address": "1 The High Street Highley CR0 9YH",
+                "dob": "21/09/1976",
+                "phone_number": "07507154077"
+            },
+            {
+                "forename": "Paul",
+                "middle_name": "",
+                "surname": "Smythe",
+                "gender": "Not Specified",
+                "address": "1 The High Street Highley PL6 7TG",
+                "dob": "21/08/2015",
+                "phone_number": "07507154057"
+            },
+            {
+                "forename": "Paul",
+                "middle_name": "",
+                "surname": "Smythe",
+                "gender": "Male",
+                "address": "1 The High Street Highley PL6 7TG",
+                "dob": "21/08/2015",
+                "phone_number": "07507154078"
+            }
+
+         ]
+         }, "description": "valid payload with multiple borrowers", "expected": 0
+    },
+    { "payload": {
+         "title_number": "DT567568",
+          "md_ref":"e-MD12345",
+         "borrowers": [
+            {
+                "forename": "Amanda",
+                "middle_name": "Elizabeth",
+                "surname": "Smy the",
+                "gender": "Female",
+                "address": "1 The High Street Highley CR0 9YH",
+                "dob": "21/09/1976",
+                "phone_number": "07507154077"
+            },
+            {
+                "forename": "Paul",
+                "middle_name": "",
+                "surname": "Smythe",
+                "gender": "Not Specified",
+                "address": "1 The High Street Highley PL6 7TG",
+                "dob": "21/08/2015",
+                "phone_number": "07507154057"
+            },
+            {
+                "forename": "Paul",
+                "middle_name": "",
+                "surname": "Smythe",
+                "gender": "Male",
+                "address": "1 The High Street Highley PL6 7TG",
+                "dob": "21/08/2015",
+                "phone_number": "07507154078"
+            }
+
+         ]
+         }, "description": "first borrower has space in surname", "expected": 1
+    }
+  ]
+}
+
+
