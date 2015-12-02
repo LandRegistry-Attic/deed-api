@@ -1,19 +1,20 @@
 from underscore import _
-from schema_tests.utils import load_json_file, get_obj_by_path, is_valid_regex
-from application.deed.utils import validate_helper, call_once_only
+from application.deed.utils import validate_helper,\
+    call_once_only, get_obj_by_path
+from schema_tests.utils import load_json_file, is_valid_regex
 import os
 import sys
 
 
 @call_once_only
 def get_test_data():
-    return load_json_file(os.path.dirname(os.path.realpath(__file__)) +
+    return load_json_file(os.getcwd() +
                           "/schema_tests/payload_tests/payload.json")
 
 
 @call_once_only
 def get_schema():
-    return load_json_file(os.path.dirname(os.path.realpath(__file__)) +
+    return load_json_file(os.getcwd() +
                           get_obj_by_path(get_test_data(), "schema"))
 
 
@@ -65,6 +66,6 @@ def run_checks():
 
     return pattern_results and payload_results
 
-res = 0 if run_checks() else 1
-
-sys.exit(res)
+if __name__ == "__main__":
+    res = 0 if run_checks() else 1
+    sys.exit(res)

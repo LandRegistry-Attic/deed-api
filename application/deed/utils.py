@@ -1,7 +1,9 @@
-import os
 from jsonschema.validators import validator_for
+from underscore import _
+import os
 import json
 import datetime
+import sys
 
 
 def validate_helper(json_to_validate):
@@ -58,5 +60,23 @@ def call_once_only(func):
             decorated._once_result = func(*args, **kwargs)
             return decorated._once_result
     return decorated
+
+
+# schema is a json obj/dict
+# path - contains the string path to a dict attribute
+# with '/' separators e.g. /root/sub_ele/child1/attr_name
+def get_obj_by_path(schema, path):
+
+    def down_one_level(schema, key, context):
+        try:
+            res = schema[key]
+            return res
+        except:
+            print("ACCESS ERROR:\nlocation in schema: %s\n with key: %s \n%s."
+                  % (schema, key, sys.exc_info()[0]))
+            raise
+
+    return _.reduce(path.strip("/").split("/"), down_one_level, schema)
+
 
 _title_validator = _create_title_validator()
