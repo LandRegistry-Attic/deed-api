@@ -137,7 +137,7 @@
         {
           "payload": "0723 424340",
           "expected": false,
-          "description": "starts with 07 but has a space"
+          "description": "starts with 07 has a space and is a digit short"
         }
       ]
     },
