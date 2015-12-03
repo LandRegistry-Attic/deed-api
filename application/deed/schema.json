@@ -13,7 +13,7 @@
       "properties": {
         "surname": {
           "type": "string",
-          "pattern": "^[A-z]+$"
+          "pattern": "^[A-z ]+$"
         },
         "forename": {
           "type": "string",
