@@ -6,6 +6,16 @@ import datetime
 import sys
 
 
+def call_once_only(func):
+    def decorated(*args, **kwargs):
+        try:
+            return decorated._once_result
+        except AttributeError:
+            decorated._once_result = func(*args, **kwargs)
+            return decorated._once_result
+    return decorated
+
+
 def validate_helper(json_to_validate):
     error_message = ""
     error_list = sorted(_title_validator.iter_errors(json_to_validate),
@@ -17,16 +27,35 @@ def validate_helper(json_to_validate):
     return len(error_list), error_message
 
 
-def _load_json_schema():
-    script_path = os.path.dirname(os.path.realpath(__file__))
-    json_path = os.path.join(script_path, 'schema.json')
-    schema_file = open(json_path)
-    schema_contents = schema_file.read()
-    return json.loads(schema_contents)
+@call_once_only
+def get_swagger_file():
+    return load_json_file(os.getcwd() +
+                          "/application/deed/deed-api.json")
+
+
+def load_json_schema():
+    swagger = get_swagger_file()
+
+    definitions = swagger["definitions"]
+    deed_application_definition = definitions["Deed_Application"]
+
+    deed_application = {
+        "definitions": definitions,
+        "properties": deed_application_definition["properties"],
+        "required": [
+            "title_number",
+            "borrowers",
+            "md_ref"
+        ],
+        "type": "object",
+        "additionalProperties": False
+    }
+
+    return deed_application
 
 
 def _create_title_validator():
-    schema = _load_json_schema()
+    schema = load_json_schema()
     validator = validator_for(schema)
     validator.check_schema(schema)
     return validator(schema)
@@ -50,16 +79,6 @@ def valid_dob(result, date_string, index):
 
 def is_unique_list(list):
     return len(dict.fromkeys(list, 0)) == len(list)
-
-
-def call_once_only(func):
-    def decorated(*args, **kwargs):
-        try:
-            return decorated._once_result
-        except AttributeError:
-            decorated._once_result = func(*args, **kwargs)
-            return decorated._once_result
-    return decorated
 
 
 # schema is a json obj/dict

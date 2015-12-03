@@ -1,6 +1,6 @@
 from underscore import _
 from application.deed.utils import validate_helper,\
-    call_once_only, get_obj_by_path, load_json_file
+    call_once_only, get_obj_by_path, load_json_file, load_json_schema
 import os
 import sys
 import re
@@ -13,8 +13,7 @@ def get_test_data():
 
 @call_once_only
 def get_schema():
-    return load_json_file(os.getcwd() +
-                          get_obj_by_path(get_test_data(), "schema"))
+    return load_json_schema()
 
 
 def is_valid_regex(value, *context):
