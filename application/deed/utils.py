@@ -42,11 +42,7 @@ def load_json_schema():
     deed_application = {
         "definitions": definitions,
         "properties": deed_application_definition["properties"],
-        "required": [
-            "title_number",
-            "borrowers",
-            "md_ref"
-        ],
+        "required": deed_application_definition["required"],
         "type": "object",
         "additionalProperties": False
     }
