@@ -87,7 +87,7 @@ Example payload:
             "surname": "bloggette",
             "address": "example address with postcode, PL14 3JR",
             "dob": "23/01/1986",
-            "phone_number": "07502154062"
+            "phone_number": "07502154075"
         },
         {
             "forename": "frank",
@@ -95,7 +95,7 @@ Example payload:
             "surname": "bloggette",
             "address": "Example address with postcode, PL14 3JR",
             "dob": "23/01/1986",
-            "phone_number": "07502154062"
+            "phone_number": "07502154076"
         }
     ]
 }
