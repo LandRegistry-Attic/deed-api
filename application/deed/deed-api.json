@@ -171,7 +171,7 @@
             "required": [
                 "title_number",
                 "borrowers",
-                "MD_ref"
+                "md_ref"
             ],
             "properties": {
                 "title_number": {
@@ -186,6 +186,18 @@
                 },
                 "md_ref": {
                     "$ref": "#/definitions/md_ref"
+                }
+            }
+        },
+        "Error": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "message": {
+                    "type": "string"
                 }
             }
         }
