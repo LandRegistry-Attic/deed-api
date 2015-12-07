@@ -7,11 +7,12 @@ class deed_api (
     $subdomain = 'deedapi',
     $domain = undef,
     $owner = 'vagrant',
-    $group = 'vagrant'
+    $group = 'vagrant',
+    $app_dir = "/opt/${module_name}",
 ) {
   require ::standard_env
 
-  vcsrepo { "/opt/${module_name}":
+  vcsrepo { "${app_dir}":
     ensure   => latest,
     provider => git,
     source   => $source,
@@ -21,7 +22,7 @@ class deed_api (
     notify   => Service[$module_name],
   }
 
-  file { "/opt/${module_name}/bin/run.sh":
+  file { "${app_dir}/bin/run.sh":
     ensure  => 'file',
     mode    => '0755',
     owner   => $owner,
@@ -43,18 +44,33 @@ class deed_api (
     owner   => $owner,
     group   => $group,
     content => template("${module_name}/service.systemd.erb"),
-    notify  => [Exec['systemctl-daemon-reload'], Service[$module_name]],
+    notify  => [
+      Exec['systemctl-daemon-reload'],
+      Service[$module_name]
+    ],
   }
+
+  exec {"${app_dir}/bin/check_integration_tests.sh":
+    cwd       => "${app_dir}",
+    user      => $owner,
+    logoutput => true,
+    require   => [
+      Vcsrepo["${app_dir}"],
+      Standard_env::Db::Postgres[$module_name],
+    ],
+  }
+
   service { $module_name:
     ensure   => 'running',
     enable   => true,
     provider => 'systemd',
     require  => [
-      Vcsrepo["/opt/${module_name}"],
+      Vcsrepo["${app_dir}"],
       File["/opt/${module_name}/bin/run.sh"],
       File["/etc/systemd/system/${module_name}.service"],
       File["/var/run/${module_name}"],
       Standard_env::Db::Postgres[$module_name],
+      Exec["${app_dir}/bin/check_integration_tests.sh"],
     ],
   }
 
