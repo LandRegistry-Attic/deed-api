@@ -25,5 +25,5 @@ class Borrower(db.Model):
 
         db.session.delete(borrower)
         db.session.commit()
-        print(str(borrower))
+
         return borrower
