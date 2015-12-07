@@ -83,7 +83,7 @@ class TestRoutes(unittest.TestCase):
     def test_delete_borrower(self, mock_borrower):
 
         mock_borrower.return_value = DeedHelper._valid_borrowers
-        response = self.app.delete(self.DEED_ENDPOINT+"/borrowers/delete/1")
+        response = self.app.delete(self.DEED_ENDPOINT+"borrowers/delete/1")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
