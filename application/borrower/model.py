@@ -16,3 +16,14 @@ class Borrower(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
+
+    def delete(self, id_):
+        borrower = Borrower.query.filter_by(id=id_).first()
+
+        if borrower is None:
+            return borrower
+
+        db.session.delete(borrower)
+        db.session.commit()
+        print(str(borrower))
+        return borrower
