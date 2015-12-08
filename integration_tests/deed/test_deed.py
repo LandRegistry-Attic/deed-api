@@ -189,3 +189,10 @@ class TestDeedRoutes(unittest.TestCase):
         response = client.delete('/deed/borrowers/delete/'+str(id))
 
         self.assertEqual(response.status_code, 200)
+
+    @with_client
+    def test_delete_borrower_none_exists(self, client):
+
+        response = client.delete('/deed/borrowers/delete/999999999')
+
+        self.assertEqual(response.status_code, 404)
