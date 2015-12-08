@@ -22,6 +22,7 @@ separate table to be used at a later date for matching.
 get     /health                     # test endpoint for the application
 get     /deed/<id_>                 # get a deed with an id in the URL
 post    /deed/                       # Create a deed by posting a json object reflecting the schema
+delete  /borrowers/delete/<borrower_id>' # delete a borrower from the borrower table
 
 ```
 > [schema](#current-schema) for post
