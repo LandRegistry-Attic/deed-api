@@ -2,6 +2,7 @@ from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 import json
 
+
 app = Flask(__name__)
 db = SQLAlchemy(app)
 

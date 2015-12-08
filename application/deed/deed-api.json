@@ -95,6 +95,7 @@
         },
         "PrivateIndividualName": {
             "type": "object",
+            "additionalProperties": false,
             "required": [
                 "surname",
                 "forename",
@@ -108,20 +109,23 @@
                     "pattern": "^[A-z]+$"
                 },
                 "middle_name": {
-                    "type": "string",
-                    "pattern": "^[A-z]+$"
+                    "type": "string"
                 },
                 "surname": {
                     "type": "string",
-                    "pattern": "^[A-z]+$"
+                    "pattern": "^[A-z ]+$"
                 },
                 "dob": {
                     "type": "string",
                     "pattern": "^(0[1-9]|[12][0-9]|3[01])[\\/\\-](0[1-9]|1[012])[/\\-]\\d{4}$"
                 },
                 "gender": {
-                    "type": "string",
-                    "pattern": "^[MFU]{1}"
+                      "type": "string",
+                      "enum": [
+                        "Male",
+                        "Female",
+                        "Not Specified"
+                      ]
                 },
                 "phone_number": {
                     "type": "string",
@@ -136,7 +140,9 @@
         "Borrowers": {
             "type": "array",
             "minItems": 1,
-            "$ref": "#/definitions/PrivateIndividualName"
+             "items": {
+                 "$ref": "#/definitions/PrivateIndividualName"
+             }
         },
         "Operative_Deed": {
             "type": "object",
@@ -165,47 +171,33 @@
             "required": [
                 "title_number",
                 "borrowers",
-                "MD_ref"
+                "md_ref"
             ],
             "properties": {
                 "title_number": {
                     "$ref": "#/definitions/title_number"
                 },
                 "borrowers": {
-                    "$ref": "#/definitions/Borrowers"
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "$ref": "#/definitions/PrivateIndividualName"
+                  }
                 },
                 "md_ref": {
                     "$ref": "#/definitions/md_ref"
                 }
             }
         },
-        "properties": {
-            "title_number": {
-                "$ref": "#/definitions/title_number"
-            },
-            "md_ref": {
-                "$ref": "#/definitions/md_ref"
-            },
-            "borrowers": {
-                "type": "array",
-                "minItems": 1,
-                "items": [
-                    {
-                        "type": "object",
-                        "$ref": "#/definitions/PrivateIndividualName"
-                    }
-                ]
-            },
-            "Error": {
-                "type": "object",
-                "properties": {
-                    "code": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "message": {
-                        "type": "string"
-                    }
+        "Error": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "message": {
+                    "type": "string"
                 }
             }
         }
