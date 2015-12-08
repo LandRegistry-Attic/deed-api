@@ -177,16 +177,15 @@ class TestDeedRoutes(unittest.TestCase):
 
         borrowerService = BorrowerService()
         borrower = {
-                        "forename": "lisa",
-                        "middle_name": "ann",
-                        "surname": "bloggette",
-                        "gender": "Male",
-                        "address": "test address with postcode, PL14 3JR",
-                        "dob": "23/01/1986",
-                        "phone_number": "07502154062"
-                   }
+            "forename": "lisa",
+            "middle_name": "ann",
+            "surname": "bloggette",
+            "gender": "Male",
+            "address": "test address with postcode, PL14 3JR",
+            "dob": "23/01/1986",
+            "phone_number": "07502154062"
+        }
         id = borrowerService.saveBorrower(borrower)
         response = client.delete('/deed/borrowers/delete/'+str(id))
 
         self.assertEqual(response.status_code, 200)
-
