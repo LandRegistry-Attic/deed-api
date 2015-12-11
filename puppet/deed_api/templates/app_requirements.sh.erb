@@ -2,6 +2,9 @@
 
 # This file will prepare all dependancies for the application
 
+psql <%=@module_name%> -c "drop table alembic_version cascade;"
+psql <%=@module_name%> -c "drop table deed cascade;"
+
 # Build and enter the python virtual environment
 virtualenv <%=@module_name%>
 
