@@ -79,6 +79,20 @@ class TestRoutes(unittest.TestCase):
         response = self.app.get(self.DEED_ENDPOINT + 'CD3456')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_schema_checks(self):
+    @mock.patch('application.borrower.model.Borrower.delete')
+    def test_delete_borrower(self, mock_borrower):
 
+        mock_borrower.return_value = DeedHelper._valid_borrowers
+        response = self.app.delete(self.DEED_ENDPOINT+"borrowers/delete/1")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    @mock.patch('application.borrower.model.Borrower.delete')
+    def test_delete_borrower_not_found(self, mock_borrower):
+        mock_borrower.return_value = None
+        response = self.app.delete(self.DEED_ENDPOINT+"borrowers/delete/99999")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_schema_checks(self):
         self.assertTrue(run_schema_checks())

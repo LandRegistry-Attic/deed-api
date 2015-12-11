@@ -6,6 +6,7 @@ from flask.ext.api import status
 import json
 from application.borrower.server import BorrowerService
 from underscore import _
+from application.borrower.model import Borrower
 
 deed_bp = Blueprint('deed', __name__,
                     template_folder='templates',
@@ -81,3 +82,18 @@ def create():
         except Exception as e:
             print("Database Exception - %s" % e)
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@deed_bp.route('/borrowers/delete/<borrower_id>', methods=['DELETE'])
+def delete_borrower(borrower_id):
+    borrower = None
+    borrowerModel = Borrower()
+    try:
+        borrower = borrowerModel.delete(borrower_id)
+    except Exception as inst:
+        print(str(type(inst)) + ":" + str(inst))
+
+    if borrower is None:
+        abort(status.HTTP_404_NOT_FOUND)
+    else:
+        return json.dumps({'id': borrower_id}), status.HTTP_200_OK
