@@ -24,13 +24,13 @@ if [ $database_migrate -eq 0 ] && [ $pip_install -eq 0 ] && [ $integration_tests
   deactivate
   echo "Pip install, Integration tests and database migrated SUCESSFUL. Exiting"
   exit 0
-elif [ $database_migrate -ne 0 ]; then
-  deactivate
-  echo "Database migration FAILED. Exiting"
-  exit 1
 elif [ $pip_install -ne 0 ]; then
   deactivate
   echo "Pip install FAILED. Exiting"
+  exit 1
+elif [ $database_migrate -ne 0 ]; then
+  deactivate
+  echo "Database migration FAILED. Exiting"
   exit 1
 elif [ $integration_tests -ne 0 ]; then
   deactivate
