@@ -21,7 +21,7 @@ def get_deed(deed_reference):
     else:
         result.deed['token'] = result.token
 
-    return json.dumps(result.deed), status.HTTP_200_OK
+    return json.dumps({"deed": result.deed}), status.HTTP_200_OK
 
 
 @deed_bp.route('/', methods=['POST'])
