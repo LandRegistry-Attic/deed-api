@@ -20,19 +20,19 @@ python manage.py db upgrade
 database_migrate=$?
 
 # Check for successes and failures, report and return
-if [ $database_migrate -eq 0 ] && [ $pip_install -eq 0 ] && [ $integration_tests -eq 0 ]; then
+if [ "$database_migrate" -eq 0 ] && [ "$install_requirements" -eq 0 ] && [ "$integration_tests" -eq 0 ]; then
   deactivate
   echo "Pip install, Integration tests and database migrated SUCESSFUL. Exiting"
   exit 0
-elif [ $pip_install -ne 0 ]; then
+elif [ "$install_requirements" -ne 0 ]; then
   deactivate
   echo "Pip install FAILED. Exiting"
   exit 1
-elif [ $database_migrate -ne 0 ]; then
+elif [ "$database_migrate" -ne 0 ]; then
   deactivate
   echo "Database migration FAILED. Exiting"
   exit 1
-elif [ $integration_tests -ne 0 ]; then
+elif [ "$integration_tests" -ne 0 ]; then
   deactivate
   echo "Integration tests FAILED. Exiting"
   exit 1
