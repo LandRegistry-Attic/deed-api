@@ -183,7 +183,7 @@
       ]
     },
     "md_ref": {
-      "pattern_path": "/definitions/md_ref",
+      "pattern_path": "/definitions/Deed_Application/properties/md_ref",
       "payload_tests": [
         {
           "payload": "",
@@ -218,7 +218,7 @@
       ]
     },
     "title_number": {
-      "pattern_path": "/definitions/title_number",
+      "pattern_path": "/definitions/Deed_Application/properties/title_number",
       "payload_tests": [
         {
           "payload": "",
@@ -613,5 +613,3 @@
     }
   ]
 }
-
-

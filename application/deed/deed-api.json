@@ -14,7 +14,7 @@
         "application/json"
     ],
     "paths": {
-        "/deed": {
+        "/deed/": {
             "post": {
                 "summary": "Deed",
                 "operationId": "addDeed",
@@ -37,7 +37,10 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "URL to the GET endpoint for the deed is returned on successful creation.\n"
+                        "description": "URL to the GET endpoint for the deed is returned on successful creation.\n",
+                        "schema": {
+                            "type": "string"
+                        }
                     },
                     "400": {
                         "description": "Bad Request due to invalid schema. Response will include 1 or more schema errors\n",
@@ -85,14 +88,6 @@
         }
     },
     "definitions": {
-        "title_number": {
-            "pattern": "^([A-Z]{0,3}[1-9][0-9]{0,5}|[0-9]{1,6}[ZT])$",
-            "type": "string"
-        },
-        "md_ref": {
-            "pattern": "^e-MD([1-9]{5}|([1-9]{3,4}[A-Z]{1}))$",
-            "type": "string"
-        },
         "PrivateIndividualName": {
             "type": "object",
             "additionalProperties": false,
@@ -120,12 +115,12 @@
                     "pattern": "^(0[1-9]|[12][0-9]|3[01])[\\/\\-](0[1-9]|1[012])[/\\-]\\d{4}$"
                 },
                 "gender": {
-                      "type": "string",
-                      "enum": [
+                    "type": "string",
+                    "enum": [
                         "Male",
                         "Female",
                         "Not Specified"
-                      ]
+                    ]
                 },
                 "phone_number": {
                     "type": "string",
@@ -140,9 +135,9 @@
         "Borrowers": {
             "type": "array",
             "minItems": 1,
-             "items": {
-                 "$ref": "#/definitions/PrivateIndividualName"
-             }
+            "items": {
+                "$ref": "#/definitions/PrivateIndividualName"
+            }
         },
         "Operative_Deed": {
             "type": "object",
@@ -175,17 +170,19 @@
             ],
             "properties": {
                 "title_number": {
-                    "$ref": "#/definitions/title_number"
+                    "type": "string",
+                    "pattern": "^([A-Z]{0,3}[1-9][0-9]{0,5}|[0-9]{1,6}[ZT])$"
                 },
                 "borrowers": {
-                  "type": "array",
-                  "minItems": 1,
-                  "items": {
-                    "$ref": "#/definitions/PrivateIndividualName"
-                  }
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/PrivateIndividualName"
+                    }
                 },
                 "md_ref": {
-                    "$ref": "#/definitions/md_ref"
+                    "pattern": "^e-MD([1-9]{5}|([1-9]{3,4}[A-Z]{1}))$",
+                    "type": "string"
                 }
             }
         },
