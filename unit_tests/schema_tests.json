@@ -295,7 +295,7 @@
           },
           {
             "forename": "Paul",
-            "middle_name": "",
+            "middle_name": "Frank",
             "surname": "Smythe",
             "gender": "Not Specified",
             "address": "1 The High Street Highley PL6 7TG",
@@ -304,7 +304,7 @@
           },
           {
             "forename": "Paul",
-            "middle_name": "",
+            "middle_name": "Frank",
             "surname": "Smythe",
             "gender": "Male",
             "address": "1 The High Street Highley PL6 7TG",
@@ -332,7 +332,7 @@
           },
           {
             "forename": "Paul",
-            "middle_name": "",
+            "middle_name": "Frank",
             "surname": "Smythe",
             "gender": "Not Specified",
             "address": "1 The High Street Highley PL6 7TG",
@@ -341,7 +341,7 @@
           },
           {
             "forename": "Paul",
-            "middle_name": "",
+            "middle_name": "Frank",
             "surname": "Smythe",
             "gender": "Male",
             "address": "1 The High Street Highley PL6 7TG",
@@ -369,7 +369,7 @@
           },
           {
             "forename": "Paul",
-            "middle_name": "",
+            "middle_name": "Frank",
             "surname": "Smy the",
             "gender": "Not Specified",
             "address": "1 The High Street Highley PL6 7TG",
@@ -378,7 +378,7 @@
           },
           {
             "forename": "Paul",
-            "middle_name": "",
+            "middle_name": "Frank",
             "surname": "Smyt he",
             "gender": "Male",
             "address": "1 The High Street Highley PL6 7TG",
@@ -406,7 +406,7 @@
           },
           {
             "forename": "Paul",
-            "middle_name": "",
+            "middle_name": "Frank",
             "surname": "Smythe",
             "gender": "Not Specified",
             "address": "1 The High Street Highley PL6 7TG",
@@ -415,7 +415,6 @@
           },
           {
             "forename": "Paul",
-            "middle_name": "",
             "surname": "Smythe",
             "gender": "Male",
             "address": "1 The High Street Highley PL6 7TG",
@@ -443,7 +442,7 @@
           },
           {
             "forename": "Paul",
-            "middle_name": "",
+            "middle_name": "Frank",
             "gender": "Not Specified",
             "address": "1 The High Street Highley PL6 7TG",
             "dob": "21/08/2015",
@@ -451,7 +450,7 @@
           },
           {
             "forename": "Paul",
-            "middle_name": "",
+            "middle_name": "Frank",
             "gender": "Male",
             "address": "1 The High Street Highley PL6 7TG",
             "dob": "21/08/2015",
@@ -478,7 +477,7 @@
           },
           {
             "forename": "Paul",
-            "middle_name": "",
+            "middle_name": "Frank",
             "gender": "Not Specified",
             "address": "1 The High Street Highley PL6 7TG",
             "dob": "21/08/2015",
@@ -486,7 +485,7 @@
           },
           {
             "forename": "Paul",
-            "middle_name": "",
+            "middle_name": "Frank",
             "gender": "Male",
             "surname": "",
             "address": "1 The High Street Highley PL6 7TG",
@@ -513,7 +512,7 @@
           },
           {
             "forename": "Paul",
-            "middle_name": "",
+            "middle_name": "Frank",
             "surname": "Smythe",
             "gender": "Not Specified",
             "address": "1 The High Street Highley PL6 7TG",
@@ -522,7 +521,7 @@
           },
           {
             "forename": "Paul",
-            "middle_name": "",
+            "middle_name": "Frank",
             "surname": "Smythe",
             "gender": "Male",
             "address": "1 The High Street Highley PL6 7TG",
@@ -609,6 +608,25 @@
         ]
       },
       "description": "extra property data is not allowed",
+      "expected": 1
+    },
+    {
+      "payload": {
+        "md_ref": "e-MD12345",
+        "title_number": "DN12345",
+        "borrowers": [
+          {
+            "forename": "Amanda",
+            "middle_name": "",
+            "surname": "Smythe",
+            "gender": "Female",
+            "address": "1 The High Street Highley CR0 9YH",
+            "dob": "21/09/1976",
+            "phone_number": "07507154077"
+          }
+        ]
+      },
+      "description": "middle name must not be blank if provided",
       "expected": 1
     }
   ]
