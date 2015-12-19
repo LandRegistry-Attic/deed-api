@@ -1,0 +1,42 @@
+#! /usr/bin/bash
+
+# This file will prepare all dependancies for the application
+
+psql <%=@module_name%> -c "drop table alembic_version cascade;"
+psql <%=@module_name%> -c "drop table deed cascade;"
+
+# Build and enter the python virtual environment
+virtualenv <%=@module_name%>
+
+source ./<%=@module_name%>/bin/activate
+
+# Install the python app requirements
+pip3 install -r requirements.txt
+install_requirements=$?
+
+# Run the integration tests
+source integration_test.sh
+integration_tests=$?
+
+# Run the database migration to ensure its up to date
+python manage.py db upgrade
+database_migrate=$?
+
+# Check for successes and failures, report and return
+if [ "$database_migrate" -eq 0 ] && [ "$install_requirements" -eq 0 ] && [ "$integration_tests" -eq 0 ]; then
+  deactivate
+  echo "Pip install, Integration tests and database migrated SUCESSFUL. Exiting"
+  exit 0
+elif [ "$install_requirements" -ne 0 ]; then
+  deactivate
+  echo "Pip install FAILED. Exiting"
+  exit 1
+elif [ "$database_migrate" -ne 0 ]; then
+  deactivate
+  echo "Database migration FAILED. Exiting"
+  exit 1
+elif [ "$integration_tests" -ne 0 ]; then
+  deactivate
+  echo "Integration tests FAILED. Exiting"
+  exit 1
+fi
