@@ -3,7 +3,6 @@ from application.deed.utils import validate_helper, valid_dob, is_unique_list
 from flask import request, abort, jsonify
 from flask import Blueprint
 from flask.ext.api import status
-import json
 from application.borrower.server import BorrowerService
 from underscore import _
 from application.borrower.model import Borrower
