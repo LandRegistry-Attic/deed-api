@@ -77,7 +77,7 @@ def create():
 
             deed.save()
             url = request.base_url + str(deed.token)
-            return url, status.HTTP_201_CREATED
+            return jsonify({"url": url}), status.HTTP_201_CREATED
         except Exception as e:
             print("Database Exception - %s" % e)
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
