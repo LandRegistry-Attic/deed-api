@@ -104,7 +104,8 @@
                     "pattern": "^[A-z]+$"
                 },
                 "middle_name": {
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^[A-z]+$"
                 },
                 "surname": {
                     "type": "string",
