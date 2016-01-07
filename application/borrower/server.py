@@ -18,6 +18,8 @@ class BorrowerService:
         borrowerModel.phonenumber = borrower['phone_number']
         borrowerModel.address = borrower['address']
 
+        borrowerModel.token = borrowerModel.generate_token()
+
         borrowerModel.save()
 
-        return borrowerModel.id
+        return borrowerModel

@@ -64,6 +64,7 @@ def create():
             for borrower in deed_json['borrowers']:
                 borrower_json = {
                     "id": "",
+                    "token": "",
                     "forename": borrower['forename'],
                     "surname": borrower['surname']
                 }
@@ -71,7 +72,10 @@ def create():
                 if 'middle_name' in borrower:
                     borrower_json['middle_name'] = borrower['middle_name']
 
-                borrower_json["id"] = borrowerService.saveBorrower(borrower)
+                createdBorrower = borrowerService.saveBorrower(borrower)
+
+                borrower_json["id"] = createdBorrower.id
+                borrower_json["token"] = createdBorrower.token
                 json_doc['borrowers'].append(borrower_json)
 
             deed.deed = json_doc
