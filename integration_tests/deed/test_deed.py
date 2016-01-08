@@ -185,8 +185,8 @@ class TestDeedRoutes(unittest.TestCase):
             "dob": "23/01/1986",
             "phone_number": "07502154062"
         }
-        id = borrowerService.saveBorrower(borrower)
-        response = client.delete('/deed/borrowers/delete/'+str(id))
+        newBorrower = borrowerService.saveBorrower(borrower)
+        response = client.delete('/deed/borrowers/delete/'+str(newBorrower.id))
 
         self.assertEqual(response.status_code, 200)
 
