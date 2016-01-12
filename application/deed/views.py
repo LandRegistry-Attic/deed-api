@@ -1,9 +1,8 @@
 from application.deed.model import Deed
 from application.deed.utils import validate_helper, valid_dob, is_unique_list
-from flask import request, abort
+from flask import request, abort, jsonify
 from flask import Blueprint
 from flask.ext.api import status
-import json
 from application.borrower.server import BorrowerService
 from underscore import _
 from application.borrower.model import Borrower
@@ -22,7 +21,7 @@ def get_deed(deed_reference):
     else:
         result.deed['token'] = result.token
 
-    return json.dumps({"deed": result.deed}), status.HTTP_200_OK
+    return jsonify({"deed": result.deed}), status.HTTP_200_OK
 
 
 @deed_bp.route('/', methods=['POST'])
@@ -82,7 +81,7 @@ def create():
 
             deed.save()
             url = request.base_url + str(deed.token)
-            return url, status.HTTP_201_CREATED
+            return jsonify({"url": url}), status.HTTP_201_CREATED
         except Exception as e:
             print("Database Exception - %s" % e)
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -100,4 +99,4 @@ def delete_borrower(borrower_id):
     if borrower is None:
         abort(status.HTTP_404_NOT_FOUND)
     else:
-        return json.dumps({'id': borrower_id}), status.HTTP_200_OK
+        return jsonify({"id": borrower_id}), status.HTTP_200_OK
