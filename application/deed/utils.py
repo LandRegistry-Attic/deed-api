@@ -137,7 +137,7 @@ def convert_json_to_borrower(borrower_json):
 
 def validate_generated_xml(xml):
 
-    with open(os.getcwd() + '/deed/schemas/' + XML_SCHEMA_FILE, "rb") as f:
+    with open(os.getcwd() + '/application/deed/schemas/' + XML_SCHEMA_FILE, "rb") as f:
         schema_str = f.read().decode()
         # replace externally reference element with a dummy local one
         schema_str = schema_str.replace('ref="dsig:Signature"', 'name="DummySigSlot"')

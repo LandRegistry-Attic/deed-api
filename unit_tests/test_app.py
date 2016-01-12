@@ -1,6 +1,7 @@
 from application import app
 from application.deed.model import Deed
 from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock
+from application.deed.utils import convert_json_to_xml, validate_generated_xml
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
 import unittest
@@ -154,6 +155,7 @@ class TestRoutes(unittest.TestCase):
     def test_schema_checks(self):
         self.assertTrue(run_schema_checks())
 
+<<<<<<< 70f0ff8df99c8dea9a74c65349f086308a155fef
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
@@ -166,3 +168,10 @@ class TestRoutes(unittest.TestCase):
                                  headers={"Content-Type": "application/json"})
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+=======
+    def test_xml_generation(self):
+
+        xml = convert_json_to_xml(DeedHelper._json_doc)
+        res = validate_generated_xml(xml)
+        self.assertEqual(res, True)
+>>>>>>> add test to validate json generated xml against pre-validated xsd
