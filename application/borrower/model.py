@@ -7,6 +7,7 @@ class Borrower(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     token = db.Column(db.String, nullable=False)
+    deed_id = db.Column(db.String, nullable = False)
     forename = db.Column(db.String, nullable=False)
     middlename = db.Column(db.String, nullable=True)
     surname = db.Column(db.String, nullable=False)
