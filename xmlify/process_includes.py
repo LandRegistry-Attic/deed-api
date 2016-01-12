@@ -232,7 +232,7 @@ def collect_inserts_aux(child, params, inserts, options):
     save_base_url = params.base_url
     string_content = resolve_ref(child, params, options)
     if string_content is not None:
-        root = etree.fromstring(string_content, base_url=params.base_url)
+        root = etree.fromstring(string_content.encode("utf-8"), base_url=params.base_url)
         roots.append(root)
         for child1 in root:
             if not isinstance(child1, etree._Comment):

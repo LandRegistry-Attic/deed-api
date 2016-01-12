@@ -6506,9 +6506,9 @@ def parseAndGenerate(
         dh = XschemaHandler()
         parser.setContentHandler(dh)
         if processIncludes:
-            from xmlify import process_includes
+            from process_includes import process_include_files
             outfile = BytesIO()
-            doc = process_includes.process_include_files(
+            doc = process_include_files(
                 infile, outfile,
                 inpath=xschemaFileName,
                 catalogpath=catalogFilename,
