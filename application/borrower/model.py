@@ -34,3 +34,9 @@ class Borrower(db.Model):
         db.session.commit()
 
         return borrower
+
+    def get_by_id(id_):
+        return Borrower.query.filter_by(id=id_).first()
+
+    def get_by_token(self, token_):
+        return Borrower.query.filter_by(token=token_).first()
