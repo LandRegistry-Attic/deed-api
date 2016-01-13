@@ -11,6 +11,7 @@ import mock
 class TestRoutes(unittest.TestCase):
 
     DEED_ENDPOINT = "/deed/"
+    BORROWER_ENDPOINT = "/borrower/"
 
     def setUp(self):
         app.config.from_pyfile("config.py")
@@ -30,7 +31,7 @@ class TestRoutes(unittest.TestCase):
 
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
-    def test_create(self, mock_Borrower, mock_Deed):
+    def test_create_with_invalid(self, mock_Borrower, mock_Deed):
         payload = json.dumps(DeedHelper._invalid_phone_numbers)
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
                                  headers={"Content-Type": "application/json"})
@@ -39,7 +40,12 @@ class TestRoutes(unittest.TestCase):
 
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
-    def test_create_with_invalid(self, mock_Borrower, mock_Deed):
+    @mock.patch('application.borrower.model.Borrower.get_by_id')
+    def test_create(self, mock_Borrower, mock_Deed, mock_borrower_get):
+        class ReturnedBorrower():
+            id = "9999"
+
+        mock_borrower_get.return_value = ReturnedBorrower()
         payload = json.dumps(DeedHelper._json_doc)
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
                                  headers={"Content-Type": "application/json"})
@@ -93,6 +99,16 @@ class TestRoutes(unittest.TestCase):
         response = self.app.delete(self.DEED_ENDPOINT+"borrowers/delete/99999")
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    @mock.patch('application.borrower.model.Borrower.get_by_token')
+    def test_validate_borrower(self, mock_borrower):
+        class ReturnedBorrower():
+            deed_token = "aaaaaa"
+
+        mock_borrower.return_value = ReturnedBorrower()
+        response = self.app.get(self.BORROWER_ENDPOINT+"aaaaaa")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_schema_checks(self):
         self.assertTrue(run_schema_checks())

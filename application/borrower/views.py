@@ -10,6 +10,6 @@ borrower_bp = Blueprint('borrower', __name__,
 
 @borrower_bp.route('/<borrower_token>', methods=['GET'])
 def validate_borrower(borrower_token):
+    print("ok: "+borrower_token)
     borrower = Borrower.get_by_token(borrower_token)
-
     return json.dumps({"deed_token": borrower.deed_token}), status.HTTP_200_OK
