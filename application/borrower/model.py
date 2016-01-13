@@ -7,7 +7,7 @@ class Borrower(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     token = db.Column(db.String, nullable=False)
-    deed_token = db.Column(db.String, nullable = False)
+    deed_token = db.Column(db.String, nullable=True)
     forename = db.Column(db.String, nullable=False)
     middlename = db.Column(db.String, nullable=True)
     surname = db.Column(db.String, nullable=False)
@@ -38,5 +38,5 @@ class Borrower(db.Model):
     def get_by_id(id_):
         return Borrower.query.filter_by(id=id_).first()
 
-    def get_by_token(self, token_):
+    def get_by_token(token_):
         return Borrower.query.filter_by(token=token_).first()

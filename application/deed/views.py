@@ -84,7 +84,7 @@ def create():
             for currentBorrower in deed.deed['borrowers']:
                 borrowerId = currentBorrower['id']
                 borrower = Borrower.get_by_id(borrowerId)
-                borrower.deed_id = deed.token
+                borrower.deed_token = deed.token
                 borrower.save()
 
             url = request.base_url + str(deed.token)
