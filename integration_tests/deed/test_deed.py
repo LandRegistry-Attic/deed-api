@@ -217,3 +217,9 @@ class TestDeedRoutes(unittest.TestCase):
         newBorrower = borrowerService.saveBorrower(borrower)
         response = client.get('/borrower/'+newBorrower.token)
         self.assertEqual(response.status_code, 200)
+
+    @with_client
+    def test_validate_borrower_not_found(self, client):
+
+        response = client.get('/borrower/aaaaaa')
+        self.assertEqual(response.status_code, 404)
