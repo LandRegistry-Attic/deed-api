@@ -197,3 +197,23 @@ class TestDeedRoutes(unittest.TestCase):
         response = client.delete('/deed/borrowers/delete/999999999')
 
         self.assertEqual(response.status_code, 404)
+
+    @with_client
+    def test_validate_borrower(self, client):
+        borrowerService = BorrowerService()
+
+        borrower = {
+            "forename": "lisa",
+            "deed_token": "aaaaaa",
+            "token": "bbbbbb",
+            "middle_name": "ann",
+            "surname": "bloggette",
+            "gender": "Male",
+            "address": "test address with postcode, PL14 3JR",
+            "dob": "23/01/1986",
+            "phone_number": "07502154062"
+        }
+
+        newBorrower = borrowerService.saveBorrower(borrower)
+        response = client.get('/borrower/'+newBorrower.token)
+        self.assertEqual(response.status_code, 200)
