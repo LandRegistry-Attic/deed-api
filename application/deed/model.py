@@ -10,6 +10,8 @@ class Deed(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     token = db.Column(db.String, nullable=False)
     deed = db.Column(JSON)
+    # TODO no wifi, check how to limit characters
+    identity_checked = db.Column(db.String(1), nullable=False)
 
     def save(self):  # pragma: no cover
         db.session.add(self)
