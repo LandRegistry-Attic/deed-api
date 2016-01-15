@@ -2,7 +2,7 @@ from application.borrower.model import Borrower
 
 
 class BorrowerService:
-    def saveBorrower(self, borrower):
+    def saveBorrower(self, borrower, deed_token):
         borrowerModel = Borrower()
         borrowerModel.forename = borrower['forename']
 
@@ -11,6 +11,7 @@ class BorrowerService:
 
         borrowerModel.surname = borrower['surname']
         borrowerModel.dob = borrower['dob']
+        borrowerModel.deed_token = deed_token
 
         if 'gender' in borrower:
             borrowerModel.gender = borrower['gender']

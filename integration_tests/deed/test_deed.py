@@ -186,7 +186,7 @@ class TestDeedRoutes(unittest.TestCase):
             "dob": "23/01/1986",
             "phone_number": "07502154062"
         }
-        newBorrower = borrowerService.saveBorrower(borrower)
+        newBorrower = borrowerService.saveBorrower(borrower, "aaaaaa")
         response = client.delete('/deed/borrowers/delete/'+str(newBorrower.id))
 
         self.assertEqual(response.status_code, 200)
@@ -214,7 +214,7 @@ class TestDeedRoutes(unittest.TestCase):
             "phone_number": "07502154062"
         }
 
-        newBorrower = borrowerService.saveBorrower(borrower)
+        newBorrower = borrowerService.saveBorrower(borrower,"aaaaaa")
         response = client.get('/borrower/'+newBorrower.token)
         self.assertEqual(response.status_code, 200)
 
