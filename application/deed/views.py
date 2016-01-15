@@ -63,7 +63,7 @@ def create():
             for borrower in deed_json['borrowers']:
                 borrower_json = {
                     "id": "",
-                    "token": "",
+                    "token": deed.token,
                     "forename": borrower['forename'],
                     "surname": borrower['surname']
                 }
@@ -81,13 +81,10 @@ def create():
 
             deed.save()
 
-            for currentBorrower in deed.deed['borrowers']:
-                borrower = Borrower.get_by_id(currentBorrower['id'])
-                borrower.deed_token = deed.token
-                borrower.save()
-
             url = request.base_url + str(deed.token)
+
             return jsonify({"url": url}), status.HTTP_201_CREATED
+
         except Exception as e:
             print("Database Exception - %s" % e)
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
