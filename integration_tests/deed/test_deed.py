@@ -49,7 +49,8 @@ class TestDeedRoutes(unittest.TestCase):
         self.assertEqual(create_deed.status_code, 201)
         self.assertIn("/deed/", str(create_deed.data))
 
-        get_created_deed = client.get(create_deed.data)
+        response_json = json.loads(create_deed.data.decode())
+        get_created_deed = client.get(response_json["url"])
         self.assertEqual(get_created_deed.status_code, 200)
 
         self.assertIn("title_number", str(get_created_deed.data))
