@@ -84,12 +84,6 @@ def create():
 
             deed.save()
 
-            for currentBorrower in deed.deed['borrowers']:
-                borrowerId = currentBorrower['id']
-                borrower = Borrower.get_by_id(borrowerId)
-                borrower.deed_token = deed.token
-                borrower.save()
-
             url = request.base_url + str(deed.token)
 
             return jsonify({"url": url}), status.HTTP_201_CREATED
