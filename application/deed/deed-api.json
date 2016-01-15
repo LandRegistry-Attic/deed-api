@@ -153,7 +153,7 @@
                         },
                         "md_ref": {
                             "type": "string",
-                            "description": "Land Registry assigned number for a Mortgage Deed (MD)"
+                            "description": "Land Registry assigned number for a Mortgage Deed (MD). If you wish to use an existing MD reference please prefix it with e- to comply with our system (eg e-md12345)"
                         },
                         "borrowers": {
                             "$ref": "#/definitions/Borrowers"
