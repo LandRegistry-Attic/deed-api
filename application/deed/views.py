@@ -82,8 +82,7 @@ def create():
             deed.save()
 
             for currentBorrower in deed.deed['borrowers']:
-                borrowerId = currentBorrower['id']
-                borrower = Borrower.get_by_id(borrowerId)
+                borrower = Borrower.get_by_id(currentBorrower['id'])
                 borrower.deed_token = deed.token
                 borrower.save()
 
