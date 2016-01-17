@@ -98,6 +98,7 @@ Example payload:
             "dob": "23/01/1986",
             "phone_number": "07502154076"
         }
-    ]
+    ],
+    "identity_checked": "Y"
 }
 ```
