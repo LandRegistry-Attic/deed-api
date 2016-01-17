@@ -1,3 +1,4 @@
+# flake8: noqa
 """Added in identity checked column to ensure that conveyancers can declare that they have checked borrowers identities
 
 Revision ID: 2ef609ed309
