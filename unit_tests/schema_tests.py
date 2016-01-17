@@ -4,6 +4,7 @@ from application.deed.utils import validate_helper,\
 import os
 import sys
 import re
+from termcolor import colored
 
 
 @call_once_only
@@ -18,8 +19,10 @@ def get_schema():
 
 def is_valid_regex(value, *context):
     matches = re.match(value["pattern"], value["payload"]) is not None
-    print("Pass: %s, Checking: '%s' matches: '%s' exp: %s got: %s desc: %s"
-          % (matches == value["expected"], value["payload"], value["pattern"],
+    print("%s: Checking: '%s' matches: '%s' exp: %s got: %s desc: %s"
+          % (colored('PASS', 'green') if matches == value["expected"]
+             else colored('FAIL', 'red'),
+             value["payload"], value["pattern"],
              value["expected"], matches, value["description"]))
     return matches == value["expected"]
 
@@ -49,8 +52,9 @@ def verify_against_schema(element, key, obj):
     error_count, error_message = validate_helper(element["payload"])
 
     print(
-        "%s - checking for %s - errors expected: %s, errors received: %s"
-        % (error_count == element["expected"], element["description"],
+        "%s: checking for %s - errors expected: %s, errors received: %s"
+        % (colored('PASS', 'green') if error_count == element["expected"]
+           else colored('FAIL', 'red'), element["description"],
            element["expected"], str(error_count)))
     return error_count == element["expected"]
 
