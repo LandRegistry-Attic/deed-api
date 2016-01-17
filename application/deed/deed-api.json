@@ -184,6 +184,10 @@
                 "md_ref": {
                     "pattern": "^e-MD([1-9]{5}|([1-9]{3,4}[A-Z]{1}))$",
                     "type": "string"
+                },
+                "identity_checked": {
+                  "pattern": "^[Y]$",
+                  "type": "string"
                 }
             }
         },

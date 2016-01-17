@@ -276,6 +276,36 @@
           "description": "too many numbers"
         }
       ]
+    },
+    "identity_check": {
+      "pattern_path": "/definitions/Deed_Application/properties/identity_checked",
+      "payload_tests": [
+        {
+          "payload": "Y",
+          "expected": true,
+          "description": "Identity checks validly complete"
+        },
+        {
+          "payload": "N",
+          "expected": false,
+          "description": "The schema should accept N so we can give the user a bespoke failure response"
+        },
+        {
+          "payload": "y",
+          "expected": false,
+          "description": "Lowercase should not be accepted"
+        },
+        {
+          "payload": "abc123",
+          "expected": false,
+          "description": "random strings should fail"
+        },
+        {
+          "payload": "",
+          "expected": false,
+          "description": "empty string should fail as its a required field"
+        }
+      ]
     }
   },
   "test_payloads": [
