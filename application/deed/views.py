@@ -44,6 +44,7 @@ def create():
             }
 
         deed.token = Deed.generate_token()
+        deed.identity_checked = deed_json["identity_checked"]
 
         valid_dob_result = _(deed_json['borrowers']).chain()\
             .map(lambda x, *a: x['dob'])\
