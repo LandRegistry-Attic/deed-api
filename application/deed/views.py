@@ -93,7 +93,7 @@ def create():
             return jsonify({"url": url}), status.HTTP_201_CREATED
 
         except Exception as e:
-            LOGGER.info("Database Exception - %s" % e)
+            LOGGER.error("Database Exception - %s" % e)
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -104,7 +104,7 @@ def delete_borrower(borrower_id):
     try:
         borrower = borrowerModel.delete(borrower_id)
     except Exception as inst:
-        LOGGER.info(str(type(inst)) + ":" + str(inst))
+        LOGGER.error(str(type(inst)) + ":" + str(inst))
 
     if borrower is None:
         abort(status.HTTP_404_NOT_FOUND)

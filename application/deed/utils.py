@@ -90,7 +90,7 @@ def get_obj_by_path(schema, path):
             res = schema[key]
             return res
         except:
-            LOGGER.info(
+            LOGGER.error(
                 "ACCESS ERROR:\nlocation in schema: %s\n with key: %s \n%s."
                 % (schema, key, sys.exc_info()[0]))
             raise
