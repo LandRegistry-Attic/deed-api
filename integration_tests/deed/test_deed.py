@@ -1,6 +1,6 @@
 import json
 import unittest
-from integration_tests.helper import with_client, setUpApp, setUpDB, tearDownDB
+from integration_tests.helper import with_client, setUpApp, setUpDB, tearDownDB, setUp_MortgageDocuments
 from application.borrower.server import BorrowerService
 
 
@@ -16,31 +16,34 @@ class TestDeedRoutes(unittest.TestCase):
     @with_client
     def test_deed_create_and_get(self, client):
 
-        valid_deed = {
-            "title_number": "DN100",
-            "md_ref": "e-MD123G",
-            "borrowers": [
-                {
-                    "forename": "lisa",
-                    "middle_name": "ann",
-                    "surname": "bloggette",
-                    "gender": "Male",
-                    "address": "test address with postcode, PL14 3JR",
-                    "dob": "23/01/1986",
-                    "phone_number": "07502154062"
-                },
-                {
-                    "forename": "frank",
-                    "middle_name": "ann",
-                    "surname": "bloggette",
-                    "gender": "Female",
-                    "address": "Test Address With Postcode, PL14 3JR",
-                    "dob": "23/01/1986",
-                    "phone_number": "07502154061"
-                }
-            ],
-            "identity_checked": "Y"
-        }
+        setUp_MortgageDocuments(self)
+
+        valid_deed = json.loads(
+            '{'
+            '   "title_number": "DN100",'
+            '   "md_ref": "e-MD123G",'
+            '   "borrowers": ['
+            '       {'
+            '           "forename": "lisa",'
+            '           "middle_name": "ann",'
+            '           "surname": "bloggette",'
+            '           "gender": "Male",'
+            '           "address": "test address with postcode, PL14 3JR",'
+            '           "dob": "23/01/1986",'
+            '           "phone_number": "07502154062"'
+            '       },'
+            '       {'
+            '           "forename": "frank",'
+            '           "middle_name": "ann",'
+            '           "surname": "bloggette",'
+            '           "gender": "Female",'
+            '           "address": "Test Address With Postcode, PL14 3JR",'
+            '           "dob": "23/01/1986",'
+            '           "phone_number": "07502154061"'
+            '       }'
+            '   ]'
+            '}'
+        )
 
         create_deed = client.post('/deed/',
                                   data=json.dumps(valid_deed),
@@ -56,6 +59,9 @@ class TestDeedRoutes(unittest.TestCase):
         self.assertIn("borrowers", str(get_created_deed.data))
         self.assertIn("forename", str(get_created_deed.data))
         self.assertIn("surname", str(get_created_deed.data))
+        self.assertIn("charge_clauses", str(get_created_deed.data))
+        self.assertIn("additional_provisions", str(get_created_deed.data))
+        self.assertIn("lender", str(get_created_deed.data))
 
     @with_client
     def test_bad_get(self, client):
@@ -163,6 +169,42 @@ class TestDeedRoutes(unittest.TestCase):
                                   headers={'content-type': 'application/json'})
 
         self.assertEqual(create_deed.status_code, 400)
+
+    @with_client
+    def test_deed_with_unknown_md_ref(self, client):
+
+        deed_with_unknown_md_ref = json.loads(
+            '{'
+            '   "title_number": "DN100",'
+            '   "md_ref": "e-MD111G",'
+            '   "borrowers": ['
+            '       {'
+            '           "forename": "lisa",'
+            '           "middle_name": "ann",'
+            '           "surname": "bloggette",'
+            '           "gender": "Male",'
+            '           "address": "test address with postcode, PL14 3JR",'
+            '           "dob": "23/01/1986",'
+            '           "phone_number": "07502154062"'
+            '       },'
+            '       {'
+            '           "forename": "frank",'
+            '           "middle_name": "ann",'
+            '           "surname": "bloggette",'
+            '           "gender": "Female",'
+            '           "address": "Test Address With Postcode, PL14 3JR",'
+            '           "dob": "23/01/1986",'
+            '           "phone_number": "07502154061"'
+            '       }'
+            '   ]'
+            '}'
+        )
+
+        create_deed = client.post('/deed/',
+                                  data=json.dumps(deed_with_unknown_md_ref),
+                                  headers={'content-type': 'application/json'})
+
+        self.assertEqual(create_deed.status_code, 500)
 
     @with_client
     def test_delete_borrower(self, client):
