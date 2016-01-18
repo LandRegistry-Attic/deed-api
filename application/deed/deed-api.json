@@ -133,6 +133,20 @@
                 }
             }
         },
+        "ChargeClauses": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "string"
+            }
+        },
+        "AdditionalProvisions": {
+            "type": "array",
+            "minItems": 0,
+            "items": {
+                "type": "string"
+            }
+        },
         "Borrowers": {
             "type": "array",
             "minItems": 1,
@@ -157,6 +171,15 @@
                         },
                         "borrowers": {
                             "$ref": "#/definitions/Borrowers"
+                        },
+                        "charge_clauses": {
+                            "$ref": "#/definitions/ChargeClauses"
+                        },
+                        "additional_provisions": {
+                            "$ref": "#/definitions/AdditionalProvisions"
+                        },
+                        "lender": {
+                            "type": "string"
                         }
                     }
                 }
