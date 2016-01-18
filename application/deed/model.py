@@ -6,9 +6,9 @@ from sqlalchemy.dialects.postgresql import JSON
 from application.mortgage_document.model import MortgageDocument
 from flask import abort
 from flask.ext.api import status
-import logger
+import logging
 
-LOGGER = logger.get_logger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class Deed(db.Model):

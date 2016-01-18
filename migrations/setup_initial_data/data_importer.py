@@ -5,9 +5,9 @@ import argparse
 from os import listdir
 from os.path import isfile, join
 from sqlalchemy import create_engine, MetaData, Table, exc, bindparam
-import logger
+import logging
 
-LOGGER = logger.get_logger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 def build_data(cols, row):
@@ -25,9 +25,9 @@ def process_input_options():
             'in the file indicates the column names to import.')
     parser.add_argument('import_directory', default='.', metavar='/path/path',
                         help='import path relative to the executable')
-    parser.add_argument('database_name', metavar='database name',
+    parser.add_argument('database_name', metavar='database_name',
                         help='name of the database instance to use e.g. deed_api')
-    parser.add_argument('table_name', metavar='table name',
+    parser.add_argument('table_name', metavar='table_name',
                         help='name of the table to which the data will be imported')
     parser.add_argument('--file_extension', '-ext', default='csv', metavar='csv',
                         help='extension type of the text files to import e.g. csv')
