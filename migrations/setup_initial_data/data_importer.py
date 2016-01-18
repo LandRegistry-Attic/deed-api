@@ -1,10 +1,13 @@
-#!/usr/local/bin/python
+#!/usr/local/bin/python3
 import csv
 import os
 import argparse
 from os import listdir
 from os.path import isfile, join
 from sqlalchemy import create_engine, MetaData, Table, exc, bindparam
+import logger
+
+LOGGER = logger.get_logger(__name__)
 
 
 def build_data(cols, row):
@@ -57,6 +60,7 @@ def process_file(csv_file, sql_connection, table):
     total_rows = 0
 
     print("\nProcessing: %s" % csv_file.name)
+    LOGGER.info("Processing file: %s" % str(csv_file.name))
 
     rows_reader = csv.reader(csv_file, delimiter='|', quotechar="'")
     row_count = 0
@@ -83,11 +87,15 @@ def process_file(csv_file, sql_connection, table):
     print("Insert Count: " + str(insert_count))
     print("Update Count: " + str(update_count))
     print("Error Count: " + str(error_count))
+    LOGGER.info("Processing file complete, errors: %s" % str(error_count))
+
     print("-" * 120)
 
 
 def run_import():
+    LOGGER.info("Data Importer Init")
     settings = process_input_options()
+    LOGGER.info("Settings from command line: %s" % str(settings))
 
     target_path = os.path.dirname(os.path.realpath(__file__)) + settings.import_directory
 
