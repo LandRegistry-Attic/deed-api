@@ -2,14 +2,14 @@
 """Added in identity checked column to ensure that conveyancers can declare that they have checked borrowers identities
 
 Revision ID: 2ef609ed309
-Revises: 610e8a67d8
+Revises: 390d0c59875
 Create Date: 2016-01-15 16:17:47.746339
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '2ef609ed309'
-down_revision = '610e8a67d8'
+down_revision = '390d0c59875'
 
 from alembic import op
 import sqlalchemy as sa
