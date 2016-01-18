@@ -5,6 +5,7 @@ from flask.ext.script import Manager
 from migrations.setup_initial_data.data_importer import process_file
 from sqlalchemy import create_engine, MetaData, Table
 
+
 def with_client(test):
     @wraps(test)
     def _wrapped_test(self):
@@ -24,6 +25,7 @@ def setUpDB(self):
     with self.app.app_context():
         db.create_all()
 
+
 def setUp_MortgageDocuments(self):
     engine = create_engine('postgresql://localhost:5432/deed_api', convert_unicode=True)
     metadata = MetaData(bind=engine)
@@ -33,6 +35,7 @@ def setUp_MortgageDocuments(self):
     csv_file = open('./integration_tests/deed/test_md.csv', newline='')
 
     process_file(csv_file, sql_connection, table)
+
 
 def tearDownDB(self):
     with self.app.app_context():
