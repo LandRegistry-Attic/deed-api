@@ -86,6 +86,8 @@ def create():
 
             deed.deed = json_doc
 
+            deed.add_clauses()
+
             deed.save()
 
             url = request.base_url + str(deed.token)

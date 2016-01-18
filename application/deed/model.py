@@ -1,8 +1,9 @@
-from application import db
-from sqlalchemy.dialects.postgresql import JSON
 import copy
 import uuid
-
+import json
+from application import db
+from sqlalchemy.dialects.postgresql import JSON
+from application.mortgage_document.model import MortgageDocument
 
 class Deed(db.Model):
     __tablename__ = 'deed'
@@ -22,3 +23,11 @@ class Deed(db.Model):
 
     def get_json_doc(self):
         return copy.deepcopy(self.json_doc)
+
+    def add_clauses(self):
+        md_ref = self.deed["md_ref"]
+        mortgage_document = MortgageDocument.query.filter_by(md_ref=str(md_ref)).first()
+        md_json = json.loads(mortgage_document.data)
+        self.deed["charge_clauses"] = md_json["charge_clauses"]
+        self.deed["additional_provisions"] = md_json["additional_provisions"]
+        self.deed["lender"] = md_json["lender"]
