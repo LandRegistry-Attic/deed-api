@@ -59,7 +59,7 @@ class TestDeedRoutes(unittest.TestCase):
         self.assertIn("borrowers", str(get_created_deed.data))
         self.assertIn("forename", str(get_created_deed.data))
         self.assertIn("surname", str(get_created_deed.data))
-        self.assertIn("charge_clauses", str(get_created_deed.data))
+        self.assertIn("charge_clause", str(get_created_deed.data))
         self.assertIn("additional_provisions", str(get_created_deed.data))
         self.assertIn("lender", str(get_created_deed.data))
 

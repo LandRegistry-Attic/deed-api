@@ -47,7 +47,7 @@ def create():
             "title_number": deed_json['title_number'],
             "md_ref": deed_json['md_ref'],
             "borrowers": [],
-            "charge_clauses": [],
+            "charge_clause": [],
             "additional_provisions": []
             }
 
@@ -93,7 +93,7 @@ def create():
             mortgage_document = MortgageDocument.query.filter_by(md_ref=str(md_ref)).first()
             if mortgage_document is not None:
                 md_json = json.loads(mortgage_document.data)
-                json_doc["charge_clauses"] = md_json["charge_clauses"]
+                json_doc["charge_clause"] = md_json["charge_clause"]
                 json_doc["additional_provisions"] = md_json["additional_provisions"]
                 json_doc["lender"] = md_json["lender"]
             else:
