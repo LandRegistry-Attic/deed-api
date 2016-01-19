@@ -204,7 +204,7 @@ class TestDeedRoutes(unittest.TestCase):
                                   data=json.dumps(deed_with_unknown_md_ref),
                                   headers={'content-type': 'application/json'})
 
-        self.assertEqual(create_deed.status_code, 500)
+        self.assertEqual(create_deed.status_code, 400)
 
     @with_client
     def test_delete_borrower(self, client):

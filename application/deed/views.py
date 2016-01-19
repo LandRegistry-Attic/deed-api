@@ -99,7 +99,7 @@ def create():
             else:
                 msg = "mortgage document associated with supplied md_ref is not found"
                 LOGGER.error(msg)
-                return msg, status.HTTP_500_INTERNAL_SERVER_ERROR
+                return msg, status.HTTP_400_BAD_REQUEST
 
             deed.deed = json_doc
 
