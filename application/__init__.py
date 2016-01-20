@@ -14,6 +14,7 @@ from .borrower.views import borrower_bp  # noqa
 app.config.from_pyfile("config.py")
 app.register_blueprint(deed_bp, url_prefix='/deed')
 app.register_blueprint(borrower_bp, url_prefix='/borrower')
+app.url_map.strict_slashes = False
 
 
 @app.route("/health")
