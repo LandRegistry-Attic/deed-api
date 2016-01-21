@@ -96,8 +96,7 @@
                 "forename",
                 "dob",
                 "phone_number",
-                "address",
-                "identity_checked"
+                "address"
             ],
             "properties": {
                 "forename": {
@@ -168,7 +167,8 @@
             "required": [
                 "title_number",
                 "borrowers",
-                "md_ref"
+                "md_ref",
+                "identity_checked"
             ],
             "properties": {
                 "title_number": {
