@@ -27,7 +27,7 @@ def setUpDB(self):
 
 
 def setUp_MortgageDocuments(self):
-    engine = create_engine('postgresql://vagrant:vagrant@localhost:5432/deed_api', convert_unicode=True)
+    engine = create_engine('postgresql://localhost:5432/deed_api', convert_unicode=True)
     metadata = MetaData(bind=engine)
     table = Table('mortgage_document', metadata, autoload=True)
     sql_connection = engine.connect()

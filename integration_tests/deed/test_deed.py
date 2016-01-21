@@ -22,6 +22,7 @@ class TestDeedRoutes(unittest.TestCase):
             '{'
             '   "title_number": "DN100",'
             '   "md_ref": "e-MD123G",'
+            '   "identity_checked": "Y",'
             '   "borrowers": ['
             '       {'
             '           "forename": "lisa",'
@@ -90,6 +91,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         deed_without_title_number = {
             "md_ref": "e-MD123G",
+            "identity_checked": "Y",
             "borrowers": [
                 {
                     "forename": "lisa",
@@ -124,6 +126,7 @@ class TestDeedRoutes(unittest.TestCase):
         deed_with_invalid_borrower = {
             "title_number": "DN100",
             "md_ref": "e-MD123G",
+            "identity_checked": "Y",
             "borrowers": [
                 {
                     "forename": "lisa"
@@ -142,6 +145,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         deed_without_md_ref = {
             "title_number": "DN100",
+            "identity_checked": "Y",
             "borrowers": [
                 {
                     "forename": "lisa",
@@ -177,6 +181,7 @@ class TestDeedRoutes(unittest.TestCase):
             '{'
             '   "title_number": "DN100",'
             '   "md_ref": "e-MD111G",'
+            '   "identity_checked": "Y",'
             '   "borrowers": ['
             '       {'
             '           "forename": "lisa",'
