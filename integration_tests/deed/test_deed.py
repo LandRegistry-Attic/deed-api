@@ -183,6 +183,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         deed_without_address = {
             "title_number": "DN100",
+            "md_ref": "e-MD123G",
             "borrowers": [
                 {
                     "forename": "lisa",
