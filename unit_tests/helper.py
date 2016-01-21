@@ -26,7 +26,8 @@ class DeedHelper:
                 "dob": "23/01/1986",
                 "phone_number": "07502154061"
             }
-        ]
+        ],
+        "identity_checked": "Y"
     }
 
     _invalid_title = {
@@ -42,68 +43,79 @@ class DeedHelper:
                 "forename": "lisa",
                 "surname": "bloggette"
             }
-        ]
+        ],
+        "identity_checked": "Y"
     }
 
-    _valid_borrowers = {"borrowers": [
-        {
-            "forename": "lisa",
-            "middle_name": "ann",
-            "surname": "bloggette",
-            "gender": "M",
-            "address": "test address with postcode, PL14 3JR",
-            "dob": "23/01/1986",
-            "phone_number": "07502154062"
-        },
-        {
-            "forename": "frank",
-            "middle_name": "ann",
-            "surname": "bloggette",
-            "gender": "M",
-            "address": "Test Address With Postcode, PL14 3JR",
-            "dob": "23/01/1986",
-            "phone_number": "07502154061"
-        }
-    ]}
+    _valid_borrowers = {
+        "borrowers": [
+            {
+                "forename": "lisa",
+                "middle_name": "ann",
+                "surname": "bloggette",
+                "gender": "M",
+                "address": "test address with postcode, PL14 3JR",
+                "dob": "23/01/1986",
+                "phone_number": "07502154062"
+            },
+            {
+                "forename": "frank",
+                "middle_name": "ann",
+                "surname": "bloggette",
+                "gender": "M",
+                "address": "Test Address With Postcode, PL14 3JR",
+                "dob": "23/01/1986",
+                "phone_number": "07502154061"
+            }
+        ],
+        "identity_checked": "Y"
+    }
 
-    _invalid_phone_numbers = {"borrowers": [
-        {
-            "forename": "lisa",
-            "middle_name": "ann",
-            "surname": "bloggette",
-            "gender": "M",
-            "address": "test address with postcode, PL14 3JR",
-            "dob": "23/01/1986",
-            "phone_number": "07502154062"
-        },
-        {
-            "forename": "frank",
-            "middle_name": "ann",
-            "surname": "bloggette",
-            "gender": "M",
-            "address": "Test Address With Postcode, PL14 3JR",
-            "dob": "23/01/1986",
-            "phone_number": "07502154062"
+    _invalid_phone_numbers = {
+        "borrowers":
+            [
+                {
+                    "forename": "lisa",
+                    "middle_name": "ann",
+                    "surname": "bloggette",
+                    "gender": "M",
+                    "address": "test address with postcode, PL14 3JR",
+                    "dob": "23/01/1986",
+                    "phone_number": "07502154062"
+                },
+                {
+                    "forename": "frank",
+                    "middle_name": "ann",
+                    "surname": "bloggette",
+                    "gender": "M",
+                    "address": "Test Address With Postcode, PL14 3JR",
+                    "dob": "23/01/1986",
+                    "phone_number": "07502154062"
+                }
+            ],
+            "identity_checked": "Y"
         }
-    ]}
 
-    _invalid_blanks_on_required_fields = {"borrowers": [
-        {
-            "forename": "lisa",
-            "middle_name": "ann",
-            "surname": "",
-            "gender": "M",
-            "address": "test address with postcode, PL14 3JR",
-            "dob": "23/01/1986",
-            "phone_number": "07502154062"
-        },
-        {
-            "forename": "",
-            "middle_name": "ann",
-            "surname": "bloggette",
-            "gender": "M",
-            "address": "Test Address With Postcode, PL14 3JR",
-            "dob": "23/01/1986",
-            "phone_number": "07502154061"
-        }
-    ]}
+    _invalid_blanks_on_required_fields = {
+        "borrowers": [
+            {
+                "forename": "lisa",
+                "middle_name": "ann",
+                "surname": "",
+                "gender": "M",
+                "address": "test address with postcode, PL14 3JR",
+                "dob": "23/01/1986",
+                "phone_number": "07502154062"
+            },
+            {
+                "forename": "",
+                "middle_name": "ann",
+                "surname": "bloggette",
+                "gender": "M",
+                "address": "Test Address With Postcode, PL14 3JR",
+                "dob": "23/01/1986",
+                "phone_number": "07502154061"
+            }
+        ],
+        "identity_checked": "Y"
+    }

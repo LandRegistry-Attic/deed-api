@@ -38,7 +38,8 @@ class TestDeedRoutes(unittest.TestCase):
                     "dob": "23/01/1986",
                     "phone_number": "07502154061"
                 }
-            ]
+            ],
+            "identity_checked": "Y"
         }
 
         create_deed = client.post('/deed/',
