@@ -18,7 +18,7 @@
             "post": {
                 "summary": "Deed",
                 "operationId": "addDeed",
-                "description": "The post Deed endpoint creates a new deed based on the JSON provided.\n The reponse will return a URL that can retrieve the created deed. \n Land Registry system requests Conveyancer to confirm that the Borrowers identity has been established in accordance with Section 111 of the Network Access Agreement. \n > Note: Identity checks must be complete in order to submit an application. (\"identity_checked\": \"Y\")",
+                "description": "The post Deed endpoint creates a new deed based on the JSON provided.\n The reponse will return a URL that can retrieve the created deed. \n > REQUIRED: Land Registry system requests Conveyancer to confirm that the Borrowers identity has been established in accordance with Section 111 of the Network Access Agreement.",
                 "consumes": [
                     "application/json"
                 ],
