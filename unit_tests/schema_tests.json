@@ -688,6 +688,7 @@
         "md_ref": "e-MD12345",
         "address": "",
         "title_number": "DN12345",
+        "identity_checked": "Y",
         "borrowers": [
           {
             "forename": "Amanda",
