@@ -7,7 +7,6 @@ from flask.ext.api import status
 from application.borrower.server import BorrowerService
 from underscore import _
 from application.borrower.model import Borrower
-import logging
 from application.mortgage_document.model import MortgageDocument
 import json
 
