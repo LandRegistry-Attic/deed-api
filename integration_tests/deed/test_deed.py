@@ -79,7 +79,8 @@ class TestDeedRoutes(unittest.TestCase):
             "md_ref": "e-MD123G",
             "address": "5 The Drive, This Town, This County, PL4 4TH",
             "borrowers": [
-            ]
+            ],
+            "identity_checked": "Y"
         }
 
         create_deed = client.post('/deed/',
@@ -113,7 +114,8 @@ class TestDeedRoutes(unittest.TestCase):
                     "dob": "23/01/1986",
                     "phone_number": "07502154061"
                 }
-            ]
+            ],
+            "identity_checked": "Y"
         }
 
         create_deed = client.post('/deed/',
@@ -134,7 +136,8 @@ class TestDeedRoutes(unittest.TestCase):
                 {
                     "forename": "lisa"
                 }
-            ]
+            ],
+            "identity_checked": "Y"
         }
 
         create_deed = client.post('/deed/',
@@ -169,7 +172,8 @@ class TestDeedRoutes(unittest.TestCase):
                     "dob": "23/01/1986",
                     "phone_number": "07502154061"
                 }
-            ]
+            ],
+            "identity_checked": "Y"
         }
 
         create_deed = client.post('/deed/',
@@ -203,7 +207,8 @@ class TestDeedRoutes(unittest.TestCase):
                     "dob": "23/01/1986",
                     "phone_number": "07502154061"
                 }
-            ]
+            ],
+            "identity_checked": "Y"
         }
 
         create_deed = client.post('/deed/',
