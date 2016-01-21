@@ -79,26 +79,29 @@ https://github.com/LandRegistry/dm-deed-api/blob/develop/application/deed/schema
 Example payload:
 ```
 {
-    "title_number": "DN100",
+    "title_number": "DT100",
     "md_ref": "e-MD12344",
     "borrowers": [
-        {
-            "forename": "lisa",
-            "middle_name": "ann",
-            "surname": "bloggette",
-            "address": "example address with postcode, PL14 3JR",
-            "dob": "23/01/1986",
-            "phone_number": "07502154075"
-        },
-        {
-            "forename": "frank",
-            "middle_name": "anne",
-            "surname": "bloggette",
-            "address": "Example address with postcode, PL14 3JR",
-            "dob": "23/01/1986",
-            "phone_number": "07502154076"
+      {
+           "forename": "Paul",
+           "middle_name": "James",
+           "surname": "Smythe",
+           "gender": "Male",
+           "address": "2 The Street, Plymouth, PL1 2PP",
+           "dob": "01/10/1976",
+           "phone_number": "07502159062"
+       },
+       {
+            "forename": "Jane",
+            "surname": "Smythe",
+            "gender": "Female",
+            "address": "2 The Street, Plymouth, PL1 2PP",
+            "dob": "01/12/1982",
+            "phone_number": "07502154999"
         }
     ],
-    "identity_checked": "Y"
-}
+    "identity_checked": "Y",
+    "address": "5 The Drive, This Town, This County, PL4 4TH",
+        
+}g
 ```
