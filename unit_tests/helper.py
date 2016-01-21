@@ -133,29 +133,28 @@ class DeedHelper:
     _validate_borrower = {"borrower_token": "aaaaaa", "dob": "23/01/1986"}
 
     _invalid_blank_address = {
-     "title_number": "DN100",
-     "md_ref": "e-MD12344",
-     "address": "",
-     "identity_checked": "Y",
-     "borrowers": [
-        {
-            "forename": "lisa",
-            "middle_name": "ann",
-            "surname": "bloggette",
-            "gender": "Male",
-            "address": "test address with postcode, PL14 3JR",
-            "dob": "23/01/1986",
-            "phone_number": "07502154062"
-        },
-        {
-            "forename": "frank",
-            "middle_name": "ann",
-            "surname": "bloggette",
-            "gender": "Female",
-            "address": "Test Address With Postcode, PL14 3JR",
-            "dob": "23/01/1986",
-            "phone_number": "07502154061"
-        }
-        ]
-
+        "title_number": "DN100",
+        "md_ref": "e-MD12344",
+        "address": "",
+        "borrowers": [
+            {
+                "forename": "lisa",
+                "middle_name": "ann",
+                "surname": "bloggette",
+                "gender": "Male",
+                "address": "test address with postcode, PL14 3JR",
+                "dob": "23/01/1986",
+                "phone_number": "07502154062"
+            },
+            {
+                "forename": "frank",
+                "middle_name": "ann",
+                "surname": "bloggette",
+                "gender": "Female",
+                "address": "Test Address With Postcode, PL14 3JR",
+                "dob": "23/01/1986",
+                "phone_number": "07502154061"
+            }
+        ],
+        "identity_checked": "Y",
     }
