@@ -191,7 +191,8 @@
                 "title_number",
                 "borrowers",
                 "md_ref",
-                "identity_checked"
+                "identity_checked",
+                "address"
             ],
             "properties": {
                 "title_number": {
@@ -212,6 +213,9 @@
                 "identity_checked": {
                   "pattern": "^[Y]$",
                   "type": "string"
+                "address": {
+                    "pattern": "^[a-zA-Z0-9\\s,]+$",
+                    "type": "string"
                 }
             }
         },
