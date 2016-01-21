@@ -96,7 +96,8 @@
                 "forename",
                 "dob",
                 "phone_number",
-                "address"
+                "address",
+                "identity_checked"
             ],
             "properties": {
                 "forename": {
