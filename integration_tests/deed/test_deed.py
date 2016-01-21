@@ -181,7 +181,7 @@ class TestDeedRoutes(unittest.TestCase):
     @with_client
     def test_deed_without_address(self, client):
 
-        deed_without_md_ref = {
+        deed_without_address = {
             "title_number": "DN100",
             "borrowers": [
                 {
@@ -206,7 +206,7 @@ class TestDeedRoutes(unittest.TestCase):
         }
 
         create_deed = client.post('/deed/',
-                                  data=json.dumps(deed_without_md_ref),
+                                  data=json.dumps(deed_without_address),
                                   headers={'content-type': 'application/json'})
 
         self.assertEqual(create_deed.status_code, 400)
