@@ -211,8 +211,9 @@
                     "type": "string"
                 },
                 "identity_checked": {
-                  "pattern": "^[Y]$",
-                  "type": "string"
+                    "pattern": "^[Y]$",
+                    "type": "string"
+                },
                 "address": {
                     "pattern": "^[a-zA-Z0-9\\s,]+$",
                     "type": "string"
