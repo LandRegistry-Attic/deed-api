@@ -126,6 +126,7 @@ class TestRoutes(unittest.TestCase):
                                  headers={"Content-Type": "application/json"})
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data.decode(), "Matching deed not found")
 
     def test_schema_checks(self):
         self.assertTrue(run_schema_checks())

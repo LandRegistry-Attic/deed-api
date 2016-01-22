@@ -263,5 +263,9 @@ class TestDeedRoutes(unittest.TestCase):
     @with_client
     def test_validate_borrower_not_found(self, client):
 
-        response = client.get('/borrower/aaaaaa')
+        response = client.post('/borrower/validate',
+                               data=json.dumps({"borrower_token": "unknown",
+                                                "dob": "23/01/1986"}),
+                               headers={"Content-Type": "application/json"})
         self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data.decode(), "Matching deed not found")
