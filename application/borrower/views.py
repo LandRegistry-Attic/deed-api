@@ -1,5 +1,5 @@
 from application.borrower.model import Borrower
-from flask import Blueprint, abort, request
+from flask import Blueprint, request
 from flask.ext.api import status
 import json
 
@@ -10,7 +10,6 @@ borrower_bp = Blueprint('borrower', __name__,
 
 @borrower_bp.route('/validate', methods=['POST'])
 def validate_borrower():
-    print("hello world")
     payload = request.get_json()
     borrower = Borrower.get_by_token(payload['borrower_token'])
 

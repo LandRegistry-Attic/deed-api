@@ -130,4 +130,4 @@ class DeedHelper:
         "identity_checked": "Y"
     }
 
-    _validate_borrower = {"borrower_token":"aaaaaa", "dob":"23/01/1986"}
+    _validate_borrower = {"borrower_token": "aaaaaa", "dob": "23/01/1986"}

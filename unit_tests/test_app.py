@@ -105,11 +105,11 @@ class TestRoutes(unittest.TestCase):
     def test_validate_borrower(self, mock_borrower):
         class ReturnedBorrower():
             deed_token = "aaaaaa"
-            dob="23/01/1986"
+            dob = "23/01/1986"
 
         mock_borrower.return_value = ReturnedBorrower()
         payload = json.dumps(DeedHelper._validate_borrower)
-        response = self.app.post(self.BORROWER_ENDPOINT + "/validate",
+        response = self.app.post(self.BORROWER_ENDPOINT + "validate",
                                  data=payload,
                                  headers={"Content-Type": "application/json"})
 
@@ -121,7 +121,7 @@ class TestRoutes(unittest.TestCase):
         mock_borrower.return_value = None
         payload = json.dumps(DeedHelper._validate_borrower)
 
-        response = self.app.post(self.BORROWER_ENDPOINT + "/validate",
+        response = self.app.post(self.BORROWER_ENDPOINT + "validate",
                                  data=payload,
                                  headers={"Content-Type": "application/json"})
 
