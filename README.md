@@ -92,7 +92,7 @@ Example payload:
         },
         {
             "forename": "frank",
-            "middle_name": "ann",
+            "middle_name": "anne",
             "surname": "bloggette",
             "address": "Example address with postcode, PL14 3JR",
             "dob": "23/01/1986",

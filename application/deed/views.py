@@ -1,3 +1,4 @@
+import logging
 from application.deed.model import Deed
 from application.deed.utils import validate_helper, valid_dob, is_unique_list
 from flask import request, abort, jsonify
@@ -6,7 +7,8 @@ from flask.ext.api import status
 from application.borrower.server import BorrowerService
 from underscore import _
 from application.borrower.model import Borrower
-import logging
+from application.mortgage_document.model import MortgageDocument
+import json
 
 LOGGER = logging.getLogger(__name__)
 
@@ -43,7 +45,9 @@ def create():
         json_doc = {
             "title_number": deed_json['title_number'],
             "md_ref": deed_json['md_ref'],
-            "borrowers": []
+            "borrowers": [],
+            "charge_clause": [],
+            "additional_provisions": []
             }
 
         deed.token = Deed.generate_token()
@@ -83,6 +87,18 @@ def create():
                 borrower_json["id"] = createdBorrower.id
                 borrower_json["token"] = createdBorrower.token
                 json_doc['borrowers'].append(borrower_json)
+
+            md_ref = deed_json["md_ref"]
+            mortgage_document = MortgageDocument.query.filter_by(md_ref=str(md_ref)).first()
+            if mortgage_document is not None:
+                md_json = json.loads(mortgage_document.data)
+                json_doc["charge_clause"] = md_json["charge_clause"]
+                json_doc["additional_provisions"] = md_json["additional_provisions"]
+                json_doc["lender"] = md_json["lender"]
+            else:
+                msg = "mortgage document associated with supplied md_ref is not found"
+                LOGGER.error(msg)
+                return msg, status.HTTP_400_BAD_REQUEST
 
             deed.deed = json_doc
 

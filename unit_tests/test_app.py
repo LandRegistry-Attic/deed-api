@@ -1,6 +1,6 @@
 from application import app
 from application.deed.model import Deed
-from unit_tests.helper import DeedHelper, DeedModelMock
+from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
 import unittest
@@ -31,26 +31,27 @@ class TestRoutes(unittest.TestCase):
 
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
-    def test_create_with_invalid(self, mock_Borrower, mock_Deed):
-        payload = json.dumps(DeedHelper._invalid_phone_numbers)
-        response = self.app.post(self.DEED_ENDPOINT, data=payload,
-                                 headers={"Content-Type": "application/json"})
+    @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
+    def create(self,  mock_query, mock_Deed, mock_Borrower):
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = MortgageDocMock()
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    @mock.patch('application.borrower.model.Borrower.save')
-    @mock.patch('application.deed.model.Deed.save')
-    @mock.patch('application.borrower.model.Borrower.get_by_id')
-    def test_create(self, mock_Borrower, mock_Deed, mock_borrower_get):
-        class ReturnedBorrower():
-            id = "9999"
-
-        mock_borrower_get.return_value = ReturnedBorrower()
         payload = json.dumps(DeedHelper._json_doc)
+
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
                                  headers={"Content-Type": "application/json"})
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    @mock.patch('application.borrower.model.Borrower.save')
+    @mock.patch('application.deed.model.Deed.save')
+    def test_create_with_invalid(self, mock_Borrower, mock_Deed):
+        payload = json.dumps(DeedHelper._invalid_phone_numbers)
+
+        response = self.app.post(self.DEED_ENDPOINT, data=payload,
+                                 headers={"Content-Type": "application/json"})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
@@ -120,3 +121,16 @@ class TestRoutes(unittest.TestCase):
 
     def test_schema_checks(self):
         self.assertTrue(run_schema_checks())
+
+    @mock.patch('application.borrower.model.Borrower.save')
+    @mock.patch('application.deed.model.Deed.save')
+    @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
+    def test_invalid_md_ref(self,  mock_query, mock_Deed, mock_Borrower):
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = None
+
+        payload = json.dumps(DeedHelper._json_doc)
+        response = self.app.post(self.DEED_ENDPOINT, data=payload,
+                                 headers={"Content-Type": "application/json"})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

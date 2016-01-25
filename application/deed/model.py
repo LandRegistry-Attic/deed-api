@@ -1,7 +1,7 @@
-from application import db
-from sqlalchemy.dialects.postgresql import JSON
 import copy
 import uuid
+from application import db
+from sqlalchemy.dialects.postgresql import JSON
 
 
 class Deed(db.Model):

@@ -2,6 +2,9 @@ from functools import wraps
 from application import app
 from application import db
 from flask.ext.script import Manager
+from migrations.setup_initial_data.data_importer import process_file
+from sqlalchemy import create_engine, MetaData, Table
+import os
 
 
 def with_client(test):
@@ -22,6 +25,21 @@ def setUpApp(self):
 def setUpDB(self):
     with self.app.app_context():
         db.create_all()
+
+
+def setUp_MortgageDocuments(self):
+
+    db_user = os.getenv("DB_USER", 'vagrant')
+    db_password = os.getenv("DB_PASSWORD", "vagrant")
+
+    engine = create_engine('postgresql://' + db_user + ':' + db_password + '@localhost:5432/deed_api', convert_unicode=True)
+    metadata = MetaData(bind=engine)
+    table = Table('mortgage_document', metadata, autoload=True)
+    sql_connection = engine.connect()
+
+    csv_file = open('./integration_tests/deed/test_md.csv', newline='')
+
+    process_file(csv_file, sql_connection, table)
 
 
 def tearDownDB(self):
