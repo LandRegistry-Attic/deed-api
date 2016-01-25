@@ -18,11 +18,10 @@ def build_data(cols, row):
 
 
 def process_input_options():
-    parser = argparse.ArgumentParser(
-            prog='data_importer', description='utility to import all '
-            'files of a given type (csv) in a given'
-            'directory to a particular postgres sql table. The first row '
-            'in the file indicates the column names to import.')
+    parser = argparse.ArgumentParser(prog='data_importer', description='utility to import all '
+                                                                       'files of a given type (csv) in a given '
+                                                                       'directory to a particular postgres sql table. The first row'
+                                                                       'in the file indicates the column names to import.')
     parser.add_argument('import_directory', default='.', metavar='/path/path',
                         help='import path relative to the executable')
     parser.add_argument('database_name', metavar='database_name',
