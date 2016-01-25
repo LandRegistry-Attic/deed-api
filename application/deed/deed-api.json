@@ -133,7 +133,7 @@
                 }
             }
         },
-        "ChargeClauses": {
+        "ChargeClause": {
             "type": "array",
             "minItems": 1,
             "items": {
@@ -172,8 +172,8 @@
                         "borrowers": {
                             "$ref": "#/definitions/Borrowers"
                         },
-                        "charge_clauses": {
-                            "$ref": "#/definitions/ChargeClauses"
+                        "charge_clause": {
+                            "$ref": "#/definitions/ChargeClause"
                         },
                         "additional_provisions": {
                             "$ref": "#/definitions/AdditionalProvisions"
