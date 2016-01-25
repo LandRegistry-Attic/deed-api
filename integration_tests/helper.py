@@ -4,6 +4,7 @@ from application import db
 from flask.ext.script import Manager
 from migrations.setup_initial_data.data_importer import process_file
 from sqlalchemy import create_engine, MetaData, Table
+import os
 
 
 def with_client(test):
@@ -27,7 +28,11 @@ def setUpDB(self):
 
 
 def setUp_MortgageDocuments(self):
-    engine = create_engine('postgresql://vagrant:vagrant@localhost:5432/deed_api', convert_unicode=True)
+
+    db_user = os.getenv("DB_USER", 'vagrant')
+    db_password = os.getenv("DB_PASSWORD", "vagrant")
+
+    engine = create_engine('postgresql://' + db_user + ':' + db_password + '@localhost:5432/deed_api', convert_unicode=True)
     metadata = MetaData(bind=engine)
     table = Table('mortgage_document', metadata, autoload=True)
     sql_connection = engine.connect()
