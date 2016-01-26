@@ -47,7 +47,8 @@ def create():
             "md_ref": deed_json['md_ref'],
             "borrowers": [],
             "charge_clause": [],
-            "additional_provisions": []
+            "additional_provisions": [],
+            "address": deed_json['address']
             }
 
         deed.token = Deed.generate_token()

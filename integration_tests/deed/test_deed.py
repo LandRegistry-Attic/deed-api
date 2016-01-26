@@ -18,33 +18,32 @@ class TestDeedRoutes(unittest.TestCase):
 
         setUp_MortgageDocuments(self)
 
-        valid_deed = json.loads(
-            '{'
-            '   "title_number": "DN100",'
-            '   "md_ref": "e-MD123G",'
-            '   "identity_checked": "Y",'
-            '   "borrowers": ['
-            '       {'
-            '           "forename": "lisa",'
-            '           "middle_name": "ann",'
-            '           "surname": "bloggette",'
-            '           "gender": "Male",'
-            '           "address": "test address with postcode, PL14 3JR",'
-            '           "dob": "23/01/1986",'
-            '           "phone_number": "07502154062"'
-            '       },'
-            '       {'
-            '           "forename": "frank",'
-            '           "middle_name": "ann",'
-            '           "surname": "bloggette",'
-            '           "gender": "Female",'
-            '           "address": "Test Address With Postcode, PL14 3JR",'
-            '           "dob": "23/01/1986",'
-            '           "phone_number": "07502154061"'
-            '       }'
-            '   ]'
-            '}'
-        )
+        valid_deed = {
+            "title_number": "DN100",
+            "md_ref": "e-MD123G",
+            "address": "5 The Drive, This Town, This County, PL4 4TH",
+            "borrowers": [
+                {
+                    "forename": "lisa",
+                    "middle_name": "ann",
+                    "surname": "bloggette",
+                    "gender": "Male",
+                    "address": "test address with postcode, PL14 3JR",
+                    "dob": "23/01/1986",
+                    "phone_number": "07502154062"
+                },
+                {
+                    "forename": "frank",
+                    "middle_name": "ann",
+                    "surname": "bloggette",
+                    "gender": "Female",
+                    "address": "Test Address With Postcode, PL14 3JR",
+                    "dob": "23/01/1986",
+                    "phone_number": "07502154061"
+                }
+            ],
+            "identity_checked": "Y"
+        }
 
         create_deed = client.post('/deed/',
                                   data=json.dumps(valid_deed),
@@ -63,6 +62,7 @@ class TestDeedRoutes(unittest.TestCase):
         self.assertIn("charge_clause", str(get_created_deed.data))
         self.assertIn("additional_provisions", str(get_created_deed.data))
         self.assertIn("lender", str(get_created_deed.data))
+        self.assertIn("address", str(get_created_deed.data))
 
     @with_client
     def test_bad_get(self, client):
@@ -77,8 +77,10 @@ class TestDeedRoutes(unittest.TestCase):
         deed_without_borrowers = {
             "title_number": "DN100",
             "md_ref": "e-MD123G",
+            "address": "5 The Drive, This Town, This County, PL4 4TH",
             "borrowers": [
-            ]
+            ],
+            "identity_checked": "Y"
         }
 
         create_deed = client.post('/deed/',
@@ -92,6 +94,7 @@ class TestDeedRoutes(unittest.TestCase):
         deed_without_title_number = {
             "md_ref": "e-MD123G",
             "identity_checked": "Y",
+            "address": "5 The Drive, This Town, This County, PL4 4TH",
             "borrowers": [
                 {
                     "forename": "lisa",
@@ -111,7 +114,8 @@ class TestDeedRoutes(unittest.TestCase):
                     "dob": "23/01/1986",
                     "phone_number": "07502154061"
                 }
-            ]
+            ],
+            "identity_checked": "Y"
         }
 
         create_deed = client.post('/deed/',
@@ -127,11 +131,13 @@ class TestDeedRoutes(unittest.TestCase):
             "title_number": "DN100",
             "md_ref": "e-MD123G",
             "identity_checked": "Y",
+            "address": "5 The Drive, This Town, This County, PL4 4TH",
             "borrowers": [
                 {
                     "forename": "lisa"
                 }
-            ]
+            ],
+            "identity_checked": "Y"
         }
 
         create_deed = client.post('/deed/',
@@ -146,6 +152,7 @@ class TestDeedRoutes(unittest.TestCase):
         deed_without_md_ref = {
             "title_number": "DN100",
             "identity_checked": "Y",
+            "address": "5 The Drive, This Town, This County, PL4 4TH",
             "borrowers": [
                 {
                     "forename": "lisa",
@@ -165,11 +172,47 @@ class TestDeedRoutes(unittest.TestCase):
                     "dob": "23/01/1986",
                     "phone_number": "07502154061"
                 }
-            ]
+            ],
+            "identity_checked": "Y"
         }
 
         create_deed = client.post('/deed/',
                                   data=json.dumps(deed_without_md_ref),
+                                  headers={'content-type': 'application/json'})
+
+        self.assertEqual(create_deed.status_code, 400)
+
+    @with_client
+    def test_deed_without_address(self, client):
+
+        deed_without_address = {
+            "title_number": "DN100",
+            "md_ref": "e-MD123G",
+            "borrowers": [
+                {
+                    "forename": "lisa",
+                    "middle_name": "ann",
+                    "surname": "bloggette",
+                    "gender": "Male",
+                    "address": "test address with postcode, PL14 3JR",
+                    "dob": "23/01/1986",
+                    "phone_number": "07502154062"
+                },
+                {
+                    "forename": "frank",
+                    "middle_name": "ann",
+                    "surname": "bloggette",
+                    "gender": "Female",
+                    "address": "Test Address With Postcode, PL14 3JR",
+                    "dob": "23/01/1986",
+                    "phone_number": "07502154061"
+                }
+            ],
+            "identity_checked": "Y"
+        }
+
+        create_deed = client.post('/deed/',
+                                  data=json.dumps(deed_without_address),
                                   headers={'content-type': 'application/json'})
 
         self.assertEqual(create_deed.status_code, 400)
