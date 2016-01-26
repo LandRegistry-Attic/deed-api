@@ -11,7 +11,10 @@ borrower_bp = Blueprint('borrower', __name__,
 @borrower_bp.route('/validate', methods=['POST'])
 def validate_borrower():
     payload = request.get_json()
-    borrower = Borrower.get_by_token(payload['borrower_token'])
+    borrower = None
+
+    if 'borrower_token' in payload:
+        borrower = Borrower.get_by_token(payload['borrower_token'].strip())
 
     if borrower is None or borrower.dob != payload['dob']:
         return "Matching deed not found", status.HTTP_404_NOT_FOUND
