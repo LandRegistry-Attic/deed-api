@@ -105,9 +105,13 @@ class TestRoutes(unittest.TestCase):
     def test_validate_borrower(self, mock_borrower):
         class ReturnedBorrower():
             deed_token = "aaaaaa"
+            dob = "23/01/1986"
 
         mock_borrower.return_value = ReturnedBorrower()
-        response = self.app.get(self.BORROWER_ENDPOINT+"aaaaaa")
+        payload = json.dumps(DeedHelper._validate_borrower)
+        response = self.app.post(self.BORROWER_ENDPOINT + "validate",
+                                 data=payload,
+                                 headers={"Content-Type": "application/json"})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -115,9 +119,14 @@ class TestRoutes(unittest.TestCase):
     def test_validate_borrower_not_found(self, mock_borrower):
 
         mock_borrower.return_value = None
-        response = self.app.get(self.BORROWER_ENDPOINT+"aaaaaa")
+        payload = json.dumps(DeedHelper._validate_borrower)
+
+        response = self.app.post(self.BORROWER_ENDPOINT + "validate",
+                                 data=payload,
+                                 headers={"Content-Type": "application/json"})
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data.decode(), "Matching deed not found")
 
     def test_schema_checks(self):
         self.assertTrue(run_schema_checks())
