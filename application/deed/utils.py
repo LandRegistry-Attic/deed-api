@@ -112,7 +112,7 @@ def load_json_file(file_path):
     return json_data
 
 
-def convert_json_to_sig_slot(borrower_json):
+def convert_json_to_signature_slot(borrower_json):
     sig_slot = api.signatureSlotType()
     borrower_name_xml = api.nameType()
     borrower_name_xml.set_forename(borrower_json["forename"])
@@ -165,7 +165,7 @@ def convert_json_to_xml(deed_json):
 
     for borrower_json in deed_json["borrowers"]:
         borrowers.add_borrower(convert_json_to_borrower(borrower_json))
-        borrower_sig_slots.add_borrower_signature(convert_json_to_sig_slot(borrower_json))
+        borrower_sig_slots.add_borrower_signature(convert_json_to_signature_slot(borrower_json))
 
     deed_data_xml.set_borrowers(borrowers)
     deed_data_xml.set_Id("deedData")
