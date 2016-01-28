@@ -116,6 +116,20 @@ class TestRoutes(unittest.TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     @mock.patch('application.borrower.model.Borrower.get_by_token')
+    def test_validate_borrower_no_leading_zero(self, mock_borrower):
+        class ReturnedBorrower():
+            deed_token = "aaaaaa"
+            dob = "01/01/1986"
+
+        mock_borrower.return_value = ReturnedBorrower()
+        payload = json.dumps(DeedHelper._validate_borrower_dob)
+        response = self.app.post(self.BORROWER_ENDPOINT + "validate",
+                                 data=payload,
+                                 headers={"Content-Type": "application/json"})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    @mock.patch('application.borrower.model.Borrower.get_by_token')
     def test_validate_borrower_not_found(self, mock_borrower):
 
         mock_borrower.return_value = None

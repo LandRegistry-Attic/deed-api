@@ -132,6 +132,8 @@ class DeedHelper:
 
     _validate_borrower = {"borrower_token": "aaaaaa", "dob": "23/01/1986"}
 
+    _validate_borrower_dob = {"borrower_token": "aaaaaa", "dob": "1/1/1986"}
+
     _invalid_blank_address = {
         "title_number": "DN100",
         "md_ref": "e-MD12344",
