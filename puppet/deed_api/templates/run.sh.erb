@@ -11,6 +11,8 @@ host="${<%=@module_name.upcase%>_GUNICORN_HOST:-0.0.0.0}"
 
 upgrade_success="python3 manage.py db upgrade"
 
+python3 data_importer.py /data/mortgage_document $DEED_DATABASE_URI mortgage_document
+
 if $upgrade_success; then
   gunicorn -b $host:$port --pid /var/run/<%=@module_name%>/<%=@module_name%>.pid "application:app"
 else
