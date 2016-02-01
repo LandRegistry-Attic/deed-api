@@ -2,6 +2,8 @@ import json
 import unittest
 from integration_tests.helper import with_client, setUpApp, setUpDB, tearDownDB, setUp_MortgageDocuments
 from application.borrower.server import BorrowerService
+from integration_tests.deed.deed_data import valid_deed
+import copy
 
 
 class TestDeedRoutes(unittest.TestCase):
@@ -17,33 +19,6 @@ class TestDeedRoutes(unittest.TestCase):
     def test_deed_create_and_get(self, client):
 
         setUp_MortgageDocuments(self)
-
-        valid_deed = {
-            "title_number": "DN100",
-            "md_ref": "e-MD123G",
-            "address": "5 The Drive, This Town, This County, PL4 4TH",
-            "borrowers": [
-                {
-                    "forename": "lisa",
-                    "middle_name": "ann",
-                    "surname": "bloggette",
-                    "gender": "Male",
-                    "address": "test address with postcode, PL14 3JR",
-                    "dob": "23/01/1986",
-                    "phone_number": "07502154062"
-                },
-                {
-                    "forename": "frank",
-                    "middle_name": "ann",
-                    "surname": "bloggette",
-                    "gender": "Female",
-                    "address": "Test Address With Postcode, PL14 3JR",
-                    "dob": "23/01/1986",
-                    "phone_number": "07502154061"
-                }
-            ],
-            "identity_checked": "Y"
-        }
 
         create_deed = client.post('/deed/',
                                   data=json.dumps(valid_deed),
@@ -62,7 +37,7 @@ class TestDeedRoutes(unittest.TestCase):
         self.assertIn("charge_clause", str(get_created_deed.data))
         self.assertIn("additional_provisions", str(get_created_deed.data))
         self.assertIn("lender", str(get_created_deed.data))
-        self.assertIn("address", str(get_created_deed.data))
+        self.assertIn("property_address", str(get_created_deed.data))
 
     @with_client
     def test_bad_get(self, client):
@@ -74,14 +49,8 @@ class TestDeedRoutes(unittest.TestCase):
     @with_client
     def test_deed_without_borrowers(self, client):
 
-        deed_without_borrowers = {
-            "title_number": "DN100",
-            "md_ref": "e-MD123G",
-            "address": "5 The Drive, This Town, This County, PL4 4TH",
-            "borrowers": [
-            ],
-            "identity_checked": "Y"
-        }
+        deed_without_borrowers = copy.deepcopy(valid_deed)
+        deed_without_borrowers["borrowers"] = []
 
         create_deed = client.post('/deed/',
                                   data=json.dumps(deed_without_borrowers),
@@ -91,32 +60,8 @@ class TestDeedRoutes(unittest.TestCase):
     @with_client
     def test_deed_without_title(self, client):
 
-        deed_without_title_number = {
-            "md_ref": "e-MD123G",
-            "identity_checked": "Y",
-            "address": "5 The Drive, This Town, This County, PL4 4TH",
-            "borrowers": [
-                {
-                    "forename": "lisa",
-                    "middle_name": "ann",
-                    "surname": "bloggette",
-                    "gender": "Male",
-                    "address": "test address with postcode, PL14 3JR",
-                    "dob": "23/01/1986",
-                    "phone_number": "07502154062"
-                },
-                {
-                    "forename": "frank",
-                    "middle_name": "ann",
-                    "surname": "bloggette",
-                    "gender": "Female",
-                    "address": "Test Address With Postcode, PL14 3JR",
-                    "dob": "23/01/1986",
-                    "phone_number": "07502154061"
-                }
-            ],
-            "identity_checked": "Y"
-        }
+        deed_without_title_number = copy.deepcopy(valid_deed)
+        del deed_without_title_number["title_number"]
 
         create_deed = client.post('/deed/',
                                   data=json.dumps(deed_without_title_number),
@@ -127,18 +72,12 @@ class TestDeedRoutes(unittest.TestCase):
     @with_client
     def test_deed_with_missing_borrower_properties(self, client):
 
-        deed_with_invalid_borrower = {
-            "title_number": "DN100",
-            "md_ref": "e-MD123G",
-            "identity_checked": "Y",
-            "address": "5 The Drive, This Town, This County, PL4 4TH",
-            "borrowers": [
-                {
-                    "forename": "lisa"
-                }
-            ],
-            "identity_checked": "Y"
-        }
+        deed_with_invalid_borrower = copy.deepcopy(valid_deed)
+        deed_with_invalid_borrower["borrowers"] = [
+            {
+                "forename": "lisa"
+            }
+        ]
 
         create_deed = client.post('/deed/',
                                   data=json.dumps(deed_with_invalid_borrower),
@@ -149,32 +88,8 @@ class TestDeedRoutes(unittest.TestCase):
     @with_client
     def test_deed_without_md_ref(self, client):
 
-        deed_without_md_ref = {
-            "title_number": "DN100",
-            "identity_checked": "Y",
-            "address": "5 The Drive, This Town, This County, PL4 4TH",
-            "borrowers": [
-                {
-                    "forename": "lisa",
-                    "middle_name": "ann",
-                    "surname": "bloggette",
-                    "gender": "Male",
-                    "address": "test address with postcode, PL14 3JR",
-                    "dob": "23/01/1986",
-                    "phone_number": "07502154062"
-                },
-                {
-                    "forename": "frank",
-                    "middle_name": "ann",
-                    "surname": "bloggette",
-                    "gender": "Female",
-                    "address": "Test Address With Postcode, PL14 3JR",
-                    "dob": "23/01/1986",
-                    "phone_number": "07502154061"
-                }
-            ],
-            "identity_checked": "Y"
-        }
+        deed_without_md_ref = copy.deepcopy(valid_deed)
+        del deed_without_md_ref["md_ref"]
 
         create_deed = client.post('/deed/',
                                   data=json.dumps(deed_without_md_ref),
@@ -185,31 +100,8 @@ class TestDeedRoutes(unittest.TestCase):
     @with_client
     def test_deed_without_address(self, client):
 
-        deed_without_address = {
-            "title_number": "DN100",
-            "md_ref": "e-MD123G",
-            "borrowers": [
-                {
-                    "forename": "lisa",
-                    "middle_name": "ann",
-                    "surname": "bloggette",
-                    "gender": "Male",
-                    "address": "test address with postcode, PL14 3JR",
-                    "dob": "23/01/1986",
-                    "phone_number": "07502154062"
-                },
-                {
-                    "forename": "frank",
-                    "middle_name": "ann",
-                    "surname": "bloggette",
-                    "gender": "Female",
-                    "address": "Test Address With Postcode, PL14 3JR",
-                    "dob": "23/01/1986",
-                    "phone_number": "07502154061"
-                }
-            ],
-            "identity_checked": "Y"
-        }
+        deed_without_address = copy.deepcopy(valid_deed)
+        del deed_without_address["property_address"]
 
         create_deed = client.post('/deed/',
                                   data=json.dumps(deed_without_address),
@@ -220,33 +112,8 @@ class TestDeedRoutes(unittest.TestCase):
     @with_client
     def test_deed_with_unknown_md_ref(self, client):
 
-        deed_with_unknown_md_ref = json.loads(
-            '{'
-            '   "title_number": "DN100",'
-            '   "md_ref": "e-MD111G",'
-            '   "identity_checked": "Y",'
-            '   "borrowers": ['
-            '       {'
-            '           "forename": "lisa",'
-            '           "middle_name": "ann",'
-            '           "surname": "bloggette",'
-            '           "gender": "Male",'
-            '           "address": "test address with postcode, PL14 3JR",'
-            '           "dob": "23/01/1986",'
-            '           "phone_number": "07502154062"'
-            '       },'
-            '       {'
-            '           "forename": "frank",'
-            '           "middle_name": "ann",'
-            '           "surname": "bloggette",'
-            '           "gender": "Female",'
-            '           "address": "Test Address With Postcode, PL14 3JR",'
-            '           "dob": "23/01/1986",'
-            '           "phone_number": "07502154061"'
-            '       }'
-            '   ]'
-            '}'
-        )
+        deed_with_unknown_md_ref = copy.deepcopy(valid_deed)
+        deed_with_unknown_md_ref["md_ref"] = "e-MD111G"
 
         create_deed = client.post('/deed/',
                                   data=json.dumps(deed_with_unknown_md_ref),
@@ -258,15 +125,8 @@ class TestDeedRoutes(unittest.TestCase):
     def test_delete_borrower(self, client):
 
         borrowerService = BorrowerService()
-        borrower = {
-            "forename": "lisa",
-            "middle_name": "ann",
-            "surname": "bloggette",
-            "gender": "Male",
-            "address": "test address with postcode, PL14 3JR",
-            "dob": "23/01/1986",
-            "phone_number": "07502154062"
-        }
+        borrower = valid_deed["borrowers"][0]
+
         newBorrower = borrowerService.saveBorrower(borrower, "aaaaaa")
         response = client.delete('/deed/borrowers/delete/'+str(newBorrower.id))
 
@@ -283,17 +143,7 @@ class TestDeedRoutes(unittest.TestCase):
     def test_validate_borrower(self, client):
         borrowerService = BorrowerService()
 
-        borrower = {
-            "forename": "lisa",
-            "deed_token": "aaaaaa",
-            "token": "bbbbbb",
-            "middle_name": "ann",
-            "surname": "bloggette",
-            "gender": "Male",
-            "address": "test address with postcode, PL14 3JR",
-            "dob": "23/01/1986",
-            "phone_number": "07502154062"
-        }
+        borrower = valid_deed["borrowers"][0]
 
         newBorrower = borrowerService.saveBorrower(borrower, "aaaaaa")
         response = client.post('/borrower/validate',
