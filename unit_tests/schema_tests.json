@@ -312,7 +312,7 @@
     {
       "payload": {
         "title_number": "DT567568",
-        "address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
         "md_ref": "e-MD12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -351,7 +351,7 @@
     {
       "payload": {
         "title_number": "DT567568",
-        "address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
         "md_ref": "e-MD12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -390,7 +390,7 @@
     {
       "payload": {
         "title_number": "DT567568",
-        "address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
         "md_ref": "e-MD12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -429,7 +429,7 @@
     {
       "payload": {
         "title_number": "DT567568",
-        "address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
         "md_ref": "e-MD12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -467,7 +467,7 @@
     {
       "payload": {
         "title_number": "DT567568",
-        "address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
         "md_ref": "e-MD12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -504,7 +504,7 @@
     {
       "payload": {
         "title_number": "DT567568",
-        "address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
         "md_ref": "e-MD12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -543,7 +543,7 @@
       "payload": {
         "md_ref": "e-MD12345",
         "identity_checked": "Y",
-        "address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
         "borrowers": [
           {
             "forename": "Amanda",
@@ -580,7 +580,7 @@
     {
       "payload": {
         "md_ref": "e-MD12345",
-        "address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
         "title_number": "DN12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -602,7 +602,7 @@
       "payload": {
         "title_number": "DN12345",
         "identity_checked": "Y",
-        "address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
         "borrowers": [
           {
             "forename": "Amanda",
@@ -623,7 +623,7 @@
         "md_ref": "e-MD12345",
         "title_number": "DN12345",
         "identity_checked": "Y",
-        "address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
         "borrowers": [
           {
             "forename": "Amanda",
@@ -645,7 +645,7 @@
         "md_ref": "e-MD12345",
         "title_number": "DN12345",
         "identity_checked": "Y",
-        "address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
         "extra2": "some extra property data",
         "borrowers": [
           {
@@ -665,7 +665,7 @@
     {
       "payload": {
         "md_ref": "e-MD12345",
-        "address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
         "title_number": "DN12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -686,7 +686,7 @@
     {
       "payload": {
         "md_ref": "e-MD12345",
-        "address": "",
+        "property_address": "",
         "title_number": "DN12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -700,7 +700,7 @@
           }
         ]
       },
-      "description": "address is blank - not allowed",
+      "description": "property address is blank - not allowed",
       "expected": 1
     }
   ]

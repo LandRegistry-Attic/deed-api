@@ -48,7 +48,7 @@ def create():
             "borrowers": [],
             "charge_clause": [],
             "additional_provisions": [],
-            "address": deed_json['address']
+            "property_address": deed_json['property_address']
             }
 
         deed.token = Deed.generate_token()

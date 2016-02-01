@@ -21,7 +21,8 @@ class TestDeedRoutes(unittest.TestCase):
         valid_deed = {
             "title_number": "DN100",
             "md_ref": "e-MD123G",
-            "address": "5 The Drive, This Town, This County, PL4 4TH",
+            "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+            "identity_checked": "Y",
             "borrowers": [
                 {
                     "forename": "lisa",
@@ -41,8 +42,7 @@ class TestDeedRoutes(unittest.TestCase):
                     "dob": "23/01/1986",
                     "phone_number": "07502154061"
                 }
-            ],
-            "identity_checked": "Y"
+            ]
         }
 
         create_deed = client.post('/deed/',
@@ -62,7 +62,7 @@ class TestDeedRoutes(unittest.TestCase):
         self.assertIn("charge_clause", str(get_created_deed.data))
         self.assertIn("additional_provisions", str(get_created_deed.data))
         self.assertIn("lender", str(get_created_deed.data))
-        self.assertIn("address", str(get_created_deed.data))
+        self.assertIn("property_address", str(get_created_deed.data))
 
     @with_client
     def test_bad_get(self, client):
@@ -77,10 +77,10 @@ class TestDeedRoutes(unittest.TestCase):
         deed_without_borrowers = {
             "title_number": "DN100",
             "md_ref": "e-MD123G",
-            "address": "5 The Drive, This Town, This County, PL4 4TH",
+            "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+            "identity_checked": "Y",
             "borrowers": [
-            ],
-            "identity_checked": "Y"
+            ]
         }
 
         create_deed = client.post('/deed/',
@@ -94,7 +94,7 @@ class TestDeedRoutes(unittest.TestCase):
         deed_without_title_number = {
             "md_ref": "e-MD123G",
             "identity_checked": "Y",
-            "address": "5 The Drive, This Town, This County, PL4 4TH",
+            "property_address": "5 The Drive, This Town, This County, PL4 4TH",
             "borrowers": [
                 {
                     "forename": "lisa",
@@ -114,8 +114,7 @@ class TestDeedRoutes(unittest.TestCase):
                     "dob": "23/01/1986",
                     "phone_number": "07502154061"
                 }
-            ],
-            "identity_checked": "Y"
+            ]
         }
 
         create_deed = client.post('/deed/',
@@ -136,8 +135,7 @@ class TestDeedRoutes(unittest.TestCase):
                 {
                     "forename": "lisa"
                 }
-            ],
-            "identity_checked": "Y"
+            ]
         }
 
         create_deed = client.post('/deed/',
@@ -152,7 +150,7 @@ class TestDeedRoutes(unittest.TestCase):
         deed_without_md_ref = {
             "title_number": "DN100",
             "identity_checked": "Y",
-            "address": "5 The Drive, This Town, This County, PL4 4TH",
+            "property_address": "5 The Drive, This Town, This County, PL4 4TH",
             "borrowers": [
                 {
                     "forename": "lisa",
@@ -172,8 +170,7 @@ class TestDeedRoutes(unittest.TestCase):
                     "dob": "23/01/1986",
                     "phone_number": "07502154061"
                 }
-            ],
-            "identity_checked": "Y"
+            ]
         }
 
         create_deed = client.post('/deed/',
@@ -188,6 +185,7 @@ class TestDeedRoutes(unittest.TestCase):
         deed_without_address = {
             "title_number": "DN100",
             "md_ref": "e-MD123G",
+            "identity_checked": "Y",
             "borrowers": [
                 {
                     "forename": "lisa",
@@ -207,8 +205,7 @@ class TestDeedRoutes(unittest.TestCase):
                     "dob": "23/01/1986",
                     "phone_number": "07502154061"
                 }
-            ],
-            "identity_checked": "Y"
+            ]
         }
 
         create_deed = client.post('/deed/',
@@ -220,33 +217,31 @@ class TestDeedRoutes(unittest.TestCase):
     @with_client
     def test_deed_with_unknown_md_ref(self, client):
 
-        deed_with_unknown_md_ref = json.loads(
-            '{'
-            '   "title_number": "DN100",'
-            '   "md_ref": "e-MD111G",'
-            '   "identity_checked": "Y",'
-            '   "borrowers": ['
-            '       {'
-            '           "forename": "lisa",'
-            '           "middle_name": "ann",'
-            '           "surname": "bloggette",'
-            '           "gender": "Male",'
-            '           "address": "test address with postcode, PL14 3JR",'
-            '           "dob": "23/01/1986",'
-            '           "phone_number": "07502154062"'
-            '       },'
-            '       {'
-            '           "forename": "frank",'
-            '           "middle_name": "ann",'
-            '           "surname": "bloggette",'
-            '           "gender": "Female",'
-            '           "address": "Test Address With Postcode, PL14 3JR",'
-            '           "dob": "23/01/1986",'
-            '           "phone_number": "07502154061"'
-            '       }'
-            '   ]'
-            '}'
-        )
+        deed_with_unknown_md_ref = {
+                "title_number": "DN100",
+                "md_ref": "e-MD111G",
+                "identity_checked": "Y",
+                "borrowers": [
+                    {
+                        "forename": "lisa",
+                        "middle_name": "ann",
+                        "surname": "bloggette",
+                        "gender": "Male",
+                        "address": "test address with postcode, PL14 3JR",
+                        "dob": "23/01/1986",
+                        "phone_number": "07502154062"
+                    },
+                    {
+                        "forename": "frank",
+                        "middle_name": "ann",
+                        "surname": "bloggette",
+                        "gender": "Female",
+                        "address": "Test Address With Postcode, PL14 3JR",
+                        "dob": "23/01/1986",
+                        "phone_number": "07502154061"
+                    }
+                ]
+            }
 
         create_deed = client.post('/deed/',
                                   data=json.dumps(deed_with_unknown_md_ref),
