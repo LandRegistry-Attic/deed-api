@@ -9,6 +9,8 @@ from underscore import _
 from application.borrower.model import Borrower
 from application.mortgage_document.model import MortgageDocument
 import json
+from sqlalchemy.sql import text
+from application import db
 
 LOGGER = logging.getLogger(__name__)
 
@@ -27,6 +29,40 @@ def get_deed(deed_reference):
         result.deed['token'] = result.token
 
     return jsonify({"deed": result.deed}), status.HTTP_200_OK
+
+
+@deed_bp.route('', methods=['GET'])
+def get_deed_case():
+    mdref = request.args.get("mdref")
+    title_number = request.args.get("title_number")
+
+    # result = Deed.query.filter_by(token=str(deed_reference)).first()
+    deed_token = Deed.query(Deed.deed["md_ref"].astext == str(mdref)).first()
+
+    conn = db.session.connection()
+
+    sql = text("SELECT * "
+               "FROM deed AS the_deed "
+               "WHERE :token in "
+               "(SELECT jsonb_array_elements("
+               "json_doc -> 'deed' -> 'operative-deed' -> "
+               "'borrowers') ->> 'token' "
+               "FROM deed WHERE id = the_deed.id)")
+
+    result = conn.execute(sql, token=token_) \
+        .fetchall()
+
+    result = conn.execute(sql, token=token_) \
+        .fetchall()
+
+    # if token_result is None:
+    #     abort(status.HTTP_404_NOT_FOUND)
+    # else:
+    #     token_result.deed['token'] = token_result.token
+    #
+    # return jsonify({"deed": result.deed}), status.HTTP_200_OK
+
+    return "Hello World - " + "MdRef = " + mdref + " Title Number = " + title_number + "Token is " + deed_token
 
 
 @deed_bp.route('/', methods=['POST'])
