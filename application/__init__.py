@@ -1,7 +1,7 @@
 import json
-from flask import Flask
+from flask import Flask, request
 from flask.ext.sqlalchemy import SQLAlchemy
-
+import os
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
@@ -19,4 +19,8 @@ app.url_map.strict_slashes = False
 
 @app.route("/health")
 def check_status():
-    return json.dumps({"Status": "OK"})
+    return json.dumps({
+        "Status": "OK",
+        "headers": str(request.headers),
+        "commit": str(os.getenv("COMMIT", "LOCAL"))
+    })

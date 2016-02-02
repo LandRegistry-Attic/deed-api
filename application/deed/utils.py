@@ -4,14 +4,13 @@ import json
 import os
 import sys
 import logging
-
-LOGGER = logging.getLogger(__name__)
-
 from jsonschema.validators import validator_for
 from lxml import etree
 from underscore import _
-
 import application.deed.generated.deed_xmlify as api
+
+LOGGER = logging.getLogger(__name__)
+
 
 XML_SCHEMA_FILE = "deed-schema-v0-1.xsd"
 
