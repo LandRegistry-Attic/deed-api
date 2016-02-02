@@ -33,36 +33,18 @@ def get_deed(deed_reference):
 
 @deed_bp.route('', methods=['GET'])
 def get_deed_case():
-    mdref = request.args.get("mdref")
+    md_ref = request.args.get("mdref")
     title_number = request.args.get("title_number")
-
-    # result = Deed.query.filter_by(token=str(deed_reference)).first()
-    deed_token = Deed.query(Deed.deed["md_ref"].astext == str(mdref)).first()
 
     conn = db.session.connection()
 
-    sql = text("SELECT * "
-               "FROM deed AS the_deed "
-               "WHERE :token in "
-               "(SELECT jsonb_array_elements("
-               "json_doc -> 'deed' -> 'operative-deed' -> "
-               "'borrowers') ->> 'token' "
-               "FROM deed WHERE id = the_deed.id)")
+    sql = text("SELECT deed.id AS deed_id, deed.token AS deed_token, deed.deed AS deed_deed, "
+               "deed.identity_checked AS deed_identity_checked FROM deed WHERE (deed.deed ->> 'md_ref') "
+               "= :md_ref AND (deed.deed ->> 'title_number') = :title_number;")
 
-    result = conn.execute(sql, token=token_) \
-        .fetchall()
+    result = conn.execute(sql, md_ref=md_ref, title_number=title_number).fetchall()
 
-    result = conn.execute(sql, token=token_) \
-        .fetchall()
-
-    # if token_result is None:
-    #     abort(status.HTTP_404_NOT_FOUND)
-    # else:
-    #     token_result.deed['token'] = token_result.token
-    #
-    # return jsonify({"deed": result.deed}), status.HTTP_200_OK
-
-    return "Hello World - " + "MdRef = " + mdref + " Title Number = " + title_number + "Token is " + deed_token
+    return str(result)
 
 
 @deed_bp.route('/', methods=['POST'])
