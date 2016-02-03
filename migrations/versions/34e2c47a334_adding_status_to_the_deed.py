@@ -1,3 +1,4 @@
+# flake8: noqa
 """adding status to the deed
 
 Revision ID: 34e2c47a334
