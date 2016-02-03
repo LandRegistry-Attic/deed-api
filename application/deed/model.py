@@ -12,7 +12,7 @@ class Deed(db.Model):
     token = db.Column(db.String, nullable=False)
     deed = db.Column(JSON)
     identity_checked = db.Column(db.String(1), nullable=False)
-    status = db.Column(db.String(16), default='CREATED')
+    status = db.Column(db.String(16), default='DRAFT')
 
     def save(self):  # pragma: no cover
         db.session.add(self)

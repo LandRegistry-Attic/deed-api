@@ -1,14 +1,13 @@
-# flake8: noqa
 """adding status to the deed
 
-Revision ID: 15523f20726
+Revision ID: 34e2c47a334
 Revises: 2ef609ed309
-Create Date: 2016-02-02 21:44:16.429977
+Create Date: 2016-02-03 11:08:54.380809
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '15523f20726'
+revision = '34e2c47a334'
 down_revision = '2ef609ed309'
 
 from alembic import op
