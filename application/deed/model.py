@@ -24,3 +24,22 @@ class Deed(db.Model):
 
     def get_json_doc(self):
         return copy.deepcopy(self.json_doc)
+
+    @staticmethod
+    def get_deed_status(title_number, mdref):
+
+        deeds = Deed.query.filter(
+            and_(
+                Deed.deed['title_number'].astext == title_number,
+                Deed.deed['md_ref'].astext == mdref
+            )
+        ).all()
+
+        deeds_with_status = list(
+            map(lambda deed: {
+                "token": deed.token,
+                "status": deed.status
+            }, deeds)
+        )
+
+        return deeds_with_status

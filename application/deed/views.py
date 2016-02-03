@@ -1,7 +1,7 @@
 import logging
 from application.deed.model import Deed
 from application.deed.utils import validate_helper, valid_dob, is_unique_list
-from flask import request, abort, jsonify
+from flask import request, abort, jsonify, Response
 from flask import Blueprint
 from flask.ext.api import status
 from application.borrower.server import BorrowerService
@@ -9,8 +9,7 @@ from underscore import _
 from application.borrower.model import Borrower
 from application.mortgage_document.model import MortgageDocument
 import json
-from sqlalchemy.sql import text
-from application import db
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -32,19 +31,23 @@ def get_deed(deed_reference):
 
 
 @deed_bp.route('', methods=['GET'])
-def get_deed_case():
-    md_ref = request.args.get("mdref")
+def get_deeds_status_with_mdref_and_title_number():
+    md_ref = request.args.get("md_ref")
     title_number = request.args.get("title_number")
 
-    conn = db.session.connection()
+    if md_ref and title_number:
+        deeds_status = Deed.get_deed_status(title_number, md_ref)
 
-    sql = text("SELECT deed.id AS deed_id, deed.token AS deed_token, deed.deed AS deed_deed, "
-               "deed.identity_checked AS deed_identity_checked FROM deed WHERE (deed.deed ->> 'md_ref') "
-               "= :md_ref AND (deed.deed ->> 'title_number') = :title_number;")
+        if len(deeds_status) == 0:
+            abort(status.HTTP_404_NOT_FOUND)
 
-    result = conn.execute(sql, md_ref=md_ref, title_number=title_number).fetchall()
+        return Response(
+            json.dumps(deeds_status),
+            status=200,
+            mimetype='application/json'
+        )
 
-    return str(result)
+    return abort(status.HTTP_400_BAD_REQUEST)
 
 
 @deed_bp.route('/', methods=['POST'])
