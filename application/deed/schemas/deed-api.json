@@ -23,7 +23,7 @@
                     "application/json"
                 ],
                 "produces": [
-                    "application/json"
+                    "text/plain"
                 ],
                 "parameters": [
                     {
