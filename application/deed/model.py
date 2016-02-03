@@ -2,6 +2,7 @@ import copy
 import uuid
 from application import db
 from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.sql.operators import and_
 
 
 class Deed(db.Model):
@@ -11,6 +12,7 @@ class Deed(db.Model):
     token = db.Column(db.String, nullable=False)
     deed = db.Column(JSON)
     identity_checked = db.Column(db.String(1), nullable=False)
+    status = db.Column(db.String(16), default='CREATED')
 
     def save(self):  # pragma: no cover
         db.session.add(self)
