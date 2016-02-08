@@ -95,6 +95,14 @@ class TestRoutes(unittest.TestCase):
         self.assertTrue("DRAFT" in response.data.decode())
         self.assertTrue("c91d57" in response.data.decode())
 
+    @mock.patch('application.deed.model.Deed.get_deed_status', autospec=True)
+    def test_get_no_status_with_mdref_and_titleno_endpoint(self, get_deed_status):
+        get_deed_status.return_value = StatusMock()._no_status_with_mdref_and_titleno
+
+        response = self.app.get(self.DEED_QUERY + '?md_ref=e-MD12344&title_number=DN100')
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
     @mock.patch('application.deed.model.Deed.query', autospec=True)
     def test_get_endpoint_not_found(self, mock_query):
         mock_instance_response = mock_query.filter_by.return_value
