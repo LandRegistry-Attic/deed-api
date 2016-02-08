@@ -158,3 +158,12 @@ class DeedHelper:
         ],
         "identity_checked": "Y",
     }
+
+
+class StatusMock:
+    _status_with_mdref_and_titleno = [
+        {
+            "status": "DRAFT",
+            "token": "c91d57"
+        }
+    ]

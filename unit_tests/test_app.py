@@ -1,6 +1,6 @@
 from application import app
 from application.deed.model import Deed
-from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock
+from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, StatusMock
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
@@ -12,6 +12,7 @@ import mock
 class TestRoutes(unittest.TestCase):
 
     DEED_ENDPOINT = "/deed/"
+    DEED_QUERY = "/deed"
     BORROWER_ENDPOINT = "/borrower/"
 
     def setUp(self):
@@ -24,6 +25,10 @@ class TestRoutes(unittest.TestCase):
 
     def test_deed(self):
         self.assertEqual((self.app.get('/deed')).status_code,
+                         status.HTTP_400_BAD_REQUEST)
+
+    def test_status_with_invalid_params(self):
+        self.assertEqual((self.app.get('/deed?invalid=invalid')).status_code,
                          status.HTTP_400_BAD_REQUEST)
 
     def test_model(self):
@@ -79,6 +84,16 @@ class TestRoutes(unittest.TestCase):
         response = self.app.get(self.DEED_ENDPOINT + 'AB1234')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue("DN100" in response.data.decode())
+
+    @mock.patch('application.deed.model.Deed.get_deed_status', autospec=True)
+    def test_get_status_with_mdref_and_titleno_endpoint(self, get_deed_status):
+        get_deed_status.return_value = StatusMock()._status_with_mdref_and_titleno
+
+        response = self.app.get(self.DEED_QUERY + '?md_ref=e-MD12344&title_number=DN100')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue("DRAFT" in response.data.decode())
+        self.assertTrue("c91d57" in response.data.decode())
 
     @mock.patch('application.deed.model.Deed.query', autospec=True)
     def test_get_endpoint_not_found(self, mock_query):
