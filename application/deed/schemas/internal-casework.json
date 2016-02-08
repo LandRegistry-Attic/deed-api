@@ -5,7 +5,7 @@
         "title": "Land Registry Internal Casework API"
     },
     "paths": {
-        "/deed?": {
+        "/deed": {
             "get": {
                 "description": "Sending in a md-ref and a title number will return a deed's token and status if it exists.\n",
                 "parameters": [
