@@ -11,14 +11,13 @@ class TestDeedRoutes(unittest.TestCase):
     def setUp(self):
         setUpApp(self)
         setUpDB(self)
+        setUp_MortgageDocuments(self)
 
     def tearDown(self):
         tearDownDB(self)
 
     @with_client
     def test_deed_create_and_get(self, client):
-
-        setUp_MortgageDocuments(self)
 
         create_deed = client.post('/deed/',
                                   data=json.dumps(valid_deed),
@@ -42,6 +41,39 @@ class TestDeedRoutes(unittest.TestCase):
     @with_client
     def test_bad_get(self, client):
         fake_token_deed = client.get("/deed/fake")
+
+        self.assertEqual(fake_token_deed.status_code, 404)
+        self.assertIn("Not Found", str(fake_token_deed.data))
+
+    @with_client
+    def test_deed_create_and_get_by_mdref_and_titleno(self, client):
+
+        create_deed = client.post('/deed/',
+                                  data=json.dumps(valid_deed),
+                                  headers={'content-type': 'application/json'})
+        self.assertEqual(create_deed.status_code, 201)
+        self.assertIn("/deed/", str(create_deed.data))
+
+        response_json = json.loads(create_deed.data.decode())
+        get_created_deed = client.get("deed?md_ref=" + valid_deed["md_ref"] +
+                                      "&title_number=" + valid_deed["title_number"])
+        self.assertEqual(get_created_deed.status_code, 200)
+
+        self.assertIn("token", str(get_created_deed.data))
+        self.assertIn("status", str(get_created_deed.data))
+        self.assertIn("DRAFT", str(get_created_deed.data))
+        self.assertIn(response_json["url"][-6:], str(get_created_deed.data))
+
+    @with_client
+    def test_invalid_params_on_get_with_mdref_and_titleno(self, client):
+        fake_token_deed = client.get("/deed?invalid_query_parameter=invalid")
+
+        self.assertEqual(fake_token_deed.status_code, 400)
+        self.assertIn("400 Bad Request", str(fake_token_deed.data))
+
+    @with_client
+    def test_invalid_query_params_on_get_with_mdref_and_titleno(self, client):
+        fake_token_deed = client.get("/deed?md_ref=InvalidMD&title_number=InvalidTitleNo")
 
         self.assertEqual(fake_token_deed.status_code, 404)
         self.assertIn("Not Found", str(fake_token_deed.data))
