@@ -126,7 +126,7 @@ def create():
 
             deed.save()
 
-            url = request.base_url + str(deed.token)
+            url = "/deed/" + str(deed.token)
 
             return jsonify({"url": url}), status.HTTP_201_CREATED
 
