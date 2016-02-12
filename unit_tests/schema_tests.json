@@ -1,0 +1,707 @@
+{
+  "schema": "/application/deed/schema.json",
+  "description": "validation of deed application",
+  "test_patterns": {
+    "surname": {
+      "pattern_path": "/definitions/PrivateIndividualName/properties/surname",
+      "payload_tests": [
+        {
+          "payload": "",
+          "expected": false,
+          "description": "must not be blank"
+        },
+        {
+          "payload": "bloggs",
+          "expected": true,
+          "description": "valid name"
+        },
+        {
+          "payload": "surname with",
+          "expected": true,
+          "description": "names can have spaces in"
+        },
+        {
+          "payload": "names_can_be_reaaly_reaaly_very__very_extremely_long",
+          "expected": true,
+          "description": "names can be long"
+        }
+      ]
+    },
+    "forename": {
+      "pattern_path": "/definitions/PrivateIndividualName/properties/forename",
+      "payload_tests": [
+        {
+          "payload": "",
+          "expected": false,
+          "description": "must not be blank"
+        },
+        {
+          "payload": "joe",
+          "expected": true,
+          "description": "valid name"
+        },
+        {
+          "payload": "first name",
+          "expected": false,
+          "description": "names do not have spaces in"
+        },
+        {
+          "payload": "names_can_be_reaaly_reaaly_very__very_extremely_long",
+          "expected": true,
+          "description": "names can be long"
+        }
+      ]
+    },
+    "dob": {
+      "pattern_path": "/definitions/PrivateIndividualName/properties/dob",
+      "payload_tests": [
+        {
+          "payload": "",
+          "expected": false,
+          "description": "must not be blank"
+        },
+        {
+          "payload": "01/02/1975",
+          "expected": true,
+          "description": "valid date"
+        },
+        {
+          "payload": "1/2/1975",
+          "expected": false,
+          "description": "invalid date"
+        }
+      ]
+    },
+    "gender": {
+      "pattern_path": "/definitions/PrivateIndividualName/properties/gender",
+      "payload_tests": [
+        {
+          "payload": "Male",
+          "expected": true,
+          "description": "check 'Male' is ok"
+        },
+        {
+          "payload": "Female",
+          "expected": true,
+          "description": "check 'Female' is ok"
+        },
+        {
+          "payload": "Not Specified",
+          "expected": true,
+          "description": "check 'Not Specified' is ok"
+        },
+        {
+          "payload": "something else",
+          "expected": false,
+          "description": "other values are not OK"
+        },
+        {
+          "payload": "",
+          "expected": false,
+          "description": "blank is not ok"
+        }
+      ]
+    },
+    "phone_number": {
+      "pattern_path": "/definitions/PrivateIndividualName/properties/phone_number",
+      "payload_tests": [
+        {
+          "payload": "",
+          "expected": false,
+          "description": "must not be blank"
+        },
+        {
+          "payload": "07234243401",
+          "expected": true,
+          "description": "valid phone numbers start with 07"
+        },
+        {
+          "payload": "082342323401",
+          "expected": false,
+          "description": "does not start with 07 (but right length)"
+        },
+        {
+          "payload": "072342334",
+          "expected": false,
+          "description": "starts with 07 but too short"
+        },
+        {
+          "payload": "082342323143",
+          "expected": false,
+          "description": "starts with 07 but too long"
+        },
+        {
+          "payload": "0723 4243401",
+          "expected": false,
+          "description": "starts with 07 but has a space"
+        },
+        {
+          "payload": "0723 424340",
+          "expected": false,
+          "description": "starts with 07 has a space and is a digit short"
+        }
+      ]
+    },
+    "address": {
+      "pattern_path": "/definitions/PrivateIndividualName/properties/address",
+      "payload_tests": [
+        {
+          "payload": "",
+          "expected": false,
+          "description": "must not be blank"
+        },
+        {
+          "payload": "PL21 0AQ",
+          "expected": true,
+          "description": "valid post code"
+        },
+        {
+          "payload": "PL21 0CC",
+          "expected": false,
+          "description": "invalid end characters"
+        },
+        {
+          "payload": "PL 0AQ",
+          "expected": false,
+          "description": "invalid start of code"
+        },
+        {
+          "payload": "PL21 0KK",
+          "expected": false,
+          "description": "invalid end characters"
+        },
+        {
+          "payload": "PL210AQ",
+          "expected": false,
+          "description": "must have a space"
+        },
+        {
+          "payload": "PL21 ABC",
+          "expected": false,
+          "description": "Second part must start with a number"
+        }
+      ]
+    },
+    "md_ref": {
+      "pattern_path": "/definitions/Deed_Application/properties/md_ref",
+      "payload_tests": [
+        {
+          "payload": "",
+          "expected": false,
+          "description": "must not be blank"
+        },
+        {
+          "payload": "e-MD12345",
+          "expected": true,
+          "description": "valid md ref"
+        },
+        {
+          "payload": "x-XX12345",
+          "expected": false,
+          "description": "must start with e-MD"
+        },
+        {
+          "payload": "e-MD1234",
+          "expected": false,
+          "description": "must have 5 digits"
+        },
+        {
+          "payload": "e-MD12 45",
+          "expected": false,
+          "description": "cannot have spaces"
+        },
+        {
+          "payload": "e-MD1234AB",
+          "expected": false,
+          "description": "only one alpha character can be on the end if three of four number e-MD reference"
+        }
+      ]
+    },
+    "title_number": {
+      "pattern_path": "/definitions/Deed_Application/properties/title_number",
+      "payload_tests": [
+        {
+          "payload": "",
+          "expected": false,
+          "description": "must not be blank"
+        },
+        {
+          "payload": "DN1234",
+          "expected": true,
+          "description": "valid title number"
+        },
+        {
+          "payload": "12345",
+          "expected": true,
+          "description": "option start characters must start with a 1"
+        },
+        {
+          "payload": "022222",
+          "expected": false,
+          "description": "must start with a 1-9 after initial chars"
+        },
+        {
+          "payload": "DN02222",
+          "expected": false,
+          "description": "must start with a 1-9 after initial chars"
+        },
+        {
+          "payload": "1234Z",
+          "expected": true,
+          "description": "can end with Z"
+        },
+        {
+          "payload": "1234T",
+          "expected": true,
+          "description": "can end with t"
+        },
+        {
+          "payload": "DN1234T",
+          "expected": false,
+          "description": "can end with t only when no starting alphas"
+        },
+        {
+          "payload": "1234X",
+          "expected": false,
+          "description": "can only end with t or z"
+        },
+        {
+          "payload": "ABCD1234",
+          "expected": false,
+          "description": "invalid alphas at start of title"
+        },
+        {
+          "payload": "AB12345678",
+          "expected": false,
+          "description": "too many numbers"
+        }
+      ]
+    },
+    "identity_check": {
+      "pattern_path": "/definitions/Deed_Application/properties/identity_checked",
+      "payload_tests": [
+        {
+          "payload": "Y",
+          "expected": true,
+          "description": "Identity checks validly complete"
+        },
+        {
+          "payload": "N",
+          "expected": false,
+          "description": "The schema should accept N so we can give the user a bespoke failure response"
+        },
+        {
+          "payload": "y",
+          "expected": false,
+          "description": "Lowercase should not be accepted"
+        },
+        {
+          "payload": "abc123",
+          "expected": false,
+          "description": "random strings should fail"
+        },
+        {
+          "payload": "",
+          "expected": false,
+          "description": "empty string should fail as its a required field"
+        }
+      ]
+    }
+  },
+  "test_payloads": [
+    {
+      "payload": {
+        "title_number": "DT567568",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "md_ref": "e-MD12345",
+        "identity_checked": "Y",
+        "borrowers": [
+          {
+            "forename": "Amanda",
+            "middle_name": "Elizabeth",
+            "surname": "Smythe",
+            "gender": "Female",
+            "address": "1 The High Street Highley CR0 9YH",
+            "dob": "21/09/1976",
+            "phone_number": "07507154077"
+          },
+          {
+            "forename": "Paul",
+            "middle_name": "Frank",
+            "surname": "Smythe",
+            "gender": "Not Specified",
+            "address": "1 The High Street Highley PL6 7TG",
+            "dob": "21/08/2015",
+            "phone_number": "07507154057"
+          },
+          {
+            "forename": "Paul",
+            "middle_name": "Frank",
+            "surname": "Smythe",
+            "gender": "Male",
+            "address": "1 The High Street Highley PL6 7TG",
+            "dob": "21/08/2015",
+            "phone_number": "07507154078"
+          }
+        ]
+      },
+      "description": "valid payload with multiple borrowers",
+      "expected": 0
+    },
+    {
+      "payload": {
+        "title_number": "DT567568",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "md_ref": "e-MD12345",
+        "identity_checked": "Y",
+        "borrowers": [
+          {
+            "forename": "Amanda",
+            "middle_name": "Elizabeth",
+            "surname": "Smy the",
+            "gender": "Female",
+            "address": "1 The High Street Highley CR0 9YH",
+            "dob": "21/09/1976",
+            "phone_number": "07507154077"
+          },
+          {
+            "forename": "Paul",
+            "middle_name": "Frank",
+            "surname": "Smythe",
+            "gender": "Not Specified",
+            "address": "1 The High Street Highley PL6 7TG",
+            "dob": "21/08/2015",
+            "phone_number": "07507154057"
+          },
+          {
+            "forename": "Paul",
+            "middle_name": "Frank",
+            "surname": "Smythe",
+            "gender": "Male",
+            "address": "1 The High Street Highley PL6 7TG",
+            "dob": "21/08/2015",
+            "phone_number": "07507154078"
+          }
+        ]
+      },
+      "description": "first borrower has space in surname",
+      "expected": 0
+    },
+    {
+      "payload": {
+        "title_number": "DT567568",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "md_ref": "e-MD12345",
+        "identity_checked": "Y",
+        "borrowers": [
+          {
+            "forename": "Amanda",
+            "middle_name": "Elizabeth",
+            "surname": "Smythe",
+            "gender": "Female",
+            "address": "1 The High Street Highley CR0 9YH",
+            "dob": "21/09/1976",
+            "phone_number": "07507154077"
+          },
+          {
+            "forename": "Paul",
+            "middle_name": "Frank",
+            "surname": "Smy the",
+            "gender": "Not Specified",
+            "address": "1 The High Street Highley PL6 7TG",
+            "dob": "21/08/2015",
+            "phone_number": "07507154057"
+          },
+          {
+            "forename": "Paul",
+            "middle_name": "Frank",
+            "surname": "Smyt he",
+            "gender": "Male",
+            "address": "1 The High Street Highley PL6 7TG",
+            "dob": "21/08/2015",
+            "phone_number": "07507154078"
+          }
+        ]
+      },
+      "description": "second and third borrowers has space in surname",
+      "expected": 0
+    },
+    {
+      "payload": {
+        "title_number": "DT567568",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "md_ref": "e-MD12345",
+        "identity_checked": "Y",
+        "borrowers": [
+          {
+            "forename": "Amanda",
+            "middle_name": "Elizabeth",
+            "surname": "Smythe",
+            "gender": "Female",
+            "address": "1 The High Street Highley CR0 9YH",
+            "dob": "21/09/1976",
+            "phone_number": "07507154077"
+          },
+          {
+            "forename": "Paul",
+            "middle_name": "Frank",
+            "surname": "Smythe",
+            "gender": "Not Specified",
+            "address": "1 The High Street Highley PL6 7TG",
+            "dob": "21/08/2015",
+            "phone_number": "07507154057"
+          },
+          {
+            "forename": "Paul",
+            "surname": "Smythe",
+            "gender": "Male",
+            "address": "1 The High Street Highley PL6 7TG",
+            "dob": "21/08/2015",
+            "phone_number": "07507154078"
+          }
+        ]
+      },
+      "description": "optional middle_name field can be missing",
+      "expected": 0
+    },
+    {
+      "payload": {
+        "title_number": "DT567568",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "md_ref": "e-MD12345",
+        "identity_checked": "Y",
+        "borrowers": [
+          {
+            "forename": "Amanda",
+            "middle_name": "Elizabeth",
+            "surname": "Smythe",
+            "gender": "Female",
+            "address": "1 The High Street Highley CR0 9YH",
+            "dob": "21/09/1976",
+            "phone_number": "07507154077"
+          },
+          {
+            "forename": "Paul",
+            "middle_name": "Frank",
+            "gender": "Not Specified",
+            "address": "1 The High Street Highley PL6 7TG",
+            "dob": "21/08/2015",
+            "phone_number": "07507154057"
+          },
+          {
+            "forename": "Paul",
+            "middle_name": "Frank",
+            "gender": "Male",
+            "address": "1 The High Street Highley PL6 7TG",
+            "dob": "21/08/2015",
+            "phone_number": "07507154078"
+          }
+        ]
+      },
+      "description": "required surname cannot be missing",
+      "expected": 2
+    },
+    {
+      "payload": {
+        "title_number": "DT567568",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "md_ref": "e-MD12345",
+        "identity_checked": "Y",
+        "borrowers": [
+          {
+            "forename": "Amanda",
+            "middle_name": "Elizabeth",
+            "surname": "Smythe",
+            "gender": "Female",
+            "address": "1 The High Street Highley CR0 9YH",
+            "dob": "21/09/1976",
+            "phone_number": "07507154077"
+          },
+          {
+            "forename": "Paul",
+            "middle_name": "Frank",
+            "gender": "Not Specified",
+            "address": "1 The High Street Highley PL6 7TG",
+            "dob": "21/08/2015",
+            "phone_number": "07507154057"
+          },
+          {
+            "forename": "Paul",
+            "middle_name": "Frank",
+            "gender": "Male",
+            "surname": "",
+            "address": "1 The High Street Highley PL6 7TG",
+            "dob": "21/08/2015",
+            "phone_number": "07507154078"
+          }
+        ]
+      },
+      "description": "required surname cannot be missing or blank",
+      "expected": 2
+    },
+    {
+      "payload": {
+        "md_ref": "e-MD12345",
+        "identity_checked": "Y",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "borrowers": [
+          {
+            "forename": "Amanda",
+            "middle_name": "Elizabeth",
+            "surname": "Smythe",
+            "gender": "Female",
+            "address": "1 The High Street Highley CR0 9YH",
+            "dob": "21/09/1976",
+            "phone_number": "07507154077"
+          },
+          {
+            "forename": "Paul",
+            "middle_name": "Frank",
+            "surname": "Smythe",
+            "gender": "Not Specified",
+            "address": "1 The High Street Highley PL6 7TG",
+            "dob": "21/08/2015",
+            "phone_number": "07507154057"
+          },
+          {
+            "forename": "Paul",
+            "middle_name": "Frank",
+            "surname": "Smythe",
+            "gender": "Male",
+            "address": "1 The High Street Highley PL6 7TG",
+            "dob": "21/08/2015",
+            "phone_number": "07507154078"
+          }
+        ]
+      },
+      "description": "title_number must be present",
+      "expected": 1
+    },
+    {
+      "payload": {
+        "md_ref": "e-MD12345",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "title_number": "DN12345",
+        "identity_checked": "Y",
+        "borrowers": [
+          {
+            "forename": "Amanda",
+            "middle_name": "Elizabeth",
+            "surname": "Smythe",
+            "gender": "Female",
+            "address": "1 The High Street Highley CR0 9YH",
+            "dob": "21/09/1976",
+            "phone_number": "07507154077"
+          }
+        ]
+      },
+      "description": "just one borrower",
+      "expected": 0
+    },
+    {
+      "payload": {
+        "title_number": "DN12345",
+        "identity_checked": "Y",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "borrowers": [
+          {
+            "forename": "Amanda",
+            "middle_name": "Elizabeth",
+            "surname": "Smythe",
+            "gender": "Female",
+            "address": "1 The High Street Highley CR0 9YH",
+            "dob": "21/09/1976",
+            "phone_number": "07507154077"
+          }
+        ]
+      },
+      "description": "mdref is missing",
+      "expected": 1
+    },
+    {
+      "payload": {
+        "md_ref": "e-MD12345",
+        "title_number": "DN12345",
+        "identity_checked": "Y",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "borrowers": [
+          {
+            "forename": "Amanda",
+            "middle_name": "Elizabeth",
+            "surname": "Smythe",
+            "gender": "Female",
+            "address": "1 The High Street Highley CR0 9YH",
+            "dob": "21/09/1976",
+            "phone_number": "07507154077",
+            "extra": "some extra data"
+          }
+        ]
+      },
+      "description": "extra property data is not allowed",
+      "expected": 1
+    },
+    {
+      "payload": {
+        "md_ref": "e-MD12345",
+        "title_number": "DN12345",
+        "identity_checked": "Y",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "extra2": "some extra property data",
+        "borrowers": [
+          {
+            "forename": "Amanda",
+            "middle_name": "Elizabeth",
+            "surname": "Smythe",
+            "gender": "Female",
+            "address": "1 The High Street Highley CR0 9YH",
+            "dob": "21/09/1976",
+            "phone_number": "07507154077"
+          }
+        ]
+      },
+      "description": "extra property data is not allowed",
+      "expected": 1
+    },
+    {
+      "payload": {
+        "md_ref": "e-MD12345",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "title_number": "DN12345",
+        "identity_checked": "Y",
+        "borrowers": [
+          {
+            "forename": "Amanda",
+            "middle_name": "",
+            "surname": "Smythe",
+            "gender": "Female",
+            "address": "1 The High Street Highley CR0 9YH",
+            "dob": "21/09/1976",
+            "phone_number": "07507154077"
+          }
+        ]
+      },
+      "description": "middle name must not be blank if provided",
+      "expected": 1
+    },
+    {
+      "payload": {
+        "md_ref": "e-MD12345",
+        "property_address": "",
+        "title_number": "DN12345",
+        "identity_checked": "Y",
+        "borrowers": [
+          {
+            "forename": "Amanda",
+            "surname": "Smythe",
+            "gender": "Female",
+            "address": "1 The High Street Highley CR0 9YH",
+            "dob": "21/09/1976",
+            "phone_number": "07507154077"
+          }
+        ]
+      },
+      "description": "property address is blank - not allowed",
+      "expected": 1
+    }
+  ]
+}

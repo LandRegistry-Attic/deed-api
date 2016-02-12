@@ -4,14 +4,15 @@ class deed_api (
     $host = '0.0.0.0',
     $source = 'https://github.com/LandRegistry/dm-deed-api',
     $branch_or_revision = 'master',
-    $subdomain = 'api',
+    $subdomain = 'deedapi',
     $domain = undef,
     $owner = 'vagrant',
-    $group = 'vagrant'
+    $group = 'vagrant',
+    $app_dir = "/opt/${module_name}",
 ) {
   require ::standard_env
 
-  vcsrepo { "/opt/${module_name}":
+  vcsrepo { "${app_dir}":
     ensure   => latest,
     provider => git,
     source   => $source,
@@ -21,12 +22,22 @@ class deed_api (
     notify   => Service[$module_name],
   }
 
-  file { "/opt/${module_name}/bin/run.sh":
+  file { "${app_dir}/bin/run.sh":
     ensure  => 'file',
     mode    => '0755',
     owner   => $owner,
     group   => $group,
     content => template("${module_name}/run.sh.erb"),
+    require => Vcsrepo["/opt/${module_name}"],
+    notify  => Service[$module_name],
+  }
+
+  file { "${app_dir}/bin/app_requirements.sh":
+    ensure  => 'file',
+    mode    => '0755',
+    owner   => $owner,
+    group   => $group,
+    content => template("${module_name}/app_requirements.sh.erb"),
     require => Vcsrepo["/opt/${module_name}"],
     notify  => Service[$module_name],
   }
@@ -43,17 +54,34 @@ class deed_api (
     owner   => $owner,
     group   => $group,
     content => template("${module_name}/service.systemd.erb"),
-    notify  => [Exec['systemctl-daemon-reload'], Service[$module_name]],
+    notify  => [
+      Exec['systemctl-daemon-reload'],
+      Service[$module_name]
+    ],
   }
+
+  exec {"${app_dir}/bin/app_requirements.sh":
+    cwd       => "${app_dir}",
+    user      => $owner,
+    logoutput => true,
+    require   => [
+      Vcsrepo["${app_dir}"],
+      Standard_env::Db::Postgres[$module_name],
+      File["${app_dir}/bin/app_requirements.sh"],
+    ],
+  }
+
   service { $module_name:
     ensure   => 'running',
     enable   => true,
     provider => 'systemd',
     require  => [
-      Vcsrepo["/opt/${module_name}"],
+      Vcsrepo["${app_dir}"],
       File["/opt/${module_name}/bin/run.sh"],
       File["/etc/systemd/system/${module_name}.service"],
       File["/var/run/${module_name}"],
+      Standard_env::Db::Postgres[$module_name],
+      Exec["${app_dir}/bin/app_requirements.sh"],
     ],
   }
 
@@ -65,6 +93,11 @@ class deed_api (
     group   => $group,
     notify  => Service['nginx'],
   }
+
+  standard_env::db::postgres { $module_name:
+   user     => $owner,
+   password => $owner,
+ }
 
   if $environment == 'development' {
     standard_env::dev_host { $subdomain: }

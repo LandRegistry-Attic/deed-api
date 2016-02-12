@@ -9,5 +9,16 @@ pip3 install -r requirements.txt
 port="${<%=@module_name.upcase%>_GUNICORN_PORT:-8000}"
 host="${<%=@module_name.upcase%>_GUNICORN_HOST:-0.0.0.0}"
 
+upgrade_success="python3 manage.py db upgrade"
 
-gunicorn -b $host:$port --pid /var/run/<%=@module_name%>/<%=@module_name%>.pid "application:app"
+DATABASE_URL="${DEED_DATABASE_URI:-postgresql://vagrant:vagrant@localhost:5432/deed_api}"
+
+# Mortgage document - upserts of md_ref's data
+python3 ./migrations/setup_initial_data/data_importer.py /data/mortgage_document/ $DATABASE_URL mortgage_document
+
+if $upgrade_success; then
+  gunicorn -b $host:$port --pid /var/run/<%=@module_name%>/<%=@module_name%>.pid "application:app"
+else
+  echo "Database migration failed!!! Exiting"
+  exit 1
+fi
