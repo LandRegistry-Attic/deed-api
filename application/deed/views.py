@@ -126,9 +126,9 @@ def create():
 
             deed.save()
 
-            url = request.base_url + str(deed.token)
+            path = "/deed/" + str(deed.token)
 
-            return jsonify({"url": url}), status.HTTP_201_CREATED
+            return jsonify({"path": path}), status.HTTP_201_CREATED
 
         except Exception as e:
             LOGGER.error("Database Exception - %s" % e)

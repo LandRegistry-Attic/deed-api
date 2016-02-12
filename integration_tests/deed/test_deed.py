@@ -26,7 +26,7 @@ class TestDeedRoutes(unittest.TestCase):
         self.assertIn("/deed/", str(create_deed.data))
 
         response_json = json.loads(create_deed.data.decode())
-        get_created_deed = client.get(response_json["url"])
+        get_created_deed = client.get(response_json["path"])
         self.assertEqual(get_created_deed.status_code, 200)
 
         self.assertIn("title_number", str(get_created_deed.data))
@@ -62,7 +62,7 @@ class TestDeedRoutes(unittest.TestCase):
         self.assertIn("token", str(get_created_deed.data))
         self.assertIn("status", str(get_created_deed.data))
         self.assertIn("DRAFT", str(get_created_deed.data))
-        self.assertIn(response_json["url"][-6:], str(get_created_deed.data))
+        self.assertIn(response_json["path"][-6:], str(get_created_deed.data))
 
     @with_client
     def test_invalid_params_on_get_with_mdref_and_titleno(self, client):
