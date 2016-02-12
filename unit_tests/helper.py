@@ -17,7 +17,7 @@ class DeedHelper:
     _json_doc = {
         "title_number": "DN100",
         "md_ref": "e-MD12344",
-        "address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
         "borrowers": [
             {
                 "forename": "lisa",
@@ -43,6 +43,7 @@ class DeedHelper:
 
     _invalid_title = {
         "title_number": "BBBB12313212BB",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
         "md_ref": "mortgageref",
         "borrowers": [
             {
@@ -78,8 +79,7 @@ class DeedHelper:
                 "dob": "23/01/1986",
                 "phone_number": "07502154061"
             }
-        ],
-        "identity_checked": "Y"
+        ]
     }
 
     _invalid_phone_numbers = {
@@ -103,8 +103,7 @@ class DeedHelper:
                     "dob": "23/01/1986",
                     "phone_number": "07502154062"
                 }
-            ],
-            "identity_checked": "Y"
+            ]
         },
     _invalid_blanks_on_required_fields = {
         "borrowers": [
@@ -126,8 +125,7 @@ class DeedHelper:
                 "dob": "23/01/1986",
                 "phone_number": "07502154061"
             }
-        ],
-        "identity_checked": "Y"
+        ]
     }
 
     _validate_borrower = {"borrower_token": "aaaaaa", "dob": "23/01/1986"}
@@ -137,7 +135,7 @@ class DeedHelper:
     _invalid_blank_address = {
         "title_number": "DN100",
         "md_ref": "e-MD12344",
-        "address": "",
+        "property_address": "",
         "borrowers": [
             {
                 "forename": "lisa",
@@ -160,3 +158,15 @@ class DeedHelper:
         ],
         "identity_checked": "Y",
     }
+
+
+class StatusMock:
+    _status_with_mdref_and_titleno = [
+        {
+            "status": "DRAFT",
+            "token": "c91d57"
+        }
+    ]
+
+    _no_status_with_mdref_and_titleno = [
+    ]

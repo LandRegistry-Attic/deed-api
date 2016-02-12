@@ -134,17 +134,43 @@
             }
         },
         "ChargeClause": {
-            "type": "array",
-            "minItems": 1,
-            "items": {
-                "type": "string"
+            "type": "object",
+            "properties": {
+                "cre_code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                }
             }
         },
         "AdditionalProvisions": {
             "type": "array",
             "minItems": 0,
             "items": {
-                "type": "string"
+                "type": "object",
+                "properties": {
+                    "additional_provision_code": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "Lender": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                }
             }
         },
         "Borrowers": {
@@ -179,7 +205,11 @@
                             "$ref": "#/definitions/AdditionalProvisions"
                         },
                         "lender": {
-                            "type": "string"
+                            "$ref": "#/definitions/Lender"
+                        },
+                        "property_address": {
+                            "type": "string",
+                            "description": "The address of property that the deed relates. This should be supplied in a comma separated format e.g. 30 wakefield rd, plymouth, PL6 3WA"
                         }
                     }
                 }
@@ -192,7 +222,7 @@
                 "borrowers",
                 "md_ref",
                 "identity_checked",
-                "address"
+                "property_address"
             ],
             "properties": {
                 "title_number": {
@@ -214,9 +244,10 @@
                     "pattern": "^[Y]$",
                     "type": "string"
                 },
-                "address": {
+                "property_address": {
                     "pattern": "^[a-zA-Z0-9\\s,]+$",
-                    "type": "string"
+                    "type": "string",
+                    "description": "The address of property that the deed relates. This should be supplied in a comma separated format e.g. 30 wakefield rd, plymouth, PL6 3WA"
                 }
             }
         },

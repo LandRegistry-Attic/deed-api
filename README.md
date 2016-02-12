@@ -101,6 +101,6 @@ Example payload:
         }
     ],
     "identity_checked": "Y",
-    "address": "5 The Drive, This Town, This County, PL4 4TH"
+    "property_address": "5 The Drive, This Town, This County, PL4 4TH"
 }
 ```

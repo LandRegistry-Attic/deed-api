@@ -4,6 +4,7 @@
 
 psql <%=@module_name%> -c "drop table alembic_version cascade;"
 psql <%=@module_name%> -c "drop table deed cascade;"
+psql <%=@module_name%> -c "drop table mortgage_document cascade;"
 
 # Build and enter the python virtual environment
 virtualenv <%=@module_name%>
