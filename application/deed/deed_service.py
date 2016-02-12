@@ -3,7 +3,6 @@ from application.deed.utils import valid_dob, is_unique_list
 from application.borrower.server import BorrowerService
 from underscore import _
 from application.mortgage_document.model import MortgageDocument
-from flask.ext.api import status
 from functools import partial
 import json
 
@@ -97,4 +96,3 @@ def update_deed(deed, deed_json):
     deed.save()
 
     return True, "OK"
-
