@@ -8,6 +8,7 @@ from jsonschema.validators import validator_for
 from lxml import etree
 from underscore import _
 import application.deed.generated.deed_xmlify as api
+from flask import request
 
 LOGGER = logging.getLogger(__name__)
 
@@ -187,5 +188,9 @@ def convert_json_to_xml(deed_json):  # pragma: no cover
     deed_xml = deed_stream.getvalue()
 
     return deed_xml
+
+
+def is_internal():
+    return True if "X-Land-Registry" in request.headers else False
 
 _title_validator = _create_title_validator()
