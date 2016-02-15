@@ -84,7 +84,7 @@ def update_deed(deed, deed_json):
         .map(update_borrower_for_token)\
         .value()
 
-    json_doc['borrowers'].append(borrower_json)
+    json_doc['borrowers'] = borrower_json
 
     if not update_md_clauses(json_doc, deed_json["md_ref"]):
         msg = "mortgage document associated with supplied md_ref is not found"
