@@ -89,7 +89,7 @@ def update_deed(deed, deed_json):
     if not update_md_clauses(json_doc, deed_json["md_ref"]):
         msg = "mortgage document associated with supplied md_ref is not found"
         LOGGER.error(msg)
-        return False, msg,
+        return False, msg
 
     deed.deed = json_doc
 
