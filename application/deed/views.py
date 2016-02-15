@@ -1,7 +1,7 @@
 import logging
 from application.deed.model import Deed
 from application.deed.utils import validate_helper
-from application.deed.deed_service import update_deed
+from application.deed.service import update_deed
 from flask import request, abort, jsonify, Response
 from flask import Blueprint
 from flask.ext.api import status
