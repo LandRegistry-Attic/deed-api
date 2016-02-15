@@ -1,13 +1,11 @@
 import logging
 from application.deed.model import Deed
-from application.deed.utils import validate_helper, valid_dob, is_unique_list
+from application.deed.utils import validate_helper
+from application.deed.service import update_deed
 from flask import request, abort, jsonify, Response
 from flask import Blueprint
 from flask.ext.api import status
-from application.borrower.server import BorrowerService
-from underscore import _
 from application.borrower.model import Borrower
-from application.mortgage_document.model import MortgageDocument
 import json
 
 
@@ -52,83 +50,24 @@ def get_deeds_status_with_mdref_and_title_number():
 
 @deed_bp.route('/', methods=['POST'])
 def create():
-    deed = Deed()
-    deed_json = request.get_json()
-    borrowerService = BorrowerService()
 
+    deed_json = request.get_json()
     error_count, error_message = validate_helper(deed_json)
 
     if error_count > 0:
         return error_message, status.HTTP_400_BAD_REQUEST
     else:
-        deed.deed = deed_json
-
-        json_doc = {
-            "title_number": deed_json['title_number'],
-            "md_ref": deed_json['md_ref'],
-            "borrowers": [],
-            "charge_clause": [],
-            "additional_provisions": [],
-            "property_address": deed_json['property_address']
-            }
-
-        deed.token = Deed.generate_token()
-        deed.identity_checked = deed_json["identity_checked"]
-
-        valid_dob_result = _(deed_json['borrowers']).chain()\
-            .map(lambda x, *a: x['dob'])\
-            .reduce(valid_dob, True).value()
-
-        if not valid_dob_result:
-            abort(status.HTTP_400_BAD_REQUEST)
-
-        phone_number_list = _(deed_json['borrowers']).chain()\
-            .map(lambda x, *a: x['phone_number'])\
-            .value()
-
-        if not is_unique_list(phone_number_list):
-            abort(status.HTTP_400_BAD_REQUEST)
 
         try:
-            for borrower in deed_json['borrowers']:
-                borrower_json = {
-                    "id": "",
-                    "token": "",
-                    "forename": borrower['forename'],
-                    "surname": borrower['surname']
-                }
+            deed = Deed()
 
-                if 'middle_name' in borrower:
-                    borrower_json['middle_name'] = borrower['middle_name']
+            deed.token = Deed.generate_token()
 
-                borrower['deed_token'] = deed.token
-
-                createdBorrower = borrowerService.saveBorrower(borrower,
-                                                               deed.token)
-
-                borrower_json["id"] = createdBorrower.id
-                borrower_json["token"] = createdBorrower.token
-                json_doc['borrowers'].append(borrower_json)
-
-            md_ref = deed_json["md_ref"]
-            mortgage_document = MortgageDocument.query.filter_by(md_ref=str(md_ref)).first()
-            if mortgage_document is not None:
-                md_json = json.loads(mortgage_document.data)
-                json_doc["charge_clause"] = md_json["charge_clause"]
-                json_doc["additional_provisions"] = md_json["additional_provisions"]
-                json_doc["lender"] = md_json["lender"]
-            else:
-                msg = "mortgage document associated with supplied md_ref is not found"
-                LOGGER.error(msg)
+            success, msg = update_deed(deed, deed_json)
+            if not success:
                 return msg, status.HTTP_400_BAD_REQUEST
 
-            deed.deed = json_doc
-
-            deed.save()
-
-            path = "/deed/" + str(deed.token)
-
-            return jsonify({"path": path}), status.HTTP_201_CREATED
+            return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
 
         except Exception as e:
             LOGGER.error("Database Exception - %s" % e)
