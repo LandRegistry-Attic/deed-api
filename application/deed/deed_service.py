@@ -27,12 +27,12 @@ def update_borrower(borrower, idx, borrowers, deed_token):
     borrower_service = BorrowerService()
 
     borrower_json = {
-                    "id": "",
-                    "token": "",
-                    "forename": borrower['forename'],
-                    "surname": borrower['surname'],
-                    "middle_name": borrower['middle_name'] if 'middle_name' in borrower else None
-                }
+        "id": "",
+        "token": "",
+        "forename": borrower['forename'],
+        "surname": borrower['surname'],
+        "middle_name": borrower['middle_name'] if 'middle_name' in borrower else None
+    }
 
     created_borrower = borrower_service.saveBorrower(borrower, deed_token)
 
