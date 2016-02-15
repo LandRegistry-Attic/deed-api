@@ -11,7 +11,7 @@ server {
     proxy_set_header X-Forwarded-Server $host;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Land-Registry $remote_addr;
+    proxy_set_header Iv-User-L CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Devices,O=1359.2.1,C=gb;
 
     proxy_pass http://<%= @host %>:<%= @port %>/;
   }
