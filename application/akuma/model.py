@@ -12,7 +12,6 @@ class Akuma:
         payload = json_payload
         headers = {'content-type': 'application/json'}
 
-        # POST with form-encoded data
         print (url)
         print ("Payload is " + str(payload))
 
@@ -22,7 +21,7 @@ class Akuma:
         print (check_result.reason)
         print (check_result.raw)
 
-        return check_result
+        return json.loads(check_result.text)
 
     @staticmethod
     def creation_check(json_payload):
