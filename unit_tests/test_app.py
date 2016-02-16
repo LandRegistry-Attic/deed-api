@@ -1,5 +1,6 @@
 from application import app
 from application.deed.model import Deed
+from application.casework.service import get_oc2
 from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, StatusMock
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
 from flask.ext.api import status
@@ -197,3 +198,8 @@ class TestRoutes(unittest.TestCase):
         xml = convert_json_to_xml(DeedHelper._json_doc)
         res = validate_generated_xml(xml)
         self.assertEqual(res, True)
+
+    def test_get_oc2(self):
+        resp = get_oc2()
+
+        self.assertEqual(str(resp.mimetype), "application/pdf")
