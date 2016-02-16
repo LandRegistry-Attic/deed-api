@@ -71,10 +71,10 @@ def create():
             check_result = Akuma.creation_check(deed_json)
 
             if check_result['result'] == 'A':
-                #Log the ID
-                #TODO: log id
+                LOGGER.info(check_result['id'])
                 return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
             else:
+                #Update Deed Status
                 return abort(status.HTTP_503_SERVICE_UNAVAILABLE)
 
         except Exception as e:
