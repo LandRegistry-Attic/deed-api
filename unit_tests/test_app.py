@@ -1,6 +1,6 @@
 from application import app
 from application.deed.model import Deed
-from application.casework.service import get_oc2
+from application.casework.service import get_document
 from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, StatusMock
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
 from flask.ext.api import status
@@ -8,6 +8,7 @@ from unit_tests.schema_tests import run_schema_checks
 import unittest
 import json
 import mock
+from flask import Flask
 
 
 class TestRoutes(unittest.TestCase):
@@ -15,6 +16,7 @@ class TestRoutes(unittest.TestCase):
     DEED_ENDPOINT = "/deed/"
     DEED_QUERY = "/deed"
     BORROWER_ENDPOINT = "/borrower/"
+    CASEWORK_ENDPOINT = "/casework/"
 
     def setUp(self):
         app.config.from_pyfile("config.py")
@@ -199,7 +201,26 @@ class TestRoutes(unittest.TestCase):
         res = validate_generated_xml(xml)
         self.assertEqual(res, True)
 
-    def test_get_oc2(self):
-        resp = get_oc2()
+    def test_get_document(self):
+        with app.app_context():
+            with app.test_request_context():
+                resp = get_document()
 
-        self.assertEqual(str(resp.mimetype), "application/pdf")
+                self.assertEqual(str(resp.mimetype), "application/pdf")
+
+    @mock.patch('application.deed.model.Deed.query', autospec=True)
+    def test_get_document_not_found(self, mock_query):
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = None
+
+        response = self.app.get(self.CASEWORK_ENDPOINT + 'CD3456')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    @mock.patch('application.deed.model.Deed.query', autospec=True)
+    def test_get_document(self, mock_query):
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = DeedModelMock()
+
+        response = self.app.get(self.CASEWORK_ENDPOINT + 'AB1234')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue("application/pdf" in response.mimetype)

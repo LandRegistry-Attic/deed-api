@@ -4,7 +4,7 @@ from flask import request, abort, jsonify, Response
 from flask import Blueprint
 from flask.ext.api import status
 import sys
-from application.casework.service import get_oc2
+from application.casework.service import get_document
 
 LOGGER = logging.getLogger(__name__)
 
@@ -21,8 +21,9 @@ def get_deed(deed_reference):
         abort(status.HTTP_404_NOT_FOUND)
     else:
         try:
-            resp = get_oc2()
+            resp = get_document()
             str(resp.mimetype)
+
             return resp
 
         except:
