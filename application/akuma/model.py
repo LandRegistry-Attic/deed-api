@@ -20,14 +20,30 @@ class Akuma:
     def creation_check(json_payload):
 
         # Wrap with Create activities
-        new_json = {
+        create_json = {
             "service": "Digital Mortgage",
             "activity": "Create",
             "payload": ""
                    }
 
-        new_json["payload"] = json_payload
+        create_json["payload"] = json_payload
 
-        check_result = Akuma.do_check(new_json)
+        check_result = Akuma.do_check(create_json)
+
+        return check_result
+
+    @staticmethod
+    def viewing_check(json_payload):
+
+        # Wrap with Create activities
+        view_json = {
+            "service": "Digital Mortgage",
+            "activity": "View",
+            "payload": ""
+                   }
+
+        view_json["payload"] = json_payload
+
+        check_result = Akuma.do_check(view_json)
 
         return check_result
