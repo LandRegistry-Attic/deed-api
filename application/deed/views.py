@@ -74,7 +74,6 @@ def create():
                 LOGGER.info(check_result['id'])
                 return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
             else:
-                #Update Deed Status
                 return abort(status.HTTP_503_SERVICE_UNAVAILABLE)
 
         except Exception as e:
