@@ -17,6 +17,8 @@ class Deed(db.Model):
     deed = db.Column(JSON)
     identity_checked = db.Column(db.String(1), nullable=False)
     status = db.Column(db.String(16), default='DRAFT')
+    deed_xml = db.Column(db.BLOB, nullable=True)
+    checksum = db.Column(db.Integer, nullable=True, default=-1)
     organisation_id = db.Column(db.String, nullable=True)
     organisation_name = db.Column(db.String, nullable=True)
 
