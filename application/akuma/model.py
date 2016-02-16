@@ -15,7 +15,7 @@ class Akuma:
         print (url)
         print ("Payload is " + str(payload))
 
-        check_result = requests.post(url, data=json.dumps(payload), headers=headers)
+        check_result = request.post(url, data=json.dumps(payload), headers=headers)
 
         print (check_result.status_code)
         print (check_result.reason)
