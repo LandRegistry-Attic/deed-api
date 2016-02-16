@@ -1,4 +1,5 @@
 import logging
+from application.akuma.model import Akuma
 from application.deed.model import Deed
 from application.deed.utils import validate_helper
 from application.deed.service import update_deed
@@ -67,7 +68,14 @@ def create():
             if not success:
                 return msg, status.HTTP_400_BAD_REQUEST
 
-            return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
+            check_result = Akuma.creation_check(deed_json)
+
+            print ("Views result is: " + str(check_result))
+
+            if check_result['result'] == "A":
+                return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
+            else:
+                return "That didn't work"
 
         except Exception as e:
             LOGGER.error("Database Exception - %s" % e)
