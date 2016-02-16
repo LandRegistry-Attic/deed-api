@@ -22,8 +22,6 @@ def get_deed(deed_reference):
     else:
         try:
             resp = get_document()
-            str(resp.mimetype)
-
             return resp
 
         except:
