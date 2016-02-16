@@ -1,6 +1,6 @@
 import logging
 from application.deed.model import Deed
-from flask import request, abort, jsonify, Response
+from flask import abort
 from flask import Blueprint
 from flask.ext.api import status
 import sys
@@ -9,8 +9,8 @@ from application.casework.service import get_document
 LOGGER = logging.getLogger(__name__)
 
 casework_bp = Blueprint('casework', __name__,
-                    template_folder='templates',
-                    static_folder='static')
+                        template_folder='templates',
+                        static_folder='static')
 
 
 @casework_bp.route('/<deed_reference>', methods=['GET'])

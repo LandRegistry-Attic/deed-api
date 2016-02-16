@@ -3,7 +3,7 @@ from flask import Flask, request
 from flask.ext.sqlalchemy import SQLAlchemy
 import os
 
-app = Flask(__name__, static_folder ='static')
+app = Flask(__name__, static_folder='static')
 db = SQLAlchemy(app)
 
 # Register routes after establishing the db prevents improperly loaded modules

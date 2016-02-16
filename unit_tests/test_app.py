@@ -8,7 +8,6 @@ from unit_tests.schema_tests import run_schema_checks
 import unittest
 import json
 import mock
-from flask import Flask
 
 
 class TestRoutes(unittest.TestCase):
@@ -217,7 +216,7 @@ class TestRoutes(unittest.TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     @mock.patch('application.deed.model.Deed.query', autospec=True)
-    def test_get_document(self, mock_query):
+    def test_get_document_from_endpoint(self, mock_query):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = DeedModelMock()
 
