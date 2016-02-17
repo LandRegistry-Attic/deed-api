@@ -4,7 +4,6 @@
       "version":"1.0.0",
       "title":"Land Registry Internal Casework API"
    },
-   "host":"api.landregistry.gov.uk",
    "paths":{
       "/deed":{
          "get":{
