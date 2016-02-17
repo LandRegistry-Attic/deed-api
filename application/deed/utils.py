@@ -195,40 +195,22 @@ def is_internal():
     return True if "X-Land-Registry" in request.headers else False
 
 
-def process_conveyancer_credentials(header_data):
+def process_conveyancer_credentials():
     header_dict = {}
 
-    for param in header_data.split(','):
-        key,value = param.split('=')
-        value =  urllib.parse.unquote(value)
-        if key in header_dict:
-            header_dict[key].append(value)
-        else:
-            header_dict[key] = [value]
+    try:
+        header_data = request.headers.get("Iv-User-L")
+
+        for param in header_data.split(','):
+            key,value = param.split('=')
+            value = urllib.parse.unquote(value)
+            if key in header_dict:
+                header_dict[key].append(value)
+            else:
+                header_dict[key] = [value]
+    except:
+        header_dict = None
 
     return header_dict
-
-# def process_conveyancer_credentials(header_data):
-#     header_dict = {}
-#
-#     header_vars = \
-#     [{k:urllib.parse.unquote(v)}
-#         for param in header_data.split(',')
-#         for k,v in [param.split("=")]]  \
-#         if header_data is not None else {}
-#
-#     for header_var in header_vars:
-#         print(str(header_var))
-#         print(str(header_var.keys()))
-#         key = list(header_var.keys())[0]
-#         value = list(header_var.values())[0]
-#         if key in header_dict:
-#             header_dict[key].append(value)
-#         else:
-#             header_dict[key] = value
-#
-#     print(str(header_dict))
-#     return header_dict
-
 
 _title_validator = _create_title_validator()

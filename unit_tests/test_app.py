@@ -9,13 +9,25 @@ from unit_tests.schema_tests import run_schema_checks
 import unittest
 import json
 import mock
-
+from flask import request
 
 class TestRoutes(unittest.TestCase):
     DEED_ENDPOINT = "/deed/"
     DEED_QUERY = "/deed"
     BORROWER_ENDPOINT = "/borrower/"
     CASEWORK_ENDPOINT = "/casework/"
+
+    non_webseal_headers = {
+        "Content-Type": "application/json"
+    }
+    webseal_headers = {
+        "Content-Type": "application/json",
+        "Iv-User-L":"CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Devices,O=1359.2.1,C=gb"
+    }
+    dodgy_webseal_headers1 = {
+        "Content-Type": "application/json",
+        "Iv-User-L":"incorrect data"
+    }
 
     def setUp(self):
         app.config.from_pyfile("config.py")
@@ -41,7 +53,7 @@ class TestRoutes(unittest.TestCase):
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def create(self, mock_query, mock_Deed, mock_Borrower):
+    def test_create_no_auth_headers(self,  mock_query, mock_Deed, mock_Borrower):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
 
@@ -50,7 +62,35 @@ class TestRoutes(unittest.TestCase):
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
                                  headers={"Content-Type": "application/json"})
 
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    @mock.patch('application.borrower.model.Borrower.save')
+    @mock.patch('application.deed.model.Deed.save')
+    @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
+    def test_create_webseal_external(self,  mock_query, mock_Deed, mock_Borrower):
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = MortgageDocMock()
+
+        payload = json.dumps(DeedHelper._json_doc)
+
+        response = self.app.post(self.DEED_ENDPOINT, data=payload,
+                                 headers=self.webseal_headers)
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    @mock.patch('application.borrower.model.Borrower.save')
+    @mock.patch('application.deed.model.Deed.save')
+    @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
+    def test_create_webseal_external_dodgy_headers1(self,  mock_query, mock_Deed, mock_Borrower):
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = MortgageDocMock()
+
+        payload = json.dumps(DeedHelper._json_doc)
+
+        response = self.app.post(self.DEED_ENDPOINT, data=payload,
+                                 headers=self.dodgy_webseal_headers1)
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
@@ -83,7 +123,8 @@ class TestRoutes(unittest.TestCase):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = DeedModelMock()
 
-        response = self.app.get(self.DEED_ENDPOINT + 'AB1234')
+        response = self.app.get(self.DEED_ENDPOINT + 'AB1234',
+                                headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue("DN100" in response.data.decode())
 
@@ -110,7 +151,8 @@ class TestRoutes(unittest.TestCase):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = None
 
-        response = self.app.get(self.DEED_ENDPOINT + 'CD3456')
+        response = self.app.get(self.DEED_ENDPOINT + 'CD3456',
+                                headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     @mock.patch('application.borrower.model.Borrower.delete')
@@ -192,7 +234,7 @@ class TestRoutes(unittest.TestCase):
 
         payload = json.dumps(DeedHelper._json_doc)
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
-                                 headers={"Content-Type": "application/json"})
+                                 headers=self.webseal_headers)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
