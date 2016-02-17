@@ -1,53 +1,70 @@
 {
-    "swagger": "2.0",
-    "info": {
-        "version": "1.0.0",
-        "title": "Land Registry Internal Casework API"
-    },
-    "paths": {
-        "/deed": {
-            "get": {
-                "description": "Sending in a md-ref and a title number will return a deed's token and status if it exists.\n",
-                "parameters": [
-                    {
-                        "name": "md_ref",
-                        "in": "query",
-                        "description": "md_ref",
-                        "required": true,
-                        "type": "string",
-                        "pattern": "^e-MD([1-9]{5}|([1-9]{3,4}[A-Z]{1}))$"
-                    },
-                    {
-                        "name": "title_number",
-                        "in": "query",
-                        "description": "title_number",
-                        "required": true,
-                        "type": "string",
-                        "pattern": "^([A-Z]{0,3}[1-9][0-9]{0,5}|[0-9]{1,6}[ZT])$"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response - returns deed token and status",
-                        "schema": {
-                            "title": "ArrayOfDeeds",
-                            "type": "array",
-                            "items": {
-                                "title": "Deed",
-                                "type": "object",
-                                "properties": {
-                                    "token": {
-                                        "type": "string"
-                                    },
-                                    "status": {
-                                        "type": "string"
-                                    }
-                                }
-                            }
+   "swagger":"2.0",
+   "info":{
+      "version":"1.0.0",
+      "title":"Land Registry Internal Casework API"
+   },
+   "paths":{
+      "/deed":{
+         "get":{
+            "description":"Sending in a md-ref and a title number will return a deed's token and status if it exists.\n",
+            "parameters":[
+               {
+                  "name":"md_ref",
+                  "in":"query",
+                  "description":"md_ref",
+                  "required":true,
+                  "type":"string",
+                  "pattern":"^e-MD([1-9]{5}|([1-9]{3,4}[A-Z]{1}))$"
+               },
+               {
+                  "name":"title_number",
+                  "in":"query",
+                  "description":"title_number",
+                  "required":true,
+                  "type":"string",
+                  "pattern":"^([A-Z]{0,3}[1-9][0-9]{0,5}|[0-9]{1,6}[ZT])$"
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"Successful response - returns deed token and status",
+                  "schema":{
+                     "title":"ArrayOfDeeds",
+                     "type":"array",
+                     "items":{
+                        "title":"Deed",
+                        "type":"object",
+                        "properties":{
+                           "token":{
+                              "type":"string"
+                           },
+                           "status":{
+                              "type":"string"
+                           }
                         }
-                    }
-                }
+                     }
+                  }
+               }
             }
-        }
-    }
+         }
+      },
+      "/casework/{deed_reference}":{
+         "get":{
+            "summary":"Deed"
+         },
+         "description":"The official copy endpoint returns a pdf official copy for the unique deed reference provided\n ",
+         "produces":[
+            "application/pdf"
+         ],
+         "responses":{
+            "200":{
+               "description":"A specific deed pdf is returned"
+            }
+         }
+      },
+      "404":{
+         "description":"Deed not found"
+      }
+   }
 }
