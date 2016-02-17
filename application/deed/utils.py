@@ -9,6 +9,7 @@ from lxml import etree
 from underscore import _
 import application.deed.generated.deed_xmlify as api
 from flask import request
+import urllib
 
 LOGGER = logging.getLogger(__name__)
 
@@ -192,5 +193,42 @@ def convert_json_to_xml(deed_json):  # pragma: no cover
 
 def is_internal():
     return True if "X-Land-Registry" in request.headers else False
+
+
+def process_conveyancer_credentials(header_data):
+    header_dict = {}
+
+    for param in header_data.split(','):
+        key,value = param.split('=')
+        value =  urllib.parse.unquote(value)
+        if key in header_dict:
+            header_dict[key].append(value)
+        else:
+            header_dict[key] = [value]
+
+    return header_dict
+
+# def process_conveyancer_credentials(header_data):
+#     header_dict = {}
+#
+#     header_vars = \
+#     [{k:urllib.parse.unquote(v)}
+#         for param in header_data.split(',')
+#         for k,v in [param.split("=")]]  \
+#         if header_data is not None else {}
+#
+#     for header_var in header_vars:
+#         print(str(header_var))
+#         print(str(header_var.keys()))
+#         key = list(header_var.keys())[0]
+#         value = list(header_var.values())[0]
+#         if key in header_dict:
+#             header_dict[key].append(value)
+#         else:
+#             header_dict[key] = value
+#
+#     print(str(header_dict))
+#     return header_dict
+
 
 _title_validator = _create_title_validator()
