@@ -70,9 +70,10 @@ def create():
             conveyancer_credentials = process_conveyancer_credentials()
 
             if conveyancer_credentials:
-                deed.organisation_id = conveyancer_credentials["O"][0]
-                deed.organisation_name = conveyancer_credentials["O"][1]
+                deed.organisation_id = conveyancer_credentials["O"][1]
+                deed.organisation_name = conveyancer_credentials["O"][0]
                 success, msg = update_deed(deed, deed_json, check_result['result'])
+
                 if not success:
                     LOGGER.error("Update deed 400_BAD_REQUEST")
                     return msg, status.HTTP_400_BAD_REQUEST
