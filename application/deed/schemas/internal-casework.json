@@ -4,6 +4,7 @@
       "version":"1.0.0",
       "title":"Land Registry Internal Casework API"
    },
+   "host":"api.landregistry.gov.uk",
    "paths":{
       "/deed":{
          "get":{
@@ -51,20 +52,28 @@
       },
       "/casework/{deed_reference}":{
          "get":{
-            "summary":"Deed"
-         },
-         "description":"The official copy endpoint returns a pdf official copy for the unique deed reference provided\n ",
-         "produces":[
-            "application/pdf"
-         ],
-         "responses":{
-            "200":{
-               "description":"A specific deed pdf is returned"
+            "description":"The official copy endpoint returns a pdf official copy for the unique deed reference provided\n ",
+            "produces":[
+               "application/pdf"
+            ],
+            "parameters": [
+                    {
+                        "name": "deed_reference",
+                        "in": "path",
+                        "description": "Unique reference of the deed.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+            "responses":{
+               "200":{
+                  "description":"A specific deed pdf is returned"
+               },
+               "404":{
+                  "description":"Deed not found"
+               }
             }
          }
-      },
-      "404":{
-         "description":"Deed not found"
       }
    }
 }
