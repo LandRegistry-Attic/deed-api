@@ -64,17 +64,18 @@ def create():
 
             deed.token = Deed.generate_token()
 
-            success, msg = update_deed(deed, deed_json)
+            check_result = Akuma.creation_check(deed_json)
+            LOGGER.info("Check ID: " + check_result['id'])
+
+            success, msg = update_deed(deed, deed_json, check_result['result'])
+
             if not success:
                 return msg, status.HTTP_400_BAD_REQUEST
 
-            check_result = Akuma.creation_check(deed_json)
-
-            if check_result['result'] == 'A':
-                LOGGER.info("Check ID: " + check_result['id'])
-                return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
-            else:
+            if check_result['result'] != "A":
                 return abort(status.HTTP_503_SERVICE_UNAVAILABLE)
+
+            return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
 
         except Exception as e:
             LOGGER.error("Database Exception - %s" % e)
