@@ -1,6 +1,7 @@
 import logging
 from application.akuma.service import Akuma
 from application.deed.model import Deed
+from application.deed.utils import validate_helper, convert_json_to_xml
 from application.deed.utils import validate_helper, process_organisation_credentials
 from application.deed.service import update_deed
 from flask import request, abort, jsonify, Response
@@ -8,6 +9,8 @@ from flask import Blueprint
 from flask.ext.api import status
 from application.borrower.model import Borrower
 import json
+import datetime
+import copy
 import sys
 
 LOGGER = logging.getLogger(__name__)
@@ -106,3 +109,46 @@ def delete_borrower(borrower_id):
         abort(status.HTTP_404_NOT_FOUND)
     else:
         return jsonify({"id": borrower_id}), status.HTTP_200_OK
+
+
+@deed_bp.route('/<deed_reference>/sign', methods=['POST'])
+def sign_deed(deed_reference):
+    request_json = request.get_json()
+    borrower_id = request_json['borrower_id']
+    result = Deed.query.filter_by(token=str(deed_reference)).first()
+
+    if result is None:
+        LOGGER.error("Database Exception 404 - %s" % e)
+        abort(status.HTTP_404_NOT_FOUND)
+    else:
+        # result.deed['token'] = result.token - what is the purpose of this? does this still need to be done when signing?
+        # check if XML already exisit
+        if result.deed_xml is None:
+            deed_XML = convert_json_to_xml(result.deed)
+            result.deed_xml = deed_XML
+            # sign then save to DB.
+
+        update_deed_signature_timestamp(result, borrower_id)
+
+    return jsonify({"deed": result.deed}), status.HTTP_200_OK
+
+
+@deed_bp.route('/<deed_reference>/make-effective', methods=['POST'])
+def make_effective(deed_reference):
+    return status.HTTP_200_OK
+
+
+def update_deed_signature_timestamp(deed, borrower_id):
+    modify_deed = copy.deepcopy(deed.deed)
+
+    for borrower in modify_deed['borrowers']:
+        if borrower['id'] == int(borrower_id):
+            borrower['signature'] = datetime.datetime.now().strftime("%A, %d %B %Y %I:%M%p")
+    deed.deed = modify_deed
+    try:
+        result = deed.update()
+        deed.deed['token'] = deed.token
+        return jsonify({"deed": deed.deed}), status.HTTP_200_OK
+    except Exception as e:
+        print("Database Exception - %s" % e)
+        return "signature addition failed"
