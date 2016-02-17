@@ -83,28 +83,28 @@ class DeedHelper:
     }
 
     _invalid_phone_numbers = {
-        "borrowers":
-            [
-                {
-                    "forename": "lisa",
-                    "middle_name": "ann",
-                    "surname": "bloggette",
-                    "gender": "M",
-                    "address": "test address with postcode, PL14 3JR",
-                    "dob": "23/01/1986",
-                    "phone_number": "07502154062"
-                },
-                {
-                    "forename": "frank",
-                    "middle_name": "ann",
-                    "surname": "bloggette",
-                    "gender": "M",
-                    "address": "Test Address With Postcode, PL14 3JR",
-                    "dob": "23/01/1986",
-                    "phone_number": "07502154062"
-                }
-            ]
-        },
+                                 "borrowers":
+                                     [
+                                         {
+                                             "forename": "lisa",
+                                             "middle_name": "ann",
+                                             "surname": "bloggette",
+                                             "gender": "M",
+                                             "address": "test address with postcode, PL14 3JR",
+                                             "dob": "23/01/1986",
+                                             "phone_number": "07502154062"
+                                         },
+                                         {
+                                             "forename": "frank",
+                                             "middle_name": "ann",
+                                             "surname": "bloggette",
+                                             "gender": "M",
+                                             "address": "Test Address With Postcode, PL14 3JR",
+                                             "dob": "23/01/1986",
+                                             "phone_number": "07502154062"
+                                         }
+                                     ]
+                             },
     _invalid_blanks_on_required_fields = {
         "borrowers": [
             {
@@ -170,3 +170,33 @@ class StatusMock:
 
     _no_status_with_mdref_and_titleno = [
     ]
+
+
+class AkumaMock:
+    _approved_akuma_payload = {
+        "payload": {
+            "borrowers": [{
+                "phone_number": "07502159062",
+                "gender": "Male",
+                "address": "2 The Street, Plymouth, PL1 2PP",
+                "forename": "Paul",
+                "dob": "22/03/1976",
+                "middle_name": "James",
+                "surname": "Smythe"
+            }, {
+                "phone_number": "07502154999",
+                "gender": "Female",
+                "address": "2 The Street, Plymouth, PL1 2PP",
+                "dob": "01/12/1982",
+                "surname": "Smythe",
+                "forename": "Jane"
+            }],
+            "md_ref": "e-MD12344",
+            "title_number": "DT107",
+            "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+            "identity_checked": "Y"
+        },
+        "service": "Digital Mortgage",
+        "activity": "Create"
+
+    }
