@@ -52,6 +52,9 @@ class Deed(db.Model):
         conveyancer_credentials = process_organisation_credentials()
         organisation_id = conveyancer_credentials["O"][1]
 
-        result = Deed.query.filter_by(token=str(deed_reference), organisation_id=organisation_id).first()
+        if organisation_id != '*':
+            result = Deed.query.filter_by(token=str(deed_reference), organisation_id=organisation_id).first()
+        else:
+            result = Deed.query.filter_by(token=str(deed_reference)).first()
 
         return result
