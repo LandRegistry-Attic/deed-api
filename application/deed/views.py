@@ -118,17 +118,19 @@ def sign_deed(deed_reference):
     result = Deed.query.filter_by(token=str(deed_reference)).first()
 
     if result is None:
-        LOGGER.error("Database Exception 404 - %s" % e)
+        LOGGER.error("Database Exception 404 for deed reference - %s" % deed_reference)
         abort(status.HTTP_404_NOT_FOUND)
     else:
+        LOGGER.info("Signing deed for borrower_id %s against deed reference %s" % (borrower_id, deed_reference))
         # result.deed['token'] = result.token - what is the purpose of this? does this still need to be done when signing?
         # check if XML already exisit
-        if result.deed_xml is None:
-            deed_XML = convert_json_to_xml(result.deed)
-            result.deed_xml = deed_XML
+        # if result.deed_xml is None:
+        #     deed_XML = convert_json_to_xml(result.deed)
+        #     print("deed_XML = %s" % deed_XML)
+        #     result.deed_xml = deed_XML.decode("UTF-8")
             # sign then save to DB.
 
-        update_deed_signature_timestamp(result, borrower_id)
+        result.deed = update_deed_signature_timestamp(result, borrower_id)
 
     return jsonify({"deed": result.deed}), status.HTTP_200_OK
 
@@ -143,12 +145,15 @@ def update_deed_signature_timestamp(deed, borrower_id):
 
     for borrower in modify_deed['borrowers']:
         if borrower['id'] == int(borrower_id):
-            borrower['signature'] = datetime.datetime.now().strftime("%A, %d %B %Y %I:%M%p")
+            borrower['signature'] = datetime.datetime.now().strftime("%d %B %Y %I:%M%p")
+
     deed.deed = modify_deed
+
     try:
-        result = deed.update()
+        deed.save()
         deed.deed['token'] = deed.token
-        return jsonify({"deed": deed.deed}), status.HTTP_200_OK
+        return deed.deed
+
     except Exception as e:
-        print("Database Exception - %s" % e)
-        return "signature addition failed"
+        LOGGER.error("Database Exception - %s" % e)
+        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
