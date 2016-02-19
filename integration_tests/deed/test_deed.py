@@ -13,6 +13,16 @@ class TestDeedRoutes(unittest.TestCase):
         "Iv-User-L":"CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Devices,O=1359.2.1,C=gb"
     }
 
+    webseal_headers_2 = {
+        "Content-Type": "application/json",
+        "Iv-User-L":"CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Test,O=1360,C=gb"
+    }
+
+    webseal_headers_internal = {
+        "Content-Type": "application/json",
+        "Iv-User-L":"CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Test,O=*,C=gb"
+    }
+
     def setUp(self):
         setUpApp(self)
         setUpDB(self)
@@ -204,3 +214,22 @@ class TestDeedRoutes(unittest.TestCase):
                                headers=self.webseal_headers)
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.data.decode(), "Matching deed not found")
+
+    @with_client
+    def test_deed_create_and_get_diff_org(self, client):
+
+        create_deed = client.post('/deed/',
+                                  data=json.dumps(valid_deed),
+                                  headers=self.webseal_headers)
+        self.assertEqual(create_deed.status_code, 201)
+        self.assertIn("/deed/", str(create_deed.data))
+
+        response_json = json.loads(create_deed.data.decode())
+        get_created_deed = client.get(response_json["path"],
+                                  headers=self.webseal_headers_2)
+        self.assertEqual(get_created_deed.status_code, 404)
+
+        response_json = json.loads(create_deed.data.decode())
+        get_created_deed = client.get(response_json["path"],
+                                  headers=self.webseal_headers_internal)
+        self.assertEqual(get_created_deed.status_code, 200)
