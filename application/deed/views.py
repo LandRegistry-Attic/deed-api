@@ -1,7 +1,7 @@
 import logging
 from application.akuma.service import Akuma
 from application.deed.model import Deed
-from application.deed.utils import validate_helper, process_conveyancer_credentials
+from application.deed.utils import validate_helper, process_organisation_credentials
 from application.deed.service import update_deed
 from flask import request, abort, jsonify, Response
 from flask import Blueprint
@@ -67,11 +67,11 @@ def create():
             check_result = Akuma.do_check(deed_json, "Create")
             LOGGER.info("Check ID: " + check_result['id'])
 
-            conveyancer_credentials = process_conveyancer_credentials()
+            organisation_credentials = process_organisation_credentials()
 
-            if conveyancer_credentials:
-                deed.organisation_id = conveyancer_credentials["O"][1]
-                deed.organisation_name = conveyancer_credentials["O"][0]
+            if organisation_credentials:
+                deed.organisation_id = organisation_credentials["O"][1]
+                deed.organisation_name = organisation_credentials["O"][0]
                 success, msg = update_deed(deed, deed_json, check_result['result'])
 
                 if not success:

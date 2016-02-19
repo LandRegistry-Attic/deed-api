@@ -3,7 +3,7 @@ from application.deed.model import Deed
 from application.casework.service import get_document
 from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, StatusMock
 from application.akuma.service import Akuma
-from application.deed.utils import convert_json_to_xml, validate_generated_xml, process_conveyancer_credentials
+from application.deed.utils import convert_json_to_xml, validate_generated_xml, process_organisation_credentials
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
 import unittest

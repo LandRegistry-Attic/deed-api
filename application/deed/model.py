@@ -3,7 +3,7 @@ import uuid
 from application import db
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.operators import and_
-from application.deed.utils import process_conveyancer_credentials
+from application.deed.utils import process_organisation_credentials
 
 
 class Deed(db.Model):
@@ -49,7 +49,7 @@ class Deed(db.Model):
     @staticmethod
     def get_deed(deed_reference):
 
-        conveyancer_credentials = process_conveyancer_credentials()
+        conveyancer_credentials = process_organisation_credentials()
         organisation_id = conveyancer_credentials["O"][1]
 
         result = Deed.query.filter_by(token=str(deed_reference), organisation_id=organisation_id).first()

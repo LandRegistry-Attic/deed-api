@@ -195,7 +195,7 @@ def is_internal():
     return True if "X-Land-Registry" in request.headers else False
 
 
-def process_conveyancer_credentials():
+def process_organisation_credentials():
     header_dict = {}
 
     try:
