@@ -97,5 +97,4 @@ def update_deed(deed, deed_json, akuma_flag):
 
     deed.save()
 
-
     return True, "OK"

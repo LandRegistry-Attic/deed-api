@@ -83,28 +83,27 @@ class DeedHelper:
     }
 
     _invalid_phone_numbers = {
-                                 "borrowers":
-                                     [
-                                         {
-                                             "forename": "lisa",
-                                             "middle_name": "ann",
-                                             "surname": "bloggette",
-                                             "gender": "M",
-                                             "address": "test address with postcode, PL14 3JR",
-                                             "dob": "23/01/1986",
-                                             "phone_number": "07502154062"
-                                         },
-                                         {
-                                             "forename": "frank",
-                                             "middle_name": "ann",
-                                             "surname": "bloggette",
-                                             "gender": "M",
-                                             "address": "Test Address With Postcode, PL14 3JR",
-                                             "dob": "23/01/1986",
-                                             "phone_number": "07502154062"
-                                         }
-                                     ]
-                             },
+        "borrowers": [
+            {
+                "forename": "lisa",
+                "middle_name": "ann",
+                "surname": "bloggette",
+                "gender": "M",
+                "address": "test address with postcode, PL14 3JR",
+                "dob": "23/01/1986",
+                "phone_number": "07502154062"
+            },
+            {
+                "forename": "frank",
+                "middle_name": "ann",
+                "surname": "bloggette",
+                "gender": "M",
+                "address": "Test Address With Postcode, PL14 3JR",
+                "dob": "23/01/1986",
+                "phone_number": "07502154062"
+            }
+        ]
+    },
     _invalid_blanks_on_required_fields = {
         "borrowers": [
             {

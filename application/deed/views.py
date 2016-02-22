@@ -1,5 +1,5 @@
 import logging
-from application.akuma.model import Akuma
+from application.akuma.service import Akuma
 from application.deed.model import Deed
 from application.deed.utils import validate_helper
 from application.deed.service import update_deed
@@ -63,8 +63,7 @@ def create():
             deed = Deed()
 
             deed.token = Deed.generate_token()
-
-            check_result = Akuma.creation_check(deed_json)
+            check_result = Akuma.do_check(deed_json, "Create")
             LOGGER.info("Check ID: " + check_result['id'])
 
             success, msg = update_deed(deed, deed_json, check_result['result'])

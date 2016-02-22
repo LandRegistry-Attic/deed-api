@@ -1,49 +1,17 @@
-from application.config import AKUMA_URI
-import requests
-import json
+from application.service_implimentation import akuma
 
 
 class Akuma:
-
     @staticmethod
-    def do_check(json_payload):
-
-        url = AKUMA_URI
-        payload = json_payload
-        headers = {'content-type': 'application/json'}
-
-        check_result = requests.post(url, data=json.dumps(payload), headers=headers)
-
-        return json.loads(check_result.text)
-
-    @staticmethod
-    def creation_check(json_payload):
-
-        # Wrap with Create activities
-        create_json = {
+    def do_check(json_payload, check_type):
+        payload = {
             "service": "Digital Mortgage",
-            "activity": "Create",
-            "payload": ""
-                   }
+            "activity": check_type,
+            "payload": json_payload
+        }
 
-        create_json["payload"] = json_payload
+        akuma_client = akuma.make_akuma_client()
 
-        check_result = Akuma.do_check(create_json)
-
-        return check_result
-
-    @staticmethod
-    def viewing_check(json_payload):
-
-        # Wrap with Create activities
-        view_json = {
-            "service": "Digital Mortgage",
-            "activity": "View",
-            "payload": ""
-                   }
-
-        view_json["payload"] = json_payload
-
-        check_result = Akuma.do_check(view_json)
+        check_result = akuma_client.perform_check(payload)
 
         return check_result
