@@ -3,13 +3,13 @@ from application.deed.model import Deed
 from application.casework.service import get_document
 from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, StatusMock
 from application.akuma.service import Akuma
-from application.deed.utils import convert_json_to_xml, validate_generated_xml, process_organisation_credentials
+from application.deed.utils import convert_json_to_xml, validate_generated_xml
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
 import unittest
 import json
 import mock
-from flask import request
+
 
 class TestRoutes(unittest.TestCase):
     DEED_ENDPOINT = "/deed/"
@@ -22,11 +22,11 @@ class TestRoutes(unittest.TestCase):
     }
     webseal_headers = {
         "Content-Type": "application/json",
-        "Iv-User-L":"CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Devices,O=1359.2.1,C=gb"
+        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Devices,O=1359.2.1,C=gb"
     }
     dodgy_webseal_headers1 = {
         "Content-Type": "application/json",
-        "Iv-User-L":"incorrect data"
+        "Iv-User-L": "incorrect data"
     }
 
     def setUp(self):
@@ -266,6 +266,7 @@ class TestRoutes(unittest.TestCase):
         response = self.app.get(self.CASEWORK_ENDPOINT + 'AB1234')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue("application/pdf" in response.mimetype)
+<<<<<<< 5706bb892520af057910b5850cde9198ae799b48
 
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     def test_akuma_check(self, mock_api):
@@ -298,3 +299,5 @@ class TestRoutes(unittest.TestCase):
                                  headers={"Content-Type": "application/json"})
 
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+=======
+>>>>>>> flake8
