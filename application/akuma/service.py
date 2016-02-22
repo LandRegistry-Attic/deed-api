@@ -1,7 +1,8 @@
-from application.service_implimentation import akuma
+from application.service_implementation import akuma
 
 
 class Akuma:
+
     @staticmethod
     def do_check(json_payload, check_type):
         payload = {
