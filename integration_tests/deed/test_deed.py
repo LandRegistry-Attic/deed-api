@@ -10,17 +10,17 @@ class TestDeedRoutes(unittest.TestCase):
 
     webseal_headers = {
         "Content-Type": "application/json",
-        "Iv-User-L":"CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Devices,O=1359.2.1,C=gb"
+        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Devices,O=1359.2.1,C=gb"
     }
 
     webseal_headers_2 = {
         "Content-Type": "application/json",
-        "Iv-User-L":"CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Test,O=1360,C=gb"
+        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Test,O=1360,C=gb"
     }
 
     webseal_headers_internal = {
         "Content-Type": "application/json",
-        "Iv-User-L":"CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Test,O=*,C=gb"
+        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Test,O=*,C=gb"
     }
 
     def setUp(self):
@@ -42,7 +42,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         response_json = json.loads(create_deed.data.decode())
         get_created_deed = client.get(response_json["path"],
-                                  headers=self.webseal_headers)
+                                      headers=self.webseal_headers)
         self.assertEqual(get_created_deed.status_code, 200)
 
         self.assertIn("title_number", str(get_created_deed.data))
@@ -57,7 +57,7 @@ class TestDeedRoutes(unittest.TestCase):
     @with_client
     def test_bad_get(self, client):
         fake_token_deed = client.get("/deed/fake",
-                                  headers=self.webseal_headers)
+                                     headers=self.webseal_headers)
 
         self.assertEqual(fake_token_deed.status_code, 404)
         self.assertIn("Not Found", str(fake_token_deed.data))
@@ -74,7 +74,7 @@ class TestDeedRoutes(unittest.TestCase):
         response_json = json.loads(create_deed.data.decode())
         get_created_deed = client.get("deed?md_ref=" + valid_deed["md_ref"] +
                                       "&title_number=" + valid_deed["title_number"],
-                                  headers=self.webseal_headers)
+                                      headers=self.webseal_headers)
         self.assertEqual(get_created_deed.status_code, 200)
 
         self.assertIn("token", str(get_created_deed.data))
@@ -85,7 +85,7 @@ class TestDeedRoutes(unittest.TestCase):
     @with_client
     def test_invalid_params_on_get_with_mdref_and_titleno(self, client):
         fake_token_deed = client.get("/deed?invalid_query_parameter=invalid",
-                                  headers=self.webseal_headers)
+                                     headers=self.webseal_headers)
 
         self.assertEqual(fake_token_deed.status_code, 400)
         self.assertIn("400 Bad Request", str(fake_token_deed.data))
@@ -93,7 +93,7 @@ class TestDeedRoutes(unittest.TestCase):
     @with_client
     def test_invalid_query_params_on_get_with_mdref_and_titleno(self, client):
         fake_token_deed = client.get("/deed?md_ref=InvalidMD&title_number=InvalidTitleNo",
-                                  headers=self.webseal_headers)
+                                     headers=self.webseal_headers)
 
         self.assertEqual(fake_token_deed.status_code, 404)
         self.assertIn("Not Found", str(fake_token_deed.data))
@@ -199,8 +199,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         newBorrower = borrowerService.saveBorrower(borrower, "aaaaaa")
         response = client.post('/borrower/validate',
-                               data=json.dumps({"borrower_token":
-                                                newBorrower.token,
+                               data=json.dumps({"borrower_token": newBorrower.token,
                                                 "dob": "23/01/1986"}),
                                headers=self.webseal_headers)
         self.assertEqual(response.status_code, 200)
@@ -226,10 +225,10 @@ class TestDeedRoutes(unittest.TestCase):
 
         response_json = json.loads(create_deed.data.decode())
         get_created_deed = client.get(response_json["path"],
-                                  headers=self.webseal_headers_2)
+                                      headers=self.webseal_headers_2)
         self.assertEqual(get_created_deed.status_code, 404)
 
         response_json = json.loads(create_deed.data.decode())
         get_created_deed = client.get(response_json["path"],
-                                  headers=self.webseal_headers_internal)
+                                      headers=self.webseal_headers_internal)
         self.assertEqual(get_created_deed.status_code, 200)
