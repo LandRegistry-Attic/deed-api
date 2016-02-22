@@ -202,7 +202,7 @@ def process_organisation_credentials():
         header_data = request.headers.get("Iv-User-L")
 
         for param in header_data.split(','):
-            key,value = param.split('=')
+            key, value = param.split('=')
             value = urllib.parse.unquote(value)
             if key in header_dict:
                 header_dict[key].append(value)
