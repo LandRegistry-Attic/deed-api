@@ -1,7 +1,7 @@
 import logging
 from application.akuma.service import Akuma
 from application.deed.model import Deed
-from application.deed.utils import validate_helper, convert_json_to_xml
+from application.deed.utils import validate_helper
 from application.deed.utils import validate_helper, process_organisation_credentials
 from application.deed.service import update_deed
 from flask import request, abort, jsonify, Response
@@ -128,7 +128,7 @@ def sign_deed(deed_reference):
         #     deed_XML = convert_json_to_xml(result.deed)
         #     print("deed_XML = %s" % deed_XML)
         #     result.deed_xml = deed_XML.decode("UTF-8")
-            # sign then save to DB.
+        # sign then save to DB.
 
         result.deed = update_deed_signature_timestamp(result, borrower_token)
 
