@@ -114,14 +114,14 @@ def delete_borrower(borrower_id):
 @deed_bp.route('/<deed_reference>/sign', methods=['POST'])
 def sign_deed(deed_reference):
     request_json = request.get_json()
-    borrower_id = request_json['borrower_id']
+    borrower_token = request_json['borrower_token']
     result = Deed.query.filter_by(token=str(deed_reference)).first()
 
     if result is None:
         LOGGER.error("Database Exception 404 for deed reference - %s" % deed_reference)
         abort(status.HTTP_404_NOT_FOUND)
     else:
-        LOGGER.info("Signing deed for borrower_id %s against deed reference %s" % (borrower_id, deed_reference))
+        LOGGER.info("Signing deed for borrower_id %s against deed reference %s" % (borrower_token, deed_reference))
         # result.deed['token'] = result.token - what is the purpose of this? does this still need to be done when signing?
         # check if XML already exisit
         # if result.deed_xml is None:
@@ -130,7 +130,7 @@ def sign_deed(deed_reference):
         #     result.deed_xml = deed_XML.decode("UTF-8")
             # sign then save to DB.
 
-        result.deed = update_deed_signature_timestamp(result, borrower_id)
+        result.deed = update_deed_signature_timestamp(result, borrower_token)
 
     return jsonify({"deed": result.deed}), status.HTTP_200_OK
 
@@ -140,11 +140,11 @@ def make_effective(deed_reference):
     return status.HTTP_200_OK
 
 
-def update_deed_signature_timestamp(deed, borrower_id):
+def update_deed_signature_timestamp(deed, borrower_token):
     modify_deed = copy.deepcopy(deed.deed)
 
     for borrower in modify_deed['borrowers']:
-        if borrower['id'] == int(borrower_id):
+        if borrower['token'] == borrower_token:
             borrower['signature'] = datetime.datetime.now().strftime("%d %B %Y %I:%M%p")
 
     deed.deed = modify_deed
