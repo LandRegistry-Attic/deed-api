@@ -8,6 +8,7 @@ from flask import Blueprint
 from flask.ext.api import status
 from application.borrower.model import Borrower
 import json
+import sys
 
 
 LOGGER = logging.getLogger(__name__)
@@ -77,7 +78,8 @@ def create():
             return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
 
         except Exception as e:
-            LOGGER.error("Database Exception - %s" % e)
+            msg = str(sys.exc_info())
+            LOGGER.error("Database Exception - %s" % msg)
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 

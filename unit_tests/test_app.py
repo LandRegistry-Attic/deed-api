@@ -179,12 +179,16 @@ class TestRoutes(unittest.TestCase):
     def test_schema_checks(self):
         self.assertTrue(run_schema_checks())
 
+    @mock.patch('application.service_implementation.akuma.interface.AkumaInterface.perform_check')
+    @mock.patch('application.deed.service', autospec=True)
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_invalid_md_ref(self, mock_query, mock_Deed, mock_Borrower):
+    def test_invalid_md_ref(self, mock_query, mock_Deed, mock_Borrower, mock_update, mock_akuma):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = None
+
+        mock_update.update_deed.return_value = True, "OK"
 
         payload = json.dumps(DeedHelper._json_doc)
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
@@ -232,17 +236,23 @@ class TestRoutes(unittest.TestCase):
 
         self.assertEqual(check_result["result"], "A")
 
+    @mock.patch('application.service_implementation.akuma.interface.AkumaInterface.perform_check')
+    @mock.patch('application.deed.service', autospec=True)
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_create_invalid_akuma(self, mock_query, mock_Deed, mock_Borrower):
+    def test_create_invalid_akuma(self, mock_query, mock_Deed, mock_Borrower, mock_update, mock_akuma):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
+        mock_update.update_deed.return_value = True, "OK"
+        mock_akuma.return_value = {
+            "result": "FFFFF",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
 
         payload = json.dumps(DeedHelper._json_doc)
 
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
                                  headers={"Content-Type": "application/json"})
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)

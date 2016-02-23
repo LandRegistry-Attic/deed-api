@@ -6,8 +6,8 @@ class DeedModelMock:
 class MortgageDocMock:
     md_ref = "e-MD12121"
     data = '{"description":"test setup charge clause","lender":{ "name":"a new lender",' \
-           '"address":"no 1 reputable street"}, "charge_clauses": [ { "cre_code": "CRE001",' \
-           '"description":"This is an example charge clause"}], "additional_provisions": ' \
+           '"address":"no 1 reputable street"}, "charge_clause": { "cre_code": "CRE001",' \
+           '"description":"This is an example charge clause"}, "additional_provisions": ' \
            '[ { "additional_provision_code":"addp001", "description":"this is additional ' \
            'provision1"}, { "additional_provision_code":"addp002", "description":"this is ' \
            'additional provision2"}]}'
