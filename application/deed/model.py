@@ -5,9 +5,10 @@ from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.operators import and_
 from application.deed.utils import process_organisation_credentials
 import logging
+from hashids import Hashids
+
 
 LOGGER = logging.getLogger(__name__)
-
 
 class Deed(db.Model):
     __tablename__ = 'deed'
@@ -28,7 +29,10 @@ class Deed(db.Model):
 
     @staticmethod
     def generate_token():
-        return str(uuid.uuid4().hex[:6]).lower()
+        uuid_value = str(uuid.uuid4().hex).lower()
+        hashids = Hashids(salt=uuid_value, alphabet='abcdef0123456789')
+        hashid = hashids.encode(123, 4)
+        return hashid
 
     def get_json_doc(self):
         return copy.deepcopy(self.json_doc)
