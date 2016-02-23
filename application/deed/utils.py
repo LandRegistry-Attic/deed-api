@@ -9,6 +9,7 @@ from lxml import etree
 from underscore import _
 import application.deed.generated.deed_xmlify as api
 from flask import request
+import urllib
 
 LOGGER = logging.getLogger(__name__)
 
@@ -192,5 +193,26 @@ def convert_json_to_xml(deed_json):  # pragma: no cover
 
 def is_internal():
     return True if "X-Land-Registry" in request.headers else False
+
+
+def process_organisation_credentials():
+    header_dict = {}
+
+    try:
+        header_data = request.headers.get("Iv-User-L")
+
+        for param in header_data.split(','):
+            key, value = param.split('=')
+            value = urllib.parse.unquote(value)
+            if key in header_dict:
+                header_dict[key].append(value)
+            else:
+                header_dict[key] = [value]
+    except:
+        msg = str(sys.exc_info())
+        LOGGER.error("unable to process organisation credentials %s" % msg)
+        header_dict = None
+
+    return header_dict
 
 _title_validator = _create_title_validator()

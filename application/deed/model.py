@@ -3,6 +3,10 @@ import uuid
 from application import db
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.operators import and_
+from application.deed.utils import process_organisation_credentials
+import logging
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Deed(db.Model):
@@ -13,6 +17,8 @@ class Deed(db.Model):
     deed = db.Column(JSON)
     identity_checked = db.Column(db.String(1), nullable=False)
     status = db.Column(db.String(16), default='DRAFT')
+    organisation_id = db.Column(db.String, nullable=True)
+    organisation_name = db.Column(db.String, nullable=True)
 
     def save(self):  # pragma: no cover
         db.session.add(self)
@@ -42,3 +48,17 @@ class Deed(db.Model):
         )
 
         return deeds_with_status
+
+    @staticmethod
+    def get_deed(deed_reference):
+
+        conveyancer_credentials = process_organisation_credentials()
+        organisation_id = conveyancer_credentials["O"][1]
+
+        if organisation_id != '*':
+            LOGGER.debug("Internal request to view deed reference %s" % deed_reference)
+            result = Deed.query.filter_by(token=str(deed_reference), organisation_id=organisation_id).first()
+        else:
+            result = Deed.query.filter_by(token=str(deed_reference)).first()
+
+        return result

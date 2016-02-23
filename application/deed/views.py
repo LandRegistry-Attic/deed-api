@@ -1,7 +1,7 @@
 import logging
 from application.akuma.service import Akuma
 from application.deed.model import Deed
-from application.deed.utils import validate_helper
+from application.deed.utils import validate_helper, process_organisation_credentials
 from application.deed.service import update_deed
 from flask import request, abort, jsonify, Response
 from flask import Blueprint
@@ -9,7 +9,6 @@ from flask.ext.api import status
 from application.borrower.model import Borrower
 import json
 import sys
-
 
 LOGGER = logging.getLogger(__name__)
 
@@ -20,7 +19,8 @@ deed_bp = Blueprint('deed', __name__,
 
 @deed_bp.route('/<deed_reference>', methods=['GET'])
 def get_deed(deed_reference):
-    result = Deed.query.filter_by(token=str(deed_reference)).first()
+
+    result = Deed.get_deed(deed_reference)
 
     if result is None:
         abort(status.HTTP_404_NOT_FOUND)
@@ -63,16 +63,23 @@ def create():
 
         try:
             deed = Deed()
-
             deed.token = Deed.generate_token()
             check_result = Akuma.do_check(deed_json, "Create")
             LOGGER.info("Check ID: " + check_result['id'])
 
-            success, msg = update_deed(deed, deed_json, check_result['result'])
+            organisation_credentials = process_organisation_credentials()
 
-            if not success:
-                LOGGER.error("Update deed 400_BAD_REQUEST")
-                return msg, status.HTTP_400_BAD_REQUEST
+            if organisation_credentials:
+                deed.organisation_id = organisation_credentials["O"][1]
+                deed.organisation_name = organisation_credentials["O"][0]
+                success, msg = update_deed(deed, deed_json, check_result['result'])
+
+                if not success:
+                    LOGGER.error("Update deed 400_BAD_REQUEST")
+                    return msg, status.HTTP_400_BAD_REQUEST
+            else:
+                LOGGER.error("Unable to process headers")
+                return "Unable to process headers", status.HTTP_401_UNAUTHORIZED
 
             if check_result['result'] != "A":
                 LOGGER.error("Akuma endpoint 503_SERVICE_UNAVAILABLE")
@@ -80,7 +87,7 @@ def create():
 
             return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
 
-        except Exception:
+        except:
             msg = str(sys.exc_info())
             LOGGER.error("Database Exception - %s" % msg)
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
