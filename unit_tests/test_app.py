@@ -3,6 +3,7 @@ from application.deed.model import Deed
 from application.casework.service import get_document
 from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, StatusMock
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
+from application.akuma.service import Akuma
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
 import unittest
@@ -11,7 +12,6 @@ import mock
 
 
 class TestRoutes(unittest.TestCase):
-
     DEED_ENDPOINT = "/deed/"
     DEED_QUERY = "/deed"
     BORROWER_ENDPOINT = "/borrower/"
@@ -41,7 +41,7 @@ class TestRoutes(unittest.TestCase):
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def create(self,  mock_query, mock_Deed, mock_Borrower):
+    def create(self, mock_query, mock_Deed, mock_Borrower):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
 
@@ -115,16 +115,15 @@ class TestRoutes(unittest.TestCase):
 
     @mock.patch('application.borrower.model.Borrower.delete')
     def test_delete_borrower(self, mock_borrower):
-
         mock_borrower.return_value = DeedHelper._valid_borrowers
-        response = self.app.delete(self.DEED_ENDPOINT+"borrowers/delete/1")
+        response = self.app.delete(self.DEED_ENDPOINT + "borrowers/delete/1")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     @mock.patch('application.borrower.model.Borrower.delete')
     def test_delete_borrower_not_found(self, mock_borrower):
         mock_borrower.return_value = None
-        response = self.app.delete(self.DEED_ENDPOINT+"borrowers/delete/99999")
+        response = self.app.delete(self.DEED_ENDPOINT + "borrowers/delete/99999")
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -158,7 +157,6 @@ class TestRoutes(unittest.TestCase):
 
     @mock.patch('application.borrower.model.Borrower.get_by_token')
     def test_validate_borrower_not_found(self, mock_borrower):
-
         mock_borrower.return_value = None
         payload = json.dumps(DeedHelper._validate_borrower)
 
@@ -181,12 +179,16 @@ class TestRoutes(unittest.TestCase):
     def test_schema_checks(self):
         self.assertTrue(run_schema_checks())
 
+    @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
+    @mock.patch('application.deed.service', autospec=True)
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_invalid_md_ref(self,  mock_query, mock_Deed, mock_Borrower):
+    def test_invalid_md_ref(self, mock_query, mock_Deed, mock_Borrower, mock_update, mock_akuma):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = None
+
+        mock_update.update_deed.return_value = True, "OK"
 
         payload = json.dumps(DeedHelper._json_doc)
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
@@ -195,7 +197,6 @@ class TestRoutes(unittest.TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_xml_generation(self):
-
         xml = convert_json_to_xml(DeedHelper._json_doc)
         res = validate_generated_xml(xml)
         self.assertEqual(res, True)
@@ -223,3 +224,35 @@ class TestRoutes(unittest.TestCase):
         response = self.app.get(self.CASEWORK_ENDPOINT + 'AB1234')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue("application/pdf" in response.mimetype)
+
+    @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
+    def test_akuma_check(self, mock_api):
+        mock_api.return_value = {
+            "result": "A",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
+
+        check_result = Akuma.do_check(DeedHelper._json_doc, "Create")
+
+        self.assertEqual(check_result["result"], "A")
+
+    @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
+    @mock.patch('application.deed.service', autospec=True)
+    @mock.patch('application.borrower.model.Borrower.save')
+    @mock.patch('application.deed.model.Deed.save')
+    @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
+    def test_create_invalid_akuma(self, mock_query, mock_Deed, mock_Borrower, mock_update, mock_akuma):
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = MortgageDocMock()
+        mock_update.update_deed.return_value = True, "OK"
+        mock_akuma.return_value = {
+            "result": "FFFFF",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
+
+        payload = json.dumps(DeedHelper._json_doc)
+
+        response = self.app.post(self.DEED_ENDPOINT, data=payload,
+                                 headers={"Content-Type": "application/json"})
+
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)

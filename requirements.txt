@@ -28,3 +28,4 @@ dicttoxml
 xmltodict
 lxml
 generateDS
+requests

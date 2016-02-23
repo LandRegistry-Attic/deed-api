@@ -69,7 +69,7 @@ def build_json_deed_document(deed_json):
     return json_doc
 
 
-def update_deed(deed, deed_json):
+def update_deed(deed, deed_json, akuma_flag):
     deed.identity_checked = deed_json["identity_checked"]
     json_doc = build_json_deed_document(deed_json)
 
@@ -84,7 +84,7 @@ def update_deed(deed, deed_json):
 
     borrower_json = _(borrowers).chain()\
         .map(update_borrower_for_token)\
-        .value()
+        .value() if akuma_flag == "A" else None
 
     json_doc['borrowers'] = borrower_json
 

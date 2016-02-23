@@ -1,4 +1,5 @@
 import logging
+from application.akuma.service import Akuma
 from application.deed.model import Deed
 from application.deed.utils import validate_helper
 from application.deed.service import update_deed
@@ -7,6 +8,7 @@ from flask import Blueprint
 from flask.ext.api import status
 from application.borrower.model import Borrower
 import json
+import sys
 
 
 LOGGER = logging.getLogger(__name__)
@@ -55,6 +57,7 @@ def create():
     error_count, error_message = validate_helper(deed_json)
 
     if error_count > 0:
+        LOGGER.error("Schema validation 400_BAD_REQUEST")
         return error_message, status.HTTP_400_BAD_REQUEST
     else:
 
@@ -62,15 +65,24 @@ def create():
             deed = Deed()
 
             deed.token = Deed.generate_token()
+            check_result = Akuma.do_check(deed_json, "Create")
+            LOGGER.info("Check ID: " + check_result['id'])
 
-            success, msg = update_deed(deed, deed_json)
+            success, msg = update_deed(deed, deed_json, check_result['result'])
+
             if not success:
+                LOGGER.error("Update deed 400_BAD_REQUEST")
                 return msg, status.HTTP_400_BAD_REQUEST
+
+            if check_result['result'] != "A":
+                LOGGER.error("Akuma endpoint 503_SERVICE_UNAVAILABLE")
+                return abort(status.HTTP_503_SERVICE_UNAVAILABLE)
 
             return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
 
-        except Exception as e:
-            LOGGER.error("Database Exception - %s" % e)
+        except Exception:
+            msg = str(sys.exc_info())
+            LOGGER.error("Database Exception - %s" % msg)
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
