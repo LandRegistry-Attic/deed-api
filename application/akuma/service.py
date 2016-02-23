@@ -1,4 +1,4 @@
-from application.service_implementation import akuma
+from application.service_clients import akuma
 
 
 class Akuma:

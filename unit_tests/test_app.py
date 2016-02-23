@@ -179,7 +179,7 @@ class TestRoutes(unittest.TestCase):
     def test_schema_checks(self):
         self.assertTrue(run_schema_checks())
 
-    @mock.patch('application.service_implementation.akuma.interface.AkumaInterface.perform_check')
+    @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.deed.service', autospec=True)
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
@@ -225,7 +225,7 @@ class TestRoutes(unittest.TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue("application/pdf" in response.mimetype)
 
-    @mock.patch('application.service_implementation.akuma.interface.AkumaInterface.perform_check')
+    @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     def test_akuma_check(self, mock_api):
         mock_api.return_value = {
             "result": "A",
@@ -236,7 +236,7 @@ class TestRoutes(unittest.TestCase):
 
         self.assertEqual(check_result["result"], "A")
 
-    @mock.patch('application.service_implementation.akuma.interface.AkumaInterface.perform_check')
+    @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.deed.service', autospec=True)
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
