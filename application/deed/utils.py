@@ -209,6 +209,8 @@ def process_organisation_credentials():
             else:
                 header_dict[key] = [value]
     except:
+        msg = str(sys.exc_info())
+        LOGGER.error("unable to process organisation credentials %s" % msg)
         header_dict = None
 
     return header_dict

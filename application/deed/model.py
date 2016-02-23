@@ -4,6 +4,9 @@ from application import db
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.operators import and_
 from application.deed.utils import process_organisation_credentials
+import logging
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Deed(db.Model):
@@ -53,6 +56,7 @@ class Deed(db.Model):
         organisation_id = conveyancer_credentials["O"][1]
 
         if organisation_id != '*':
+            LOGGER.debug("Internal request to view deed reference %s" % deed_reference)
             result = Deed.query.filter_by(token=str(deed_reference), organisation_id=organisation_id).first()
         else:
             result = Deed.query.filter_by(token=str(deed_reference)).first()
