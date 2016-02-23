@@ -57,6 +57,7 @@ def create():
     error_count, error_message = validate_helper(deed_json)
 
     if error_count > 0:
+        LOGGER.error("Schema validation 400_BAD_REQUEST")
         return error_message, status.HTTP_400_BAD_REQUEST
     else:
 
@@ -70,9 +71,11 @@ def create():
             success, msg = update_deed(deed, deed_json, check_result['result'])
 
             if not success:
+                LOGGER.error("Update deed 400_BAD_REQUEST")
                 return msg, status.HTTP_400_BAD_REQUEST
 
             if check_result['result'] != "A":
+                LOGGER.error("Akuma endpoint 503_SERVICE_UNAVAILABLE")
                 return abort(status.HTTP_503_SERVICE_UNAVAILABLE)
 
             return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
