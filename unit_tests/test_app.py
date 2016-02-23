@@ -50,12 +50,17 @@ class TestRoutes(unittest.TestCase):
         test_token = test_deed.generate_token()
         self.assertTrue(len(test_token) == 6)
 
+    @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_create_no_auth_headers(self,  mock_query, mock_Deed, mock_Borrower):
+    def test_create_no_auth_headers(self,  mock_query, mock_Deed, mock_Borrower, mock_akuma):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
+        mock_akuma.return_value = {
+            "result": "A",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
 
         payload = json.dumps(DeedHelper._json_doc)
 
@@ -64,12 +69,17 @@ class TestRoutes(unittest.TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_create_webseal_external(self,  mock_query, mock_Deed, mock_Borrower):
+    def test_create_webseal_external(self,  mock_query, mock_Deed, mock_Borrower, mock_akuma):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
+        mock_akuma.return_value = {
+            "result": "A",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
 
         payload = json.dumps(DeedHelper._json_doc)
 
@@ -78,12 +88,17 @@ class TestRoutes(unittest.TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_create_webseal_external_dodgy_headers1(self,  mock_query, mock_Deed, mock_Borrower):
+    def test_create_webseal_external_dodgy_headers1(self,  mock_query, mock_Deed, mock_Borrower, mock_akuma):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
+        mock_akuma.return_value = {
+            "result": "A",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
 
         payload = json.dumps(DeedHelper._json_doc)
 
@@ -266,7 +281,6 @@ class TestRoutes(unittest.TestCase):
         response = self.app.get(self.CASEWORK_ENDPOINT + 'AB1234')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue("application/pdf" in response.mimetype)
-<<<<<<< 5706bb892520af057910b5850cde9198ae799b48
 
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     def test_akuma_check(self, mock_api):
@@ -296,8 +310,6 @@ class TestRoutes(unittest.TestCase):
         payload = json.dumps(DeedHelper._json_doc)
 
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
-                                 headers={"Content-Type": "application/json"})
+                                 headers=self.webseal_headers)
 
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-=======
->>>>>>> flake8
