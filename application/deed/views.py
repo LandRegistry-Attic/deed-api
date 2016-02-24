@@ -1,7 +1,6 @@
 import logging
 from application.akuma.service import Akuma
 from application.deed.model import Deed
-from application.deed.utils import validate_helper
 from application.deed.utils import validate_helper, process_organisation_credentials
 from application.deed.service import update_deed
 from flask import request, abort, jsonify, Response
