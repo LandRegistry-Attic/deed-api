@@ -121,13 +121,6 @@ def sign_deed(deed_reference):
         abort(status.HTTP_404_NOT_FOUND)
     else:
         LOGGER.info("Signing deed for borrower_id %s against deed reference %s" % (borrower_token, deed_reference))
-        # result.deed['token'] = result.token - what is the purpose of this? does this still need to be done when signing?
-        # check if XML already exisit
-        # if result.deed_xml is None:
-        #     deed_XML = convert_json_to_xml(result.deed)
-        #     print("deed_XML = %s" % deed_XML)
-        #     result.deed_xml = deed_XML.decode("UTF-8")
-        # sign then save to DB.
 
         result.deed = update_deed_signature_timestamp(result, borrower_token)
 
