@@ -2,13 +2,14 @@ import logging
 from application.akuma.service import Akuma
 from application.deed.model import Deed
 from application.deed.utils import validate_helper, process_organisation_credentials
-from application.deed.service import update_deed
+from application.deed.service import update_deed, update_deed_signature_timestamp
 from flask import request, abort, jsonify, Response
 from flask import Blueprint
 from flask.ext.api import status
 from application.borrower.model import Borrower
 import json
 import sys
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -106,3 +107,25 @@ def delete_borrower(borrower_id):
         abort(status.HTTP_404_NOT_FOUND)
     else:
         return jsonify({"id": borrower_id}), status.HTTP_200_OK
+
+
+@deed_bp.route('/<deed_reference>/sign', methods=['POST'])
+def sign_deed(deed_reference):
+    request_json = request.get_json()
+    borrower_token = request_json['borrower_token']
+    result = Deed.get_deed(deed_reference)
+
+    if result is None:
+        LOGGER.error("Database Exception 404 for deed reference - %s" % deed_reference)
+        abort(status.HTTP_404_NOT_FOUND)
+    else:
+        LOGGER.info("Signing deed for borrower_id %s against deed reference %s" % (borrower_token, deed_reference))
+
+        result.deed = update_deed_signature_timestamp(result, borrower_token)
+
+    return jsonify({"deed": result.deed}), status.HTTP_200_OK
+
+
+@deed_bp.route('/<deed_reference>/make-effective', methods=['POST'])
+def make_effective(deed_reference):
+    return status.HTTP_200_OK
