@@ -6,6 +6,7 @@ from application.mortgage_document.model import MortgageDocument
 from functools import partial
 from flask.ext.api import status
 from flask import abort
+from application.deed.deed_status import DeedStatus
 import json
 import datetime
 import copy
@@ -131,3 +132,17 @@ def make_effective_text(organisation_name):
                        " is to take effect."
 
     return effective_clause % organisation_name
+
+
+def set_signed_status(deed):
+    LOGGER.info("updating Deed signed Status")
+    signed_count = 0
+
+    for idx, borrower in enumerate(deed.deed["borrowers"], start=0):
+        if 'signature' in borrower:
+            signed_count += 1
+
+    if signed_count == len(deed.deed['borrowers']):
+        deed.status = DeedStatus.all_signed
+    elif signed_count > 0:
+        deed.status = DeedStatus.partial

@@ -64,3 +64,10 @@ class Deed(db.Model):
             result = Deed.query.filter_by(token=str(deed_reference)).first()
 
         return result
+
+
+    def get_borrower_position(self, borrower_token):
+        for idx, borrower in enumerate(self.deed['borrowers'], start=1):
+            if borrower_token == borrower['token']:
+                return idx
+        return -1
