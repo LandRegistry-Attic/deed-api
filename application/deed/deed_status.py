@@ -5,6 +5,7 @@ class DeedStatus(Enum):
   draft = "DRAFT"
   partial = "PARTIALLY-SIGNED"
   superseeded = "SUPERCEDED"
+  suspended = "SUSPENDED"
   aborted = "ABORTED"
   stopped = "STOPPED"
   all_signed = "ALL-SIGNED"

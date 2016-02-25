@@ -1,6 +1,4 @@
 import json
-import os
-
 from flask import Flask, request
 from flask.ext.sqlalchemy import SQLAlchemy
 from application.service_clients.esec import make_esec_client
