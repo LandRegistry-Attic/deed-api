@@ -19,7 +19,7 @@ def add_borrower_signature(deed_xml, borrower_pos):  # pragma: no cover
 
     if resp.status_code == status.HTTP_200_OK:
         LOGGER.info("Response XML = %s" % resp.content)
-        return resp.content
+        return resp.content, resp.status_code
     else:
         LOGGER.error("Esecurity Client Exception")
         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
