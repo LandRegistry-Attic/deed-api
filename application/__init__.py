@@ -2,6 +2,14 @@ import json
 from flask import Flask, request
 from flask.ext.sqlalchemy import SQLAlchemy
 import os
+import logging
+from logger import logging_config
+
+logging_config.setup_logging()
+LOGGER = logging.getLogger(__name__)
+
+LOGGER.info("Starting the server")
+
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
