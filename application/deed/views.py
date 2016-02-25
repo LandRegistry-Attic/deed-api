@@ -152,19 +152,25 @@ def sign_deed(deed_reference):
             borrower_pos = result.get_borrower_position(borrower_token)
 
             LOGGER.info("XML = %s " % modify_xml.decode())
-            modify_xml = esec_client.add_borrower_signature(modify_xml.decode(), borrower_pos)
+            modify_xml, status_code = esec_client.add_borrower_signature(modify_xml.decode(), borrower_pos)
+            LOGGER.info("signed status code: %s" % str(status_code))
             LOGGER.info("signed XML: %s" % modify_xml)
-            result.deed_xml = modify_xml
-            set_signed_status(result)
 
-            LOGGER.info("Saving XML to DB")
-            result.save()
+            if status_code == 200:
+                result.deed_xml = modify_xml
 
-            LOGGER.info("updating JSON with Signature")
-            result.deed = update_deed_signature_timestamp(result, borrower_token)
+                LOGGER.info("Saving XML to DB")
+                result.save()
 
-        except Exception as e:
-            LOGGER.error("Failed to sign Mortgage document: %s" % e)
+                LOGGER.info("updating JSON with Signature")
+                result.deed = update_deed_signature_timestamp(result, borrower_token)
+            else:
+                LOGGER.error("Failed to sign Mortgage document")
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        except:
+            msg = str(sys.exc_info())
+            LOGGER.error("Failed to sign Mortgage document: %s" % msg)
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 >>>>>>> initial commit. XMLify, then calls esec-client and signs XML
 
