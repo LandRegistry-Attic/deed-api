@@ -4,7 +4,12 @@ from application.borrower.server import BorrowerService
 from underscore import _
 from application.mortgage_document.model import MortgageDocument
 from functools import partial
+from flask.ext.api import status
+from flask import abort
 import json
+import datetime
+import copy
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -98,3 +103,22 @@ def update_deed(deed, deed_json, akuma_flag):
     deed.save()
 
     return True, "OK"
+
+
+def update_deed_signature_timestamp(deed, borrower_token):
+    modify_deed = copy.deepcopy(deed.deed)
+
+    for borrower in modify_deed['borrowers']:
+        if borrower['token'] == borrower_token:
+            borrower['signature'] = datetime.datetime.now().strftime("%d %B %Y %I:%M%p")
+
+    deed.deed = modify_deed
+
+    try:
+        deed.save()
+        deed.deed['token'] = deed.token
+        return deed.deed
+
+    except Exception as e:
+        LOGGER.error("Database Exception - %s" % e)
+        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)

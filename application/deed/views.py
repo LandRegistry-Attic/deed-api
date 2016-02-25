@@ -2,15 +2,14 @@ import logging
 from application.akuma.service import Akuma
 from application.deed.model import Deed
 from application.deed.utils import validate_helper, process_organisation_credentials
-from application.deed.service import update_deed
+from application.deed.service import update_deed, update_deed_signature_timestamp
 from flask import request, abort, jsonify, Response
 from flask import Blueprint
 from flask.ext.api import status
 from application.borrower.model import Borrower
 import json
-import datetime
-import copy
 import sys
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -114,7 +113,7 @@ def delete_borrower(borrower_id):
 def sign_deed(deed_reference):
     request_json = request.get_json()
     borrower_token = request_json['borrower_token']
-    result = Deed.query.filter_by(token=str(deed_reference)).first()
+    result = Deed.get_deed(deed_reference)
 
     if result is None:
         LOGGER.error("Database Exception 404 for deed reference - %s" % deed_reference)
@@ -130,22 +129,3 @@ def sign_deed(deed_reference):
 @deed_bp.route('/<deed_reference>/make-effective', methods=['POST'])
 def make_effective(deed_reference):
     return status.HTTP_200_OK
-
-
-def update_deed_signature_timestamp(deed, borrower_token):
-    modify_deed = copy.deepcopy(deed.deed)
-
-    for borrower in modify_deed['borrowers']:
-        if borrower['token'] == borrower_token:
-            borrower['signature'] = datetime.datetime.now().strftime("%d %B %Y %I:%M%p")
-
-    deed.deed = modify_deed
-
-    try:
-        deed.save()
-        deed.deed['token'] = deed.token
-        return deed.deed
-
-    except Exception as e:
-        LOGGER.error("Database Exception - %s" % e)
-        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
