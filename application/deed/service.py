@@ -118,6 +118,7 @@ def update_deed_signature_timestamp(deed, borrower_token):
     deed.deed = modify_deed
 
     try:
+        set_signed_status(deed)
         deed.save()
         deed.deed['token'] = deed.token
         return deed.deed
@@ -143,6 +144,6 @@ def set_signed_status(deed):
             signed_count += 1
 
     if signed_count == len(deed.deed['borrowers']):
-        deed.status = DeedStatus.all_signed
+        deed.status = DeedStatus.all_signed.value
     elif signed_count > 0:
-        deed.status = DeedStatus.partial
+        deed.status = DeedStatus.partial.value
