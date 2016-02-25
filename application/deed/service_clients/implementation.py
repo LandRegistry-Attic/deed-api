@@ -6,7 +6,6 @@ from flask import abort
 
 LOGGER = logging.getLogger(__name__)
 
-
 def sign_by_user(deed_xml, borrower_pos, user_id):  # pragma: no cover
     LOGGER.info("Calling dm-esec-client")
     request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/sign_by_user'
