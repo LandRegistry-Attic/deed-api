@@ -4,11 +4,11 @@ from application import db
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.operators import and_
 from application.deed.utils import process_organisation_credentials
-import logging
 from hashids import Hashids
-
+import logging
 
 LOGGER = logging.getLogger(__name__)
+
 
 class Deed(db.Model):
     __tablename__ = 'deed'
