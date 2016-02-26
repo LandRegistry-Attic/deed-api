@@ -1,7 +1,6 @@
 import json
 from logging.config import dictConfig  # type: ignore
 from logger.utils import call_once_only
-import os
 
 
 @call_once_only
