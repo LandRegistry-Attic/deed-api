@@ -27,6 +27,11 @@ def get_deed(deed_reference):
         abort(status.HTTP_404_NOT_FOUND)
     else:
         result.deed['token'] = result.token
+        bor_token = "abcdef"
+        res_token = result.token
+    code = generate_sms_code(res_token, bor_token)
+
+    print (code)
 
     return jsonify({"deed": result.deed}), status.HTTP_200_OK
 
@@ -129,3 +134,23 @@ def sign_deed(deed_reference):
 @deed_bp.route('/<deed_reference>/make-effective', methods=['POST'])
 def make_effective(deed_reference):
     return status.HTTP_200_OK
+
+
+def send_sms(deed_reference):
+    message = "...is your digital mortgage authentication code"
+    #add other twilio variables as required
+    #call generate_sms_code
+    return True
+
+def verify_sms(deed_reference):
+    #get submitted code
+    #compare submitted code
+    #notify user of the authenication outcome
+    return True
+
+
+def generate_sms_code(deed_reference, borrower_token):
+    if deed_reference is not None and deed_reference != '':
+        if borrower_token is not None and borrower_token != '':
+            gen_code = deed_reference[-3:] + borrower_token[-3:]
+            return gen_code
