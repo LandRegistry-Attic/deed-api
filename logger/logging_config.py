@@ -7,8 +7,8 @@ import os
 @call_once_only
 def setup_logging():
     try:
-        if not os.path.exists("logs"):
-            os.makedirs("logs")
+        if not os.path.exists("../logs"):
+            os.makedirs("../logs")
 
         with open('logger/logging_config.json', 'rt') as file:
             config = json.load(file)
