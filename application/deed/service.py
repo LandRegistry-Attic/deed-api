@@ -56,6 +56,7 @@ def update_md_clauses(json_doc, md_ref):
         json_doc["charge_clause"] = md_json["charge_clause"]
         json_doc["additional_provisions"] = md_json["additional_provisions"]
         json_doc["lender"] = md_json["lender"]
+        json_doc["effective_text"] = md_json["effective_text"]
 
     return mortgage_document is not None
 
