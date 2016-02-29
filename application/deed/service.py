@@ -68,7 +68,8 @@ def build_json_deed_document(deed_json):
         "borrowers": [],
         "charge_clause": [],
         "additional_provisions": [],
-        "property_address": deed_json['property_address']
+        "property_address": deed_json['property_address'],
+        "effective_text": []
     }
 
     return json_doc
