@@ -216,4 +216,10 @@ def process_organisation_credentials():
     return header_dict
 
 
+def get_borrower_position(deed, borrower_token):
+        for idx, borrower in enumerate(deed['borrowers'], start=1):
+            if borrower_token == borrower['token']:
+                return idx
+        return -1
+
 _title_validator = _create_title_validator()

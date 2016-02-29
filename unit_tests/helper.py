@@ -1,7 +1,37 @@
 class DeedModelMock:
     token = "ABC1234"
-    deed = {"title_number": "DN100"}
     status= "DRAFT"
+    deed = {"title_number": "DN100", "borrowers": [
+      {
+        "forename": "bob",
+        "id": 1,
+        "surname": "Thomas",
+        "token": "AAAAAA"
+      },
+      {
+        "forename": "Jane",
+        "id": 2,
+        "surname": "Thomas",
+        "token": "BBBBBB"
+      }
+    ]}
+
+    deed_xml = "<dm-application><operativeDeed><deedData Id='deedData'><titleNumber>DT100</titleNumber>\
+                <propertyDescription>property description</propertyDescription>\
+                <borrowers><borrower><name><forename>Paul</forename><surname>Smythe</surname></name>\
+                    <address>borrower address</address></borrower>\
+                <borrower><name><forename>Jane</forename><middlename>middlename</middlename>\
+                    <surname>Smythe</surname></name><address>borrower address</address></borrower>\
+                </borrowers>\
+                <mdRef>e-MD12344</mdRef>\
+                </deedData>\
+                <signatureSlots><borrower_signature><signature  xmlns:dsig='http://www.w3.org/2000/09/xmldsig#' />\
+                <signatory><forename>Paul</forename><middlename>middlename</middlename><surname>Smythe</surname>\
+                </signatory></borrower_signature><borrower_signature>\
+                <signature  xmlns:dsig='http://www.w3.org/2000/09/xmldsig' />\
+                <signatory><forename>Jane</forename><middlename>middlename</middlename><surname>Smythe</surname>\
+                </signatory></borrower_signature></signatureSlots></operativeDeed>\
+                <effectiveDate>23/5/15</effectiveDate><authSignature/></dm-application>".encode()
 
 class MortgageDocMock:
     md_ref = "e-MD12121"
@@ -157,6 +187,8 @@ class DeedHelper:
         ],
         "identity_checked": "Y",
     }
+
+    _add_borrower_signature = {"borrower_token": "3"}
 
 
 class StatusMock:

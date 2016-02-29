@@ -294,6 +294,7 @@ class TestRoutes(unittest.TestCase):
 
         self.assertEqual(check_result["result"], "A")
 
+
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.deed.service', autospec=True)
     @mock.patch('application.borrower.model.Borrower.save')
@@ -315,6 +316,7 @@ class TestRoutes(unittest.TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
     def test_make_effective_clause(self):
 
         effective_clause = make_effective_text("Test Organisation")
@@ -322,3 +324,21 @@ class TestRoutes(unittest.TestCase):
                                    "Test Organisation that the charge is to take effect."
 
         self.assertEqual(effective_clause, correct_effective_clause)
+
+    @mock.patch('application.deed.utils.get_borrower_position')
+    @mock.patch('application.service_clients.esec.interface.EsecClientInterface.add_borrower_signature')
+    @mock.patch('application.deed.model.Deed.save', autospec=True)
+    @mock.patch('application.deed.model.Deed.query', autospec=True)
+    def test_add_borrower_signature(self, mock_query, mock_Deed_save, mock_esec, mock_position):
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = DeedModelMock()
+
+        mock_esec.return_value = "<p:deed-application></p:deed_application>", 200
+        mock_position.return_value = 1
+
+        payload = json.dumps(DeedHelper._add_borrower_signature)
+
+        response = self.app.post(self.DEED_ENDPOINT + 'AB1234' + '/sign',
+                                data=payload,
+                                headers=self.webseal_headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

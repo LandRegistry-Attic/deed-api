@@ -1,12 +1,8 @@
 import logging
 from application.akuma.service import Akuma
 from application.deed.model import Deed
-from application.deed.utils import validate_helper, process_organisation_credentials, convert_json_to_xml
-<<<<<<< HEAD
-from application.deed.service import update_deed, update_deed_signature_timestamp
-=======
+from application.deed.utils import validate_helper, process_organisation_credentials, convert_json_to_xml, get_borrower_position
 from application.deed.service import update_deed, set_signed_status, update_deed_signature_timestamp
->>>>>>> initial commit. XMLify, then calls esec-client and signs XML
 from flask import request, abort, jsonify, Response
 from flask import Blueprint
 from flask.ext.api import status
@@ -18,10 +14,7 @@ from application import esec_client
 import json
 import sys
 import copy
-<<<<<<< HEAD
-=======
 
->>>>>>> initial commit. XMLify, then calls esec-client and signs XML
 
 LOGGER = logging.getLogger(__name__)
 
@@ -131,48 +124,12 @@ def sign_deed(deed_reference):
         abort(status.HTTP_404_NOT_FOUND)
     else:
         LOGGER.info("Signing deed for borrower_token %s against deed reference %s" % (borrower_token, deed_reference))
-<<<<<<< HEAD
 
         # check if XML already exisit
         if deed.deed_xml is None:
             LOGGER.info("Generating DEED_XML")
             deed_XML = convert_json_to_xml(deed.deed)
             deed.deed_xml = deed_XML.encode("utf-8")
-=======
-
-        # check if XML already exisit
-        if result.deed_xml is None:
-            LOGGER.info("Generating DEED_XML")
-            deed_XML = convert_json_to_xml(result.deed)
-            result.deed_xml = deed_XML.encode("utf-8")
-
-        try:
-            LOGGER.info("getting exisiting XML")
-            modify_xml = copy.deepcopy(result.deed_xml)
-            borrower_pos = result.get_borrower_position(borrower_token)
-
-            LOGGER.info("XML = %s " % modify_xml.decode())
-            modify_xml, status_code = esec_client.add_borrower_signature(modify_xml.decode(), borrower_pos)
-            LOGGER.info("signed status code: %s" % str(status_code))
-            LOGGER.info("signed XML: %s" % modify_xml)
-
-            if status_code == 200:
-                result.deed_xml = modify_xml
-
-                LOGGER.info("Saving XML to DB")
-                result.save()
-
-                LOGGER.info("updating JSON with Signature")
-                result.deed = update_deed_signature_timestamp(result, borrower_token)
-            else:
-                LOGGER.error("Failed to sign Mortgage document")
-                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        except:
-            msg = str(sys.exc_info())
-            LOGGER.error("Failed to sign Mortgage document: %s" % msg)
-            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
->>>>>>> initial commit. XMLify, then calls esec-client and signs XML
 
         try:
             LOGGER.info("getting exisiting XML")

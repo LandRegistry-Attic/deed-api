@@ -4,7 +4,7 @@ from enum import Enum
 class DeedStatus(Enum):
   draft = "DRAFT"
   partial = "PARTIALLY-SIGNED"
-  suspended = "SUSPENDED"
+  superseeded = "SUPERSEEDED"
   aborted = "ABORTED"
   stopped = "STOPPED"
   all_signed = "ALL-SIGNED"
