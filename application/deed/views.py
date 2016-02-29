@@ -7,8 +7,10 @@ from flask import request, abort, jsonify, Response
 from flask import Blueprint
 from flask.ext.api import status
 from application.borrower.model import Borrower
+from twilio.rest import TwilioRestClient
 import json
 import sys
+from application import config
 
 
 LOGGER = logging.getLogger(__name__)
@@ -27,11 +29,18 @@ def get_deed(deed_reference):
         abort(status.HTTP_404_NOT_FOUND)
     else:
         result.deed['token'] = result.token
+
+        # 2 Factor auth initialisations
         bor_token = "abcdef"
         res_token = result.token
-    code = generate_sms_code(res_token, bor_token)
+        phone_number = "insert phone_number here"
+        bor_code = "0c4def"
 
-    print (code)
+        send_simulation = send_sms(res_token, bor_token, phone_number)
+        verify_simulation = verify_sms(res_token, bor_token, bor_code)
+
+        print (send_simulation)
+        print (verify_simulation)
 
     return jsonify({"deed": result.deed}), status.HTTP_200_OK
 
@@ -136,21 +145,41 @@ def make_effective(deed_reference):
     return status.HTTP_200_OK
 
 
-def send_sms(deed_reference):
-    message = "...is your digital mortgage authentication code"
-    #add other twilio variables as required
-    #call generate_sms_code
-    return True
+@deed_bp.route('/<deed_reference>/send-sms', methods=['POST'])
+def send_sms(deed_reference, borrower_token, borrower_phone_number):
+    if borrower_token is not None and borrower_token != '':
+        if borrower_phone_number is not None and borrower_phone_number != '':
+            code = generate_sms_code(deed_reference, borrower_token)
+            print (code)
 
-def verify_sms(deed_reference):
+            message = code + " is your digital mortgage authentication code."
+            twilio_phone_number = "+441442796219"
+
+            client = TwilioRestClient(config.account, config.auth)
+
+            client.messages.create(
+                to=borrower_phone_number,
+                from_=twilio_phone_number,
+                body=message,
+            )
+            return True, status
+
+
+@deed_bp.route('/<deed_reference>/verify-sms', methods=['POST'])
+def verify_sms(deed_reference, borrower_token, borrower_code):
     #get submitted code
     #compare submitted code
     #notify user of the authenication outcome
-    return True
+    if borrower_token is not None and borrower_token != '':
+        if borrower_code is not None and borrower_code != '':
+            code = generate_sms_code(deed_reference, borrower_token)
+            if borrower_code != code:
+                LOGGER.error("Invalid code")
+                return "Unable to complete authentication", status.HTTP_401_UNAUTHORIZED
+            else:
+                return True, status.HTTP_200_OK
 
 
 def generate_sms_code(deed_reference, borrower_token):
-    if deed_reference is not None and deed_reference != '':
-        if borrower_token is not None and borrower_token != '':
-            gen_code = deed_reference[-3:] + borrower_token[-3:]
-            return gen_code
+    gen_code = deed_reference[-3:] + borrower_token[-3:]
+    return gen_code
