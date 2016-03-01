@@ -33,8 +33,8 @@ def get_deed(deed_reference):
         # 2 Factor auth initialisations
         bor_token = "abcdef"
         res_token = result.token
-        phone_number = "insert phone_number here"
-        bor_code = "0c4def"
+        phone_number = "+447453278499"
+        bor_code = "6c3def"
 
         send_simulation = send_sms(res_token, bor_token, phone_number)
         verify_simulation = verify_sms(res_token, bor_token, bor_code)
@@ -154,15 +154,21 @@ def send_sms(deed_reference, borrower_token, borrower_phone_number):
 
             message = code + " is your digital mortgage authentication code."
             twilio_phone_number = "+441442796219"
+            try:
+                client = TwilioRestClient(config.ACCOUNT_SID, config.AUTH_TOKEN)
 
-            client = TwilioRestClient(config.account, config.auth)
-
-            client.messages.create(
-                to=borrower_phone_number,
-                from_=twilio_phone_number,
-                body=message,
-            )
-            return True, status
+                client.messages.create(
+                    to=borrower_phone_number,
+                    from_=twilio_phone_number,
+                    body=message,
+                )
+                messages = client.messages.list()
+                #vari = client.messages.redact("PN720646742befdb0091b0f8e6c57df9e5")
+                print (dir(messages))
+                print (str(messages.count))
+                return True
+            except:
+                return False
 
 
 @deed_bp.route('/<deed_reference>/verify-sms', methods=['POST'])
