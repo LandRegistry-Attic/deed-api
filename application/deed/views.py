@@ -30,18 +30,6 @@ def get_deed(deed_reference):
     else:
         result.deed['token'] = result.token
 
-        # 2 Factor auth initialisations
-        bor_token = "abcdef"
-        res_token = result.token
-        phone_number = "+447453278499"
-        bor_code = "6c3def"
-
-        send_simulation = send_sms(res_token, bor_token, phone_number)
-        verify_simulation = verify_sms(res_token, bor_token, bor_code)
-
-        print (send_simulation)
-        print (verify_simulation)
-
     return jsonify({"deed": result.deed}), status.HTTP_200_OK
 
 
@@ -146,11 +134,18 @@ def make_effective(deed_reference):
 
 
 @deed_bp.route('/<deed_reference>/send-sms', methods=['POST'])
-def send_sms(deed_reference, borrower_token, borrower_phone_number):
+def send_sms(deed_reference):
+    request_json = None
+    request_json = request.get_json()
+    borrower_token = request_json['borrower_token']
     if borrower_token is not None and borrower_token != '':
-        if borrower_phone_number is not None and borrower_phone_number != '':
+        borrower = None
+        borrower = Borrower.get_by_token(borrower_token.strip())
+
+        if borrower is not None:
+            borrower_phone_number = borrower.phonenumber
+
             code = generate_sms_code(deed_reference, borrower_token)
-            print (code)
 
             message = code + " is your digital mortgage authentication code."
             twilio_phone_number = "+441442796219"
@@ -162,20 +157,15 @@ def send_sms(deed_reference, borrower_token, borrower_phone_number):
                     from_=twilio_phone_number,
                     body=message,
                 )
-                messages = client.messages.list()
+                #messages = client.messages.list()
                 #vari = client.messages.redact("PN720646742befdb0091b0f8e6c57df9e5")
-                print (dir(messages))
-                print (str(messages.count))
-                return True
+                return True, status.HTTP_200_OK
             except:
                 return False
 
 
 @deed_bp.route('/<deed_reference>/verify-sms', methods=['POST'])
 def verify_sms(deed_reference, borrower_token, borrower_code):
-    #get submitted code
-    #compare submitted code
-    #notify user of the authenication outcome
     if borrower_token is not None and borrower_token != '':
         if borrower_code is not None and borrower_code != '':
             code = generate_sms_code(deed_reference, borrower_token)
