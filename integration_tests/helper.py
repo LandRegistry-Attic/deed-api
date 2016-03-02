@@ -29,10 +29,11 @@ def setUpDB(self):
 
 def setUp_MortgageDocuments(self):
 
-    db_user = os.getenv("DB_USER", 'vagrant')
+    db_user = os.getenv("USERNAME", 'vagrant')
     db_password = os.getenv("DB_PASSWORD", "vagrant")
+    db_address = os.getenv("ADDRESS", "@localhost:5432/deed_api")
 
-    engine = create_engine('postgresql://' + db_user + ':' + db_password + '@localhost:5432/deed_api', convert_unicode=True)
+    engine = create_engine('postgresql://' + db_user + ':' + db_password + db_address, convert_unicode=True)
     metadata = MetaData(bind=engine)
     table = Table('mortgage_document', metadata, autoload=True)
     sql_connection = engine.connect()
