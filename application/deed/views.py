@@ -8,6 +8,7 @@ from flask import Blueprint
 from flask.ext.api import status
 from application.borrower.model import Borrower
 from twilio.rest import TwilioRestClient
+from twilio.rest.exceptions import TwilioRestException
 import json
 import sys
 from application import config
@@ -135,11 +136,9 @@ def make_effective(deed_reference):
 
 @deed_bp.route('/<deed_reference>/send-sms', methods=['POST'])
 def send_sms(deed_reference):
-    request_json = None
     request_json = request.get_json()
     borrower_token = request_json['borrower_token']
     if borrower_token is not None and borrower_token != '':
-        borrower = None
         borrower = Borrower.get_by_token(borrower_token.strip())
 
         if borrower is not None:
@@ -148,7 +147,7 @@ def send_sms(deed_reference):
             code = generate_sms_code(deed_reference, borrower_token)
 
             message = code + " is your digital mortgage authentication code."
-            twilio_phone_number = "+441442796219"
+            twilio_phone_number = config.TWILIO_PHONE_NUMBER
             try:
                 client = TwilioRestClient(config.ACCOUNT_SID, config.AUTH_TOKEN)
 
@@ -157,11 +156,12 @@ def send_sms(deed_reference):
                     from_=twilio_phone_number,
                     body=message,
                 )
-                #messages = client.messages.list()
-                #vari = client.messages.redact("PN720646742befdb0091b0f8e6c57df9e5")
-                return True, status.HTTP_200_OK
-            except:
-                return False
+                LOGGER.error("SMS has been sent to  " + borrower_phone_number)
+                return "Authentication has been sent via SMS", status.HTTP_200_OK
+            except TwilioRestException as e:
+                LOGGER.error("Unable to send SMS, Error Code  " + str(e.code))
+                LOGGER.error("Unable to send SMS, Error Message  " + e.msg)
+                return "Unable to send authentication code", status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 @deed_bp.route('/<deed_reference>/verify-sms', methods=['POST'])
