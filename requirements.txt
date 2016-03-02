@@ -7,6 +7,7 @@ Flask-Migrate==1.4.0
 Flask-Script==2.0.5
 Flask-SQLAlchemy==2.0
 gunicorn==19.3.0
+hashids==1.1.0
 itsdangerous==0.24
 Jinja2==2.8
 jsonschema==2.5.1
