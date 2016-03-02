@@ -1,4 +1,7 @@
-class DeedModelMock:
+from application.deed.model import Deed
+
+
+class DeedModelMock(Deed):
     token = "ABC1234"
     status= "DRAFT"
     deed = {"title_number": "DN100", "borrowers": [
