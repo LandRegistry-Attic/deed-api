@@ -134,7 +134,7 @@ def make_effective(deed_reference):
     return status.HTTP_200_OK
 
 
-@deed_bp.route('/<deed_reference>/send-sms', methods=['POST'])
+@deed_bp.route('/<deed_reference>/request-auth-code', methods=['POST'])
 def send_sms(deed_reference):
     request_json = request.get_json()
     borrower_token = request_json['borrower_token']
@@ -164,7 +164,7 @@ def send_sms(deed_reference):
                 return "Unable to send authentication code", status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
-@deed_bp.route('/<deed_reference>/verify-sms', methods=['POST'])
+@deed_bp.route('/<deed_reference>/verify-auth-code', methods=['POST'])
 def verify_sms(deed_reference, borrower_token, borrower_code):
     if borrower_token is not None and borrower_token != '':
         if borrower_code is not None and borrower_code != '':
