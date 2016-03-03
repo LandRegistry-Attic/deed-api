@@ -3,7 +3,7 @@ export SETTINGS="config.DevelopmentConfig"
 py.test --junitxml=TEST-INT-flask-app-medium.xml --cov-report term-missing --cov application integration_tests
 
 # This file will prepare all dependancies for the application
-DB_NAME = "${DEED_DATABASE_NAME:-deed_api}"
+DB_NAME="${DEED_DATABASE_NAME:-deed_api}"
 
 psql $DB_NAME -c "drop table alembic_version cascade;"
 psql $DB_NAME -c "drop table deed cascade;"
