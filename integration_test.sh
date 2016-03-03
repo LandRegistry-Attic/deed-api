@@ -6,6 +6,7 @@ py.test --junitxml=TEST-INT-flask-app-medium.xml --cov-report term-missing --cov
 
 psql deed_api -c "drop table alembic_version cascade;"
 psql deed_api -c "drop table deed cascade;"
+psql deed_api -c "drop table borrower cascade;"
 psql deed_api -c "drop table mortgage_document cascade;"
 
 python3 manage.py db upgrade
