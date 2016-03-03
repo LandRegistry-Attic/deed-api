@@ -157,11 +157,11 @@ def send_sms(deed_reference):
                     body=message,
                 )
                 LOGGER.error("SMS has been sent to  " + borrower_phone_number)
-                return "Authentication has been sent via SMS", status.HTTP_200_OK
+                return jsonify({"result": True}), status.HTTP_200_OK
             except TwilioRestException as e:
                 LOGGER.error("Unable to send SMS, Error Code  " + str(e.code))
                 LOGGER.error("Unable to send SMS, Error Message  " + e.msg)
-                return "Unable to send authentication code", status.HTTP_500_INTERNAL_SERVER_ERROR
+                return jsonify({"result": False}), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 @deed_bp.route('/<deed_reference>/verify-auth-code', methods=['POST'])
