@@ -3,11 +3,12 @@ export SETTINGS="config.DevelopmentConfig"
 py.test --junitxml=TEST-INT-flask-app-medium.xml --cov-report term-missing --cov application integration_tests
 
 # This file will prepare all dependancies for the application
+DB_NAME = "${DEED_DATABASE_NAME:-deed_api}"
 
-psql deed_api -c "drop table alembic_version cascade;"
-psql deed_api -c "drop table deed cascade;"
-psql deed_api -c "drop table borrower cascade;"
-psql deed_api -c "drop table mortgage_document cascade;"
+psql DB_NAME -c "drop table alembic_version cascade;"
+psql DB_NAME -c "drop table deed cascade;"
+psql DB_NAME -c "drop table borrower cascade;"
+psql DB_NAME -c "drop table mortgage_document cascade;"
 
 python3 manage.py db upgrade
 
