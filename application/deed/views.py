@@ -147,16 +147,15 @@ def send_sms(deed_reference):
             code = generate_sms_code(deed_reference, borrower_token)
 
             message = code + " is your digital mortgage authentication code."
-            twilio_phone_number = config.TWILIO_PHONE_NUMBER
             try:
                 client = TwilioRestClient(config.ACCOUNT_SID, config.AUTH_TOKEN)
 
                 client.messages.create(
                     to=borrower_phone_number,
-                    from_=twilio_phone_number,
+                    from_=config.TWILIO_PHONE_NUMBER,
                     body=message,
                 )
-                LOGGER.error("SMS has been sent to  " + borrower_phone_number)
+                LOGGER.info("SMS has been sent to  " + borrower_phone_number)
                 return jsonify({"result": True}), status.HTTP_200_OK
             except TwilioRestException as e:
                 LOGGER.error("Unable to send SMS, Error Code  " + str(e.code))
