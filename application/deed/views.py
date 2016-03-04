@@ -2,7 +2,7 @@ import logging
 from application.akuma.service import Akuma
 from application.deed.model import Deed
 from application.deed.utils import validate_helper, process_organisation_credentials, convert_json_to_xml
-from application.deed.service import update_deed, set_signed_status, update_deed_signature_timestamp
+from application.deed.service import update_deed, update_deed_signature_timestamp
 from flask import request, abort, jsonify, Response
 from flask import Blueprint
 from flask.ext.api import status
@@ -15,7 +15,6 @@ import json
 import sys
 import copy
 
-
 LOGGER = logging.getLogger(__name__)
 
 deed_bp = Blueprint('deed', __name__,
@@ -25,7 +24,6 @@ deed_bp = Blueprint('deed', __name__,
 
 @deed_bp.route('/<deed_reference>', methods=['GET'])
 def get_deed(deed_reference):
-
     result = Deed.get_deed(deed_reference)
 
     if result is None:
@@ -59,7 +57,6 @@ def get_deeds_status_with_mdref_and_title_number():
 
 @deed_bp.route('/', methods=['POST'])
 def create():
-
     deed_json = request.get_json()
     error_count, error_message = validate_helper(deed_json)
 

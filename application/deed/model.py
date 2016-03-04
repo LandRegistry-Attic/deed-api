@@ -65,7 +65,6 @@ class Deed(db.Model):
 
         return result
 
-
     def get_borrower_position(self, borrower_token):
         for idx, borrower in enumerate(self.deed['borrowers'], start=1):
             if borrower_token == borrower['token']:
