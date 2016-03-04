@@ -135,7 +135,7 @@ def make_effective(deed_reference):
 
 
 @deed_bp.route('/<deed_reference>/request-auth-code', methods=['POST'])
-def send_sms(deed_reference):
+def request_auth_code(deed_reference):
     request_json = request.get_json()
     borrower_token = request_json['borrower_token']
     if borrower_token is not None and borrower_token != '':
@@ -164,7 +164,7 @@ def send_sms(deed_reference):
 
 
 @deed_bp.route('/<deed_reference>/verify-auth-code', methods=['POST'])
-def verify_sms(deed_reference, borrower_token, borrower_code):
+def verify_auth_code(deed_reference, borrower_token, borrower_code):
     if borrower_token is not None and borrower_token != '':
         if borrower_code is not None and borrower_code != '':
             code = generate_sms_code(deed_reference, borrower_token)
