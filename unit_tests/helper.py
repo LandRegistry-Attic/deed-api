@@ -127,7 +127,7 @@ class DeedHelper:
         ]
     }
 
-    _validate_borrower = {"borrower_token": "aaaaaa", "dob": "23/01/1986"}
+    _validate_borrower = {"borrower_token": "aaaaaa", "dob": "23/01/1986", "phonenumber": "07502154999"}
 
     _validate_borrower_dob = {"borrower_token": "aaaaaa", "dob": "1/1/1986"}
 
