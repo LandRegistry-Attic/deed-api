@@ -56,7 +56,7 @@ def update_md_clauses(json_doc, md_ref):
         json_doc["charge_clause"] = md_json["charge_clause"]
         json_doc["additional_provisions"] = md_json["additional_provisions"]
         json_doc["lender"] = md_json["lender"]
-        json_doc["effective_text"] = md_json["effective_text"]
+        json_doc["effective_clause"] = md_json["effective_clause"]
 
     return mortgage_document is not None
 
@@ -70,7 +70,7 @@ def build_json_deed_document(deed_json):
         "charge_clause": [],
         "additional_provisions": [],
         "property_address": deed_json['property_address'],
-        "effective_text": []
+        "effective_clause": []
     }
 
     return json_doc
