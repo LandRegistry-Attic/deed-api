@@ -1,7 +1,7 @@
 class DeedModelMock:
     token = "ABC1234"
     deed = {"title_number": "DN100"}
-
+    status= "DRAFT"
 
 class MortgageDocMock:
     md_ref = "e-MD12121"
