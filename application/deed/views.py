@@ -118,41 +118,46 @@ def delete_borrower(borrower_id):
 def sign_deed(deed_reference):
     request_json = request.get_json()
     borrower_token = request_json['borrower_token']
-    result = Deed.get_deed(deed_reference)
+    deed = Deed.get_deed(deed_reference)
 
-    if result is None:
+    if deed is None:
         LOGGER.error("Database Exception 404 for deed reference - %s" % deed_reference)
         abort(status.HTTP_404_NOT_FOUND)
     else:
         LOGGER.info("Signing deed for borrower_token %s against deed reference %s" % (borrower_token, deed_reference))
 
         # check if XML already exisit
-        if result.deed_xml is None:
+        if deed.deed_xml is None:
             LOGGER.info("Generating DEED_XML")
-            deed_XML = convert_json_to_xml(result.deed)
-            result.deed_xml = deed_XML.encode("utf-8")
+            deed_XML = convert_json_to_xml(deed.deed)
+            deed.deed_xml = deed_XML.encode("utf-8")
 
         try:
             LOGGER.info("getting exisiting XML")
-            modify_xml = copy.deepcopy(result.deed_xml)
-            borrower_pos = result.get_borrower_position(borrower_token)
+            modify_xml = copy.deepcopy(deed.deed_xml)
+            borrower_pos = deed.get_borrower_position(borrower_token)
+            borrower = Borrower.get_by_token(borrower_token)
 
             LOGGER.info("XML = %s " % modify_xml.decode())
 
+            user_id, status_code = esec_client.initiate_signing(borrower.forename, borrower.surname,
+                                                                deed.organisation_id)
+            borrower.esec_user_name = user_id.decode()
+            borrower.save()
 
-            modify_xml, status_code = esec_client.add_borrower_signature(modify_xml.decode(), borrower_pos,
-                                                                         user_id, orgnisation_id)
+            modify_xml, status_code = esec_client.sign_by_user(modify_xml.decode(), borrower_pos,
+                                                               user_id.decode())
             LOGGER.info("signed status code: %s" % str(status_code))
             LOGGER.info("signed XML: %s" % modify_xml)
 
             if status_code == 200:
-                result.deed_xml = modify_xml
+                deed.deed_xml = modify_xml
 
                 LOGGER.info("Saving XML to DB")
-                result.save()
+                deed.save()
 
                 LOGGER.info("updating JSON with Signature")
-                result.deed = update_deed_signature_timestamp(result, borrower_token)
+                deed.deed = update_deed_signature_timestamp(deed, borrower_token)
             else:
                 LOGGER.error("Failed to sign Mortgage document")
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -162,7 +167,7 @@ def sign_deed(deed_reference):
             LOGGER.error("Failed to sign Mortgage document: %s" % msg)
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    return jsonify({"deed": result.deed}), status.HTTP_200_OK
+    return jsonify({"deed": deed.deed}), status.HTTP_200_OK
 
 
 @deed_bp.route('/<deed_reference>/make-effective', methods=['POST'])
