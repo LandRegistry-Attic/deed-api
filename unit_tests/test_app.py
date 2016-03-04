@@ -255,7 +255,7 @@ class TestRoutes(unittest.TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_xml_generation(self):
-        xml = convert_json_to_xml(DeedHelper._json_doc)
+        xml = convert_json_to_xml(DeedModelMock().deed)
         res = validate_generated_xml(xml)
         self.assertEqual(res, True)
 

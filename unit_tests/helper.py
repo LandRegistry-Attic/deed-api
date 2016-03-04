@@ -23,6 +23,25 @@ class DeedModelMock(Deed):
                 "token": "BBBBBB"
             }
         ],
+        "additional_provisions": [
+        {
+            "additional_provision_code": "addp001",
+            "description": "Description"
+        },
+        {
+            "additional_provision_code": "addp002",
+            "description": "Description"
+        }
+        ],
+        "charge_clause": {
+                "cre_code": "CRE001",
+                "description": "Description"
+        },
+        "lender": {
+          "address": "Test Address, London NW10 7TQ",
+          "name": "Bank of England Plc",
+          "registration": "Company registration number: 123456"
+        },
         "identity_checked": "Y"
     }
     status= "DRAFT"
