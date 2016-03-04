@@ -3,21 +3,29 @@ from application.deed.model import Deed
 
 class DeedModelMock(Deed):
     token = "ABC1234"
+    deed = {
+        "title_number": "DN100",
+        "md_ref": "e-MD12344",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "borrowers": [
+            {
+                "forename": "lisa",
+                "middle_name": "ann",
+                "surname": "bloggette",
+                "address": "test address with postcode, PL14 3JR",
+                "token": "AAAAAA"
+            },
+            {
+                "forename": "frank",
+                "middle_name": "ann",
+                "surname": "bloggette",
+                "address": "Test Address With Postcode, PL14 3JR",
+                "token": "BBBBBB"
+            }
+        ],
+        "identity_checked": "Y"
+    }
     status= "DRAFT"
-    deed = {"title_number": "DN100", "borrowers": [
-      {
-        "forename": "bob",
-        "id": 1,
-        "surname": "Thomas",
-        "token": "AAAAAA"
-      },
-      {
-        "forename": "Jane",
-        "id": 2,
-        "surname": "Thomas",
-        "token": "BBBBBB"
-      }
-    ]}
 
     deed_xml = "<dm-application><operativeDeed><deedData Id='deedData'><titleNumber>DT100</titleNumber>\
                 <propertyDescription>property description</propertyDescription>\
