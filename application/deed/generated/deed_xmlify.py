@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Fri Mar  4 10:24:54 2016 by generateDS.py version 2.18a.
+# Generated Fri Mar  4 13:56:11 2016 by generateDS.py version 2.18a.
 #
 # Command line options:
 #   ('-f', '')
@@ -1272,10 +1272,7 @@ class deedDataType(GeneratedsSuper):
         self.borrowers = borrowers
         self.mdRef = mdRef
         self.chargeClause = chargeClause
-        if additionalProvisions is None:
-            self.additionalProvisions = []
-        else:
-            self.additionalProvisions = additionalProvisions
+        self.additionalProvisions = additionalProvisions
         self.lender = lender
         self.effectiveClause = effectiveClause
     def factory(*args_, **kwargs_):
@@ -1296,9 +1293,6 @@ class deedDataType(GeneratedsSuper):
     def set_chargeClause(self, chargeClause): self.chargeClause = chargeClause
     def get_additionalProvisions(self): return self.additionalProvisions
     def set_additionalProvisions(self, additionalProvisions): self.additionalProvisions = additionalProvisions
-    def add_additionalProvisions(self, value): self.additionalProvisions.append(value)
-    def insert_additionalProvisions_at(self, index, value): self.additionalProvisions.insert(index, value)
-    def replace_additionalProvisions_at(self, index, value): self.additionalProvisions[index] = value
     def get_lender(self): return self.lender
     def set_lender(self, lender): self.lender = lender
     def get_effectiveClause(self): return self.effectiveClause
@@ -1312,7 +1306,7 @@ class deedDataType(GeneratedsSuper):
             self.borrowers is not None or
             self.mdRef is not None or
             self.chargeClause is not None or
-            self.additionalProvisions or
+            self.additionalProvisions is not None or
             self.lender is not None or
             self.effectiveClause is not None
         ):
@@ -1359,8 +1353,8 @@ class deedDataType(GeneratedsSuper):
             outfile.write('<%smdRef>%s</%smdRef>%s' % (namespace_, self.gds_format_string(quote_xml(self.mdRef).encode(ExternalEncoding), input_name='mdRef'), namespace_, eol_))
         if self.chargeClause is not None:
             self.chargeClause.export(outfile, level, namespace_, name_='chargeClause', pretty_print=pretty_print)
-        for additionalProvisions_ in self.additionalProvisions:
-            additionalProvisions_.export(outfile, level, namespace_, name_='additionalProvisions', pretty_print=pretty_print)
+        if self.additionalProvisions is not None:
+            self.additionalProvisions.export(outfile, level, namespace_, name_='additionalProvisions', pretty_print=pretty_print)
         if self.lender is not None:
             self.lender.export(outfile, level, namespace_, name_='lender', pretty_print=pretty_print)
         if self.effectiveClause is not None:
@@ -1404,7 +1398,7 @@ class deedDataType(GeneratedsSuper):
         elif nodeName_ == 'additionalProvisions':
             obj_ = additionalProvisionsType.factory()
             obj_.build(child_)
-            self.additionalProvisions.append(obj_)
+            self.additionalProvisions = obj_
             obj_.original_tagname_ = 'additionalProvisions'
         elif nodeName_ == 'lender':
             obj_ = lenderType.factory()
@@ -1889,28 +1883,26 @@ class chargeClauseType(GeneratedsSuper):
 class additionalProvisionsType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, code=None, entryText=None, sequenceNumber=None):
+    def __init__(self, provision=None):
         self.original_tagname_ = None
-        self.code = code
-        self.entryText = entryText
-        self.sequenceNumber = sequenceNumber
+        if provision is None:
+            self.provision = []
+        else:
+            self.provision = provision
     def factory(*args_, **kwargs_):
         if additionalProvisionsType.subclass:
             return additionalProvisionsType.subclass(*args_, **kwargs_)
         else:
             return additionalProvisionsType(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_code(self): return self.code
-    def set_code(self, code): self.code = code
-    def get_entryText(self): return self.entryText
-    def set_entryText(self, entryText): self.entryText = entryText
-    def get_sequenceNumber(self): return self.sequenceNumber
-    def set_sequenceNumber(self, sequenceNumber): self.sequenceNumber = sequenceNumber
+    def get_provision(self): return self.provision
+    def set_provision(self, provision): self.provision = provision
+    def add_provision(self, value): self.provision.append(value)
+    def insert_provision_at(self, index, value): self.provision.insert(index, value)
+    def replace_provision_at(self, index, value): self.provision[index] = value
     def hasContent_(self):
         if (
-            self.code is not None or
-            self.entryText is not None or
-            self.sequenceNumber is not None
+            self.provision
         ):
             return True
         else:
@@ -1936,6 +1928,80 @@ class additionalProvisionsType(GeneratedsSuper):
     def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='additionalProvisionsType'):
         pass
     def exportChildren(self, outfile, level, namespace_='', name_='additionalProvisionsType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for provision_ in self.provision:
+            provision_.export(outfile, level, namespace_, name_='provision', pretty_print=pretty_print)
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'provision':
+            obj_ = provisionType.factory()
+            obj_.build(child_)
+            self.provision.append(obj_)
+            obj_.original_tagname_ = 'provision'
+# end class additionalProvisionsType
+
+
+class provisionType(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, code=None, entryText=None, sequenceNumber=None):
+        self.original_tagname_ = None
+        self.code = code
+        self.entryText = entryText
+        self.sequenceNumber = sequenceNumber
+    def factory(*args_, **kwargs_):
+        if provisionType.subclass:
+            return provisionType.subclass(*args_, **kwargs_)
+        else:
+            return provisionType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_code(self): return self.code
+    def set_code(self, code): self.code = code
+    def get_entryText(self): return self.entryText
+    def set_entryText(self, entryText): self.entryText = entryText
+    def get_sequenceNumber(self): return self.sequenceNumber
+    def set_sequenceNumber(self, sequenceNumber): self.sequenceNumber = sequenceNumber
+    def hasContent_(self):
+        if (
+            self.code is not None or
+            self.entryText is not None or
+            self.sequenceNumber is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='provisionType', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='provisionType')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='provisionType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='provisionType'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='provisionType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
@@ -1975,7 +2041,7 @@ class additionalProvisionsType(GeneratedsSuper):
                 raise_parse_error(child_, 'requires integer: %s' % exp)
             ival_ = self.gds_validate_integer(ival_, node, 'sequenceNumber')
             self.sequenceNumber = ival_
-# end class additionalProvisionsType
+# end class provisionType
 
 
 class SignatureType(GeneratedsSuper):
@@ -3243,10 +3309,10 @@ class KeyValueType(GeneratedsSuper):
 class RetrievalMethodType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, Type=None, URI=None, Transforms=None):
+    def __init__(self, URI=None, Type=None, Transforms=None):
         self.original_tagname_ = None
-        self.Type = _cast(None, Type)
         self.URI = _cast(None, URI)
+        self.Type = _cast(None, Type)
         self.Transforms = Transforms
     def factory(*args_, **kwargs_):
         if RetrievalMethodType.subclass:
@@ -3256,10 +3322,10 @@ class RetrievalMethodType(GeneratedsSuper):
     factory = staticmethod(factory)
     def get_Transforms(self): return self.Transforms
     def set_Transforms(self, Transforms): self.Transforms = Transforms
-    def get_Type(self): return self.Type
-    def set_Type(self, Type): self.Type = Type
     def get_URI(self): return self.URI
     def set_URI(self, URI): self.URI = URI
+    def get_Type(self): return self.Type
+    def set_Type(self, Type): self.Type = Type
     def hasContent_(self):
         if (
             self.Transforms is not None
@@ -3286,12 +3352,12 @@ class RetrievalMethodType(GeneratedsSuper):
         else:
             outfile.write('/>%s' % (eol_, ))
     def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='RetrievalMethodType'):
-        if self.Type is not None and 'Type' not in already_processed:
-            already_processed.add('Type')
-            outfile.write(' Type=%s' % (quote_attrib(self.Type), ))
         if self.URI is not None and 'URI' not in already_processed:
             already_processed.add('URI')
             outfile.write(' URI=%s' % (quote_attrib(self.URI), ))
+        if self.Type is not None and 'Type' not in already_processed:
+            already_processed.add('Type')
+            outfile.write(' Type=%s' % (quote_attrib(self.Type), ))
     def exportChildren(self, outfile, level, namespace_='', name_='RetrievalMethodType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
@@ -3307,14 +3373,14 @@ class RetrievalMethodType(GeneratedsSuper):
             self.buildChildren(child, node, nodeName_)
         return self
     def buildAttributes(self, node, attrs, already_processed):
-        value = find_attr_value_('Type', node)
-        if value is not None and 'Type' not in already_processed:
-            already_processed.add('Type')
-            self.Type = value
         value = find_attr_value_('URI', node)
         if value is not None and 'URI' not in already_processed:
             already_processed.add('URI')
             self.URI = value
+        value = find_attr_value_('Type', node)
+        if value is not None and 'Type' not in already_processed:
+            already_processed.add('Type')
+            self.Type = value
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
         if nodeName_ == 'Transforms':
             obj_ = TransformsType.factory()
@@ -4439,45 +4505,46 @@ class RSAKeyValueType(GeneratedsSuper):
 
 
 GDSClassesMapping = {
-    'borrower': borrowerType,
-    'KeyInfo': KeyInfoType,
-    'deedData': deedDataType,
-    'Transforms': TransformsType,
-    'authSignature': authSignatureType,
-    'KeyValue': KeyValueType,
-    'dm-application': dmApplicationType,
     'Manifest': ManifestType,
-    'PGPData': PGPDataType,
-    'name': nameType,
-    'operativeDeed': operativeDeedType,
+    'CanonicalizationMethod': CanonicalizationMethodType,
+    'provision': provisionType,
+    'borrower_signature': signatureSlotType,
+    'SignedInfo': SignedInfoType,
+    'deedData': deedDataType,
+    'X509IssuerSerial': X509IssuerSerialType,
+    'SignatureValue': SignatureValueType,
+    'signatory': nameType,
+    'SPKIData': SPKIDataType,
+    'DSAKeyValue': DSAKeyValueType,
+    'Signature': SignatureType,
+    'lender': lenderType,
+    'KeyInfo': KeyInfoType,
+    'SignatureProperties': SignaturePropertiesType,
+    'Reference': ReferenceType,
     'organisationName': nameType,
-    'Transform': TransformType,
+    'privateIndividual': privateIndividualType,
+    'Transforms': TransformsType,
+    'RSAKeyValue': RSAKeyValueType,
+    'Object': ObjectType,
+    'operativeDeed': operativeDeedType,
+    'signatureSlots': signatureSlotsType,
+    'borrower': borrowerType,
+    'signature': signatureType,
+    'KeyValue': KeyValueType,
+    'SignatureProperty': SignaturePropertyType,
+    'PGPData': PGPDataType,
+    'RetrievalMethod': RetrievalMethodType,
     'additionalProvisions': additionalProvisionsType,
+    'authSignature': authSignatureType,
+    'borrowers': borrowersType,
+    'dm-application': dmApplicationType,
     'X509Data': X509DataType,
     'SignatureMethod': SignatureMethodType,
-    'DSAKeyValue': DSAKeyValueType,
-    'Object': ObjectType,
-    'SignedInfo': SignedInfoType,
-    'X509IssuerSerial': X509IssuerSerialType,
-    'SPKIData': SPKIDataType,
     'company': companyType,
     'DigestMethod': DigestMethodType,
-    'signature': signatureType,
-    'CanonicalizationMethod': CanonicalizationMethodType,
-    'lender': lenderType,
-    'Signature': SignatureType,
-    'RSAKeyValue': RSAKeyValueType,
-    'borrowers': borrowersType,
-    'RetrievalMethod': RetrievalMethodType,
-    'SignatureValue': SignatureValueType,
     'chargeClause': chargeClauseType,
-    'borrower_signature': signatureSlotType,
-    'SignatureProperties': SignaturePropertiesType,
-    'SignatureProperty': SignaturePropertyType,
-    'signatory': nameType,
-    'Reference': ReferenceType,
-    'privateIndividual': privateIndividualType,
-    'signatureSlots': signatureSlotsType,
+    'Transform': TransformType,
+    'name': nameType,
 }
 
 
@@ -4635,6 +4702,7 @@ __all__ = [
     "nameType",
     "operativeDeedType",
     "privateIndividualType",
+    "provisionType",
     "signature",
     "signatureSlotType",
     "signatureSlotsType",

@@ -93,7 +93,7 @@
         		minOccurs="1" maxOccurs="1">
         	</xs:element>
         	<xs:element name="additionalProvisions" type="additionalProvisionsType" 
-        		minOccurs="0" maxOccurs="unbounded">
+        		minOccurs="1" maxOccurs="1">
         	</xs:element>
         	<xs:element name="lender" type="lenderType"
                 maxOccurs="1" minOccurs="1">
@@ -166,6 +166,12 @@
     </xs:complexType>
     
     <xs:complexType name="additionalProvisionsType">
+        <xs:sequence>
+            <xs:element name="provision" type="provisionType" maxOccurs="unbounded" minOccurs="1"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="provisionType">
     	<xs:sequence>
     		<xs:element name="code" type="xs:string" maxOccurs="1"
     			minOccurs="1">
