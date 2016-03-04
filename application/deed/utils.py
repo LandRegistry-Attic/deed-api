@@ -116,6 +116,10 @@ def load_json_file(file_path):
 def convert_json_to_signature_slot(borrower_json):
     sig_slot = api.signatureSlotType()
     borrower_name_xml = api.nameType()
+
+    if 'middle_name' in borrower_json:
+        borrower_name_xml.set_middlename(borrower_json["middle_name"])
+
     borrower_name_xml.set_forename(borrower_json["forename"])
     borrower_name_xml.set_middlename("middlename")
     borrower_name_xml.set_surname(borrower_json["surname"])
@@ -127,14 +131,37 @@ def convert_json_to_signature_slot(borrower_json):
 def convert_json_to_borrower(borrower_json):
     borrower = api.borrowerType()
     borrower_name_xml = api.nameType()
-    borrower_name_xml.set_forename(borrower_json["forename"])
-    borrower_name_xml.set_middlename("middlename")
-    borrower_name_xml.set_surname(borrower_json["surname"])
+    private_individual = api.privateIndividualType()
+    private_individual.set_forename(borrower_json["forename"])
+
+    if 'middle_name' in borrower_json:
+        private_individual.set_middlename(borrower_json["middle_name"])
+
+    private_individual.set_surname(borrower_json["surname"])
+    borrower_name_xml.set_privateIndividual(private_individual)
     borrower.set_name(borrower_name_xml)
     borrower.set_address("borrower address")
 
     return borrower
 
+def convert_json_to_lender(lender_json):
+    lender = api.lenderType()
+    lender_name_xml = api.nameType()
+    company = api.companyType()
+    company.set_name(lender_json["name"])
+    lender.set_name(lender_name_xml)
+    lender.set_address(lender_json["address"])
+    lender.set_companyRegistrationDetails(lender_json["registration"])
+
+    return lender
+
+def convert_json_to_provision(provision_json, pos):
+    additional_provision_xml = api.additionalProvisionsType()
+    additional_provision_xml.set_code(provision_json["additional_provision_code"])
+    additional_provision_xml.set_entryText(provision_json["description"])
+    additional_provision_xml.set_sequenceNumber(pos)
+
+    return additional_provision_xml
 
 def validate_generated_xml(xml):
 
@@ -172,9 +199,24 @@ def convert_json_to_xml(deed_json):  # pragma: no cover
     deed_data_xml.set_Id("deedData")
     deed_data_xml.set_mdRef(deed_json["md_ref"])
     deed_data_xml.set_titleNumber(deed_json["title_number"])
-    deed_data_xml.set_propertyDescription("property description")
+    deed_data_xml.set_propertyDescription(deed_json["property_address"])
+
+    charge_clause_xml = api.chargeClauseType()
+    charge_clause_xml.set_creCode(deed_json["charge_clause"]["cre_code"])
+    charge_clause_xml.set_entryText(deed_json["charge_clause"]["description"])
+    deed_data_xml.set_chargeClause(charge_clause_xml)
+
+    deed_data_xml.set_effectiveClause(deed_json["effective_clause"])
+
+    deed_data_xml.set_lender(convert_json_to_lender(deed_json["lender"]))
+
+    additional_provisions = api.additionalProvisionsType()
+
+    for idx, provision_json in enumerate(deed_json["additional_provisions"]):
+        additional_provisions.add_provision(convert_json_to_provision(provision_json, idx))
+
     operative_deed_xml.set_deedData(deed_data_xml)
-    deed_app_xml.set_effectiveDate("23/5/15")
+    deed_app_xml.set_effectiveDate("tbc")
     auth_sig = api.authSignatureType()
     deed_app_xml.set_authSignature(auth_sig)
     operative_deed_xml.set_signatureSlots(borrower_sig_slots)
