@@ -21,11 +21,11 @@ class Borrower(db.Model):
     def generate_token():
         return str(uuid.uuid4().hex[:6]).lower()
 
-    def save(self): # pragma: no cover
+    def save(self):  # pragma: no cover
         db.session.add(self)
         db.session.commit()
 
-    def delete(self, id_): # pragma: no cover
+    def delete(self, id_):  # pragma: no cover
         borrower = Borrower.query.filter_by(id=id_).first()
 
         if borrower is None:

@@ -294,7 +294,6 @@ class TestRoutes(unittest.TestCase):
 
         self.assertEqual(check_result["result"], "A")
 
-
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.deed.service', autospec=True)
     @mock.patch('application.borrower.model.Borrower.save')
@@ -339,10 +338,9 @@ class TestRoutes(unittest.TestCase):
         payload = json.dumps(DeedHelper._add_borrower_signature)
 
         response = self.app.post(self.DEED_ENDPOINT + 'AB1234' + '/sign',
-                                data=payload,
-                                headers=self.webseal_headers)
+                                 data=payload,
+                                 headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
 
     @mock.patch('application.deed.utils.get_borrower_position')
     @mock.patch('application.service_clients.esec.interface.EsecClientInterface.add_borrower_signature')
@@ -358,7 +356,6 @@ class TestRoutes(unittest.TestCase):
         payload = json.dumps(DeedHelper._add_borrower_signature)
 
         response = self.app.post(self.DEED_ENDPOINT + 'AB1234' + '/sign',
-                                data=payload,
-                                headers=self.webseal_headers)
+                                 data=payload,
+                                 headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-

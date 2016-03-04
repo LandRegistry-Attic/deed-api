@@ -145,6 +145,7 @@ def convert_json_to_borrower(borrower_json):
 
     return borrower
 
+
 def convert_json_to_lender(lender_json):
     lender = api.lenderType()
     lender_name_xml = api.nameType()
@@ -157,6 +158,7 @@ def convert_json_to_lender(lender_json):
 
     return lender
 
+
 def convert_json_to_provision(provision_json, pos):
     additional_provision_xml = api.provisionType()
     additional_provision_xml.set_code(provision_json["additional_provision_code"])
@@ -164,6 +166,7 @@ def convert_json_to_provision(provision_json, pos):
     additional_provision_xml.set_sequenceNumber(pos)
 
     return additional_provision_xml
+
 
 def validate_generated_xml(xml):
 

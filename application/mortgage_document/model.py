@@ -8,6 +8,6 @@ class MortgageDocument(db.Model):
     md_ref = db.Column(db.String, primary_key=True)
     data = db.Column(JSON)
 
-    def save(self): # pragma: no cover
+    def save(self):  # pragma: no cover
         db.session.add(self)
         db.session.commit()

@@ -2,7 +2,7 @@ import logging
 from application.akuma.service import Akuma
 from application.deed.model import Deed
 from application.deed.utils import validate_helper, process_organisation_credentials, convert_json_to_xml, get_borrower_position
-from application.deed.service import update_deed, set_signed_status, update_deed_signature_timestamp
+from application.deed.service import update_deed, update_deed_signature_timestamp
 from flask import request, abort, jsonify, Response
 from flask import Blueprint
 from flask.ext.api import status
