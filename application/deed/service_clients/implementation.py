@@ -9,7 +9,7 @@ LOGGER = logging.getLogger(__name__)
 
 def sign_by_user(deed_xml, borrower_pos, user_id):  # pragma: no cover
     LOGGER.info("Calling dm-esec-client")
-    request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/sign_by_user/' + str(borrower_pos)
+    request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/sign_by_user'
     element_id = 'deedData'
     borrower_path = "/dm-application/operativeDeed/signatureSlots"
 
@@ -32,7 +32,7 @@ def sign_by_user(deed_xml, borrower_pos, user_id):  # pragma: no cover
 
 def initiate_signing(first_name, last_name, organisation_id):  # pragma: no cover
     LOGGER.info("Calling dm-esec-client")
-    request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/intiate_signing'
+    request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/initiate_signing'
 
     parameters = {
         'first-name': first_name,
