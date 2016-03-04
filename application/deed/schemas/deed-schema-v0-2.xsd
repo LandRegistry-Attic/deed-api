@@ -95,7 +95,12 @@
         	<xs:element name="additionalProvisions" type="additionalProvisionsType" 
         		minOccurs="0" maxOccurs="unbounded">
         	</xs:element>
-        	<xs:element name="lender" type="lenderType"></xs:element>
+        	<xs:element name="lender" type="lenderType"
+                maxOccurs="1" minOccurs="1">
+            </xs:element>
+        	<xs:element name="effectiveClause" type="xs:string"
+                maxOccurs="1" minOccurs="1">
+            </xs:element>
         </xs:sequence>
         <xs:attribute name="Id" type="xs:ID" use="required"/>
     </xs:complexType>
