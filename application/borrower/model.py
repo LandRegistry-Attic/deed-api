@@ -15,6 +15,7 @@ class Borrower(db.Model):
     gender = db.Column(db.String, nullable=True)
     phonenumber = db.Column(db.String, nullable=False)
     address = db.Column(db.String, nullable=False)
+    esec_user_name = db.Column(db.String, nullable=True)
 
     @staticmethod
     def generate_token():

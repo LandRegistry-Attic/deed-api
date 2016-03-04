@@ -138,7 +138,10 @@ def sign_deed(deed_reference):
             borrower_pos = result.get_borrower_position(borrower_token)
 
             LOGGER.info("XML = %s " % modify_xml.decode())
-            modify_xml, status_code = esec_client.add_borrower_signature(modify_xml.decode(), borrower_pos)
+
+
+            modify_xml, status_code = esec_client.add_borrower_signature(modify_xml.decode(), borrower_pos,
+                                                                         user_id, orgnisation_id)
             LOGGER.info("signed status code: %s" % str(status_code))
             LOGGER.info("signed XML: %s" % modify_xml)
 

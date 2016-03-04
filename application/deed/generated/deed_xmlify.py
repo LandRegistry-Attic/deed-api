@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Tue Jan 12 09:47:16 2016 by generateDS.py version 2.18a.
+# Generated Thu Mar  3 11:24:19 2016 by generateDS.py version 2.18a.
 #
 # Command line options:
 #   ('-f', '')
@@ -1002,25 +1002,25 @@ class borrowerType(GeneratedsSuper):
 class signatureType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, Signature=None):
+    def __init__(self, signature=None):
         self.original_tagname_ = None
-        self.Signature = Signature
+        self.signature = signature
     def factory(*args_, **kwargs_):
         if signatureType.subclass:
             return signatureType.subclass(*args_, **kwargs_)
         else:
             return signatureType(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_Signature(self): return self.Signature
-    def set_Signature(self, Signature): self.Signature = Signature
+    def get_signature(self): return self.signature
+    def set_signature(self, signature): self.signature = signature
     def hasContent_(self):
         if (
-            self.Signature is not None
+            self.signature is not None
         ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='signatureType', namespacedef_=' xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" ', pretty_print=True):
+    def export(self, outfile, level, namespace_='', name_='signatureType', namespacedef_='', pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
@@ -1045,8 +1045,9 @@ class signatureType(GeneratedsSuper):
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.Signature is not None:
-            self.Signature.export(outfile, level, namespace_='dsig:', name_='Signature', pretty_print=pretty_print)
+        if self.signature is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%ssignature>%s</%ssignature>%s' % (namespace_, self.gds_format_string(quote_xml(self.signature).encode(ExternalEncoding), input_name='signature'), namespace_, eol_))
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -1057,12 +1058,64 @@ class signatureType(GeneratedsSuper):
     def buildAttributes(self, node, attrs, already_processed):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
-        if nodeName_ == 'Signature':
-            obj_ = SignatureType.factory()
-            obj_.build(child_)
-            self.Signature = obj_
-            obj_.original_tagname_ = 'Signature'
+        if nodeName_ == 'signature':
+            signature_ = child_.text
+            signature_ = self.gds_validate_string(signature_, node, 'signature')
+            self.signature = signature_
 # end class signatureType
+
+
+class signature(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self):
+        self.original_tagname_ = None
+    def factory(*args_, **kwargs_):
+        if signature.subclass:
+            return signature.subclass(*args_, **kwargs_)
+        else:
+            return signature(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def hasContent_(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='signature', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='signature')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='signature', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='signature'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='signature', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        pass
+# end class signature
 
 
 class authSignatureType(GeneratedsSuper):
@@ -3245,10 +3298,10 @@ class SPKIDataType(GeneratedsSuper):
 class ObjectType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, Encoding=None, MimeType=None, Id=None, anytypeobjs_=None, valueOf_=None, mixedclass_=None, content_=None):
+    def __init__(self, MimeType=None, Encoding=None, Id=None, anytypeobjs_=None, valueOf_=None, mixedclass_=None, content_=None):
         self.original_tagname_ = None
-        self.Encoding = _cast(None, Encoding)
         self.MimeType = _cast(None, MimeType)
+        self.Encoding = _cast(None, Encoding)
         self.Id = _cast(None, Id)
         self.anytypeobjs_ = anytypeobjs_
         self.valueOf_ = valueOf_
@@ -3269,10 +3322,10 @@ class ObjectType(GeneratedsSuper):
     factory = staticmethod(factory)
     def get_anytypeobjs_(self): return self.anytypeobjs_
     def set_anytypeobjs_(self, anytypeobjs_): self.anytypeobjs_ = anytypeobjs_
-    def get_Encoding(self): return self.Encoding
-    def set_Encoding(self, Encoding): self.Encoding = Encoding
     def get_MimeType(self): return self.MimeType
     def set_MimeType(self, MimeType): self.MimeType = MimeType
+    def get_Encoding(self): return self.Encoding
+    def set_Encoding(self, Encoding): self.Encoding = Encoding
     def get_Id(self): return self.Id
     def set_Id(self, Id): self.Id = Id
     def get_valueOf_(self): return self.valueOf_
@@ -3304,12 +3357,12 @@ class ObjectType(GeneratedsSuper):
         else:
             outfile.write('/>%s' % (eol_, ))
     def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='ObjectType'):
-        if self.Encoding is not None and 'Encoding' not in already_processed:
-            already_processed.add('Encoding')
-            outfile.write(' Encoding=%s' % (quote_attrib(self.Encoding), ))
         if self.MimeType is not None and 'MimeType' not in already_processed:
             already_processed.add('MimeType')
             outfile.write(' MimeType=%s' % (quote_attrib(self.MimeType), ))
+        if self.Encoding is not None and 'Encoding' not in already_processed:
+            already_processed.add('Encoding')
+            outfile.write(' Encoding=%s' % (quote_attrib(self.Encoding), ))
         if self.Id is not None and 'Id' not in already_processed:
             already_processed.add('Id')
             outfile.write(' Id=%s' % (quote_attrib(self.Id), ))
@@ -3330,14 +3383,14 @@ class ObjectType(GeneratedsSuper):
             self.buildChildren(child, node, nodeName_)
         return self
     def buildAttributes(self, node, attrs, already_processed):
-        value = find_attr_value_('Encoding', node)
-        if value is not None and 'Encoding' not in already_processed:
-            already_processed.add('Encoding')
-            self.Encoding = value
         value = find_attr_value_('MimeType', node)
         if value is not None and 'MimeType' not in already_processed:
             already_processed.add('MimeType')
             self.MimeType = value
+        value = find_attr_value_('Encoding', node)
+        if value is not None and 'Encoding' not in already_processed:
+            already_processed.add('Encoding')
+            self.Encoding = value
         value = find_attr_value_('Id', node)
         if value is not None and 'Id' not in already_processed:
             already_processed.add('Id')
@@ -3523,10 +3576,10 @@ class SignaturePropertiesType(GeneratedsSuper):
 class SignaturePropertyType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, Target=None, Id=None, anytypeobjs_=None, valueOf_=None, mixedclass_=None, content_=None):
+    def __init__(self, Id=None, Target=None, anytypeobjs_=None, valueOf_=None, mixedclass_=None, content_=None):
         self.original_tagname_ = None
-        self.Target = _cast(None, Target)
         self.Id = _cast(None, Id)
+        self.Target = _cast(None, Target)
         self.anytypeobjs_ = anytypeobjs_
         self.valueOf_ = valueOf_
         if mixedclass_ is None:
@@ -3546,10 +3599,10 @@ class SignaturePropertyType(GeneratedsSuper):
     factory = staticmethod(factory)
     def get_anytypeobjs_(self): return self.anytypeobjs_
     def set_anytypeobjs_(self, anytypeobjs_): self.anytypeobjs_ = anytypeobjs_
-    def get_Target(self): return self.Target
-    def set_Target(self, Target): self.Target = Target
     def get_Id(self): return self.Id
     def set_Id(self, Id): self.Id = Id
+    def get_Target(self): return self.Target
+    def set_Target(self, Target): self.Target = Target
     def get_valueOf_(self): return self.valueOf_
     def set_valueOf_(self, valueOf_): self.valueOf_ = valueOf_
     def hasContent_(self):
@@ -3579,12 +3632,12 @@ class SignaturePropertyType(GeneratedsSuper):
         else:
             outfile.write('/>%s' % (eol_, ))
     def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='SignaturePropertyType'):
-        if self.Target is not None and 'Target' not in already_processed:
-            already_processed.add('Target')
-            outfile.write(' Target=%s' % (quote_attrib(self.Target), ))
         if self.Id is not None and 'Id' not in already_processed:
             already_processed.add('Id')
             outfile.write(' Id=%s' % (quote_attrib(self.Id), ))
+        if self.Target is not None and 'Target' not in already_processed:
+            already_processed.add('Target')
+            outfile.write(' Target=%s' % (quote_attrib(self.Target), ))
     def exportChildren(self, outfile, level, namespace_='', name_='SignaturePropertyType', fromsubclass_=False, pretty_print=True):
         if not fromsubclass_:
             for item_ in self.content_:
@@ -3602,14 +3655,14 @@ class SignaturePropertyType(GeneratedsSuper):
             self.buildChildren(child, node, nodeName_)
         return self
     def buildAttributes(self, node, attrs, already_processed):
-        value = find_attr_value_('Target', node)
-        if value is not None and 'Target' not in already_processed:
-            already_processed.add('Target')
-            self.Target = value
         value = find_attr_value_('Id', node)
         if value is not None and 'Id' not in already_processed:
             already_processed.add('Id')
             self.Id = value
+        value = find_attr_value_('Target', node)
+        if value is not None and 'Target' not in already_processed:
+            already_processed.add('Target')
+            self.Target = value
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
         if nodeName_ == '':
             obj_ = __ANY__.factory()
@@ -3936,38 +3989,38 @@ class RSAKeyValueType(GeneratedsSuper):
 
 
 GDSClassesMapping = {
-    'RetrievalMethod': RetrievalMethodType,
-    'authSignature': authSignatureType,
-    'KeyValue': KeyValueType,
-    'SignatureMethod': SignatureMethodType,
-    'signatureSlots': signatureSlotsType,
-    'borrower_signature': signatureSlotType,
-    'operativeDeed': operativeDeedType,
-    'deedData': deedDataType,
-    'Reference': ReferenceType,
-    'SignedInfo': SignedInfoType,
-    'PGPData': PGPDataType,
-    'DigestMethod': DigestMethodType,
-    'CanonicalizationMethod': CanonicalizationMethodType,
-    'KeyInfo': KeyInfoType,
-    'signature': signatureType,
-    'name': nameType,
-    'X509IssuerSerial': X509IssuerSerialType,
-    'SignatureValue': SignatureValueType,
-    'RSAKeyValue': RSAKeyValueType,
     'dm-application': dmApplicationType,
-    'DSAKeyValue': DSAKeyValueType,
-    'SignatureProperty': SignaturePropertyType,
-    'Manifest': ManifestType,
-    'SPKIData': SPKIDataType,
-    'borrowers': borrowersType,
     'Object': ObjectType,
-    'SignatureProperties': SignaturePropertiesType,
-    'Transform': TransformType,
-    'Transforms': TransformsType,
-    'borrower': borrowerType,
     'signatory': nameType,
+    'SignatureMethod': SignatureMethodType,
+    'SPKIData': SPKIDataType,
+    'operativeDeed': operativeDeedType,
+    'name': nameType,
+    'DSAKeyValue': DSAKeyValueType,
+    'Transform': TransformType,
+    'CanonicalizationMethod': CanonicalizationMethodType,
+    'deedData': deedDataType,
+    'borrowers': borrowersType,
+    'Manifest': ManifestType,
+    'SignatureValue': SignatureValueType,
+    'SignedInfo': SignedInfoType,
+    'Reference': ReferenceType,
+    'RSAKeyValue': RSAKeyValueType,
+    'RetrievalMethod': RetrievalMethodType,
+    'DigestMethod': DigestMethodType,
+    'borrower_signature': signatureSlotType,
+    'authSignature': authSignatureType,
+    'SignatureProperties': SignaturePropertiesType,
+    'signatureSlots': signatureSlotsType,
+    'borrower': borrowerType,
+    'signature': signatureType,
+    'Transforms': TransformsType,
+    'KeyValue': KeyValueType,
     'X509Data': X509DataType,
+    'PGPData': PGPDataType,
+    'X509IssuerSerial': X509IssuerSerialType,
+    'KeyInfo': KeyInfoType,
+    'SignatureProperty': SignaturePropertyType,
     'Signature': SignatureType,
 }
 
@@ -4121,6 +4174,7 @@ __all__ = [
     "dmApplicationType",
     "nameType",
     "operativeDeedType",
+    "signature",
     "signatureSlotType",
     "signatureSlotsType",
     "signatureType"
