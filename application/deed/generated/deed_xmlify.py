@@ -3748,10 +3748,10 @@ class SPKIDataType(GeneratedsSuper):
 class ObjectType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, Encoding=None, MimeType=None, Id=None, anytypeobjs_=None, valueOf_=None, mixedclass_=None, content_=None):
+    def __init__(self, MimeType=None, Encoding=None, Id=None, anytypeobjs_=None, valueOf_=None, mixedclass_=None, content_=None):
         self.original_tagname_ = None
-        self.Encoding = _cast(None, Encoding)
         self.MimeType = _cast(None, MimeType)
+        self.Encoding = _cast(None, Encoding)
         self.Id = _cast(None, Id)
         self.anytypeobjs_ = anytypeobjs_
         self.valueOf_ = valueOf_
@@ -3772,10 +3772,10 @@ class ObjectType(GeneratedsSuper):
     factory = staticmethod(factory)
     def get_anytypeobjs_(self): return self.anytypeobjs_
     def set_anytypeobjs_(self, anytypeobjs_): self.anytypeobjs_ = anytypeobjs_
-    def get_Encoding(self): return self.Encoding
-    def set_Encoding(self, Encoding): self.Encoding = Encoding
     def get_MimeType(self): return self.MimeType
     def set_MimeType(self, MimeType): self.MimeType = MimeType
+    def get_Encoding(self): return self.Encoding
+    def set_Encoding(self, Encoding): self.Encoding = Encoding
     def get_Id(self): return self.Id
     def set_Id(self, Id): self.Id = Id
     def get_valueOf_(self): return self.valueOf_
@@ -3807,12 +3807,12 @@ class ObjectType(GeneratedsSuper):
         else:
             outfile.write('/>%s' % (eol_, ))
     def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='ObjectType'):
-        if self.Encoding is not None and 'Encoding' not in already_processed:
-            already_processed.add('Encoding')
-            outfile.write(' Encoding=%s' % (quote_attrib(self.Encoding), ))
         if self.MimeType is not None and 'MimeType' not in already_processed:
             already_processed.add('MimeType')
             outfile.write(' MimeType=%s' % (quote_attrib(self.MimeType), ))
+        if self.Encoding is not None and 'Encoding' not in already_processed:
+            already_processed.add('Encoding')
+            outfile.write(' Encoding=%s' % (quote_attrib(self.Encoding), ))
         if self.Id is not None and 'Id' not in already_processed:
             already_processed.add('Id')
             outfile.write(' Id=%s' % (quote_attrib(self.Id), ))
@@ -3833,14 +3833,14 @@ class ObjectType(GeneratedsSuper):
             self.buildChildren(child, node, nodeName_)
         return self
     def buildAttributes(self, node, attrs, already_processed):
-        value = find_attr_value_('Encoding', node)
-        if value is not None and 'Encoding' not in already_processed:
-            already_processed.add('Encoding')
-            self.Encoding = value
         value = find_attr_value_('MimeType', node)
         if value is not None and 'MimeType' not in already_processed:
             already_processed.add('MimeType')
             self.MimeType = value
+        value = find_attr_value_('Encoding', node)
+        if value is not None and 'Encoding' not in already_processed:
+            already_processed.add('Encoding')
+            self.Encoding = value
         value = find_attr_value_('Id', node)
         if value is not None and 'Id' not in already_processed:
             already_processed.add('Id')
@@ -4026,10 +4026,10 @@ class SignaturePropertiesType(GeneratedsSuper):
 class SignaturePropertyType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, Target=None, Id=None, anytypeobjs_=None, valueOf_=None, mixedclass_=None, content_=None):
+    def __init__(self, Id=None, Target=None, anytypeobjs_=None, valueOf_=None, mixedclass_=None, content_=None):
         self.original_tagname_ = None
-        self.Target = _cast(None, Target)
         self.Id = _cast(None, Id)
+        self.Target = _cast(None, Target)
         self.anytypeobjs_ = anytypeobjs_
         self.valueOf_ = valueOf_
         if mixedclass_ is None:
@@ -4049,10 +4049,10 @@ class SignaturePropertyType(GeneratedsSuper):
     factory = staticmethod(factory)
     def get_anytypeobjs_(self): return self.anytypeobjs_
     def set_anytypeobjs_(self, anytypeobjs_): self.anytypeobjs_ = anytypeobjs_
-    def get_Target(self): return self.Target
-    def set_Target(self, Target): self.Target = Target
     def get_Id(self): return self.Id
     def set_Id(self, Id): self.Id = Id
+    def get_Target(self): return self.Target
+    def set_Target(self, Target): self.Target = Target
     def get_valueOf_(self): return self.valueOf_
     def set_valueOf_(self, valueOf_): self.valueOf_ = valueOf_
     def hasContent_(self):
@@ -4082,12 +4082,12 @@ class SignaturePropertyType(GeneratedsSuper):
         else:
             outfile.write('/>%s' % (eol_, ))
     def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='SignaturePropertyType'):
-        if self.Target is not None and 'Target' not in already_processed:
-            already_processed.add('Target')
-            outfile.write(' Target=%s' % (quote_attrib(self.Target), ))
         if self.Id is not None and 'Id' not in already_processed:
             already_processed.add('Id')
             outfile.write(' Id=%s' % (quote_attrib(self.Id), ))
+        if self.Target is not None and 'Target' not in already_processed:
+            already_processed.add('Target')
+            outfile.write(' Target=%s' % (quote_attrib(self.Target), ))
     def exportChildren(self, outfile, level, namespace_='', name_='SignaturePropertyType', fromsubclass_=False, pretty_print=True):
         if not fromsubclass_:
             for item_ in self.content_:
@@ -4105,14 +4105,14 @@ class SignaturePropertyType(GeneratedsSuper):
             self.buildChildren(child, node, nodeName_)
         return self
     def buildAttributes(self, node, attrs, already_processed):
-        value = find_attr_value_('Target', node)
-        if value is not None and 'Target' not in already_processed:
-            already_processed.add('Target')
-            self.Target = value
         value = find_attr_value_('Id', node)
         if value is not None and 'Id' not in already_processed:
             already_processed.add('Id')
             self.Id = value
+        value = find_attr_value_('Target', node)
+        if value is not None and 'Target' not in already_processed:
+            already_processed.add('Target')
+            self.Target = value
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
         if nodeName_ == '':
             obj_ = __ANY__.factory()
