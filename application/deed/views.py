@@ -15,7 +15,6 @@ import json
 import sys
 import copy
 
-
 LOGGER = logging.getLogger(__name__)
 
 deed_bp = Blueprint('deed', __name__,
@@ -176,6 +175,7 @@ def sign_deed(deed_reference):
 @deed_bp.route('/<deed_reference>/make-effective', methods=['POST'])
 def make_effective(deed_reference):
     return status.HTTP_200_OK
+<<<<<<< 222e84eea3f854f1eed222def637f101a6d734e3
 
 @deed_bp.route('/<deed_reference>/request-auth-code', methods=['POST'])
 def request_auth_code(deed_reference):
