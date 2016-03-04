@@ -32,6 +32,7 @@ def get_deed(deed_reference):
         abort(status.HTTP_404_NOT_FOUND)
     else:
         result.deed['token'] = result.token
+        result.deed['deed_status'] = result.status
 
     return jsonify({"deed": result.deed}), status.HTTP_200_OK
 
@@ -138,28 +139,32 @@ def sign_deed(deed_reference):
             borrower_pos = deed.get_borrower_position(borrower_token)
             borrower = Borrower.get_by_token(borrower_token)
 
-            LOGGER.info("XML = %s " % modify_xml.decode())
-
             user_id, status_code = esec_client.initiate_signing(borrower.forename, borrower.surname,
                                                                 deed.organisation_id)
-            borrower.esec_user_name = user_id.decode()
-            borrower.save()
-
-            modify_xml, status_code = esec_client.sign_by_user(modify_xml.decode(), borrower_pos,
-                                                               user_id.decode())
-            LOGGER.info("signed status code: %s" % str(status_code))
-            LOGGER.info("signed XML: %s" % modify_xml)
 
             if status_code == 200:
-                deed.deed_xml = modify_xml
+                LOGGER.info("Created new esec user: %s" % str(user_id.decode()))
+                borrower.esec_user_name = user_id.decode()
+                borrower.save()
 
-                LOGGER.info("Saving XML to DB")
-                deed.save()
+                modify_xml, status_code = esec_client.sign_by_user(modify_xml.decode(), borrower_pos,
+                                                                   user_id.decode())
+                LOGGER.info("signed status code: %s" % str(status_code))
+                LOGGER.info("signed XML: %s" % modify_xml)
 
-                LOGGER.info("updating JSON with Signature")
-                deed.deed = update_deed_signature_timestamp(deed, borrower_token)
+                if status_code == 200:
+                    deed.deed_xml = modify_xml
+
+                    LOGGER.info("Saving XML to DB")
+                    deed.save()
+
+                    LOGGER.info("updating JSON with Signature")
+                    deed.deed = update_deed_signature_timestamp(deed, borrower_token)
+                else:
+                    LOGGER.error("Failed to sign Mortgage document")
+                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
-                LOGGER.error("Failed to sign Mortgage document")
+                LOGGER.error("Failed to sign Mortgage document - unable to create user")
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         except:
