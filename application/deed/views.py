@@ -146,7 +146,7 @@ def request_auth_code(deed_reference):
 
             code = generate_sms_code(deed_reference, borrower_token)
 
-            message = code + " is your digital mortgage authentication code."
+            message = code + " is your authentication code from the Land Registry. This code expires in 10 minutes."
             try:
                 client = TwilioRestClient(config.ACCOUNT_SID, config.AUTH_TOKEN)
 
