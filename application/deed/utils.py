@@ -14,7 +14,7 @@ import urllib
 LOGGER = logging.getLogger(__name__)
 
 
-XML_SCHEMA_FILE = "deed-schema-v0-1.xsd"
+XML_SCHEMA_FILE = "deed-schema-v0-2.xsd"
 
 
 def call_once_only(func):
@@ -116,13 +116,14 @@ def load_json_file(file_path):
 def convert_json_to_signature_slot(borrower_json):
     sig_slot = api.signatureSlotType()
     borrower_name_xml = api.nameType()
+    private_individual = api.privateIndividualType()
+    private_individual.set_forename(borrower_json["forename"])
 
     if 'middle_name' in borrower_json:
-        borrower_name_xml.set_middlename(borrower_json["middle_name"])
+        private_individual.set_middlename(borrower_json["middle_name"])
 
-    borrower_name_xml.set_forename(borrower_json["forename"])
-    borrower_name_xml.set_middlename("middlename")
-    borrower_name_xml.set_surname(borrower_json["surname"])
+    private_individual.set_surname(borrower_json["surname"])
+    borrower_name_xml.set_privateIndividual(private_individual)
     sig_slot.set_signatory(borrower_name_xml)
     sig_slot.set_signature(api.signatureType())
     return sig_slot
@@ -149,14 +150,15 @@ def convert_json_to_lender(lender_json):
     lender_name_xml = api.nameType()
     company = api.companyType()
     company.set_name(lender_json["name"])
-    lender.set_name(lender_name_xml)
+    lender_name_xml.set_company(company)
+    lender.set_organisationName(lender_name_xml)
     lender.set_address(lender_json["address"])
     lender.set_companyRegistrationDetails(lender_json["registration"])
 
     return lender
 
 def convert_json_to_provision(provision_json, pos):
-    additional_provision_xml = api.additionalProvisionsType()
+    additional_provision_xml = api.provisionType()
     additional_provision_xml.set_code(provision_json["additional_provision_code"])
     additional_provision_xml.set_entryText(provision_json["description"])
     additional_provision_xml.set_sequenceNumber(pos)
@@ -206,14 +208,17 @@ def convert_json_to_xml(deed_json):  # pragma: no cover
     charge_clause_xml.set_entryText(deed_json["charge_clause"]["description"])
     deed_data_xml.set_chargeClause(charge_clause_xml)
 
-    deed_data_xml.set_effectiveClause(deed_json["effective_clause"])
-
-    deed_data_xml.set_lender(convert_json_to_lender(deed_json["lender"]))
-
     additional_provisions = api.additionalProvisionsType()
 
     for idx, provision_json in enumerate(deed_json["additional_provisions"]):
         additional_provisions.add_provision(convert_json_to_provision(provision_json, idx))
+
+    deed_data_xml.set_additionalProvisions(additional_provisions)
+
+    deed_data_xml.set_lender(convert_json_to_lender(deed_json["lender"]))
+
+    deed_data_xml.set_effectiveClause("effective_clause")
+    # deed_data_xml.set_effectiveClause(deed_json["effective_clause"])
 
     operative_deed_xml.set_deedData(deed_data_xml)
     deed_app_xml.set_effectiveDate("tbc")
