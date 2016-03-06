@@ -212,16 +212,20 @@ def request_auth_code(deed_reference):
 
 
 @deed_bp.route('/<deed_reference>/verify-auth-code', methods=['POST'])
-def verify_auth_code(deed_reference, borrower_token, borrower_code):
+def verify_auth_code(deed_reference):
+    request_json = request.get_json()
+    borrower_token = request_json['borrower_token']
+    borrower_code = request_json['authentication_code']
     if borrower_token is not None and borrower_token != '':
         if borrower_code is not None and borrower_code != '':
             code = generate_sms_code(deed_reference, borrower_token)
             if borrower_code != code:
-                LOGGER.error("Invalid code")
-                return "Unable to complete authentication", status.HTTP_401_UNAUTHORIZED
+                LOGGER.error("Invalid authentication code: %s for borrower token %s ", borrower_code, borrower_token)
+                return jsonify({"result": False}), status.HTTP_401_UNAUTHORIZED
             else:
-                data, result = sign_deed(deed_reference, borrower_token)
-                return result is not None, result
+                LOGGER.info("Borrower with token %s successfully authenticated using valid authentication code: %s",
+                            borrower_token, borrower_code)
+                return jsonify({"result": True}), status.HTTP_200_OK
 
 
 def generate_sms_code(deed_reference, borrower_token):
