@@ -60,14 +60,10 @@ class deed_api (
     ],
   }
 
-  exec { 'setup_db':
-    environment => ["DEED_DATABASE_NAME=deed_api"],
-    command => '/bin/echo $DEED_DATABASE_NAME > /tmp/bar'
-  }
-
   exec {"${app_dir}/bin/app_requirements.sh":
     cwd       => "${app_dir}",
     user      => $owner,
+    environment => ["DEED_DATABASE_NAME=deed_api"],
     logoutput => true,
     environment => ["DEED_DATABASE_NAME=deed_api"],
     require   => [
