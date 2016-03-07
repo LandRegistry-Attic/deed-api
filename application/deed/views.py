@@ -30,7 +30,7 @@ def get_deed(deed_reference):
         abort(status.HTTP_404_NOT_FOUND)
     else:
         result.deed['token'] = result.token
-        result.deed['deed_status'] = result.status
+        result.deed['status'] = result.status
 
     return jsonify({"deed": result.deed}), status.HTTP_200_OK
 
@@ -112,10 +112,8 @@ def delete_borrower(borrower_id):
         return jsonify({"id": borrower_id}), status.HTTP_200_OK
 
 
-@deed_bp.route('/<deed_reference>/sign', methods=['POST'])
-def sign_deed(deed_reference):
-    request_json = request.get_json()
-    borrower_token = request_json['borrower_token']
+def sign_deed(deed_reference, borrower_token):
+
     deed = Deed.get_deed(deed_reference)
 
     if deed is None:
@@ -215,7 +213,8 @@ def verify_auth_code(deed_reference, borrower_token, borrower_code):
                 LOGGER.error("Invalid code")
                 return "Unable to complete authentication", status.HTTP_401_UNAUTHORIZED
             else:
-                return True, status.HTTP_200_OK
+                data, result = sign_deed(deed_reference, borrower_token)
+                return result is not None, result
 
 
 def generate_sms_code(deed_reference, borrower_token):
