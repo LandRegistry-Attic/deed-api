@@ -64,6 +64,7 @@ class deed_api (
     cwd       => "${app_dir}",
     user      => $owner,
     logoutput => true,
+    environment => ["DEED_DATABASE_NAME=deed_api"],
     require   => [
       Vcsrepo["${app_dir}"],
       Standard_env::Db::Postgres[$module_name],
