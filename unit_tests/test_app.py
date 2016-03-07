@@ -6,6 +6,7 @@ from application.akuma.service import Akuma
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
+from twilio.rest import TwilioRestClient
 import unittest
 import json
 import mock
@@ -313,3 +314,25 @@ class TestRoutes(unittest.TestCase):
                                  headers=self.webseal_headers)
 
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+    @mock.patch('twilio.rest.TwilioRestClient')
+    @mock.patch('twilio.rest.TwilioRestClient.messages', autospec=True)
+    @mock.patch('application.borrower.model.Borrower.get_by_token', autospec=True)
+    def test_request_auth_code(self, mock_borrower, mock_messages, mock_twilio):
+
+        class ReturnedBorrower:
+            deed_token = "aaaaaa"
+            dob = "01/01/1986"
+            phonenumber = "07502154999"
+
+        mock_borrower.return_value = ReturnedBorrower()
+        payload = {"borrower_token" : "bbbbbb"}
+
+        mock_twilio.return_value = True
+        mock_messages.create.return_value =True
+
+        response = self.app.post(self.DEED_ENDPOINT + "/aaaaaa/request-auth-code", data=payload,
+                                 headers=self.webseal_headers)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
