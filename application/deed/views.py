@@ -112,6 +112,13 @@ def delete_borrower(borrower_id):
         return jsonify({"id": borrower_id}), status.HTTP_200_OK
 
 
+@deed_bp.route('/<deed_reference>/sign', methods=['POST'])
+def sign(deed_reference):
+    request_json = request.get_json()
+    borrower_token = request_json['borrower_token']
+    return sign_deed(deed_reference, borrower_token)
+
+
 def sign_deed(deed_reference, borrower_token):
 
     deed = Deed.get_deed(deed_reference)
