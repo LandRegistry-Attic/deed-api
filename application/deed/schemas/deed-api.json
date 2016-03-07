@@ -207,7 +207,7 @@
                         "lender": {
                             "$ref": "#/definitions/Lender"
                         },
-                        "effective_text": {
+                        "effective_clause": {
                             "type": "string",
                             "description": "Text to display the make effective clause"
                         },
