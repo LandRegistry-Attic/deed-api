@@ -49,13 +49,14 @@ def update_borrower(borrower, idx, borrowers, deed_token):
     return borrower_json
 
 
-def update_md_clauses(json_doc, md_ref):
+def update_md_clauses(json_doc, md_ref, organisation_name):
     mortgage_document = MortgageDocument.query.filter_by(md_ref=str(md_ref)).first()
     if mortgage_document is not None:
         md_json = json.loads(mortgage_document.data)
         json_doc["charge_clause"] = md_json["charge_clause"]
         json_doc["additional_provisions"] = md_json["additional_provisions"]
         json_doc["lender"] = md_json["lender"]
+        json_doc["effective_clause"] = make_effective_text(organisation_name)
 
     return mortgage_document is not None
 
@@ -78,7 +79,6 @@ def build_json_deed_document(deed_json):
 def update_deed(deed, deed_json, akuma_flag):
     deed.identity_checked = deed_json["identity_checked"]
     json_doc = build_json_deed_document(deed_json)
-    json_doc["effective_clause"] = make_effective_text(deed.organisation_name)
 
     borrowers = deed_json["borrowers"]
 
@@ -127,8 +127,7 @@ def update_deed_signature_timestamp(deed, borrower_token):
 
 
 def make_effective_text(organisation_name):
-    effective_clause = {"effective_clause": "This charge takes effect when the registrar receives notification from\
-     %s that the charge is to take effect."}
-    effective_clause.replace("%s", organisation_name)
+    effective_clause = "This charge takes effect when the registrar receives notification from %s that the charge" + \
+                       " is to take effect."
 
-    return effective_clause
+    return effective_clause % organisation_name
