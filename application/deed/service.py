@@ -110,7 +110,6 @@ def update_deed(deed, deed_json, akuma_flag):
 
 def update_deed_signature_timestamp(deed, borrower_token):
     modify_deed = copy.deepcopy(deed.deed)
-    print(deed.deed['borrowers'])
     for borrower in modify_deed['borrowers']:
         if borrower['token'] == borrower_token:
             borrower['signature'] = datetime.datetime.now().strftime("%d %B %Y %I:%M%p")
