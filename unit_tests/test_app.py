@@ -4,6 +4,7 @@ from application.casework.service import get_document
 from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, StatusMock
 from application.akuma.service import Akuma
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
+from application.deed.service import make_effective_text
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
 import unittest
@@ -313,3 +314,11 @@ class TestRoutes(unittest.TestCase):
                                  headers=self.webseal_headers)
 
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def test_make_effective_clause(self):
+
+        effective_clause = make_effective_text("Test Organisation")
+        correct_effective_clause = "This charge takes effect when the registrar receives notification from " + \
+                                   "Test Organisation that the charge is to take effect."
+
+        self.assertEqual(effective_clause, correct_effective_clause)
