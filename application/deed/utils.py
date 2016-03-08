@@ -10,6 +10,7 @@ from underscore import _
 import application.deed.generated.deed_xmlify as api
 from flask import request
 import urllib
+import html
 
 LOGGER = logging.getLogger(__name__)
 
@@ -162,7 +163,7 @@ def convert_json_to_lender(lender_json):
 def convert_json_to_provision(provision_json, pos):
     additional_provision_xml = api.provisionType()
     additional_provision_xml.set_code(provision_json["additional_provision_code"])
-    additional_provision_xml.set_entryText(provision_json["description"])
+    additional_provision_xml.set_entryText(html.escape(provision_json["description"]))
     additional_provision_xml.set_sequenceNumber(pos)
 
     return additional_provision_xml
@@ -236,7 +237,7 @@ def convert_json_to_xml(deed_json):  # pragma: no cover
                                       'xsi:noNamespaceSchemaLocation="http://localhost:9080/schemas/' +
                                       XML_SCHEMA_FILE + '"'
                         )
-    deed_xml = deed_stream.getvalue()
+    deed_xml = '<?xml version="1.0" encoding="UTF-8"?>' + deed_stream.getvalue()
 
     return deed_xml
 
