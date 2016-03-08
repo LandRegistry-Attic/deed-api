@@ -6,7 +6,6 @@ from application.akuma.service import Akuma
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
-from twilio.rest import TwilioRestClient
 import unittest
 import json
 import mock
