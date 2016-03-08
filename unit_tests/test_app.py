@@ -55,7 +55,7 @@ class TestRoutes(unittest.TestCase):
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_create_no_auth_headers(self,  mock_query, mock_Deed, mock_Borrower, mock_akuma):
+    def test_create_no_auth_headers(self, mock_query, mock_Deed, mock_Borrower, mock_akuma):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
         mock_akuma.return_value = {
@@ -74,7 +74,7 @@ class TestRoutes(unittest.TestCase):
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_create_webseal_external(self,  mock_query, mock_Deed, mock_Borrower, mock_akuma):
+    def test_create_webseal_external(self, mock_query, mock_Deed, mock_Borrower, mock_akuma):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
         mock_akuma.return_value = {
@@ -93,7 +93,7 @@ class TestRoutes(unittest.TestCase):
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_create_webseal_external_dodgy_headers1(self,  mock_query, mock_Deed, mock_Borrower, mock_akuma):
+    def test_create_webseal_external_dodgy_headers1(self, mock_query, mock_Deed, mock_Borrower, mock_akuma):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
         mock_akuma.return_value = {
