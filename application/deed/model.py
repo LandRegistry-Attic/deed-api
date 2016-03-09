@@ -28,7 +28,7 @@ class Deed(db.Model):
 
     @staticmethod
     def generate_token():
-        return str(uuid.uuid4().hex).lower()
+        return str(uuid.uuid4().hex[:6]).lower()
 
     def get_json_doc(self):
         return copy.deepcopy(self.json_doc)
