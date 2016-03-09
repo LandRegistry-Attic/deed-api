@@ -1,6 +1,7 @@
 from application import db
 import uuid
 
+
 class Borrower(db.Model):
     __tablename__ = 'borrower'
 
