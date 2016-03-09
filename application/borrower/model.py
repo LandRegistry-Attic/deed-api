@@ -1,7 +1,5 @@
 from application import db
 import uuid
-from hashids import Hashids
-
 
 class Borrower(db.Model):
     __tablename__ = 'borrower'
@@ -19,10 +17,7 @@ class Borrower(db.Model):
 
     @staticmethod
     def generate_token():
-        uuid_value = str(uuid.uuid4().hex).lower()
-        hashids = Hashids(salt=uuid_value, alphabet='abcdef0123456789')
-        hashid = hashids.encode(123, 4)
-        return hashid
+        return str(uuid.uuid4().hex).lower()
 
     def save(self):
         db.session.add(self)
