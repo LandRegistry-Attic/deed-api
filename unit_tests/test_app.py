@@ -7,6 +7,7 @@ from application.deed.utils import convert_json_to_xml, validate_generated_xml
 from application.deed.service import make_effective_text
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
+from application.borrower.model import generate_hex
 import unittest
 import json
 import mock
@@ -322,3 +323,11 @@ class TestRoutes(unittest.TestCase):
                                    "Test Organisation that the charge is to take effect."
 
         self.assertEqual(effective_clause, correct_effective_clause)
+
+    def test_uuid_generation(self):
+        a = {}
+        for f in range(0,100000):
+            new_hash = generate_hex()
+            a[new_hash] = True
+
+        self.assertEqual(100000, len(a))
