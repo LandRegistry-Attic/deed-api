@@ -149,13 +149,13 @@ def sign_deed(deed_reference, borrower_token):
                 borrower.esec_user_name = user_id.decode()
                 borrower.save()
 
-                modify_xml, status_code = esec_client.sign_by_user(modify_xml.decode(), borrower_pos,
+                result_xml, status_code = esec_client.sign_by_user(modify_xml, borrower_pos,
                                                                    user_id.decode())
                 LOGGER.info("signed status code: %s" % str(status_code))
-                LOGGER.info("signed XML: %s" % modify_xml)
+                LOGGER.info("signed XML: %s" % result_xml)
 
                 if status_code == 200:
-                    deed.deed_xml = modify_xml
+                    deed.deed_xml = result_xml
 
                     LOGGER.info("Saving XML to DB")
                     deed.save()

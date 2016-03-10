@@ -55,7 +55,7 @@
 
     <xs:complexType name="signatureType">
         <xs:sequence>
-            <xs:element name="signature" minOccurs="0"></xs:element>
+            <xs:element ref="dsig:Signature" minOccurs="0"></xs:element>
         </xs:sequence>
     </xs:complexType>
 

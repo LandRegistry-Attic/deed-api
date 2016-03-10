@@ -237,7 +237,7 @@ def convert_json_to_xml(deed_json):  # pragma: no cover
                                       'xsi:noNamespaceSchemaLocation="http://localhost:9080/schemas/' +
                                       XML_SCHEMA_FILE + '"'
                         )
-    deed_xml = '<?xml version="1.0" encoding="UTF-8"?>' + deed_stream.getvalue()
+    deed_xml = deed_stream.getvalue()
 
     return deed_xml
 
