@@ -49,7 +49,7 @@ class TestRoutes(unittest.TestCase):
     def test_model(self):
         test_deed = Deed()
         test_token = test_deed.generate_token()
-        self.assertTrue(len(test_token) == 6)
+        self.assertTrue(len(test_token) == 36)
 
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')
