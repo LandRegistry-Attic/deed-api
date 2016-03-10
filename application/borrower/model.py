@@ -43,9 +43,11 @@ class Borrower(db.Model):
     def get_by_token(token_):
         return Borrower.query.filter_by(token=token_).first()
 
+
 def bin_to_char(bin_str):
-    pos = min(int(bin_str[:6],2), len(charset)-1)
+    pos = min(int(bin_str[:6], 2), len(charset)-1)
     return charset[pos]
+
 
 def generate_hex():
     val = str(bin(uuid.uuid4().int))

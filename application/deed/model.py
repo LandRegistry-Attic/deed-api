@@ -53,7 +53,6 @@ class Deed(db.Model):
 
     @staticmethod
     def get_deed(deed_reference):
-
         conveyancer_credentials = process_organisation_credentials()
         organisation_id = conveyancer_credentials["O"][1]
 
