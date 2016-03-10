@@ -326,7 +326,7 @@ class TestRoutes(unittest.TestCase):
 
     def test_uuid_generation(self):
         a = {}
-        for f in range(0,100000):
+        for f in range(0, 100000):
             new_hash = generate_hex()
             a[new_hash] = True
 
