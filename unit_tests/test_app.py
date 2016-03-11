@@ -11,6 +11,7 @@ from application.borrower.model import generate_hex
 import unittest
 import json
 import mock
+from application.borrower.model import Borrower
 
 
 class TestRoutes(unittest.TestCase):
@@ -56,7 +57,7 @@ class TestRoutes(unittest.TestCase):
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_create_no_auth_headers(self,  mock_query, mock_Deed, mock_Borrower, mock_akuma):
+    def test_create_no_auth_headers(self, mock_query, mock_Deed, mock_Borrower, mock_akuma):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
         mock_akuma.return_value = {
@@ -75,7 +76,7 @@ class TestRoutes(unittest.TestCase):
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_create_webseal_external(self,  mock_query, mock_Deed, mock_Borrower, mock_akuma):
+    def test_create_webseal_external(self, mock_query, mock_Deed, mock_Borrower, mock_akuma):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
         mock_akuma.return_value = {
@@ -94,7 +95,7 @@ class TestRoutes(unittest.TestCase):
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_create_webseal_external_dodgy_headers1(self,  mock_query, mock_Deed, mock_Borrower, mock_akuma):
+    def test_create_webseal_external_dodgy_headers1(self, mock_query, mock_Deed, mock_Borrower, mock_akuma):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
         mock_akuma.return_value = {
@@ -256,7 +257,7 @@ class TestRoutes(unittest.TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_xml_generation(self):
-        xml = convert_json_to_xml(DeedHelper._json_doc)
+        xml = convert_json_to_xml(DeedModelMock().deed)
         res = validate_generated_xml(xml)
         self.assertEqual(res, True)
 
@@ -331,3 +332,66 @@ class TestRoutes(unittest.TestCase):
             a[new_hash] = True
 
         self.assertEqual(100000, len(a))
+
+    @mock.patch('application.borrower.model.Borrower.save')
+    @mock.patch('application.borrower.model.Borrower.get_by_token')
+    @mock.patch('application.deed.utils.get_borrower_position')
+    @mock.patch('application.service_clients.esec.interface.EsecClientInterface.sign_by_user')
+    @mock.patch('application.service_clients.esec.interface.EsecClientInterface.initiate_signing')
+    @mock.patch('application.deed.model.Deed.save', autospec=True)
+    @mock.patch('application.deed.model.Deed.query', autospec=True)
+    def test_add_borrower_signature(self, mock_query, mock_Deed_save, mock_initiate,
+                                    mock_sign, mock_position, mock_borrower, mock_borrower_save):
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = DeedModelMock()
+
+        class ReturnedBorrower(Borrower):
+            deed_token = "aaaaaa"
+            dob = "01/01/1986"
+            forename = "Jack"
+            surname = "Jones"
+
+        mock_borrower.return_value = ReturnedBorrower()
+
+        mock_initiate.return_value = "DM1234".encode(), 200
+        mock_sign.return_value = "<p></p>", 200
+        mock_position.return_value = 1
+        mock_borrower_save.return_value = "OK"
+
+        payload = json.dumps(DeedHelper._add_borrower_signature)
+
+        response = self.app.post(self.DEED_ENDPOINT + 'AB1234' + '/sign',
+                                 data=payload,
+                                 headers=self.webseal_headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    @mock.patch('application.borrower.model.Borrower.save')
+    @mock.patch('application.borrower.model.Borrower.get_by_token')
+    @mock.patch('application.deed.utils.get_borrower_position')
+    @mock.patch('application.service_clients.esec.interface.EsecClientInterface.sign_by_user')
+    @mock.patch('application.service_clients.esec.interface.EsecClientInterface.initiate_signing')
+    @mock.patch('application.deed.model.Deed.save', autospec=True)
+    @mock.patch('application.deed.model.Deed.query', autospec=True)
+    def test_add_borrower_signature_fail(self, mock_query, mock_Deed_save, mock_initiate,
+                                         mock_sign, mock_position, mock_borrower, mock_borrower_save):
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = DeedModelMock()
+
+        class ReturnedBorrower():
+            deed_token = "aaaaaa"
+            dob = "01/01/1986"
+            forename = "Jack"
+            surname = "Jones"
+
+        mock_borrower.return_value = ReturnedBorrower()
+
+        mock_initiate.return_value = "Fail", 500
+        mock_sign.return_value = "<p></p>", 500
+        mock_position.return_value = 1
+
+        payload = json.dumps(DeedHelper._add_borrower_signature)
+
+        response = self.app.post(self.DEED_ENDPOINT + 'AB1234' + '/sign',
+                                 data=payload,
+                                 headers=self.webseal_headers)
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)

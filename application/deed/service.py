@@ -6,6 +6,7 @@ from application.mortgage_document.model import MortgageDocument
 from functools import partial
 from flask.ext.api import status
 from flask import abort
+from application.deed.deed_status import DeedStatus
 import json
 import datetime
 import copy
@@ -109,7 +110,6 @@ def update_deed(deed, deed_json, akuma_flag):
 
 def update_deed_signature_timestamp(deed, borrower_token):
     modify_deed = copy.deepcopy(deed.deed)
-
     for borrower in modify_deed['borrowers']:
         if borrower['token'] == borrower_token:
             borrower['signature'] = datetime.datetime.now().strftime("%d %B %Y %I:%M%p")
@@ -117,6 +117,7 @@ def update_deed_signature_timestamp(deed, borrower_token):
     deed.deed = modify_deed
 
     try:
+        set_signed_status(deed)
         deed.save()
         deed.deed['token'] = deed.token
         return deed.deed
@@ -131,3 +132,17 @@ def make_effective_text(organisation_name):
                        " is to take effect."
 
     return effective_clause % organisation_name
+
+
+def set_signed_status(deed):
+    LOGGER.info("updating Deed signed Status")
+    signed_count = 0
+
+    for idx, borrower in enumerate(deed.deed["borrowers"], start=0):
+        if 'signature' in borrower:
+            signed_count += 1
+
+    if signed_count == len(deed.deed['borrowers']):
+        deed.status = DeedStatus.all_signed.value
+    elif signed_count > 0:
+        deed.status = DeedStatus.partial.value

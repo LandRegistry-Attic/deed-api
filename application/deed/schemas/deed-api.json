@@ -214,6 +214,10 @@
                         "property_address": {
                             "type": "string",
                             "description": "The address of property that the deed relates. This should be supplied in a comma separated format e.g. 30 wakefield rd, plymouth, PL6 3WA"
+                        },
+                        "deed_status": {
+                            "type": "string",
+                            "description": "Current state of the deed"
                         }
                     }
                 }

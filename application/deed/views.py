@@ -1,7 +1,7 @@
 import logging
 from application.akuma.service import Akuma
 from application.deed.model import Deed
-from application.deed.utils import validate_helper, process_organisation_credentials
+from application.deed.utils import validate_helper, process_organisation_credentials, convert_json_to_xml
 from application.deed.service import update_deed, update_deed_signature_timestamp
 from flask import request, abort, jsonify, Response
 from flask import Blueprint
@@ -9,10 +9,11 @@ from flask.ext.api import status
 from application.borrower.model import Borrower
 from twilio.rest import TwilioRestClient
 from twilio.rest.exceptions import TwilioRestException
+from application import config
+from application import esec_client
 import json
 import sys
-from application import config
-
+import copy
 
 LOGGER = logging.getLogger(__name__)
 
@@ -23,13 +24,13 @@ deed_bp = Blueprint('deed', __name__,
 
 @deed_bp.route('/<deed_reference>', methods=['GET'])
 def get_deed(deed_reference):
-
     result = Deed.get_deed(deed_reference)
 
     if result is None:
         abort(status.HTTP_404_NOT_FOUND)
     else:
         result.deed['token'] = result.token
+        result.deed['status'] = result.status
 
     return jsonify({"deed": result.deed}), status.HTTP_200_OK
 
@@ -56,7 +57,6 @@ def get_deeds_status_with_mdref_and_title_number():
 
 @deed_bp.route('/', methods=['POST'])
 def create():
-
     deed_json = request.get_json()
     error_count, error_message = validate_helper(deed_json)
 
@@ -113,20 +113,68 @@ def delete_borrower(borrower_id):
 
 
 @deed_bp.route('/<deed_reference>/sign', methods=['POST'])
-def sign_deed(deed_reference):
+def sign(deed_reference):
     request_json = request.get_json()
     borrower_token = request_json['borrower_token']
-    result = Deed.get_deed(deed_reference)
+    return sign_deed(deed_reference, borrower_token)
 
-    if result is None:
+
+def sign_deed(deed_reference, borrower_token):
+
+    deed = Deed.get_deed(deed_reference)
+
+    if deed is None:
         LOGGER.error("Database Exception 404 for deed reference - %s" % deed_reference)
         abort(status.HTTP_404_NOT_FOUND)
     else:
-        LOGGER.info("Signing deed for borrower_id %s against deed reference %s" % (borrower_token, deed_reference))
+        LOGGER.info("Signing deed for borrower_token %s against deed reference %s" % (borrower_token, deed_reference))
 
-        result.deed = update_deed_signature_timestamp(result, borrower_token)
+        # check if XML already exisit
+        if deed.deed_xml is None:
+            LOGGER.info("Generating DEED_XML")
+            deed_XML = convert_json_to_xml(deed.deed)
+            deed.deed_xml = deed_XML.encode("utf-8")
 
-    return jsonify({"deed": result.deed}), status.HTTP_200_OK
+        try:
+            LOGGER.info("getting exisiting XML")
+            modify_xml = copy.deepcopy(deed.deed_xml)
+            borrower_pos = deed.get_borrower_position(borrower_token)
+            borrower = Borrower.get_by_token(borrower_token)
+
+            user_id, status_code = esec_client.initiate_signing(borrower.forename, borrower.surname,
+                                                                deed.organisation_id)
+
+            if status_code == 200:
+                LOGGER.info("Created new esec user: %s" % str(user_id.decode()))
+                borrower.esec_user_name = user_id.decode()
+                borrower.save()
+
+                result_xml, status_code = esec_client.sign_by_user(modify_xml, borrower_pos,
+                                                                   user_id.decode())
+                LOGGER.info("signed status code: %s" % str(status_code))
+                LOGGER.info("signed XML: %s" % result_xml)
+
+                if status_code == 200:
+                    deed.deed_xml = result_xml
+
+                    LOGGER.info("Saving XML to DB")
+                    deed.save()
+
+                    LOGGER.info("updating JSON with Signature")
+                    deed.deed = update_deed_signature_timestamp(deed, borrower_token)
+                else:
+                    LOGGER.error("Failed to sign Mortgage document")
+                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                LOGGER.error("Failed to sign Mortgage document - unable to create user")
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        except:
+            msg = str(sys.exc_info())
+            LOGGER.error("Failed to sign Mortgage document: %s" % msg)
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return jsonify({"deed": deed.deed}), status.HTTP_200_OK
 
 
 @deed_bp.route('/<deed_reference>/make-effective', methods=['POST'])
@@ -153,7 +201,7 @@ def request_auth_code(deed_reference):
                 client.messages.create(
                     to=borrower_phone_number,
                     from_=config.TWILIO_PHONE_NUMBER,
-                    body=message,
+                    body=message
                 )
                 LOGGER.info("SMS has been sent to  " + borrower_phone_number)
                 return jsonify({"result": True}), status.HTTP_200_OK
@@ -172,7 +220,8 @@ def verify_auth_code(deed_reference, borrower_token, borrower_code):
                 LOGGER.error("Invalid code")
                 return "Unable to complete authentication", status.HTTP_401_UNAUTHORIZED
             else:
-                return True, status.HTTP_200_OK
+                data, result = sign_deed(deed_reference, borrower_token)
+                return result is not None, result
 
 
 def generate_sms_code(deed_reference, borrower_token):

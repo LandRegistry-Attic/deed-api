@@ -17,16 +17,17 @@ class Borrower(db.Model):
     gender = db.Column(db.String, nullable=True)
     phonenumber = db.Column(db.String, nullable=False)
     address = db.Column(db.String, nullable=False)
+    esec_user_name = db.Column(db.String, nullable=True)
 
     @staticmethod
     def generate_token():
         return generate_hex()
 
-    def save(self):
+    def save(self):  # pragma: no cover
         db.session.add(self)
         db.session.commit()
 
-    def delete(self, id_):
+    def delete(self, id_):  # pragma: no cover
         borrower = Borrower.query.filter_by(id=id_).first()
 
         if borrower is None:
