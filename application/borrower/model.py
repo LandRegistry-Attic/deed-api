@@ -55,10 +55,6 @@ class VerifyMatch(db.Model):
     verify_pid = db.Column(db.String, primary_key=True)
     borrower_id = db.Column(db.Integer, ForeignKey("borrower.id"), primary_key=True)
 
-    def get_by_verify_pid(verify_pid_):
-        return VerifyMatch.query.filter_by(verify_pid=verify_pid_).first()
-
-
 
 def bin_to_char(bin_str):
     pos = min(int(bin_str[:6], 2), len(charset)-1)
