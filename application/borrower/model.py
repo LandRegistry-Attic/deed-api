@@ -58,4 +58,4 @@ def generate_hex():
         result += bin_to_char(bin_str[:15])
         bin_str = bin_str[15:]
 
-    return result[:4]+"-"+result[-4:]
+    return result
