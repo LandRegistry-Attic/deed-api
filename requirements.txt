@@ -25,6 +25,7 @@ wheel==0.24.0
 datetime
 underscore.py
 termcolor
+twilio==5.3.0
 dicttoxml
 xmltodict
 lxml

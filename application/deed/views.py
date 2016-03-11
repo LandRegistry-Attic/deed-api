@@ -7,8 +7,11 @@ from flask import request, abort, jsonify, Response
 from flask import Blueprint
 from flask.ext.api import status
 from application.borrower.model import Borrower
+from twilio.rest import TwilioRestClient
+from twilio.rest.exceptions import TwilioRestException
 import json
 import sys
+from application import config
 
 
 LOGGER = logging.getLogger(__name__)
@@ -129,3 +132,49 @@ def sign_deed(deed_reference):
 @deed_bp.route('/<deed_reference>/make-effective', methods=['POST'])
 def make_effective(deed_reference):
     return status.HTTP_200_OK
+
+
+@deed_bp.route('/<deed_reference>/request-auth-code', methods=['POST'])
+def request_auth_code(deed_reference):
+    request_json = request.get_json()
+    borrower_token = request_json['borrower_token']
+    if borrower_token is not None and borrower_token != '':
+        borrower = Borrower.get_by_token(borrower_token.strip())
+
+        if borrower is not None:
+            borrower_phone_number = borrower.phonenumber
+
+            code = generate_sms_code(deed_reference, borrower_token)
+
+            message = code + " is your authentication code from the Land Registry. This code expires in 10 minutes."
+            try:
+                client = TwilioRestClient(config.ACCOUNT_SID, config.AUTH_TOKEN)
+
+                client.messages.create(
+                    to=borrower_phone_number,
+                    from_=config.TWILIO_PHONE_NUMBER,
+                    body=message,
+                )
+                LOGGER.info("SMS has been sent to  " + borrower_phone_number)
+                return jsonify({"result": True}), status.HTTP_200_OK
+            except TwilioRestException as e:
+                LOGGER.error("Unable to send SMS, Error Code  " + str(e.code))
+                LOGGER.error("Unable to send SMS, Error Message  " + e.msg)
+                return jsonify({"result": False}), status.HTTP_500_INTERNAL_SERVER_ERROR
+
+
+@deed_bp.route('/<deed_reference>/verify-auth-code', methods=['POST'])
+def verify_auth_code(deed_reference, borrower_token, borrower_code):
+    if borrower_token is not None and borrower_token != '':
+        if borrower_code is not None and borrower_code != '':
+            code = generate_sms_code(deed_reference, borrower_token)
+            if borrower_code != code:
+                LOGGER.error("Invalid code")
+                return "Unable to complete authentication", status.HTTP_401_UNAUTHORIZED
+            else:
+                return True, status.HTTP_200_OK
+
+
+def generate_sms_code(deed_reference, borrower_token):
+    gen_code = deed_reference[-3:] + borrower_token[-3:]
+    return gen_code

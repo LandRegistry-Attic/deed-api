@@ -4,8 +4,10 @@ from application.casework.service import get_document
 from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, StatusMock
 from application.akuma.service import Akuma
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
+from application.deed.service import make_effective_text
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
+from application.borrower.model import generate_hex
 import unittest
 import json
 import mock
@@ -48,7 +50,7 @@ class TestRoutes(unittest.TestCase):
     def test_model(self):
         test_deed = Deed()
         test_token = test_deed.generate_token()
-        self.assertTrue(len(test_token) == 6)
+        self.assertTrue(len(test_token) == 36)
 
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')
@@ -186,30 +188,30 @@ class TestRoutes(unittest.TestCase):
 
     @mock.patch('application.borrower.model.Borrower.get_by_token')
     def test_validate_borrower(self, mock_borrower):
-        class ReturnedBorrower():
+        class ReturnedBorrower:
             deed_token = "aaaaaa"
             dob = "23/01/1986"
+            phonenumber = "07502154999"
 
         mock_borrower.return_value = ReturnedBorrower()
         payload = json.dumps(DeedHelper._validate_borrower)
         response = self.app.post(self.BORROWER_ENDPOINT + "validate",
                                  data=payload,
                                  headers={"Content-Type": "application/json"})
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     @mock.patch('application.borrower.model.Borrower.get_by_token')
     def test_validate_borrower_no_leading_zero(self, mock_borrower):
-        class ReturnedBorrower():
+        class ReturnedBorrower:
             deed_token = "aaaaaa"
             dob = "01/01/1986"
+            phonenumber = "07502154999"
 
         mock_borrower.return_value = ReturnedBorrower()
         payload = json.dumps(DeedHelper._validate_borrower_dob)
         response = self.app.post(self.BORROWER_ENDPOINT + "validate",
                                  data=payload,
                                  headers={"Content-Type": "application/json"})
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     @mock.patch('application.borrower.model.Borrower.get_by_token')
@@ -313,3 +315,19 @@ class TestRoutes(unittest.TestCase):
                                  headers=self.webseal_headers)
 
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def test_make_effective_clause(self):
+
+        effective_clause = make_effective_text("Test Organisation")
+        correct_effective_clause = "This charge takes effect when the registrar receives notification from " + \
+                                   "Test Organisation that the charge is to take effect."
+
+        self.assertEqual(effective_clause, correct_effective_clause)
+
+    def test_uuid_generation(self):
+        a = {}
+        for f in range(0, 100000):
+            new_hash = generate_hex()
+            a[new_hash] = True
+
+        self.assertEqual(100000, len(a))

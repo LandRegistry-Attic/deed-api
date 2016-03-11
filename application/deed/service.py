@@ -49,13 +49,14 @@ def update_borrower(borrower, idx, borrowers, deed_token):
     return borrower_json
 
 
-def update_md_clauses(json_doc, md_ref):
+def update_md_clauses(json_doc, md_ref, organisation_name):
     mortgage_document = MortgageDocument.query.filter_by(md_ref=str(md_ref)).first()
     if mortgage_document is not None:
         md_json = json.loads(mortgage_document.data)
         json_doc["charge_clause"] = md_json["charge_clause"]
         json_doc["additional_provisions"] = md_json["additional_provisions"]
         json_doc["lender"] = md_json["lender"]
+        json_doc["effective_clause"] = make_effective_text(organisation_name)
 
     return mortgage_document is not None
 
@@ -68,7 +69,8 @@ def build_json_deed_document(deed_json):
         "borrowers": [],
         "charge_clause": [],
         "additional_provisions": [],
-        "property_address": deed_json['property_address']
+        "property_address": deed_json['property_address'],
+        "effective_clause": ""
     }
 
     return json_doc
@@ -93,7 +95,7 @@ def update_deed(deed, deed_json, akuma_flag):
 
     json_doc['borrowers'] = borrower_json
 
-    if not update_md_clauses(json_doc, deed_json["md_ref"]):
+    if not update_md_clauses(json_doc, deed_json["md_ref"], deed.organisation_name):
         msg = "mortgage document associated with supplied md_ref is not found"
         LOGGER.error(msg)
         return False, msg
@@ -122,3 +124,10 @@ def update_deed_signature_timestamp(deed, borrower_token):
     except Exception as e:
         LOGGER.error("Database Exception - %s" % e)
         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+def make_effective_text(organisation_name):
+    effective_clause = "This charge takes effect when the registrar receives notification from %s that the charge" + \
+                       " is to take effect."
+
+    return effective_clause % organisation_name
