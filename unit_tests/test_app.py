@@ -316,7 +316,6 @@ class TestRoutes(unittest.TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
     def test_make_effective_clause(self):
 
         effective_clause = make_effective_text("Test Organisation")

@@ -10,7 +10,6 @@ from underscore import _
 import application.deed.generated.deed_xmlify as api
 from flask import request
 import urllib
-import html
 
 LOGGER = logging.getLogger(__name__)
 

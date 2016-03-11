@@ -70,4 +70,3 @@ class Deed(db.Model):
             if borrower_token == borrower['token']:
                 return idx
         return -1
-

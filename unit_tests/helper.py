@@ -63,6 +63,7 @@ class DeedModelMock(Deed):
                 </signatory></borrower_signature></signatureSlots></operativeDeed>\
                 <effectiveDate>23/5/15</effectiveDate><authSignature/></dm-application>".encode()
 
+
 class MortgageDocMock:
     md_ref = "e-MD12121"
     data = '{"description":"test setup charge clause","lender":{ "name":"a new lender",' \
