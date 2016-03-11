@@ -1,6 +1,6 @@
 export SETTINGS="config.DevelopmentConfig"
 
-py.test --junitxml=TEST-INT-flask-app-medium.xml --cov-report term-missing --cov application integration_tests
+py.test --junitxml=TEST-INT-flask-app-medium.xml --verbose --cov-report term-missing --cov application integration_tests
 
 # This file will prepare all dependancies for the application
 DB_NAME="${DEED_DATABASE_NAME:-dm-deeds}"
