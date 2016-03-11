@@ -28,7 +28,7 @@ class Deed(db.Model):
 
     @staticmethod
     def generate_token():
-        return str(uuid.uuid4().hex[:6]).lower()
+        return str(uuid.uuid4())
 
     def get_json_doc(self):
         return copy.deepcopy(self.json_doc)
@@ -53,7 +53,6 @@ class Deed(db.Model):
 
     @staticmethod
     def get_deed(deed_reference):
-
         conveyancer_credentials = process_organisation_credentials()
         organisation_id = conveyancer_credentials["O"][1]
 
