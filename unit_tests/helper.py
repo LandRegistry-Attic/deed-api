@@ -42,6 +42,7 @@ class DeedModelMock(Deed):
             "name": "Bank of England Plc",
             "registration": "Company registration number: 123456"
         },
+        "effective_clause": "Effective clause goes here",
         "identity_checked": "Y"
     }
     status = "DRAFT"

@@ -220,8 +220,7 @@ def convert_json_to_xml(deed_json):  # pragma: no cover
 
     deed_data_xml.set_lender(convert_json_to_lender(deed_json["lender"]))
 
-    deed_data_xml.set_effectiveClause("effective_clause")
-    # deed_data_xml.set_effectiveClause(deed_json["effective_clause"])
+    deed_data_xml.set_effectiveClause(deed_json["effective_clause"])
 
     operative_deed_xml.set_deedData(deed_data_xml)
     deed_app_xml.set_effectiveDate("tbc")
