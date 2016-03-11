@@ -163,7 +163,7 @@ def convert_json_to_lender(lender_json):
 def convert_json_to_provision(provision_json, pos):
     additional_provision_xml = api.provisionType()
     additional_provision_xml.set_code(provision_json["additional_provision_code"])
-    additional_provision_xml.set_entryText(html.escape(provision_json["description"]))
+    additional_provision_xml.set_entryText("<![CDATA["+provision_json["description"]+"]]>")
     additional_provision_xml.set_sequenceNumber(pos)
 
     return additional_provision_xml

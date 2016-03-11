@@ -10,6 +10,7 @@ from unit_tests.schema_tests import run_schema_checks
 import unittest
 import json
 import mock
+from application.borrower.model import Borrower
 
 
 class TestRoutes(unittest.TestCase):
@@ -324,6 +325,8 @@ class TestRoutes(unittest.TestCase):
 
         self.assertEqual(effective_clause, correct_effective_clause)
 
+    @mock.patch('application.borrower.model.Borrower.save')
+    @mock.patch('application.borrower.model.Borrower.get_by_token')
     @mock.patch('application.deed.utils.get_borrower_position')
     @mock.patch('application.service_clients.esec.interface.EsecClientInterface.sign_by_user')
     @mock.patch('application.service_clients.esec.interface.EsecClientInterface.initiate_signing')
@@ -334,7 +337,7 @@ class TestRoutes(unittest.TestCase):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = DeedModelMock()
 
-        class ReturnedBorrower():
+        class ReturnedBorrower(Borrower):
             deed_token = "aaaaaa"
             dob = "01/01/1986"
             forename = "Jack"
@@ -345,6 +348,7 @@ class TestRoutes(unittest.TestCase):
         mock_initiate.return_value = "DM1234".encode(), 200
         mock_sign.return_value = "<p></p>", 200
         mock_position.return_value = 1
+        mock_borrower_save.return_value = "OK"
 
         payload = json.dumps(DeedHelper._add_borrower_signature)
 

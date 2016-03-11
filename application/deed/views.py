@@ -201,7 +201,7 @@ def request_auth_code(deed_reference):
                 client.messages.create(
                     to=borrower_phone_number,
                     from_=config.TWILIO_PHONE_NUMBER,
-                    body=message,
+                    body=message
                 )
                 LOGGER.info("SMS has been sent to  " + borrower_phone_number)
                 return jsonify({"result": True}), status.HTTP_200_OK
