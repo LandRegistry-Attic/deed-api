@@ -63,7 +63,6 @@ class deed_api (
   exec {"${app_dir}/bin/app_requirements.sh":
     cwd       => "${app_dir}",
     user      => $owner,
-    environment => ["DEED_DATABASE_NAME=deed_api"],
     logoutput => true,
     environment => ["DEED_DATABASE_NAME=deed_api"],
     require   => [
