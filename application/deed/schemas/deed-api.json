@@ -204,7 +204,7 @@
                 }
             }
         },
-        "Borrowers": {
+        "ReturnedBorrowers": {
             "type": "array",
             "minItems": 1,
             "items": {
@@ -227,7 +227,7 @@
                             "description": "Land Registry assigned number for a Mortgage Deed (MD). If you wish to use an existing MD reference please prefix it with e- to comply with our system (eg e-MD12345)"
                         },
                         "borrowers": {
-                            "$ref": "#/definitions/Borrowers"
+                            "$ref": "#/definitions/ReturnedBorrowers"
                         },
                         "charge_clause": {
                             "$ref": "#/definitions/ChargeClause"
