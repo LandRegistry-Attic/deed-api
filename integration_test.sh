@@ -2,6 +2,7 @@ export SETTINGS="config.DevelopmentConfig"
 
 py.test --junitxml=TEST-INT-flask-app-medium.xml --verbose --cov-report term-missing --cov application integration_tests
 
+RESULT=$?
 # This file will prepare all dependancies for the application
 DB_NAME="${DEED_DATABASE_NAME:-dm-deeds}"
 
@@ -16,3 +17,5 @@ DATABASE_URL="${DEED_DATABASE_URI:-postgresql://vagrant:vagrant@localhost:5432/d
 
 # Mortgage document - upserts of md_ref's data
 python3 ./migrations/setup_initial_data/data_importer.py /data/mortgage_document/ $DATABASE_URL mortgage_document
+
+exit $RESULT
