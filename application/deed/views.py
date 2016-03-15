@@ -112,13 +112,6 @@ def delete_borrower(borrower_id):
         return jsonify({"id": borrower_id}), status.HTTP_200_OK
 
 
-@deed_bp.route('/<deed_reference>/sign', methods=['POST'])
-def sign(deed_reference):
-    request_json = request.get_json()
-    borrower_token = request_json['borrower_token']
-    return sign_deed(deed_reference, borrower_token)
-
-
 def sign_deed(deed_reference, borrower_token):
 
     deed = Deed.get_deed(deed_reference)
@@ -190,24 +183,14 @@ def request_auth_code(deed_reference):
         borrower = Borrower.get_by_token(borrower_token.strip())
 
         if borrower is not None:
-            borrower_phone_number = borrower.phonenumber
+            borrower_id = borrower.id
 
-            code = generate_sms_code(deed_reference, borrower_token)
-
-            message = code + " is your authentication code from the Land Registry. This code expires in 10 minutes."
             try:
-                client = TwilioRestClient(config.ACCOUNT_SID, config.AUTH_TOKEN)
-
-                client.messages.create(
-                    to=borrower_phone_number,
-                    from_=config.TWILIO_PHONE_NUMBER,
-                    body=message
-                )
-                LOGGER.info("SMS has been sent to  " + borrower_phone_number)
+                # TODO: Call e-sec to issue OTP via sms
+                LOGGER.info("SMS has been sent to  " + borrower_id)
                 return jsonify({"result": True}), status.HTTP_200_OK
-            except TwilioRestException as e:
-                LOGGER.error("Unable to send SMS, Error Code  " + str(e.code))
-                LOGGER.error("Unable to send SMS, Error Message  " + e.msg)
+            except Exception as e:
+                LOGGER.error("Unable to send SMS, Error Code  ")
                 return jsonify({"result": False}), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
@@ -218,12 +201,14 @@ def verify_auth_code(deed_reference):
     borrower_code = request_json['authentication_code']
     if borrower_token is not None and borrower_token != '':
         if borrower_code is not None and borrower_code != '':
-            code = generate_sms_code(deed_reference, borrower_token)
-            if borrower_code != code:
-                LOGGER.error("Invalid authentication code: %s for borrower token %s ", borrower_code, borrower_token)
-                return jsonify({"result": False}), status.HTTP_401_UNAUTHORIZED
-            else:
+            # TODO: call e-sec endpoint to verify auth code
+            if borrower_code:
+                # TODO: check if this is the right place to jsonify deed
+                sign_deed(deed_reference, borrower_token)
                 LOGGER.info("Borrower with token %s successfully authenticated using valid authentication code: %s",
                             borrower_token, borrower_code)
-                return jsonify({"result": True}), status.HTTP_200_OK
+            else:
+                LOGGER.error("Invalid authentication code: %s for borrower token %s ", borrower_code, borrower_token)
+                return jsonify({"result": False}), status.HTTP_401_UNAUTHORIZED
+
 
