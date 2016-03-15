@@ -234,7 +234,11 @@
                             "description": "Land Registry assigned number for a Mortgage Deed (MD). If you wish to use an existing MD reference please prefix it with e- to comply with our system (eg e-MD12345)"
                         },
                         "borrowers": {
+<<<<<<< HEAD
                             "$ref": "#/definitions/OpBorrowers"
+=======
+                            "$ref": "#/definitions/ReturnedBorrowers"
+>>>>>>> 5fe31564468c90eaa68bd85ef53ce2f49bdf24ff
                         },
                         "charge_clause": {
                             "$ref": "#/definitions/ChargeClause"
