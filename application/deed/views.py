@@ -227,7 +227,3 @@ def verify_auth_code(deed_reference):
                             borrower_token, borrower_code)
                 return jsonify({"result": True}), status.HTTP_200_OK
 
-
-def generate_sms_code(deed_reference, borrower_token):
-    gen_code = deed_reference[-3:] + borrower_token[-3:]
-    return gen_code
