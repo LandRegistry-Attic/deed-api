@@ -7,9 +7,6 @@ from flask import request, abort, jsonify, Response
 from flask import Blueprint
 from flask.ext.api import status
 from application.borrower.model import Borrower
-from twilio.rest import TwilioRestClient
-from twilio.rest.exceptions import TwilioRestException
-from application import config
 from application import esec_client
 import json
 import sys
@@ -112,7 +109,7 @@ def delete_borrower(borrower_id):
         return jsonify({"id": borrower_id}), status.HTTP_200_OK
 
 
-def sign_deed(deed_reference, borrower_token):
+def authenticate_and_sign(deed_reference, borrower_token, borrower_code):
 
     deed = Deed.get_deed(deed_reference)
 
@@ -189,7 +186,7 @@ def request_auth_code(deed_reference):
                 # TODO: Call e-sec to issue OTP via sms
                 LOGGER.info("SMS has been sent to  " + borrower_id)
                 return jsonify({"result": True}), status.HTTP_200_OK
-            except Exception as e:
+            except Exception:
                 LOGGER.error("Unable to send SMS, Error Code  ")
                 return jsonify({"result": False}), status.HTTP_500_INTERNAL_SERVER_ERROR
 
@@ -202,13 +199,10 @@ def verify_auth_code(deed_reference):
     if borrower_token is not None and borrower_token != '':
         if borrower_code is not None and borrower_code != '':
             # TODO: call e-sec endpoint to verify auth code
-            if borrower_code:
-                # TODO: check if this is the right place to jsonify deed
-                sign_deed(deed_reference, borrower_token)
+            response = authenticate_and_sign(deed_reference, borrower_token, borrower_code)
+            if response == status.HTTP_200_OK:
                 LOGGER.info("Borrower with token %s successfully authenticated using valid authentication code: %s",
                             borrower_token, borrower_code)
             else:
                 LOGGER.error("Invalid authentication code: %s for borrower token %s ", borrower_code, borrower_token)
                 return jsonify({"result": False}), status.HTTP_401_UNAUTHORIZED
-
-
