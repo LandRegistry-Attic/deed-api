@@ -15,7 +15,7 @@
       "class": "logging.handlers.RotatingFileHandler",
       "formatter": "default",
       "maxBytes": 1000000,
-      "filename": "deed-api-dm.log",
+      "filename": "../logs/dm-api-info.log",
       "filters": ["exclude_auditing"]
     },
     "console": {

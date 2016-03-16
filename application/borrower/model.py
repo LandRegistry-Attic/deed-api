@@ -1,6 +1,8 @@
 from application import db
 import uuid
 
+charset = list("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
 
 class Borrower(db.Model):
     __tablename__ = 'borrower'
@@ -15,16 +17,17 @@ class Borrower(db.Model):
     gender = db.Column(db.String, nullable=True)
     phonenumber = db.Column(db.String, nullable=False)
     address = db.Column(db.String, nullable=False)
+    esec_user_name = db.Column(db.String, nullable=True)
 
     @staticmethod
     def generate_token():
-        return str(uuid.uuid4().hex[:6]).lower()
+        return generate_hex()
 
-    def save(self):
+    def save(self):  # pragma: no cover
         db.session.add(self)
         db.session.commit()
 
-    def delete(self, id_):
+    def delete(self, id_):  # pragma: no cover
         borrower = Borrower.query.filter_by(id=id_).first()
 
         if borrower is None:
@@ -40,3 +43,20 @@ class Borrower(db.Model):
 
     def get_by_token(token_):
         return Borrower.query.filter_by(token=token_).first()
+
+
+def bin_to_char(bin_str):
+    pos = min(int(bin_str[:6], 2), len(charset)-1)
+    return charset[pos]
+
+
+def generate_hex():
+    val = str(bin(uuid.uuid4().int))
+    bin_str = val[2:]
+    result = ""
+
+    while len(bin_str) > 15:
+        result += bin_to_char(bin_str[:15])
+        bin_str = bin_str[15:]
+
+    return result

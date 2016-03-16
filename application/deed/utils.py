@@ -8,11 +8,13 @@ from jsonschema.validators import validator_for
 from lxml import etree
 from underscore import _
 import application.deed.generated.deed_xmlify as api
+from flask import request
+import urllib
 
 LOGGER = logging.getLogger(__name__)
 
 
-XML_SCHEMA_FILE = "deed-schema-v0-1.xsd"
+XML_SCHEMA_FILE = "deed-schema-v0-2.xsd"
 
 
 def call_once_only(func):
@@ -114,9 +116,14 @@ def load_json_file(file_path):
 def convert_json_to_signature_slot(borrower_json):
     sig_slot = api.signatureSlotType()
     borrower_name_xml = api.nameType()
-    borrower_name_xml.set_forename(borrower_json["forename"])
-    borrower_name_xml.set_middlename("middlename")
-    borrower_name_xml.set_surname(borrower_json["surname"])
+    private_individual = api.privateIndividualType()
+    private_individual.set_forename(borrower_json["forename"])
+
+    if 'middle_name' in borrower_json:
+        private_individual.set_middlename(borrower_json["middle_name"])
+
+    private_individual.set_surname(borrower_json["surname"])
+    borrower_name_xml.set_privateIndividual(private_individual)
     sig_slot.set_signatory(borrower_name_xml)
     sig_slot.set_signature(api.signatureType())
     return sig_slot
@@ -125,13 +132,40 @@ def convert_json_to_signature_slot(borrower_json):
 def convert_json_to_borrower(borrower_json):
     borrower = api.borrowerType()
     borrower_name_xml = api.nameType()
-    borrower_name_xml.set_forename(borrower_json["forename"])
-    borrower_name_xml.set_middlename("middlename")
-    borrower_name_xml.set_surname(borrower_json["surname"])
+    private_individual = api.privateIndividualType()
+    private_individual.set_forename(borrower_json["forename"])
+
+    if 'middle_name' in borrower_json:
+        private_individual.set_middlename(borrower_json["middle_name"])
+
+    private_individual.set_surname(borrower_json["surname"])
+    borrower_name_xml.set_privateIndividual(private_individual)
     borrower.set_name(borrower_name_xml)
     borrower.set_address("borrower address")
 
     return borrower
+
+
+def convert_json_to_lender(lender_json):
+    lender = api.lenderType()
+    lender_name_xml = api.nameType()
+    company = api.companyType()
+    company.set_name(lender_json["name"])
+    lender_name_xml.set_company(company)
+    lender.set_organisationName(lender_name_xml)
+    lender.set_address(lender_json["address"])
+    lender.set_companyRegistrationDetails(lender_json["registration"])
+
+    return lender
+
+
+def convert_json_to_provision(provision_json, pos):
+    additional_provision_xml = api.provisionType()
+    additional_provision_xml.set_code(provision_json["additional_provision_code"])
+    additional_provision_xml.set_entryText("<![CDATA["+provision_json["description"]+"]]>")
+    additional_provision_xml.set_sequenceNumber(pos)
+
+    return additional_provision_xml
 
 
 def validate_generated_xml(xml):
@@ -170,9 +204,26 @@ def convert_json_to_xml(deed_json):  # pragma: no cover
     deed_data_xml.set_Id("deedData")
     deed_data_xml.set_mdRef(deed_json["md_ref"])
     deed_data_xml.set_titleNumber(deed_json["title_number"])
-    deed_data_xml.set_propertyDescription("property description")
+    deed_data_xml.set_propertyDescription(deed_json["property_address"])
+
+    charge_clause_xml = api.chargeClauseType()
+    charge_clause_xml.set_creCode(deed_json["charge_clause"]["cre_code"])
+    charge_clause_xml.set_entryText(deed_json["charge_clause"]["description"])
+    deed_data_xml.set_chargeClause(charge_clause_xml)
+
+    additional_provisions = api.additionalProvisionsType()
+
+    for idx, provision_json in enumerate(deed_json["additional_provisions"]):
+        additional_provisions.add_provision(convert_json_to_provision(provision_json, idx))
+
+    deed_data_xml.set_additionalProvisions(additional_provisions)
+
+    deed_data_xml.set_lender(convert_json_to_lender(deed_json["lender"]))
+
+    deed_data_xml.set_effectiveClause(deed_json["effective_clause"])
+
     operative_deed_xml.set_deedData(deed_data_xml)
-    deed_app_xml.set_effectiveDate("23/5/15")
+    deed_app_xml.set_effectiveDate("tbc")
     auth_sig = api.authSignatureType()
     deed_app_xml.set_authSignature(auth_sig)
     operative_deed_xml.set_signatureSlots(borrower_sig_slots)
@@ -187,5 +238,37 @@ def convert_json_to_xml(deed_json):  # pragma: no cover
     deed_xml = deed_stream.getvalue()
 
     return deed_xml
+
+
+def is_internal():
+    return True if "X-Land-Registry" in request.headers else False
+
+
+def process_organisation_credentials():
+    header_dict = {}
+
+    try:
+        header_data = request.headers.get("Iv-User-L")
+
+        for param in header_data.split(','):
+            key, value = param.split('=')
+            value = urllib.parse.unquote(value)
+            if key in header_dict:
+                header_dict[key].append(value)
+            else:
+                header_dict[key] = [value]
+    except:
+        msg = str(sys.exc_info())
+        LOGGER.error("unable to process organisation credentials %s" % msg)
+        header_dict = None
+
+    return header_dict
+
+
+def get_borrower_position(deed, borrower_token):
+        for idx, borrower in enumerate(deed['borrowers'], start=1):
+            if borrower_token == borrower['token']:
+                return idx
+        return -1
 
 _title_validator = _create_title_validator()

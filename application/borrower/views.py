@@ -20,7 +20,13 @@ def validate_borrower():
             db_dob = datetime.strptime(borrower.dob, "%d/%m/%Y")
 
             if input_dob == db_dob:
-                return json.dumps({"deed_token": borrower.deed_token}),\
+                stripped_number = strip_number_to_four_digits(borrower.phonenumber)
+                return json.dumps({"deed_token": borrower.deed_token, "phone_number": stripped_number}),\
                     status.HTTP_200_OK
 
     return "Matching deed not found", status.HTTP_404_NOT_FOUND
+
+
+def strip_number_to_four_digits(phone_number):
+    stripped_number = phone_number[-4:]
+    return stripped_number
