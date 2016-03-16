@@ -64,7 +64,7 @@ class deed_api (
     cwd       => "${app_dir}",
     user      => $owner,
     logoutput => true,
-    environment => ["DEED_DATABASE_NAME=deed_api,ESEC_CLIENT_URI=http://127.0.0.1:9040"],
+    environment => ["DEED_DATABASE_NAME=deed_api","ESEC_CLIENT_URI=http://127.0.0.1:9040"],
     require   => [
       Vcsrepo["${app_dir}"],
       Standard_env::Db::Postgres[$module_name],
