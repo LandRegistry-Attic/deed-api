@@ -44,9 +44,9 @@ def get_deeds_status_with_mdref_and_title_number():
             abort(status.HTTP_404_NOT_FOUND)
 
         return Response(
-            json.dumps(deeds_status),
-            status=200,
-            mimetype='application/json'
+                json.dumps(deeds_status),
+                status=200,
+                mimetype='application/json'
         )
 
     return abort(status.HTTP_400_BAD_REQUEST)
@@ -110,7 +110,6 @@ def delete_borrower(borrower_id):
 
 
 def authenticate_and_sign(deed_reference, borrower_token, borrower_code):
-
     deed = Deed.get_deed(deed_reference)
 
     if deed is None:
@@ -119,28 +118,22 @@ def authenticate_and_sign(deed_reference, borrower_token, borrower_code):
     else:
         LOGGER.info("Signing deed for borrower_token %s against deed reference %s" % (borrower_token, deed_reference))
 
-        # check if XML already exisit
+        # check if XML already exist
         if deed.deed_xml is None:
             LOGGER.info("Generating DEED_XML")
             deed_XML = convert_json_to_xml(deed.deed)
             deed.deed_xml = deed_XML.encode("utf-8")
 
         try:
-            LOGGER.info("getting exisiting XML")
+            LOGGER.info("getting existing XML")
             modify_xml = copy.deepcopy(deed.deed_xml)
             borrower_pos = deed.get_borrower_position(borrower_token)
             borrower = Borrower.get_by_token(borrower_token)
+            esec_id = borrower.esec_user_name
 
-            user_id, status_code = esec_client.initiate_signing(borrower.forename, borrower.surname,
-                                                                deed.organisation_id)
-
-            if status_code == 200:
-                LOGGER.info("Created new esec user: %s" % str(user_id.decode()))
-                borrower.esec_user_name = user_id.decode()
-                borrower.save()
-
-                result_xml, status_code = esec_client.sign_by_user(modify_xml, borrower_pos,
-                                                                   user_id.decode())
+            if esec_id:
+                result_xml, status_code = esec_client.verify_auth_code_and_sign(modify_xml, borrower_pos,
+                                                                                esec_id.decode())
                 LOGGER.info("signed status code: %s" % str(status_code))
                 LOGGER.info("signed XML: %s" % result_xml)
 
@@ -167,6 +160,53 @@ def authenticate_and_sign(deed_reference, borrower_token, borrower_code):
     return jsonify({"deed": deed.deed}), status.HTTP_200_OK
 
 
+def initiate_signing(deed_reference, borrower_token):
+    deed = Deed.get_deed(deed_reference)
+
+    if deed is None:
+        LOGGER.error("Database Exception 404 for deed reference - %s" % deed_reference)
+        abort(status.HTTP_404_NOT_FOUND)
+    else:
+        LOGGER.info("Signing deed for borrower_token %s against deed reference %s" % (borrower_token, deed_reference))
+
+        # check if XML already exist
+        if deed.deed_xml is None:
+            LOGGER.info("Generating DEED_XML")
+            deed_XML = convert_json_to_xml(deed.deed)
+            deed.deed_xml = deed_XML.encode("utf-8")
+
+        try:
+            LOGGER.info("getting existing XML")
+            borrower = Borrower.get_by_token(borrower_token)
+
+            if not borrower.esec_user_name:
+                LOGGER.info("creating esec user for borrower[token:%s]", borrower.token)
+                user_id, status_code = esec_client.initiate_signing(borrower.forename, borrower.surname,
+                                                                    deed.organisation_id)
+                if status_code == 200:
+                    LOGGER.info("Created new esec user: %s for borrower[token:%s]" % str(user_id.decode()),
+                                borrower.token)
+                    borrower.esec_user_name = user_id.decode()
+                    borrower.save()
+                else:
+                    LOGGER.error("Unable to create new e-sec user for borrower [token:%s]", borrower.token)
+                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            else:
+                status_code = esec_client.reissue_auth_code(borrower.esec_user_name)
+
+                if status_code != 200:
+                    LOGGER.error("Unable to reissue new sms code for esec user: %s", borrower.esec_user_name)
+                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        except:
+            msg = str(sys.exc_info())
+            LOGGER.error("Failed to issue auth code via sms: %s" % msg)
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return status.HTTP_200_OK
+
+
 @deed_bp.route('/<deed_reference>/make-effective', methods=['POST'])
 def make_effective(deed_reference):
     return status.HTTP_200_OK
@@ -175,20 +215,14 @@ def make_effective(deed_reference):
 @deed_bp.route('/<deed_reference>/request-auth-code', methods=['POST'])
 def request_auth_code(deed_reference):
     request_json = request.get_json()
-    borrower_token = request_json['borrower_token']
-    if borrower_token is not None and borrower_token != '':
-        borrower = Borrower.get_by_token(borrower_token.strip())
 
-        if borrower is not None:
-            borrower_id = borrower.id
+    status_code = authenticate_and_sign(deed_reference, request_json['borrower_token'])
 
-            try:
-                # TODO: Call e-sec to issue OTP via sms
-                LOGGER.info("SMS has been sent to  " + str(borrower_id))
-                return jsonify({"result": True}), status.HTTP_200_OK
-            except Exception:
-                LOGGER.error("Unable to send SMS, Error Code  ")
-                return jsonify({"result": False}), status.HTTP_500_INTERNAL_SERVER_ERROR
+    if status_code == status.HTTP_200_OK:
+        return jsonify({"result": True}), status_code
+    else:
+        LOGGER.error("Unable to send SMS")
+        return jsonify({"result": False}), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 @deed_bp.route('/<deed_reference>/verify-auth-code', methods=['POST'])
@@ -196,14 +230,16 @@ def verify_auth_code(deed_reference):
     request_json = request.get_json()
     borrower_token = request_json['borrower_token']
     borrower_code = request_json['authentication_code']
-    if borrower_token is not None and borrower_token != '':
-        if borrower_code is not None and borrower_code != '':
-            # TODO: call e-sec endpoint to verify auth code
-            deed, status_code = authenticate_and_sign(deed_reference, borrower_token, borrower_code)
-            if status_code == status.HTTP_200_OK:
-                LOGGER.info("Borrower with token %s successfully authenticated using valid authentication code: %s",
-                            borrower_token, borrower_code)
-                return jsonify({"result": True}), status.HTTP_200_OK
-            else:
-                LOGGER.error("Invalid authentication code: %s for borrower token %s ", borrower_code, borrower_token)
-                return jsonify({"result": False}), status_code
+
+    deed, status_code = authenticate_and_sign(deed_reference, borrower_token, borrower_code)
+
+    if status_code == status.HTTP_200_OK:
+        LOGGER.info("Borrower with token %s successfully authenticated using valid authentication code: %s",
+                    borrower_token, borrower_code)
+        return jsonify({"result": True}), status.HTTP_200_OK
+    elif status_code == status.HTTP_401_UNAUTHORIZED:
+        LOGGER.error("Invalid authentication code: %s for borrower token %s ", borrower_code, borrower_token)
+        return jsonify({"result": False}), status_code
+    else:
+        LOGGER.error("Not able to sign the deed")
+        return jsonify({"result": False}), status_code
