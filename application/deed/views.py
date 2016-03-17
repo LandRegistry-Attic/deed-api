@@ -184,7 +184,7 @@ def request_auth_code(deed_reference):
 
             try:
                 # TODO: Call e-sec to issue OTP via sms
-                LOGGER.info("SMS has been sent to  " + borrower_id)
+                LOGGER.info("SMS has been sent to  " + str(borrower_id))
                 return jsonify({"result": True}), status.HTTP_200_OK
             except Exception:
                 LOGGER.error("Unable to send SMS, Error Code  ")
@@ -199,10 +199,11 @@ def verify_auth_code(deed_reference):
     if borrower_token is not None and borrower_token != '':
         if borrower_code is not None and borrower_code != '':
             # TODO: call e-sec endpoint to verify auth code
-            response = authenticate_and_sign(deed_reference, borrower_token, borrower_code)
-            if response == status.HTTP_200_OK:
+            deed, status_code = authenticate_and_sign(deed_reference, borrower_token, borrower_code)
+            if status_code == status.HTTP_200_OK:
                 LOGGER.info("Borrower with token %s successfully authenticated using valid authentication code: %s",
                             borrower_token, borrower_code)
+                return jsonify({"result": True}), status.HTTP_200_OK
             else:
                 LOGGER.error("Invalid authentication code: %s for borrower token %s ", borrower_code, borrower_token)
-                return jsonify({"result": False}), status.HTTP_401_UNAUTHORIZED
+                return jsonify({"result": False}), status_code
