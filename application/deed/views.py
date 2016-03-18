@@ -147,7 +147,7 @@ def authenticate_and_sign(deed_reference, borrower_token, borrower_code):
                     deed.deed = update_deed_signature_timestamp(deed, borrower_token)
                 else:
                     LOGGER.error("Failed to sign Mortgage document")
-                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    return "Failed to sign Mortgage document", status_code
             else:
                 LOGGER.error("Failed to sign Mortgage document - unable to create user")
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)

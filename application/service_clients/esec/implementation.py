@@ -62,7 +62,7 @@ def verify_auth_code_and_sign(deed_xml, borrower_pos, user_id, borrower_auth_cod
 
     resp = requests.post(request_url, params=parameters, data=deed_xml)
 
-    if resp.status_code == status.HTTP_200_OK:
+    if resp.status_code == status.HTTP_200_OK or resp.status_code == status.HTTP_401_UNAUTHORIZED:
         LOGGER.info("Response XML = %s" % resp.content)
         return resp.content, resp.status_code
     else:
