@@ -279,7 +279,7 @@
                     "$ref": "#/definitions/Borrowers"
                 },
                 "md_ref": {
-                    "pattern": "^e-MD([1-9]{5}|([1-9]{3,4}[A-Z]{1}))$",
+                    "pattern": "^e-MD([0-9]{5}|([0-9]{3,4}[A-Z]{1}))$",
                     "type": "string"
                 },
                 "identity_checked": {

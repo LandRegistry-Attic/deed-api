@@ -15,7 +15,7 @@
                   "description":"md_ref",
                   "required":true,
                   "type":"string",
-                  "pattern":"^e-MD([1-9]{5}|([1-9]{3,4}[A-Z]{1}))$"
+                  "pattern":"^e-MD([0-9]{5}|([0-9]{3,4}[A-Z]{1}))$"
                },
                {
                   "name":"title_number",
