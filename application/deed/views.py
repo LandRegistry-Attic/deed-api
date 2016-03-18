@@ -133,8 +133,8 @@ def authenticate_and_sign(deed_reference, borrower_token, borrower_code):
 
             if esec_id:
                 result_xml, status_code = esec_client.verify_auth_code_and_sign(modify_xml, borrower_pos,
-                                                                                esec_id.decode())
-                LOGGER.info("signed status code: %s" % str(status_code))
+                                                                                esec_id, borrower_code)
+                LOGGER.info("signed status code: %s", str(status_code))
                 LOGGER.info("signed XML: %s" % result_xml)
 
                 if status_code == 200:
@@ -182,9 +182,9 @@ def initiate_signing(deed_reference, borrower_token):
             if not borrower.esec_user_name:
                 LOGGER.info("creating esec user for borrower[token:%s]", borrower.token)
                 user_id, status_code = esec_client.initiate_signing(borrower.forename, borrower.surname,
-                                                                    deed.organisation_id)
+                                                                    deed.organisation_id, borrower.phonenumber)
                 if status_code == 200:
-                    LOGGER.info("Created new esec user: %s for borrower[token:%s]" % str(user_id.decode()),
+                    LOGGER.info("Created new esec user: %s for borrower[token:%s]", str(user_id.decode()),
                                 borrower.token)
                     borrower.esec_user_name = user_id.decode()
                     borrower.save()
@@ -216,7 +216,7 @@ def make_effective(deed_reference):
 def request_auth_code(deed_reference):
     request_json = request.get_json()
 
-    status_code = authenticate_and_sign(deed_reference, request_json['borrower_token'])
+    status_code = initiate_signing(deed_reference, request_json['borrower_token'])
 
     if status_code == status.HTTP_200_OK:
         return jsonify({"result": True}), status_code

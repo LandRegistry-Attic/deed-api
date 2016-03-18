@@ -7,14 +7,15 @@ from flask import abort
 LOGGER = logging.getLogger(__name__)
 
 
-def initiate_signing(first_name, last_name, organisation_id):  # pragma: no cover
+def initiate_signing(first_name, last_name, organisation_id, phone_number):  # pragma: no cover
     LOGGER.info("Calling dm-esec-client")
-    request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/initiate_signing'
+    request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/issue_sms'
 
     parameters = {
         'first-name': first_name,
         'last-name': last_name,
-        'organisation-id': organisation_id
+        'organisation-id': organisation_id,
+        'phone-number': phone_number
     }
 
     resp = requests.post(request_url, params=parameters)
@@ -32,7 +33,7 @@ def reissue_auth_code(esec_user_name):  # pragma: no cover
     request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/reissue_sms'
 
     parameters = {
-        'esec-user-name': esec_user_name
+        'esec-username': esec_user_name
     }
 
     resp = requests.post(request_url, params=parameters)
