@@ -44,9 +44,9 @@ def get_deeds_status_with_mdref_and_title_number():
             abort(status.HTTP_404_NOT_FOUND)
 
         return Response(
-                json.dumps(deeds_status),
-                status=200,
-                mimetype='application/json'
+            json.dumps(deeds_status),
+            status=200,
+            mimetype='application/json'
         )
 
     return abort(status.HTTP_400_BAD_REQUEST)
@@ -168,7 +168,6 @@ def initiate_signing(deed_reference, borrower_token):
         abort(status.HTTP_404_NOT_FOUND)
     else:
         LOGGER.info("Signing deed for borrower_token %s against deed reference %s" % (borrower_token, deed_reference))
-
 
         try:
             LOGGER.info("getting existing XML")
