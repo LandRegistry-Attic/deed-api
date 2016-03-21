@@ -169,11 +169,6 @@ def initiate_signing(deed_reference, borrower_token):
     else:
         LOGGER.info("Signing deed for borrower_token %s against deed reference %s" % (borrower_token, deed_reference))
 
-        # check if XML already exist
-        if deed.deed_xml is None:
-            LOGGER.info("Generating DEED_XML")
-            deed_XML = convert_json_to_xml(deed.deed)
-            deed.deed_xml = deed_XML.encode("utf-8")
 
         try:
             LOGGER.info("getting existing XML")
@@ -193,7 +188,7 @@ def initiate_signing(deed_reference, borrower_token):
                     abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             else:
-                status_code = esec_client.reissue_auth_code(borrower.esec_user_name)
+                result, status_code = esec_client.reissue_auth_code(borrower.esec_user_name)
 
                 if status_code != 200:
                     LOGGER.error("Unable to reissue new sms code for esec user: %s", borrower.esec_user_name)
