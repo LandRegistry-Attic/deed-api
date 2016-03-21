@@ -335,15 +335,12 @@ class TestRoutes(unittest.TestCase):
 
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.borrower.model.Borrower.get_by_token')
-    @mock.patch('application.deed.utils.get_borrower_position')
-    @mock.patch('application.service_clients.esec.interface.EsecClientInterface.sign_by_user')
     @mock.patch('application.service_clients.esec.interface.EsecClientInterface.initiate_signing')
-    @mock.patch('application.deed.model.Deed.save', autospec=True)
     @mock.patch('application.deed.model.Deed.query', autospec=True)
-    def test_add_borrower_signature(self, mock_query, mock_Deed_save, mock_initiate,
-                                    mock_sign, mock_position, mock_borrower, mock_borrower_save):
+    def test_request_auth_code(self, mock_query, mock_initiate, mock_borrower, mock_borrower_save):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = DeedModelMock()
+        mock_initiate.return_value = "DM212".encode(), 200
 
         class ReturnedBorrower(Borrower):
             deed_token = "aaaaaa"
@@ -352,15 +349,35 @@ class TestRoutes(unittest.TestCase):
             surname = "Jones"
 
         mock_borrower.return_value = ReturnedBorrower()
-
-        mock_initiate.return_value = "DM1234".encode(), 200
-        mock_sign.return_value = "<p></p>", 200
-        mock_position.return_value = 1
         mock_borrower_save.return_value = "OK"
 
         payload = json.dumps(DeedHelper._add_borrower_signature)
 
-        response = self.app.post(self.DEED_ENDPOINT + 'AB1234' + '/sign',
+        response = self.app.post(self.DEED_ENDPOINT + 'AB1234' + '/request-auth-code',
+                                 data=payload,
+                                 headers=self.webseal_headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    @mock.patch('application.borrower.model.Borrower.get_by_token')
+    @mock.patch('application.service_clients.esec.interface.EsecClientInterface.reissue_auth_code')
+    @mock.patch('application.deed.model.Deed.query', autospec=True)
+    def test_reissue_auth_code(self, mock_query, mock_reissue, mock_borrower):
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = DeedModelMock()
+        mock_reissue.return_value = "SUCCESS", 200
+
+        class ReturnedBorrower(Borrower):
+            deed_token = "aaaaaa"
+            dob = "01/01/1986"
+            forename = "Jack"
+            surname = "Jones"
+            esec_user_name = "DM123"
+
+        mock_borrower.return_value = ReturnedBorrower()
+
+        payload = json.dumps(DeedHelper._add_borrower_signature)
+
+        response = self.app.post(self.DEED_ENDPOINT + 'AB1234' + '/request-auth-code',
                                  data=payload,
                                  headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -368,30 +385,30 @@ class TestRoutes(unittest.TestCase):
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.borrower.model.Borrower.get_by_token')
     @mock.patch('application.deed.utils.get_borrower_position')
-    @mock.patch('application.service_clients.esec.interface.EsecClientInterface.sign_by_user')
-    @mock.patch('application.service_clients.esec.interface.EsecClientInterface.initiate_signing')
+    @mock.patch('application.service_clients.esec.interface.EsecClientInterface.verify_auth_code_and_sign')
     @mock.patch('application.deed.model.Deed.save', autospec=True)
     @mock.patch('application.deed.model.Deed.query', autospec=True)
-    def test_add_borrower_signature_fail(self, mock_query, mock_Deed_save, mock_initiate,
-                                         mock_sign, mock_position, mock_borrower, mock_borrower_save):
+    def test_add_authenticate_and_sign(self, mock_query, mock_Deed_save,
+                                       mock_verify_and_sign, mock_position, mock_borrower, mock_borrower_save):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = DeedModelMock()
 
-        class ReturnedBorrower():
+        class ReturnedBorrower(Borrower):
             deed_token = "aaaaaa"
             dob = "01/01/1986"
             forename = "Jack"
             surname = "Jones"
+            esec_user_name = "DM123"
 
         mock_borrower.return_value = ReturnedBorrower()
 
-        mock_initiate.return_value = "Fail", 500
-        mock_sign.return_value = "<p></p>", 500
+        mock_verify_and_sign.return_value = "<p></p>", 200
         mock_position.return_value = 1
+        mock_borrower_save.return_value = "OK"
 
-        payload = json.dumps(DeedHelper._add_borrower_signature)
+        payload = json.dumps(DeedHelper._verify_and_sign)
 
-        response = self.app.post(self.DEED_ENDPOINT + 'AB1234' + '/sign',
+        response = self.app.post(self.DEED_ENDPOINT + 'AB1234' + '/verify-auth-code',
                                  data=payload,
                                  headers=self.webseal_headers)
-        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

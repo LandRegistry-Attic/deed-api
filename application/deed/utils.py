@@ -187,7 +187,7 @@ def validate_generated_xml(xml):
     return False
 
 
-def convert_json_to_xml(deed_json):  # pragma: no cover
+def convert_json_to_xml(deed_json):
 
     deed_app_xml = api.dmApplicationType()
     deed_app_xml.original_tagname_ = "dm-application"
