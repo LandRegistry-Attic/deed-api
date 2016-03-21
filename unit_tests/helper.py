@@ -47,23 +47,6 @@ class DeedModelMock(Deed):
     }
     status = "DRAFT"
 
-    deed_xml = "<dm-application><operativeDeed><deedData Id='deedData'><titleNumber>DT100</titleNumber>\
-                <propertyDescription>property description</propertyDescription>\
-                <borrowers><borrower><name><forename>Paul</forename><surname>Smythe</surname></name>\
-                    <address>borrower address</address></borrower>\
-                <borrower><name><forename>Jane</forename><middlename>middlename</middlename>\
-                    <surname>Smythe</surname></name><address>borrower address</address></borrower>\
-                </borrowers>\
-                <mdRef>e-MD12344</mdRef>\
-                </deedData>\
-                <signatureSlots><borrower_signature><signature  xmlns:dsig='http://www.w3.org/2000/09/xmldsig#' />\
-                <signatory><forename>Paul</forename><middlename>middlename</middlename><surname>Smythe</surname>\
-                </signatory></borrower_signature><borrower_signature>\
-                <signature  xmlns:dsig='http://www.w3.org/2000/09/xmldsig' />\
-                <signatory><forename>Jane</forename><middlename>middlename</middlename><surname>Smythe</surname>\
-                </signatory></borrower_signature></signatureSlots></operativeDeed>\
-                <effectiveDate>23/5/15</effectiveDate><authSignature/></dm-application>".encode()
-
 
 class MortgageDocMock:
     md_ref = "e-MD12121"
@@ -219,6 +202,9 @@ class DeedHelper:
     }
 
     _add_borrower_signature = {"borrower_token": "3"}
+
+    _verify_and_sign = {"borrower_token": "3",
+                        "authentication_code": "aW23xw"}
 
 
 class StatusMock:
