@@ -7,7 +7,7 @@ from flask import abort
 LOGGER = logging.getLogger(__name__)
 
 
-def initiate_signing(first_name, last_name, organisation_id, phone_number):  # pragma: no cover
+def isssue_sms(first_name, last_name, organisation_id, phone_number):  # pragma: no cover
     LOGGER.info("Calling dm-esec-client to initiate signing")
     request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/issue_sms'
 
@@ -28,7 +28,7 @@ def initiate_signing(first_name, last_name, organisation_id, phone_number):  # p
         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def reissue_auth_code(esec_user_name):  # pragma: no cover
+def reissue_sms(esec_user_name):  # pragma: no cover
     LOGGER.info("Calling dm-esec-client to reissue auth code")
     request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/reissue_sms'
 
@@ -46,7 +46,7 @@ def reissue_auth_code(esec_user_name):  # pragma: no cover
         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def verify_auth_code_and_sign(deed_xml, borrower_pos, user_id, borrower_auth_code):  # pragma: no cover
+def auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code):  # pragma: no cover
     LOGGER.info("Calling dm-esec-client to verify OTP code and sign the deed")
     request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/auth_sms'
     element_id = 'deedData'

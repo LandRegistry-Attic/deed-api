@@ -109,7 +109,7 @@ def delete_borrower(borrower_id):
         return jsonify({"id": borrower_id}), status.HTTP_200_OK
 
 
-def authenticate_and_sign(deed_reference, borrower_token, borrower_code):
+def auth_sms(deed_reference, borrower_token, borrower_code):
     deed = Deed.get_deed(deed_reference)
 
     if deed is None:
@@ -132,8 +132,8 @@ def authenticate_and_sign(deed_reference, borrower_token, borrower_code):
             esec_id = borrower.esec_user_name
 
             if esec_id:
-                result_xml, status_code = esec_client.verify_auth_code_and_sign(modify_xml, borrower_pos,
-                                                                                esec_id, borrower_code)
+                result_xml, status_code = esec_client.auth_sms(modify_xml, borrower_pos,
+                                                               esec_id, borrower_code)
                 LOGGER.info("signed status code: %s", str(status_code))
                 LOGGER.info("signed XML: %s" % result_xml)
 
@@ -160,7 +160,7 @@ def authenticate_and_sign(deed_reference, borrower_token, borrower_code):
     return jsonify({"deed": deed.deed}), status.HTTP_200_OK
 
 
-def initiate_signing(deed_reference, borrower_token):
+def issue_sms(deed_reference, borrower_token):
     deed = Deed.get_deed(deed_reference)
 
     if deed is None:
@@ -175,8 +175,8 @@ def initiate_signing(deed_reference, borrower_token):
 
             if not borrower.esec_user_name:
                 LOGGER.info("creating esec user for borrower[token:%s]", borrower.token)
-                user_id, status_code = esec_client.initiate_signing(borrower.forename, borrower.surname,
-                                                                    deed.organisation_id, borrower.phonenumber)
+                user_id, status_code = esec_client.issue_sms(borrower.forename, borrower.surname,
+                                                             deed.organisation_id, borrower.phonenumber)
                 if status_code == 200:
                     LOGGER.info("Created new esec user: %s for borrower[token:%s]", str(user_id.decode()),
                                 borrower.token)
@@ -187,7 +187,7 @@ def initiate_signing(deed_reference, borrower_token):
                     abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             else:
-                result, status_code = esec_client.reissue_auth_code(borrower.esec_user_name)
+                result, status_code = esec_client.reissue_sms(borrower.esec_user_name)
 
                 if status_code != 200:
                     LOGGER.error("Unable to reissue new sms code for esec user: %s", borrower.esec_user_name)
@@ -210,7 +210,7 @@ def make_effective(deed_reference):
 def request_auth_code(deed_reference):
     request_json = request.get_json()
 
-    status_code = initiate_signing(deed_reference, request_json['borrower_token'])
+    status_code = issue_sms(deed_reference, request_json['borrower_token'])
 
     if status_code == status.HTTP_200_OK:
         return jsonify({"result": True}), status_code
@@ -225,7 +225,7 @@ def verify_auth_code(deed_reference):
     borrower_token = request_json['borrower_token']
     borrower_code = request_json['authentication_code']
 
-    deed, status_code = authenticate_and_sign(deed_reference, borrower_token, borrower_code)
+    deed, status_code = auth_sms(deed_reference, borrower_token, borrower_code)
 
     if status_code == status.HTTP_200_OK:
         LOGGER.info("Borrower with token %s successfully authenticated using valid authentication code: %s",
