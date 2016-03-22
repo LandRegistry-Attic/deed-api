@@ -7,7 +7,7 @@ from flask import abort
 LOGGER = logging.getLogger(__name__)
 
 
-def isssue_sms(first_name, last_name, organisation_id, phone_number):  # pragma: no cover
+def issue_sms(first_name, last_name, organisation_id, phone_number):  # pragma: no cover
     LOGGER.info("Calling dm-esec-client to initiate signing")
     request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/issue_sms'
 
