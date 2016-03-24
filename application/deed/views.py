@@ -7,9 +7,6 @@ from flask import request, abort, jsonify, Response
 from flask import Blueprint
 from flask.ext.api import status
 from application.borrower.model import Borrower
-from twilio.rest import TwilioRestClient
-from twilio.rest.exceptions import TwilioRestException
-from application import config
 from application import esec_client
 import json
 import sys
@@ -112,15 +109,7 @@ def delete_borrower(borrower_id):
         return jsonify({"id": borrower_id}), status.HTTP_200_OK
 
 
-@deed_bp.route('/<deed_reference>/sign', methods=['POST'])
-def sign(deed_reference):
-    request_json = request.get_json()
-    borrower_token = request_json['borrower_token']
-    return sign_deed(deed_reference, borrower_token)
-
-
-def sign_deed(deed_reference, borrower_token):
-
+def auth_sms(deed_reference, borrower_token, borrower_code):
     deed = Deed.get_deed(deed_reference)
 
     if deed is None:
@@ -129,29 +118,23 @@ def sign_deed(deed_reference, borrower_token):
     else:
         LOGGER.info("Signing deed for borrower_token %s against deed reference %s" % (borrower_token, deed_reference))
 
-        # check if XML already exisit
+        # check if XML already exist
         if deed.deed_xml is None:
             LOGGER.info("Generating DEED_XML")
             deed_XML = convert_json_to_xml(deed.deed)
             deed.deed_xml = deed_XML.encode("utf-8")
 
         try:
-            LOGGER.info("getting exisiting XML")
+            LOGGER.info("getting existing XML")
             modify_xml = copy.deepcopy(deed.deed_xml)
             borrower_pos = deed.get_borrower_position(borrower_token)
             borrower = Borrower.get_by_token(borrower_token)
+            esec_id = borrower.esec_user_name
 
-            user_id, status_code = esec_client.initiate_signing(borrower.forename, borrower.surname,
-                                                                deed.organisation_id)
-
-            if status_code == 200:
-                LOGGER.info("Created new esec user: %s" % str(user_id.decode()))
-                borrower.esec_user_name = user_id.decode()
-                borrower.save()
-
-                result_xml, status_code = esec_client.sign_by_user(modify_xml, borrower_pos,
-                                                                   user_id.decode())
-                LOGGER.info("signed status code: %s" % str(status_code))
+            if esec_id:
+                result_xml, status_code = esec_client.auth_sms(modify_xml, borrower_pos,
+                                                               esec_id, borrower_code)
+                LOGGER.info("signed status code: %s", str(status_code))
                 LOGGER.info("signed XML: %s" % result_xml)
 
                 if status_code == 200:
@@ -164,7 +147,7 @@ def sign_deed(deed_reference, borrower_token):
                     deed.deed = update_deed_signature_timestamp(deed, borrower_token)
                 else:
                     LOGGER.error("Failed to sign Mortgage document")
-                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    return "Failed to sign Mortgage document", status_code
             else:
                 LOGGER.error("Failed to sign Mortgage document - unable to create user")
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -177,6 +160,47 @@ def sign_deed(deed_reference, borrower_token):
     return jsonify({"deed": deed.deed}), status.HTTP_200_OK
 
 
+def issue_sms(deed_reference, borrower_token):
+    deed = Deed.get_deed(deed_reference)
+
+    if deed is None:
+        LOGGER.error("Database Exception 404 for deed reference - %s" % deed_reference)
+        abort(status.HTTP_404_NOT_FOUND)
+    else:
+        LOGGER.info("Signing deed for borrower_token %s against deed reference %s" % (borrower_token, deed_reference))
+
+        try:
+            LOGGER.info("getting existing XML")
+            borrower = Borrower.get_by_token(borrower_token)
+
+            if not borrower.esec_user_name:
+                LOGGER.info("creating esec user for borrower[token:%s]", borrower.token)
+                user_id, status_code = esec_client.issue_sms(borrower.forename, borrower.surname,
+                                                             deed.organisation_id, borrower.phonenumber)
+                if status_code == 200:
+                    LOGGER.info("Created new esec user: %s for borrower[token:%s]", str(user_id.decode()),
+                                borrower.token)
+                    borrower.esec_user_name = user_id.decode()
+                    borrower.save()
+                else:
+                    LOGGER.error("Unable to create new e-sec user for borrower [token:%s]", borrower.token)
+                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            else:
+                result, status_code = esec_client.reissue_sms(borrower.esec_user_name)
+
+                if status_code != 200:
+                    LOGGER.error("Unable to reissue new sms code for esec user: %s", borrower.esec_user_name)
+                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        except:
+            msg = str(sys.exc_info())
+            LOGGER.error("Failed to issue auth code via sms: %s" % msg)
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return status.HTTP_200_OK
+
+
 @deed_bp.route('/<deed_reference>/make-effective', methods=['POST'])
 def make_effective(deed_reference):
     return status.HTTP_200_OK
@@ -185,45 +209,31 @@ def make_effective(deed_reference):
 @deed_bp.route('/<deed_reference>/request-auth-code', methods=['POST'])
 def request_auth_code(deed_reference):
     request_json = request.get_json()
-    borrower_token = request_json['borrower_token']
-    if borrower_token is not None and borrower_token != '':
-        borrower = Borrower.get_by_token(borrower_token.strip())
 
-        if borrower is not None:
-            borrower_phone_number = borrower.phonenumber
+    status_code = issue_sms(deed_reference, request_json['borrower_token'])
 
-            code = generate_sms_code(deed_reference, borrower_token)
-
-            message = code + " is your authentication code from the Land Registry. This code expires in 10 minutes."
-            try:
-                client = TwilioRestClient(config.ACCOUNT_SID, config.AUTH_TOKEN)
-
-                client.messages.create(
-                    to=borrower_phone_number,
-                    from_=config.TWILIO_PHONE_NUMBER,
-                    body=message
-                )
-                LOGGER.info("SMS has been sent to  " + borrower_phone_number)
-                return jsonify({"result": True}), status.HTTP_200_OK
-            except TwilioRestException as e:
-                LOGGER.error("Unable to send SMS, Error Code  " + str(e.code))
-                LOGGER.error("Unable to send SMS, Error Message  " + e.msg)
-                return jsonify({"result": False}), status.HTTP_500_INTERNAL_SERVER_ERROR
+    if status_code == status.HTTP_200_OK:
+        return jsonify({"result": True}), status_code
+    else:
+        LOGGER.error("Unable to send SMS")
+        return jsonify({"result": False}), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 @deed_bp.route('/<deed_reference>/verify-auth-code', methods=['POST'])
-def verify_auth_code(deed_reference, borrower_token, borrower_code):
-    if borrower_token is not None and borrower_token != '':
-        if borrower_code is not None and borrower_code != '':
-            code = generate_sms_code(deed_reference, borrower_token)
-            if borrower_code != code:
-                LOGGER.error("Invalid code")
-                return "Unable to complete authentication", status.HTTP_401_UNAUTHORIZED
-            else:
-                data, result = sign_deed(deed_reference, borrower_token)
-                return result is not None, result
+def verify_auth_code(deed_reference):
+    request_json = request.get_json()
+    borrower_token = request_json['borrower_token']
+    borrower_code = request_json['authentication_code']
 
+    deed, status_code = auth_sms(deed_reference, borrower_token, borrower_code)
 
-def generate_sms_code(deed_reference, borrower_token):
-    gen_code = deed_reference[-3:] + borrower_token[-3:]
-    return gen_code
+    if status_code == status.HTTP_200_OK:
+        LOGGER.info("Borrower with token %s successfully authenticated using valid authentication code: %s",
+                    borrower_token, borrower_code)
+        return jsonify({"result": True}), status.HTTP_200_OK
+    elif status_code == status.HTTP_401_UNAUTHORIZED:
+        LOGGER.error("Invalid authentication code: %s for borrower token %s ", borrower_code, borrower_token)
+        return jsonify({"result": False}), status_code
+    else:
+        LOGGER.error("Not able to sign the deed")
+        return jsonify({"result": False}), status_code
