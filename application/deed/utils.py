@@ -19,6 +19,7 @@ XML_SCHEMA_FILE = "deed-schema-v0-2.xsd"
 
 SCHEMA_LOCATION = config.ESEC_SCHEMA_LOCATION
 
+
 def call_once_only(func):
     def decorated(*args, **kwargs):
         try:
