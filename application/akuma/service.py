@@ -4,10 +4,11 @@ from application.service_clients import akuma
 class Akuma:
 
     @staticmethod
-    def do_check(json_payload, check_type):
+    def do_check(json_payload, check_type, org_id):
         payload = {
-            "service": "digital mortgage",
+            "service": "Digital Mortgage",
             "activity": check_type,
+            "organisation ID": org_id,
             "payload": json_payload
         }
 
