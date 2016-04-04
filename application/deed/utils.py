@@ -10,12 +10,14 @@ from underscore import _
 import application.deed.generated.deed_xmlify as api
 from flask import request
 import urllib
+from application import config
 
 LOGGER = logging.getLogger(__name__)
 
 
 XML_SCHEMA_FILE = "deed-schema-v0-2.xsd"
 
+SCHEMA_LOCATION = config.ESEC_SCHEMA_LOCATION
 
 def call_once_only(func):
     def decorated(*args, **kwargs):
@@ -232,7 +234,7 @@ def convert_json_to_xml(deed_json):
     deed_stream = io.StringIO()
     deed_app_xml.export(deed_stream, 0,
                         namespacedef_='xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
-                                      'xsi:noNamespaceSchemaLocation="http://localhost:9080/schemas/' +
+                                      'xsi:noNamespaceSchemaLocation="' + SCHEMA_LOCATION +
                                       XML_SCHEMA_FILE + '"'
                         )
     deed_xml = deed_stream.getvalue()
