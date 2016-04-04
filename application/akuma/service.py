@@ -5,6 +5,9 @@ class Akuma:
 
     @staticmethod
     def do_check(json_payload, check_type, org_id):
+
+        json_payload['title_no'] = json_payload['title_number']
+        
         payload = {
             "service": "digital mortgage",
             "activity": check_type,
