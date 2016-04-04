@@ -11,7 +11,7 @@ class Akuma:
         payload = {
             "service": "digital mortgage",
             "activity": check_type,
-            "organisation ID": org_id,
+            "organisation ID": org_name,
             "payload": json_payload
         }
 
