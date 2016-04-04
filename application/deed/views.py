@@ -65,14 +65,14 @@ def create():
         try:
             deed = Deed()
             deed.token = Deed.generate_token()
-            check_result = Akuma.do_check(deed_json, "create deed")
-            LOGGER.info("Check ID: " + check_result['id'])
 
             organisation_credentials = process_organisation_credentials()
 
             if organisation_credentials:
                 deed.organisation_id = organisation_credentials["O"][1]
                 deed.organisation_name = organisation_credentials["O"][0]
+                check_result = Akuma.do_check(deed_json, "create deed", deed.organisation_id)
+                LOGGER.info("Check ID: " + check_result['id'])
                 success, msg = update_deed(deed, deed_json, check_result['result'])
 
                 if not success:
