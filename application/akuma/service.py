@@ -13,7 +13,7 @@ class Akuma:
             "activity": check_type,
             "organisation_name": org_name,
             "payload": json_payload,
-            "organisation_locale" : org_locale
+            "organisation_locale": org_locale
         }
 
         akuma_client = akuma.make_akuma_client()
