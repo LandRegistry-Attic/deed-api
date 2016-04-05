@@ -8,7 +8,7 @@ class Akuma:
 
         json_payload['title_no'] = str(json_payload['title_number'])
         json_payload['organisation_locale'] = org_locale
-        json_payload ['organisation_name'] = org_name
+        json_payload['organisation_name'] = org_name
 
         payload = {
             "service": "digital mortgage",
