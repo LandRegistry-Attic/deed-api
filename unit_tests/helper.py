@@ -244,9 +244,9 @@ class AkumaMock:
             "identity_checked": "Y",
             "title_no": "DT107",
             "organisation_locale": "gb",
-            "organisation_name": "Land Registry Devices",
+            "organisation_name": "Land Registry Devices"
         },
-        "service": "Digital Mortgage",
-        "activity": "Create"
+        "service": "digital mortgage",
+        "activity": "create deed"
 
     }
