@@ -20,6 +20,7 @@ def upgrade():
     op.create_table('verify_match',
     sa.Column('verify_pid', sa.String(), nullable=False),
     sa.Column('borrower_id', sa.Integer(), nullable=False),
+    sa.Column('confidence_level', sa.String(), nullable=False),
     sa.ForeignKeyConstraint(['borrower_id'], ['borrower.id'], ),
     sa.PrimaryKeyConstraint('verify_pid', 'borrower_id')
     )
