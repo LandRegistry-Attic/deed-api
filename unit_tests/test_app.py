@@ -99,9 +99,10 @@ class TestRoutes(unittest.TestCase):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
         mock_akuma.return_value = {
-                "id": "3afb45f2-fbd1-11e5-a1b7-022404e4ac2f",
-                "result": "A"
-                }
+            "result": "A",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
+
         payload = json.dumps(DeedHelper._json_doc)
 
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
