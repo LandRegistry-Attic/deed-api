@@ -292,7 +292,7 @@ class TestRoutes(unittest.TestCase):
             "id": "2b9115b2-d956-11e5-942f-08002719cd16"
         }
 
-        check_result = Akuma.do_check(DeedHelper._json_doc, "Create")
+        check_result = Akuma.do_check(DeedHelper._json_doc, "create deed", "Land Registry Devices", "gb")
 
         self.assertEqual(check_result["result"], "A")
 
