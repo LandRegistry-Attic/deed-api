@@ -21,7 +21,7 @@ def upgrade():
     sa.Column('verify_pid', sa.String(), nullable=False),
     sa.Column('borrower_id', sa.Integer(), nullable=False),
     sa.Column('confidence_level', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['borrower_id'], ['borrower.id'], ),
+    sa.ForeignKeyConstraint(['borrower_id'], ['borrower.id'], ondelete="CASCADE"),
     sa.PrimaryKeyConstraint('verify_pid', 'borrower_id')
     )
     ### end Alembic commands ###
