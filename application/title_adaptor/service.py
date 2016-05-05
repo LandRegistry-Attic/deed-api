@@ -1,5 +1,4 @@
 from application.service_clients import title_adaptor
-from copy import deepcopy
 
 
 class TitleAdaptor:

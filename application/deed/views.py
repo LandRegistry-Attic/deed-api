@@ -90,9 +90,10 @@ def create():
                 return abort(status.HTTP_503_SERVICE_UNAVAILABLE)
 
             valid_title = TitleAdaptor.do_check(deed.deed['title_number'])
+            title_resp = valid_title.json()
 
-            if valid_title['response_code'] != 200:
-                return jsonify({"message": valid_title['message'], status.HTTP_400_BAD_REQUEST
+            if valid_title.status_code != status.HTTP_200_OK:
+                return jsonify({"message": title_resp['message']}), status.HTTP_400_BAD_REQUEST
 
 
             return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
