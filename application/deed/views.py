@@ -1,5 +1,6 @@
 import logging
 from application.akuma.service import Akuma
+from application.title_adaptor.service import TitleAdaptor
 from application.deed.model import Deed
 from application.deed.utils import validate_helper, process_organisation_credentials, convert_json_to_xml
 from application.deed.service import update_deed, update_deed_signature_timestamp
@@ -88,10 +89,10 @@ def create():
                 LOGGER.error("Akuma endpoint 503_SERVICE_UNAVAILABLE")
                 return abort(status.HTTP_503_SERVICE_UNAVAILABLE)
 
-            valid_title[0] = None
+            valid_title = TitleAdaptor.do_check(deed.deed['title_number'])
 
             if valid_title['response_code'] != 200:
-                return jsonify({"message": valid_title['response_message'], status.HTTP_400_BAD_REQUEST
+                return jsonify({"message": valid_title['message'], status.HTTP_400_BAD_REQUEST
 
 
             return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
