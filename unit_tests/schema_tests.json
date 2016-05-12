@@ -308,6 +308,16 @@
       ]
     }
   },
+  "property_address": {
+      "pattern_path": "/definitions/Deed_Application/properties/property_address",
+      "payload_tests": [
+	  {
+	      "description": "Special Chars",
+	      "expected": true,
+	      "payload": "Chalon-Sur-Saône, Westward Ho!, Devon"
+	  }
+      ]
+  },
   "test_payloads": [
     {
       "payload": {
