@@ -91,8 +91,7 @@ def update_deed(deed, deed_json, akuma_flag):
     update_borrower_for_token = partial(update_borrower, deed_token=deed.token)
 
     borrower_json = _(borrowers).chain()\
-        .map(update_borrower_for_token)\
-        .value() if akuma_flag == "A" else None
+        .map(update_borrower_for_token).value()
 
     json_doc['borrowers'] = borrower_json
 
