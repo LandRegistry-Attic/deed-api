@@ -84,10 +84,6 @@ def create():
                 LOGGER.error("Unable to process headers")
                 return "Unable to process headers", status.HTTP_401_UNAUTHORIZED
 
-            if check_result['result'] != "A":
-                LOGGER.error("Akuma endpoint 503_SERVICE_UNAVAILABLE")
-                return abort(status.HTTP_503_SERVICE_UNAVAILABLE)
-
             return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
 
         except:
