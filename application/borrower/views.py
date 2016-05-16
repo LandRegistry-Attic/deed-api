@@ -27,6 +27,22 @@ def validate_borrower():
     return "Matching deed not found", status.HTTP_404_NOT_FOUND
 
 
+@borrower_bp.route('/verify/pid/<verify_pid>', methods=['GET'])
+def get_borrower_details_by_verify_pid(verify_pid):
+    result = Borrower.get_by_verify_pid(verify_pid)
+
+    if result is not None:
+        return json.dumps(
+            {
+                "borrower_token": result.token,
+                "deed_token": result.deed_token,
+                "phone_number": result.phonenumber
+            }
+        ), status.HTTP_200_OK
+
+    return "Matching borrower not found", status.HTTP_404_NOT_FOUND
+
+
 def strip_number_to_four_digits(phone_number):
     stripped_number = phone_number[-4:]
     return stripped_number

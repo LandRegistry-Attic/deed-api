@@ -1,3 +1,4 @@
+from sqlalchemy import ForeignKey
 from application import db
 import uuid
 
@@ -43,6 +44,16 @@ class Borrower(db.Model):
 
     def get_by_token(token_):
         return Borrower.query.filter_by(token=token_).first()
+
+    def get_by_verify_pid(verify_pid):
+        return Borrower.query.join(VerifyMatch).filter(VerifyMatch.verify_pid == verify_pid).first()
+
+
+class VerifyMatch(db.Model):
+    __tablename__ = 'verify_match'
+
+    verify_pid = db.Column(db.String, primary_key=True)
+    borrower_id = db.Column(db.Integer, ForeignKey("borrower.id"), primary_key=True)
 
 
 def bin_to_char(bin_str):
