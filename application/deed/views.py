@@ -86,9 +86,8 @@ def create():
                 return "Unable to process headers", status.HTTP_401_UNAUTHORIZED
 
             valid_title = TitleAdaptor.do_check(deed.deed['title_number'])
-
-            if valid_title != "title OK":
-                return jsonify({"message": valid_title}), status.HTTP_400_BAD_REQUEST
+            if valid_title.text != "title OK":
+                return jsonify({"message": valid_title.text}), status.HTTP_400_BAD_REQUEST
 
             return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
 
