@@ -85,10 +85,6 @@ def create():
                 LOGGER.error("Unable to process headers")
                 return "Unable to process headers", status.HTTP_401_UNAUTHORIZED
 
-            if check_result['result'] != "A":
-                LOGGER.error("Akuma endpoint 503_SERVICE_UNAVAILABLE")
-                return abort(status.HTTP_503_SERVICE_UNAVAILABLE)
-
             valid_title = TitleAdaptor.do_check(deed.deed['title_number'])
 
             if valid_title != "title OK":
