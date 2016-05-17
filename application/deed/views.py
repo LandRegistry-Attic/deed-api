@@ -1,5 +1,6 @@
 import logging
 from application.akuma.service import Akuma
+from application.title_adaptor.service import TitleAdaptor
 from application.deed.model import Deed
 from application.deed.utils import validate_helper, process_organisation_credentials, convert_json_to_xml
 from application.deed.service import update_deed, update_deed_signature_timestamp
@@ -83,6 +84,11 @@ def create():
             else:
                 LOGGER.error("Unable to process headers")
                 return "Unable to process headers", status.HTTP_401_UNAUTHORIZED
+
+            valid_title = TitleAdaptor.do_check(deed.deed['title_number'])
+
+            if valid_title != "title OK":
+                return jsonify({"message": valid_title}), status.HTTP_400_BAD_REQUEST
 
             return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
 
