@@ -94,7 +94,6 @@ def create():
             if valid_title != "title OK":
                 return jsonify({"message": valid_title}), status.HTTP_400_BAD_REQUEST
 
-
             return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
 
         except:
