@@ -71,7 +71,7 @@ class TestRoutes(unittest.TestCase):
                                  headers={"Content-Type": "application/json"})
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        
+
     @mock.patch('application.service_clients.title_adaptor.interface.TitleAdaptorInterface.perform_check')
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')
