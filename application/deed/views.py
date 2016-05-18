@@ -77,7 +77,7 @@ def create():
                                               deed.organisation_name, organisation_locale)
                 LOGGER.info("Check ID: " + check_result['id'])
 
-                valid_title = TitleAdaptor.do_check(deed['title_ number'])
+                valid_title = TitleAdaptor.do_check(deed_json['title_ number'])
                 if valid_title.text != "title OK":
                     return jsonify({"message": valid_title.text}), status.HTTP_400_BAD_REQUEST
 
