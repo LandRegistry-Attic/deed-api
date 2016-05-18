@@ -76,6 +76,11 @@ def create():
                 check_result = Akuma.do_check(deed_json, "create deed",
                                               deed.organisation_name, organisation_locale)
                 LOGGER.info("Check ID: " + check_result['id'])
+
+            valid_title = TitleAdaptor.do_check(deed.deed['title_number'])
+            if valid_title.text != "title OK":
+                return jsonify({"message": valid_title.text}), status.HTTP_400_BAD_REQUEST
+
                 success, msg = update_deed(deed, deed_json, check_result['result'])
 
                 if not success:
@@ -85,9 +90,7 @@ def create():
                 LOGGER.error("Unable to process headers")
                 return "Unable to process headers", status.HTTP_401_UNAUTHORIZED
 
-            valid_title = TitleAdaptor.do_check(deed.deed['title_number'])
-            if valid_title.text != "title OK":
-                return jsonify({"message": valid_title.text}), status.HTTP_400_BAD_REQUEST
+
 
             return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
 
