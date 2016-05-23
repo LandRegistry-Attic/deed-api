@@ -12,6 +12,8 @@ from application import esec_client
 import json
 import sys
 import copy
+from application.deed.validate_borrowers import check_borrower_names, BorrowerNamesException
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -64,6 +66,7 @@ def create():
     else:
 
         try:
+            check_borrower_names(deed_json)
             deed = Deed()
             deed.token = Deed.generate_token()
 
@@ -90,7 +93,10 @@ def create():
                 return "Unable to process headers", status.HTTP_401_UNAUTHORIZED
 
             return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
-
+        except BorrowerNamesException:
+            return (jsonify({'message':
+                            "a digital mortgage cannot be created as there is a discrepancy between the names given and those held on the register."}),
+                    status.HTTP_400_BAD_REQUEST)
         except:
             msg = str(sys.exc_info())
             LOGGER.error("Database Exception - %s" % msg)
