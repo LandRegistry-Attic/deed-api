@@ -10,4 +10,4 @@ class TitleAdaptor:
 
         check_result = title_adaptor_client.perform_check(title)
 
-        return check_result
+        return check_result.text
