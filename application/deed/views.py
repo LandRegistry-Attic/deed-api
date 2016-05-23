@@ -76,9 +76,8 @@ def create():
                 check_result = Akuma.do_check(deed_json, "create deed",
                                               deed.organisation_name, organisation_locale)
                 LOGGER.info("Check ID: " + check_result['id'])
-
                 valid_title = TitleAdaptor.do_check(deed_json['title_number'])
-                if valid_title.text != "title OK":
+                if valid_title != "title OK":
                     return jsonify({"message": valid_title.text}), status.HTTP_400_BAD_REQUEST
 
                 success, msg = update_deed(deed, deed_json, check_result['result'])

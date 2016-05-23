@@ -72,20 +72,19 @@ class TestRoutes(unittest.TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    @mock.patch('application.service_clients.title_adaptor.interface.TitleAdaptorInterface.perform_check')
+    @mock.patch('application.title_adaptor.service.TitleAdaptor.do_check', autospec=False)
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_create_webseal_external(self, mock_query, mock_Deed, mock_Borrower, mock_akuma, mock_validator):
+    def test_create_webseal_external(self, mock_query, mock_Deed, mock_Borrower, mock_akuma, mock_title):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
         mock_akuma.return_value = {
             "result": "A",
             "id": "2b9115b2-d956-11e5-942f-08002719cd16"
         }
-        mock_validator.return_value = "title OK"
-
+        mock_title.return_value = "title OK"
         payload = json.dumps(DeedHelper._json_doc)
 
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
@@ -241,16 +240,18 @@ class TestRoutes(unittest.TestCase):
     def test_schema_checks(self):
         self.assertTrue(run_schema_checks())
 
+    @mock.patch('application.service_clients.title_adaptor.interface.TitleAdaptorInterface.perform_check')
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.deed.service', autospec=True)
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_invalid_md_ref(self, mock_query, mock_Deed, mock_Borrower, mock_update, mock_akuma):
+    def test_invalid_md_ref(self, mock_query, mock_Deed, mock_Borrower, mock_update, mock_akuma, mock_validator):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = None
 
         mock_update.update_deed.return_value = True, "OK"
+        mock_validator.return_value.text = "title OK"
 
         payload = json.dumps(DeedHelper._json_doc)
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
