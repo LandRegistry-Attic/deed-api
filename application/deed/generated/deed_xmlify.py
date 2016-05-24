@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Tue Jan 12 09:47:16 2016 by generateDS.py version 2.18a.
+# Generated Fri Mar  4 13:56:11 2016 by generateDS.py version 2.18a.
 #
 # Command line options:
 #   ('-f', '')
 #   ('-o', '../application/deed/generated/deed_xmlify.py')
 #
 # Command line arguments:
-#   ../application/deed/schemas/deed-schema-v0-1.xsd
+#   ../application/deed/schemas/deed-schema-v0-2.xsd
 #
 # Command line:
-#   C:\Users\cs769st\PycharmProjects\dm-deed-api\xmlify\generateDS.py -f -o "../application/deed/generated/deed_xmlify.py" ../application/deed/schemas/deed-schema-v0-1.xsd
+#   generateDS.py -f -o "../application/deed/generated/deed_xmlify.py" ../application/deed/schemas/deed-schema-v0-2.xsd
 #
 # Current working directory (os.getcwd()):
 #   xmlify
@@ -1002,25 +1002,25 @@ class borrowerType(GeneratedsSuper):
 class signatureType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, Signature=None):
+    def __init__(self, signature=None):
         self.original_tagname_ = None
-        self.Signature = Signature
+        self.signature = signature
     def factory(*args_, **kwargs_):
         if signatureType.subclass:
             return signatureType.subclass(*args_, **kwargs_)
         else:
             return signatureType(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_Signature(self): return self.Signature
-    def set_Signature(self, Signature): self.Signature = Signature
+    def get_signature(self): return self.signature
+    def set_signature(self, signature): self.signature = signature
     def hasContent_(self):
         if (
-            self.Signature is not None
+            self.signature is not None
         ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='signatureType', namespacedef_=' xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" ', pretty_print=True):
+    def export(self, outfile, level, namespace_='', name_='signatureType', namespacedef_='', pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
@@ -1045,8 +1045,9 @@ class signatureType(GeneratedsSuper):
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.Signature is not None:
-            self.Signature.export(outfile, level, namespace_='dsig:', name_='Signature', pretty_print=pretty_print)
+        if self.signature is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%ssignature>%s</%ssignature>%s' % (namespace_, self.gds_format_string(quote_xml(self.signature).encode(ExternalEncoding), input_name='signature'), namespace_, eol_))
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -1057,12 +1058,64 @@ class signatureType(GeneratedsSuper):
     def buildAttributes(self, node, attrs, already_processed):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
-        if nodeName_ == 'Signature':
-            obj_ = SignatureType.factory()
-            obj_.build(child_)
-            self.Signature = obj_
-            obj_.original_tagname_ = 'Signature'
+        if nodeName_ == 'signature':
+            signature_ = child_.text
+            signature_ = self.gds_validate_string(signature_, node, 'signature')
+            self.signature = signature_
 # end class signatureType
+
+
+class signature(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self):
+        self.original_tagname_ = None
+    def factory(*args_, **kwargs_):
+        if signature.subclass:
+            return signature.subclass(*args_, **kwargs_)
+        else:
+            return signature(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def hasContent_(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='signature', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='signature')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='signature', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='signature'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='signature', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        pass
+# end class signature
 
 
 class authSignatureType(GeneratedsSuper):
@@ -1211,13 +1264,17 @@ class signatureSlotType(GeneratedsSuper):
 class deedDataType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, Id=None, titleNumber=None, propertyDescription=None, borrowers=None, mdRef=None):
+    def __init__(self, Id=None, titleNumber=None, propertyDescription=None, borrowers=None, mdRef=None, chargeClause=None, additionalProvisions=None, lender=None, effectiveClause=None):
         self.original_tagname_ = None
         self.Id = _cast(None, Id)
         self.titleNumber = titleNumber
         self.propertyDescription = propertyDescription
         self.borrowers = borrowers
         self.mdRef = mdRef
+        self.chargeClause = chargeClause
+        self.additionalProvisions = additionalProvisions
+        self.lender = lender
+        self.effectiveClause = effectiveClause
     def factory(*args_, **kwargs_):
         if deedDataType.subclass:
             return deedDataType.subclass(*args_, **kwargs_)
@@ -1232,6 +1289,14 @@ class deedDataType(GeneratedsSuper):
     def set_borrowers(self, borrowers): self.borrowers = borrowers
     def get_mdRef(self): return self.mdRef
     def set_mdRef(self, mdRef): self.mdRef = mdRef
+    def get_chargeClause(self): return self.chargeClause
+    def set_chargeClause(self, chargeClause): self.chargeClause = chargeClause
+    def get_additionalProvisions(self): return self.additionalProvisions
+    def set_additionalProvisions(self, additionalProvisions): self.additionalProvisions = additionalProvisions
+    def get_lender(self): return self.lender
+    def set_lender(self, lender): self.lender = lender
+    def get_effectiveClause(self): return self.effectiveClause
+    def set_effectiveClause(self, effectiveClause): self.effectiveClause = effectiveClause
     def get_Id(self): return self.Id
     def set_Id(self, Id): self.Id = Id
     def hasContent_(self):
@@ -1239,7 +1304,11 @@ class deedDataType(GeneratedsSuper):
             self.titleNumber is not None or
             self.propertyDescription is not None or
             self.borrowers is not None or
-            self.mdRef is not None
+            self.mdRef is not None or
+            self.chargeClause is not None or
+            self.additionalProvisions is not None or
+            self.lender is not None or
+            self.effectiveClause is not None
         ):
             return True
         else:
@@ -1282,6 +1351,15 @@ class deedDataType(GeneratedsSuper):
         if self.mdRef is not None:
             showIndent(outfile, level, pretty_print)
             outfile.write('<%smdRef>%s</%smdRef>%s' % (namespace_, self.gds_format_string(quote_xml(self.mdRef).encode(ExternalEncoding), input_name='mdRef'), namespace_, eol_))
+        if self.chargeClause is not None:
+            self.chargeClause.export(outfile, level, namespace_, name_='chargeClause', pretty_print=pretty_print)
+        if self.additionalProvisions is not None:
+            self.additionalProvisions.export(outfile, level, namespace_, name_='additionalProvisions', pretty_print=pretty_print)
+        if self.lender is not None:
+            self.lender.export(outfile, level, namespace_, name_='lender', pretty_print=pretty_print)
+        if self.effectiveClause is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%seffectiveClause>%s</%seffectiveClause>%s' % (namespace_, self.gds_format_string(quote_xml(self.effectiveClause).encode(ExternalEncoding), input_name='effectiveClause'), namespace_, eol_))
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -1312,6 +1390,25 @@ class deedDataType(GeneratedsSuper):
             mdRef_ = child_.text
             mdRef_ = self.gds_validate_string(mdRef_, node, 'mdRef')
             self.mdRef = mdRef_
+        elif nodeName_ == 'chargeClause':
+            obj_ = chargeClauseType.factory()
+            obj_.build(child_)
+            self.chargeClause = obj_
+            obj_.original_tagname_ = 'chargeClause'
+        elif nodeName_ == 'additionalProvisions':
+            obj_ = additionalProvisionsType.factory()
+            obj_.build(child_)
+            self.additionalProvisions = obj_
+            obj_.original_tagname_ = 'additionalProvisions'
+        elif nodeName_ == 'lender':
+            obj_ = lenderType.factory()
+            obj_.build(child_)
+            self.lender = obj_
+            obj_.original_tagname_ = 'lender'
+        elif nodeName_ == 'effectiveClause':
+            effectiveClause_ = child_.text
+            effectiveClause_ = self.gds_validate_string(effectiveClause_, node, 'effectiveClause')
+            self.effectiveClause = effectiveClause_
 # end class deedDataType
 
 
@@ -1390,28 +1487,24 @@ class signatureSlotsType(GeneratedsSuper):
 class nameType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, forename=None, middlename=None, surname=None):
+    def __init__(self, privateIndividual=None, company=None):
         self.original_tagname_ = None
-        self.forename = forename
-        self.middlename = middlename
-        self.surname = surname
+        self.privateIndividual = privateIndividual
+        self.company = company
     def factory(*args_, **kwargs_):
         if nameType.subclass:
             return nameType.subclass(*args_, **kwargs_)
         else:
             return nameType(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_forename(self): return self.forename
-    def set_forename(self, forename): self.forename = forename
-    def get_middlename(self): return self.middlename
-    def set_middlename(self, middlename): self.middlename = middlename
-    def get_surname(self): return self.surname
-    def set_surname(self, surname): self.surname = surname
+    def get_privateIndividual(self): return self.privateIndividual
+    def set_privateIndividual(self, privateIndividual): self.privateIndividual = privateIndividual
+    def get_company(self): return self.company
+    def set_company(self, company): self.company = company
     def hasContent_(self):
         if (
-            self.forename is not None or
-            self.middlename is not None or
-            self.surname is not None
+            self.privateIndividual is not None or
+            self.company is not None
         ):
             return True
         else:
@@ -1437,6 +1530,87 @@ class nameType(GeneratedsSuper):
     def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='nameType'):
         pass
     def exportChildren(self, outfile, level, namespace_='', name_='nameType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.privateIndividual is not None:
+            self.privateIndividual.export(outfile, level, namespace_, name_='privateIndividual', pretty_print=pretty_print)
+        if self.company is not None:
+            self.company.export(outfile, level, namespace_, name_='company', pretty_print=pretty_print)
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'privateIndividual':
+            obj_ = privateIndividualType.factory()
+            obj_.build(child_)
+            self.privateIndividual = obj_
+            obj_.original_tagname_ = 'privateIndividual'
+        elif nodeName_ == 'company':
+            obj_ = companyType.factory()
+            obj_.build(child_)
+            self.company = obj_
+            obj_.original_tagname_ = 'company'
+# end class nameType
+
+
+class privateIndividualType(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, forename=None, middlename=None, surname=None):
+        self.original_tagname_ = None
+        self.forename = forename
+        self.middlename = middlename
+        self.surname = surname
+    def factory(*args_, **kwargs_):
+        if privateIndividualType.subclass:
+            return privateIndividualType.subclass(*args_, **kwargs_)
+        else:
+            return privateIndividualType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_forename(self): return self.forename
+    def set_forename(self, forename): self.forename = forename
+    def get_middlename(self): return self.middlename
+    def set_middlename(self, middlename): self.middlename = middlename
+    def get_surname(self): return self.surname
+    def set_surname(self, surname): self.surname = surname
+    def hasContent_(self):
+        if (
+            self.forename is not None or
+            self.middlename is not None or
+            self.surname is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='privateIndividualType', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='privateIndividualType')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='privateIndividualType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='privateIndividualType'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='privateIndividualType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
@@ -1472,7 +1646,402 @@ class nameType(GeneratedsSuper):
             surname_ = child_.text
             surname_ = self.gds_validate_string(surname_, node, 'surname')
             self.surname = surname_
-# end class nameType
+# end class privateIndividualType
+
+
+class companyType(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, name=None):
+        self.original_tagname_ = None
+        self.name = name
+    def factory(*args_, **kwargs_):
+        if companyType.subclass:
+            return companyType.subclass(*args_, **kwargs_)
+        else:
+            return companyType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_name(self): return self.name
+    def set_name(self, name): self.name = name
+    def hasContent_(self):
+        if (
+            self.name is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='companyType', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='companyType')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='companyType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='companyType'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='companyType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.name is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sname>%s</%sname>%s' % (namespace_, self.gds_format_string(quote_xml(self.name).encode(ExternalEncoding), input_name='name'), namespace_, eol_))
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'name':
+            name_ = child_.text
+            name_ = self.gds_validate_string(name_, node, 'name')
+            self.name = name_
+# end class companyType
+
+
+class lenderType(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, organisationName=None, address=None, companyRegistrationDetails=None):
+        self.original_tagname_ = None
+        self.organisationName = organisationName
+        self.address = address
+        self.companyRegistrationDetails = companyRegistrationDetails
+    def factory(*args_, **kwargs_):
+        if lenderType.subclass:
+            return lenderType.subclass(*args_, **kwargs_)
+        else:
+            return lenderType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_organisationName(self): return self.organisationName
+    def set_organisationName(self, organisationName): self.organisationName = organisationName
+    def get_address(self): return self.address
+    def set_address(self, address): self.address = address
+    def get_companyRegistrationDetails(self): return self.companyRegistrationDetails
+    def set_companyRegistrationDetails(self, companyRegistrationDetails): self.companyRegistrationDetails = companyRegistrationDetails
+    def hasContent_(self):
+        if (
+            self.organisationName is not None or
+            self.address is not None or
+            self.companyRegistrationDetails is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='lenderType', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='lenderType')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='lenderType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='lenderType'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='lenderType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.organisationName is not None:
+            self.organisationName.export(outfile, level, namespace_, name_='organisationName', pretty_print=pretty_print)
+        if self.address is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%saddress>%s</%saddress>%s' % (namespace_, self.gds_format_string(quote_xml(self.address).encode(ExternalEncoding), input_name='address'), namespace_, eol_))
+        if self.companyRegistrationDetails is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%scompanyRegistrationDetails>%s</%scompanyRegistrationDetails>%s' % (namespace_, self.gds_format_string(quote_xml(self.companyRegistrationDetails).encode(ExternalEncoding), input_name='companyRegistrationDetails'), namespace_, eol_))
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'organisationName':
+            obj_ = nameType.factory()
+            obj_.build(child_)
+            self.organisationName = obj_
+            obj_.original_tagname_ = 'organisationName'
+        elif nodeName_ == 'address':
+            address_ = child_.text
+            address_ = self.gds_validate_string(address_, node, 'address')
+            self.address = address_
+        elif nodeName_ == 'companyRegistrationDetails':
+            companyRegistrationDetails_ = child_.text
+            companyRegistrationDetails_ = self.gds_validate_string(companyRegistrationDetails_, node, 'companyRegistrationDetails')
+            self.companyRegistrationDetails = companyRegistrationDetails_
+# end class lenderType
+
+
+class chargeClauseType(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, creCode=None, entryText=None):
+        self.original_tagname_ = None
+        self.creCode = creCode
+        self.entryText = entryText
+    def factory(*args_, **kwargs_):
+        if chargeClauseType.subclass:
+            return chargeClauseType.subclass(*args_, **kwargs_)
+        else:
+            return chargeClauseType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_creCode(self): return self.creCode
+    def set_creCode(self, creCode): self.creCode = creCode
+    def get_entryText(self): return self.entryText
+    def set_entryText(self, entryText): self.entryText = entryText
+    def hasContent_(self):
+        if (
+            self.creCode is not None or
+            self.entryText is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='chargeClauseType', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='chargeClauseType')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='chargeClauseType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='chargeClauseType'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='chargeClauseType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.creCode is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%screCode>%s</%screCode>%s' % (namespace_, self.gds_format_string(quote_xml(self.creCode).encode(ExternalEncoding), input_name='creCode'), namespace_, eol_))
+        if self.entryText is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sentryText>%s</%sentryText>%s' % (namespace_, self.gds_format_string(quote_xml(self.entryText).encode(ExternalEncoding), input_name='entryText'), namespace_, eol_))
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'creCode':
+            creCode_ = child_.text
+            creCode_ = self.gds_validate_string(creCode_, node, 'creCode')
+            self.creCode = creCode_
+        elif nodeName_ == 'entryText':
+            entryText_ = child_.text
+            entryText_ = self.gds_validate_string(entryText_, node, 'entryText')
+            self.entryText = entryText_
+# end class chargeClauseType
+
+
+class additionalProvisionsType(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, provision=None):
+        self.original_tagname_ = None
+        if provision is None:
+            self.provision = []
+        else:
+            self.provision = provision
+    def factory(*args_, **kwargs_):
+        if additionalProvisionsType.subclass:
+            return additionalProvisionsType.subclass(*args_, **kwargs_)
+        else:
+            return additionalProvisionsType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_provision(self): return self.provision
+    def set_provision(self, provision): self.provision = provision
+    def add_provision(self, value): self.provision.append(value)
+    def insert_provision_at(self, index, value): self.provision.insert(index, value)
+    def replace_provision_at(self, index, value): self.provision[index] = value
+    def hasContent_(self):
+        if (
+            self.provision
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='additionalProvisionsType', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='additionalProvisionsType')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='additionalProvisionsType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='additionalProvisionsType'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='additionalProvisionsType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for provision_ in self.provision:
+            provision_.export(outfile, level, namespace_, name_='provision', pretty_print=pretty_print)
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'provision':
+            obj_ = provisionType.factory()
+            obj_.build(child_)
+            self.provision.append(obj_)
+            obj_.original_tagname_ = 'provision'
+# end class additionalProvisionsType
+
+
+class provisionType(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, code=None, entryText=None, sequenceNumber=None):
+        self.original_tagname_ = None
+        self.code = code
+        self.entryText = entryText
+        self.sequenceNumber = sequenceNumber
+    def factory(*args_, **kwargs_):
+        if provisionType.subclass:
+            return provisionType.subclass(*args_, **kwargs_)
+        else:
+            return provisionType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_code(self): return self.code
+    def set_code(self, code): self.code = code
+    def get_entryText(self): return self.entryText
+    def set_entryText(self, entryText): self.entryText = entryText
+    def get_sequenceNumber(self): return self.sequenceNumber
+    def set_sequenceNumber(self, sequenceNumber): self.sequenceNumber = sequenceNumber
+    def hasContent_(self):
+        if (
+            self.code is not None or
+            self.entryText is not None or
+            self.sequenceNumber is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='provisionType', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='provisionType')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='provisionType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='provisionType'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='provisionType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.code is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%scode>%s</%scode>%s' % (namespace_, self.gds_format_string(quote_xml(self.code).encode(ExternalEncoding), input_name='code'), namespace_, eol_))
+        if self.entryText is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sentryText>%s</%sentryText>%s' % (namespace_, self.gds_format_string(quote_xml(self.entryText).encode(ExternalEncoding), input_name='entryText'), namespace_, eol_))
+        if self.sequenceNumber is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%ssequenceNumber>%s</%ssequenceNumber>%s' % (namespace_, self.gds_format_integer(self.sequenceNumber, input_name='sequenceNumber'), namespace_, eol_))
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'code':
+            code_ = child_.text
+            code_ = self.gds_validate_string(code_, node, 'code')
+            self.code = code_
+        elif nodeName_ == 'entryText':
+            entryText_ = child_.text
+            entryText_ = self.gds_validate_string(entryText_, node, 'entryText')
+            self.entryText = entryText_
+        elif nodeName_ == 'sequenceNumber':
+            sval_ = child_.text
+            try:
+                ival_ = int(sval_)
+            except (TypeError, ValueError) as exp:
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'sequenceNumber')
+            self.sequenceNumber = ival_
+# end class provisionType
 
 
 class SignatureType(GeneratedsSuper):
@@ -1983,10 +2552,10 @@ class SignatureMethodType(GeneratedsSuper):
 class ReferenceType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, URI=None, Type=None, Id=None, Transforms=None, DigestMethod=None, DigestValue=None):
+    def __init__(self, Type=None, URI=None, Id=None, Transforms=None, DigestMethod=None, DigestValue=None):
         self.original_tagname_ = None
-        self.URI = _cast(None, URI)
         self.Type = _cast(None, Type)
+        self.URI = _cast(None, URI)
         self.Id = _cast(None, Id)
         self.Transforms = Transforms
         self.DigestMethod = DigestMethod
@@ -2003,10 +2572,10 @@ class ReferenceType(GeneratedsSuper):
     def set_DigestMethod(self, DigestMethod): self.DigestMethod = DigestMethod
     def get_DigestValue(self): return self.DigestValue
     def set_DigestValue(self, DigestValue): self.DigestValue = DigestValue
-    def get_URI(self): return self.URI
-    def set_URI(self, URI): self.URI = URI
     def get_Type(self): return self.Type
     def set_Type(self, Type): self.Type = Type
+    def get_URI(self): return self.URI
+    def set_URI(self, URI): self.URI = URI
     def get_Id(self): return self.Id
     def set_Id(self, Id): self.Id = Id
     def hasContent_(self):
@@ -2037,12 +2606,12 @@ class ReferenceType(GeneratedsSuper):
         else:
             outfile.write('/>%s' % (eol_, ))
     def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='ReferenceType'):
-        if self.URI is not None and 'URI' not in already_processed:
-            already_processed.add('URI')
-            outfile.write(' URI=%s' % (quote_attrib(self.URI), ))
         if self.Type is not None and 'Type' not in already_processed:
             already_processed.add('Type')
             outfile.write(' Type=%s' % (quote_attrib(self.Type), ))
+        if self.URI is not None and 'URI' not in already_processed:
+            already_processed.add('URI')
+            outfile.write(' URI=%s' % (quote_attrib(self.URI), ))
         if self.Id is not None and 'Id' not in already_processed:
             already_processed.add('Id')
             outfile.write(' Id=%s' % (quote_attrib(self.Id), ))
@@ -2066,14 +2635,14 @@ class ReferenceType(GeneratedsSuper):
             self.buildChildren(child, node, nodeName_)
         return self
     def buildAttributes(self, node, attrs, already_processed):
-        value = find_attr_value_('URI', node)
-        if value is not None and 'URI' not in already_processed:
-            already_processed.add('URI')
-            self.URI = value
         value = find_attr_value_('Type', node)
         if value is not None and 'Type' not in already_processed:
             already_processed.add('Type')
             self.Type = value
+        value = find_attr_value_('URI', node)
+        if value is not None and 'URI' not in already_processed:
+            already_processed.add('URI')
+            self.URI = value
         value = find_attr_value_('Id', node)
         if value is not None and 'Id' not in already_processed:
             already_processed.add('Id')
@@ -3245,10 +3814,10 @@ class SPKIDataType(GeneratedsSuper):
 class ObjectType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, Encoding=None, MimeType=None, Id=None, anytypeobjs_=None, valueOf_=None, mixedclass_=None, content_=None):
+    def __init__(self, MimeType=None, Encoding=None, Id=None, anytypeobjs_=None, valueOf_=None, mixedclass_=None, content_=None):
         self.original_tagname_ = None
-        self.Encoding = _cast(None, Encoding)
         self.MimeType = _cast(None, MimeType)
+        self.Encoding = _cast(None, Encoding)
         self.Id = _cast(None, Id)
         self.anytypeobjs_ = anytypeobjs_
         self.valueOf_ = valueOf_
@@ -3269,10 +3838,10 @@ class ObjectType(GeneratedsSuper):
     factory = staticmethod(factory)
     def get_anytypeobjs_(self): return self.anytypeobjs_
     def set_anytypeobjs_(self, anytypeobjs_): self.anytypeobjs_ = anytypeobjs_
-    def get_Encoding(self): return self.Encoding
-    def set_Encoding(self, Encoding): self.Encoding = Encoding
     def get_MimeType(self): return self.MimeType
     def set_MimeType(self, MimeType): self.MimeType = MimeType
+    def get_Encoding(self): return self.Encoding
+    def set_Encoding(self, Encoding): self.Encoding = Encoding
     def get_Id(self): return self.Id
     def set_Id(self, Id): self.Id = Id
     def get_valueOf_(self): return self.valueOf_
@@ -3304,12 +3873,12 @@ class ObjectType(GeneratedsSuper):
         else:
             outfile.write('/>%s' % (eol_, ))
     def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='ObjectType'):
-        if self.Encoding is not None and 'Encoding' not in already_processed:
-            already_processed.add('Encoding')
-            outfile.write(' Encoding=%s' % (quote_attrib(self.Encoding), ))
         if self.MimeType is not None and 'MimeType' not in already_processed:
             already_processed.add('MimeType')
             outfile.write(' MimeType=%s' % (quote_attrib(self.MimeType), ))
+        if self.Encoding is not None and 'Encoding' not in already_processed:
+            already_processed.add('Encoding')
+            outfile.write(' Encoding=%s' % (quote_attrib(self.Encoding), ))
         if self.Id is not None and 'Id' not in already_processed:
             already_processed.add('Id')
             outfile.write(' Id=%s' % (quote_attrib(self.Id), ))
@@ -3330,14 +3899,14 @@ class ObjectType(GeneratedsSuper):
             self.buildChildren(child, node, nodeName_)
         return self
     def buildAttributes(self, node, attrs, already_processed):
-        value = find_attr_value_('Encoding', node)
-        if value is not None and 'Encoding' not in already_processed:
-            already_processed.add('Encoding')
-            self.Encoding = value
         value = find_attr_value_('MimeType', node)
         if value is not None and 'MimeType' not in already_processed:
             already_processed.add('MimeType')
             self.MimeType = value
+        value = find_attr_value_('Encoding', node)
+        if value is not None and 'Encoding' not in already_processed:
+            already_processed.add('Encoding')
+            self.Encoding = value
         value = find_attr_value_('Id', node)
         if value is not None and 'Id' not in already_processed:
             already_processed.add('Id')
@@ -3523,10 +4092,10 @@ class SignaturePropertiesType(GeneratedsSuper):
 class SignaturePropertyType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, Target=None, Id=None, anytypeobjs_=None, valueOf_=None, mixedclass_=None, content_=None):
+    def __init__(self, Id=None, Target=None, anytypeobjs_=None, valueOf_=None, mixedclass_=None, content_=None):
         self.original_tagname_ = None
-        self.Target = _cast(None, Target)
         self.Id = _cast(None, Id)
+        self.Target = _cast(None, Target)
         self.anytypeobjs_ = anytypeobjs_
         self.valueOf_ = valueOf_
         if mixedclass_ is None:
@@ -3546,10 +4115,10 @@ class SignaturePropertyType(GeneratedsSuper):
     factory = staticmethod(factory)
     def get_anytypeobjs_(self): return self.anytypeobjs_
     def set_anytypeobjs_(self, anytypeobjs_): self.anytypeobjs_ = anytypeobjs_
-    def get_Target(self): return self.Target
-    def set_Target(self, Target): self.Target = Target
     def get_Id(self): return self.Id
     def set_Id(self, Id): self.Id = Id
+    def get_Target(self): return self.Target
+    def set_Target(self, Target): self.Target = Target
     def get_valueOf_(self): return self.valueOf_
     def set_valueOf_(self, valueOf_): self.valueOf_ = valueOf_
     def hasContent_(self):
@@ -3579,12 +4148,12 @@ class SignaturePropertyType(GeneratedsSuper):
         else:
             outfile.write('/>%s' % (eol_, ))
     def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='SignaturePropertyType'):
-        if self.Target is not None and 'Target' not in already_processed:
-            already_processed.add('Target')
-            outfile.write(' Target=%s' % (quote_attrib(self.Target), ))
         if self.Id is not None and 'Id' not in already_processed:
             already_processed.add('Id')
             outfile.write(' Id=%s' % (quote_attrib(self.Id), ))
+        if self.Target is not None and 'Target' not in already_processed:
+            already_processed.add('Target')
+            outfile.write(' Target=%s' % (quote_attrib(self.Target), ))
     def exportChildren(self, outfile, level, namespace_='', name_='SignaturePropertyType', fromsubclass_=False, pretty_print=True):
         if not fromsubclass_:
             for item_ in self.content_:
@@ -3602,14 +4171,14 @@ class SignaturePropertyType(GeneratedsSuper):
             self.buildChildren(child, node, nodeName_)
         return self
     def buildAttributes(self, node, attrs, already_processed):
-        value = find_attr_value_('Target', node)
-        if value is not None and 'Target' not in already_processed:
-            already_processed.add('Target')
-            self.Target = value
         value = find_attr_value_('Id', node)
         if value is not None and 'Id' not in already_processed:
             already_processed.add('Id')
             self.Id = value
+        value = find_attr_value_('Target', node)
+        if value is not None and 'Target' not in already_processed:
+            already_processed.add('Target')
+            self.Target = value
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
         if nodeName_ == '':
             obj_ = __ANY__.factory()
@@ -3936,39 +4505,46 @@ class RSAKeyValueType(GeneratedsSuper):
 
 
 GDSClassesMapping = {
-    'RetrievalMethod': RetrievalMethodType,
-    'authSignature': authSignatureType,
-    'KeyValue': KeyValueType,
-    'SignatureMethod': SignatureMethodType,
-    'signatureSlots': signatureSlotsType,
-    'borrower_signature': signatureSlotType,
-    'operativeDeed': operativeDeedType,
-    'deedData': deedDataType,
-    'Reference': ReferenceType,
-    'SignedInfo': SignedInfoType,
-    'PGPData': PGPDataType,
-    'DigestMethod': DigestMethodType,
+    'Manifest': ManifestType,
     'CanonicalizationMethod': CanonicalizationMethodType,
-    'KeyInfo': KeyInfoType,
-    'signature': signatureType,
-    'name': nameType,
+    'provision': provisionType,
+    'borrower_signature': signatureSlotType,
+    'SignedInfo': SignedInfoType,
+    'deedData': deedDataType,
     'X509IssuerSerial': X509IssuerSerialType,
     'SignatureValue': SignatureValueType,
-    'RSAKeyValue': RSAKeyValueType,
-    'dm-application': dmApplicationType,
-    'DSAKeyValue': DSAKeyValueType,
-    'SignatureProperty': SignaturePropertyType,
-    'Manifest': ManifestType,
-    'SPKIData': SPKIDataType,
-    'borrowers': borrowersType,
-    'Object': ObjectType,
-    'SignatureProperties': SignaturePropertiesType,
-    'Transform': TransformType,
-    'Transforms': TransformsType,
-    'borrower': borrowerType,
     'signatory': nameType,
-    'X509Data': X509DataType,
+    'SPKIData': SPKIDataType,
+    'DSAKeyValue': DSAKeyValueType,
     'Signature': SignatureType,
+    'lender': lenderType,
+    'KeyInfo': KeyInfoType,
+    'SignatureProperties': SignaturePropertiesType,
+    'Reference': ReferenceType,
+    'organisationName': nameType,
+    'privateIndividual': privateIndividualType,
+    'Transforms': TransformsType,
+    'RSAKeyValue': RSAKeyValueType,
+    'Object': ObjectType,
+    'operativeDeed': operativeDeedType,
+    'signatureSlots': signatureSlotsType,
+    'borrower': borrowerType,
+    'signature': signatureType,
+    'KeyValue': KeyValueType,
+    'SignatureProperty': SignaturePropertyType,
+    'PGPData': PGPDataType,
+    'RetrievalMethod': RetrievalMethodType,
+    'additionalProvisions': additionalProvisionsType,
+    'authSignature': authSignatureType,
+    'borrowers': borrowersType,
+    'dm-application': dmApplicationType,
+    'X509Data': X509DataType,
+    'SignatureMethod': SignatureMethodType,
+    'company': companyType,
+    'DigestMethod': DigestMethodType,
+    'chargeClause': chargeClauseType,
+    'Transform': TransformType,
+    'name': nameType,
 }
 
 
@@ -4113,14 +4689,21 @@ __all__ = [
     "TransformsType",
     "X509DataType",
     "X509IssuerSerialType",
+    "additionalProvisionsType",
     "authSignatureType",
     "borrowerType",
     "borrowersType",
+    "chargeClauseType",
+    "companyType",
     "deedApplicationType",
     "deedDataType",
     "dmApplicationType",
+    "lenderType",
     "nameType",
     "operativeDeedType",
+    "privateIndividualType",
+    "provisionType",
+    "signature",
     "signatureSlotType",
     "signatureSlotsType",
     "signatureType"

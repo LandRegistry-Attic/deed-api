@@ -9,6 +9,8 @@ virtualenv $env_dir
 #install requirements
 pip install -r requirements.txt
 
+mkdir ../logs
+
 ./unit_test.sh
 
 unit_test_pass=$?

@@ -1,15 +1,17 @@
 import logging
+from application.akuma.service import Akuma
+from application.title_adaptor.service import TitleAdaptor
 from application.deed.model import Deed
-from application.deed.utils import validate_helper, valid_dob, is_unique_list
+from application.deed.utils import validate_helper, process_organisation_credentials, convert_json_to_xml
+from application.deed.service import update_deed, update_deed_signature_timestamp
 from flask import request, abort, jsonify, Response
 from flask import Blueprint
 from flask.ext.api import status
-from application.borrower.server import BorrowerService
-from underscore import _
 from application.borrower.model import Borrower
-from application.mortgage_document.model import MortgageDocument
+from application import esec_client
 import json
-
+import sys
+import copy
 
 LOGGER = logging.getLogger(__name__)
 
@@ -20,12 +22,13 @@ deed_bp = Blueprint('deed', __name__,
 
 @deed_bp.route('/<deed_reference>', methods=['GET'])
 def get_deed(deed_reference):
-    result = Deed.query.filter_by(token=str(deed_reference)).first()
+    result = Deed.get_deed(deed_reference)
 
     if result is None:
         abort(status.HTTP_404_NOT_FOUND)
     else:
         result.deed['token'] = result.token
+        result.deed['status'] = result.status
 
     return jsonify({"deed": result.deed}), status.HTTP_200_OK
 
@@ -52,86 +55,45 @@ def get_deeds_status_with_mdref_and_title_number():
 
 @deed_bp.route('/', methods=['POST'])
 def create():
-    deed = Deed()
     deed_json = request.get_json()
-    borrowerService = BorrowerService()
-
     error_count, error_message = validate_helper(deed_json)
 
     if error_count > 0:
+        LOGGER.error("Schema validation 400_BAD_REQUEST")
         return error_message, status.HTTP_400_BAD_REQUEST
     else:
-        deed.deed = deed_json
-
-        json_doc = {
-            "title_number": deed_json['title_number'],
-            "md_ref": deed_json['md_ref'],
-            "borrowers": [],
-            "charge_clause": [],
-            "additional_provisions": [],
-            "property_address": deed_json['property_address']
-            }
-
-        deed.token = Deed.generate_token()
-        deed.identity_checked = deed_json["identity_checked"]
-
-        valid_dob_result = _(deed_json['borrowers']).chain()\
-            .map(lambda x, *a: x['dob'])\
-            .reduce(valid_dob, True).value()
-
-        if not valid_dob_result:
-            abort(status.HTTP_400_BAD_REQUEST)
-
-        phone_number_list = _(deed_json['borrowers']).chain()\
-            .map(lambda x, *a: x['phone_number'])\
-            .value()
-
-        if not is_unique_list(phone_number_list):
-            abort(status.HTTP_400_BAD_REQUEST)
 
         try:
-            for borrower in deed_json['borrowers']:
-                borrower_json = {
-                    "id": "",
-                    "token": "",
-                    "forename": borrower['forename'],
-                    "surname": borrower['surname']
-                }
+            deed = Deed()
+            deed.token = Deed.generate_token()
 
-                if 'middle_name' in borrower:
-                    borrower_json['middle_name'] = borrower['middle_name']
+            organisation_credentials = process_organisation_credentials()
 
-                borrower['deed_token'] = deed.token
+            if organisation_credentials:
+                deed.organisation_id = organisation_credentials["O"][1]
+                deed.organisation_name = organisation_credentials["O"][0]
+                organisation_locale = organisation_credentials["C"][0]
+                check_result = Akuma.do_check(deed_json, "create deed",
+                                              deed.organisation_name, organisation_locale)
+                LOGGER.info("Check ID: " + check_result['id'])
+                valid_title = TitleAdaptor.do_check(deed_json['title_number'])
+                if valid_title != "title OK":
+                    return jsonify({"message": valid_title}), status.HTTP_400_BAD_REQUEST
 
-                createdBorrower = borrowerService.saveBorrower(borrower,
-                                                               deed.token)
+                success, msg = update_deed(deed, deed_json, check_result['result'])
 
-                borrower_json["id"] = createdBorrower.id
-                borrower_json["token"] = createdBorrower.token
-                json_doc['borrowers'].append(borrower_json)
-
-            md_ref = deed_json["md_ref"]
-            mortgage_document = MortgageDocument.query.filter_by(md_ref=str(md_ref)).first()
-            if mortgage_document is not None:
-                md_json = json.loads(mortgage_document.data)
-                json_doc["charge_clause"] = md_json["charge_clause"]
-                json_doc["additional_provisions"] = md_json["additional_provisions"]
-                json_doc["lender"] = md_json["lender"]
+                if not success:
+                    LOGGER.error("Update deed 400_BAD_REQUEST")
+                    return msg, status.HTTP_400_BAD_REQUEST
             else:
-                msg = "mortgage document associated with supplied md_ref is not found"
-                LOGGER.error(msg)
-                return msg, status.HTTP_400_BAD_REQUEST
+                LOGGER.error("Unable to process headers")
+                return "Unable to process headers", status.HTTP_401_UNAUTHORIZED
 
-            deed.deed = json_doc
+            return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
 
-            deed.save()
-
-            path = "/deed/" + str(deed.token)
-
-            return jsonify({"path": path}), status.HTTP_201_CREATED
-
-        except Exception as e:
-            LOGGER.error("Database Exception - %s" % e)
+        except:
+            msg = str(sys.exc_info())
+            LOGGER.error("Database Exception - %s" % msg)
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -148,3 +110,133 @@ def delete_borrower(borrower_id):
         abort(status.HTTP_404_NOT_FOUND)
     else:
         return jsonify({"id": borrower_id}), status.HTTP_200_OK
+
+
+def auth_sms(deed_reference, borrower_token, borrower_code):
+    deed = Deed.get_deed(deed_reference)
+
+    if deed is None:
+        LOGGER.error("Database Exception 404 for deed reference - %s" % deed_reference)
+        abort(status.HTTP_404_NOT_FOUND)
+    else:
+        LOGGER.info("Signing deed for borrower_token %s against deed reference %s" % (borrower_token, deed_reference))
+
+        # check if XML already exist
+        if deed.deed_xml is None:
+            LOGGER.info("Generating DEED_XML")
+            deed_XML = convert_json_to_xml(deed.deed)
+            deed.deed_xml = deed_XML.encode("utf-8")
+
+        try:
+            LOGGER.info("getting existing XML")
+            modify_xml = copy.deepcopy(deed.deed_xml)
+            borrower_pos = deed.get_borrower_position(borrower_token)
+            borrower = Borrower.get_by_token(borrower_token)
+            esec_id = borrower.esec_user_name
+
+            if esec_id:
+                result_xml, status_code = esec_client.auth_sms(modify_xml, borrower_pos,
+                                                               esec_id, borrower_code)
+                LOGGER.info("signed status code: %s", str(status_code))
+                LOGGER.info("signed XML: %s" % result_xml)
+
+                if status_code == 200:
+                    deed.deed_xml = result_xml
+
+                    LOGGER.info("Saving XML to DB")
+                    deed.save()
+
+                    LOGGER.info("updating JSON with Signature")
+                    deed.deed = update_deed_signature_timestamp(deed, borrower_token)
+                else:
+                    LOGGER.error("Failed to sign Mortgage document")
+                    return "Failed to sign Mortgage document", status_code
+            else:
+                LOGGER.error("Failed to sign Mortgage document - unable to create user")
+                abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        except:
+            msg = str(sys.exc_info())
+            LOGGER.error("Failed to sign Mortgage document: %s" % msg)
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return jsonify({"deed": deed.deed}), status.HTTP_200_OK
+
+
+def issue_sms(deed_reference, borrower_token):
+    deed = Deed.get_deed(deed_reference)
+
+    if deed is None:
+        LOGGER.error("Database Exception 404 for deed reference - %s" % deed_reference)
+        abort(status.HTTP_404_NOT_FOUND)
+    else:
+        LOGGER.info("Signing deed for borrower_token %s against deed reference %s" % (borrower_token, deed_reference))
+
+        try:
+            LOGGER.info("getting existing XML")
+            borrower = Borrower.get_by_token(borrower_token)
+
+            if not borrower.esec_user_name:
+                LOGGER.info("creating esec user for borrower[token:%s]", borrower.token)
+                user_id, status_code = esec_client.issue_sms(borrower.forename, borrower.surname,
+                                                             deed.organisation_id, borrower.phonenumber)
+                if status_code == 200:
+                    LOGGER.info("Created new esec user: %s for borrower[token:%s]", str(user_id.decode()),
+                                borrower.token)
+                    borrower.esec_user_name = user_id.decode()
+                    borrower.save()
+                else:
+                    LOGGER.error("Unable to create new e-sec user for borrower [token:%s]", borrower.token)
+                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            else:
+                result, status_code = esec_client.reissue_sms(borrower.esec_user_name)
+
+                if status_code != 200:
+                    LOGGER.error("Unable to reissue new sms code for esec user: %s", borrower.esec_user_name)
+                    abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        except:
+            msg = str(sys.exc_info())
+            LOGGER.error("Failed to issue auth code via sms: %s" % msg)
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return status.HTTP_200_OK
+
+
+@deed_bp.route('/<deed_reference>/make-effective', methods=['POST'])
+def make_effective(deed_reference):
+    return status.HTTP_200_OK
+
+
+@deed_bp.route('/<deed_reference>/request-auth-code', methods=['POST'])
+def request_auth_code(deed_reference):
+    request_json = request.get_json()
+
+    status_code = issue_sms(deed_reference, request_json['borrower_token'])
+
+    if status_code == status.HTTP_200_OK:
+        return jsonify({"result": True}), status_code
+    else:
+        LOGGER.error("Unable to send SMS")
+        return jsonify({"result": False}), status.HTTP_500_INTERNAL_SERVER_ERROR
+
+
+@deed_bp.route('/<deed_reference>/verify-auth-code', methods=['POST'])
+def verify_auth_code(deed_reference):
+    request_json = request.get_json()
+    borrower_token = request_json['borrower_token']
+    borrower_code = request_json['authentication_code']
+
+    deed, status_code = auth_sms(deed_reference, borrower_token, borrower_code)
+
+    if status_code == status.HTTP_200_OK:
+        LOGGER.info("Borrower with token %s successfully authenticated using valid authentication code: %s",
+                    borrower_token, borrower_code)
+        return jsonify({"result": True}), status.HTTP_200_OK
+    elif status_code == status.HTTP_401_UNAUTHORIZED:
+        LOGGER.error("Invalid authentication code: %s for borrower token %s ", borrower_code, borrower_token)
+        return jsonify({"result": False}), status_code
+    else:
+        LOGGER.error("Not able to sign the deed")
+        return jsonify({"result": False}), status_code

@@ -3,11 +3,13 @@ __pycache__/
 *.py[cod]
 
 .vagrant/
+.DS_Store
 
 # C extensions
 *.so
 
 TEST-*.xml
+.DS_Store
 
 # Distribution / packaging
 .Python
@@ -49,6 +51,7 @@ coverage.xml
 *.pot
 
 # Django stuff:
+logs
 *.log
 
 # Sphinx documentation
