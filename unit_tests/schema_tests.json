@@ -42,8 +42,8 @@
         },
         {
           "payload": "first name",
-          "expected": false,
-          "description": "names do not have spaces in"
+          "expected": true,
+          "description": "names can have spaces in"
         },
         {
           "payload": "names_can_be_reaaly_reaaly_very__very_extremely_long",
