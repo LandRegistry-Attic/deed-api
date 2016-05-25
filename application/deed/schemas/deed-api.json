@@ -99,15 +99,15 @@
             "properties": {
                 "forename": {
                     "type": "string",
-                    "pattern": "^[A-z]+$"
+                    "pattern": "^(?!\\s*$).+"
                 },
                 "middle_name": {
                     "type": "string",
-                    "pattern": "^[A-z]+$"
+                    "pattern": "^(?!\\s*$).+"
                 },
                 "surname": {
                     "type": "string",
-                    "pattern": "^[A-z ]+$"
+                    "pattern": "^(?!\\s*$).+"
                 },
                 "token": {
                     "type": "string",
@@ -132,15 +132,15 @@
             "properties": {
                 "forename": {
                     "type": "string",
-                    "pattern": "^[A-z]+$"
+                    "pattern": "^(?!\\s*$).+"
                 },
                 "middle_name": {
                     "type": "string",
-                    "pattern": "^[A-z]+$"
+                    "pattern": "^(?!\\s*$).+"
                 },
                 "surname": {
                     "type": "string",
-                    "pattern": "^[A-z ]+$"
+                    "pattern": "^(?!\\s*$).+"
                 },
                 "dob": {
                     "type": "string",
