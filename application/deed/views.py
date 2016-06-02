@@ -213,6 +213,9 @@ def make_effective(deed_reference):
         abort(status.HTTP_404_NOT_FOUND)
     else:
 
+        deed_status = str(result.status)
+
+        if deed_status == "ALL-SIGNED":
             Akuma.do_check(result.deed, "make effective", result.organisation_id, result.organisation_name)
 
             signed_time = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
@@ -225,6 +228,9 @@ def make_effective(deed_reference):
                                ), status.HTTP_200_OK
             else:
                 return stamped_deed_status
+        else:
+            return jsonify({"message": "You can not make this deed effective as it is not fully signed."}), \
+                   status.HTTP_406_NOT_ACCEPTABLE
 
 
 @deed_bp.route('/<deed_reference>/request-auth-code', methods=['POST'])
