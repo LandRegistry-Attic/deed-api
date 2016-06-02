@@ -150,6 +150,7 @@ def set_signed_status(deed):
 def make_deed_effective_date(deed, signed_time):
     stamped_deed = copy.deepcopy(deed.deed)
     stamped_deed['effective_date'] = signed_time
+    deed.status = "EFFECTIVE"
 
     deed.deed = stamped_deed
 
