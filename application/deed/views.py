@@ -212,6 +212,11 @@ def make_effective(deed_reference):
     if result is None:
         abort(status.HTTP_404_NOT_FOUND)
     else:
+
+        Akuma.do_check(result.deed, "make effective",
+                                    result.deed.organisation_name,
+                                    result.deed.organisation_locale)
+
         signed_time = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
         stamped_deed_status, stamp_time = make_deed_effective_date(result,signed_time)
