@@ -3,7 +3,7 @@ from application.akuma.service import Akuma
 from application.title_adaptor.service import TitleAdaptor
 from application.deed.model import Deed
 from application.deed.utils import validate_helper, process_organisation_credentials, convert_json_to_xml
-from application.deed.service import update_deed, update_deed_signature_timestamp
+from application.deed.service import update_deed, update_deed_signature_timestamp, make_deed_effective_date
 from flask import request, abort, jsonify, Response
 from flask import Blueprint
 from flask.ext.api import status
@@ -12,6 +12,7 @@ from application import esec_client
 import json
 import sys
 import copy
+from datetime import datetime
 
 LOGGER = logging.getLogger(__name__)
 
@@ -206,7 +207,19 @@ def issue_sms(deed_reference, borrower_token):
 
 @deed_bp.route('/<deed_reference>/make-effective', methods=['POST'])
 def make_effective(deed_reference):
-    return status.HTTP_200_OK
+    result = Deed.get_deed(deed_reference)
+
+    if result is None:
+        abort(status.HTTP_404_NOT_FOUND)
+    else:
+        signed_time = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+
+        stamped_deed_status, stamp_time = make_deed_effective_date(result,signed_time)
+
+        if stamped_deed_status == status.HTTP_202_ACCEPTED:
+            return jsonify({"deed": result.deed,
+                            "made_effective at": stamp_time}
+                           ), status.HTTP_200_OK
 
 
 @deed_bp.route('/<deed_reference>/request-auth-code', methods=['POST'])

@@ -145,3 +145,19 @@ def set_signed_status(deed):
         deed.status = DeedStatus.all_signed.value
     elif signed_count > 0:
         deed.status = DeedStatus.partial.value
+
+
+def make_deed_effective_date(deed, signed_time):
+    stamped_deed = copy.deepcopy(deed.deed)
+    stamped_deed['effective_date'] = signed_time
+
+    deed.deed = stamped_deed
+
+    try:
+        deed.save()
+        return status.HTTP_202_ACCEPTED, deed.deed['effective_date']
+
+    except Exception as e:
+        LOGGER.error("Database Exception - %s" % e)
+        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
