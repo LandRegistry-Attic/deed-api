@@ -213,16 +213,18 @@ def make_effective(deed_reference):
         abort(status.HTTP_404_NOT_FOUND)
     else:
 
-        Akuma.do_check(result.deed, "make effective", "test", "me")
+            Akuma.do_check(result.deed, "make effective", result.organisation_id, result.organisation_name)
 
-        signed_time = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+            signed_time = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
-        stamped_deed_status, stamp_time = make_deed_effective_date(result,signed_time)
+            stamped_deed_status, stamp_time = make_deed_effective_date(result, signed_time)
 
-        if stamped_deed_status == status.HTTP_202_ACCEPTED:
-            return jsonify({"deed": result.deed,
-                            "made_effective at": stamp_time}
-                           ), status.HTTP_200_OK
+            if stamped_deed_status == status.HTTP_202_ACCEPTED:
+                return jsonify({"deed": result.deed,
+                                "Deed made effective at": stamp_time}
+                               ), status.HTTP_200_OK
+            else:
+                return stamped_deed_status
 
 
 @deed_bp.route('/<deed_reference>/request-auth-code', methods=['POST'])
