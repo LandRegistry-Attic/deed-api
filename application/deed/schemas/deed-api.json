@@ -85,6 +85,41 @@
                     }
                 }
             }
+        },
+        "/deed/{deed_reference}/make-effective": {
+            "post": {
+                "summary": "Make Effective",
+                "description": "The Make Effective endpoint triggers the service to make a deed effective, dating it with the timestamp of when this call is made.\nThe response includes the Title Number, Property information, Borrower(s) information and deed information, as well as the timestamp that is saved onto the deed.\n",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "deed_reference",
+                        "in": "path",
+                        "description": "Unique reference of the deed.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "Make Effective"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A specific deed is returned.",
+                        "schema": {
+                            "$ref": "#/definitions/Operative_Deed"
+                        }
+                    },
+                    "404": {
+                        "description": "Deed not found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -99,15 +134,15 @@
             "properties": {
                 "forename": {
                     "type": "string",
-                    "pattern": "^(?!\\s*$).+"
+                    "pattern": "^(?!\\\\s*$).+"
                 },
                 "middle_name": {
                     "type": "string",
-                    "pattern": "^(?!\\s*$).+"
+                    "pattern": "^(?!\\\\s*$).+"
                 },
                 "surname": {
                     "type": "string",
-                    "pattern": "^(?!\\s*$).+"
+                    "pattern": "^(?!\\\\s*$).+"
                 },
                 "token": {
                     "type": "string",
@@ -132,15 +167,15 @@
             "properties": {
                 "forename": {
                     "type": "string",
-                    "pattern": "^(?!\\s*$).+"
+                    "pattern": "^(?!\\\\s*$).+"
                 },
                 "middle_name": {
                     "type": "string",
-                    "pattern": "^(?!\\s*$).+"
+                    "pattern": "^(?!\\\\s*$).+"
                 },
                 "surname": {
                     "type": "string",
-                    "pattern": "^(?!\\s*$).+"
+                    "pattern": "^(?!\\\\s*$).+"
                 },
                 "dob": {
                     "type": "string",
@@ -253,9 +288,9 @@
                             "type": "string",
                             "description": "The address of property that the deed relates. This should be supplied in a comma separated format e.g. 30 wakefield rd, plymouth, PL6 3WA"
                         },
-                        "deed_status": {
+                        "effective_date": {
                             "type": "string",
-                            "description": "Current state of the deed"
+                            "description": "An effective date is shown if the deed is made effective"
                         }
                     }
                 }
@@ -287,7 +322,7 @@
                     "type": "string"
                 },
                 "property_address": {
-                    "pattern": "^(?!\\s*$).+",
+                    "pattern": "^[a-zA-Z0-9\\s,]+$",
                     "type": "string",
                     "description": "The address of property that the deed relates. This should be supplied in a comma separated format e.g. 30 wakefield rd, plymouth, PL6 3WA"
                 }
