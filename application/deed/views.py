@@ -233,7 +233,8 @@ def make_effective(deed_reference):
                    status.HTTP_406_NOT_ACCEPTABLE
 
         else:
-            return jsonify({"message": "You can not make this deed effective as it is not fully signed."}), \
+            return jsonify({"message": "You cannot make this deed effective as it has not "
+                                       "been signed by all borrowers."}), \
                    status.HTTP_406_NOT_ACCEPTABLE
 
 
