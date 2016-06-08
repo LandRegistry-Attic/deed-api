@@ -2,8 +2,8 @@
 class deed_api (
     $port = '9020',
     $host = '0.0.0.0',
-    $source = 'https://github.com/LandRegistry/dm-deed-api',
-    $branch_or_revision = 'master',
+    $source = 'https://192.168.249.38/digital-mortgage/deed-api',
+    $branch_or_revision = 'develop',
     $subdomain = 'deedapi',
     $domain = undef,
     $owner = 'vagrant',
