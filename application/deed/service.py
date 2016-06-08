@@ -1,5 +1,5 @@
 import logging
-from application.deed.utils import valid_dob, is_unique_list
+from application.deed.utils import valid_dob, is_unique_list, add_effective_date_to_xml
 from application.borrower.server import BorrowerService
 from underscore import _
 from application.mortgage_document.model import MortgageDocument
@@ -10,6 +10,8 @@ from application.deed.deed_status import DeedStatus
 import json
 import datetime
 import copy
+from application import esec_client
+import sys
 
 
 LOGGER = logging.getLogger(__name__)
@@ -27,6 +29,41 @@ def valid_borrowers(borrowers):
     valid &= is_unique_list(phone_number_list)
 
     return valid
+
+
+def apply_registrar_signature(deed_reference, deed, effective_date):
+    if deed is None:
+        LOGGER.error("No deed object passed for deed document - {}".format(deed_reference))
+        abort(status.HTTP_404_NOT_FOUND)
+
+    #check deed status is effective-not-signed
+    if DeedStatus.effective_not_signed.value in deed.status:
+        LOGGER.error("Deed with ref {1} has a wrong status. Status should be {0}".format(DeedStatus.effective_not_signed.value,
+                                                                                         deed_reference))
+        return status.HTTP_400_BAD_REQUEST
+
+    #altering xml structure to add effective_not_signed status
+    deed_xml = copy.deepcopy(deed.deed_xml)
+
+    effective_xml = add_effective_date_to_xml(deed_xml, effective_date)
+
+    LOGGER.info("Applying registrar's signature to deed {}".format(deed_reference))
+
+    try:
+        response_content, status_code = esec_client.sign_document_with_authority(effective_xml)
+        LOGGER.info("signature application status: {}".format(str(status_code)))
+
+        deed.deed_xml = response_content
+
+        LOGGER.info("Saving signed document to DB")
+        deed.save()
+
+        LOGGER.info("Signed document saved to DB")
+        return status.HTTP_200_OK
+    except:
+        msg = str(sys.exc_info())
+        LOGGER.error("Failed to apply registrar's signature: {}".format(msg))
+        return status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 def update_borrower(borrower, idx, borrowers, deed_token):
