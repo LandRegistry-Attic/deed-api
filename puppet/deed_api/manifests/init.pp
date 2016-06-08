@@ -2,7 +2,7 @@
 class deed_api (
     $port = '9020',
     $host = '0.0.0.0',
-    $source = 'git@192.168.249.38/digital-mortgage/deed-api.git',
+    $source = 'git@192.168.249.38:digital-mortgage/deed-api.git',
     $branch_or_revision = 'develop',
     $subdomain = 'deedapi',
     $domain = undef,
