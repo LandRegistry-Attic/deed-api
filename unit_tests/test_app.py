@@ -4,7 +4,7 @@ from application.casework.service import get_document
 from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, StatusMock
 from application.akuma.service import Akuma
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
-from application.deed.service import make_effective_text
+from application.deed.service import make_effective_text, make_deed_effective_date
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
 from application.borrower.model import generate_hex
@@ -13,6 +13,9 @@ import json
 import mock
 from application.borrower.model import Borrower
 
+
+class TestException(Exception):
+    pass
 
 class TestRoutes(unittest.TestCase):
     DEED_ENDPOINT = "/deed/"
@@ -394,3 +397,36 @@ class TestRoutes(unittest.TestCase):
                                  data=payload,
                                  headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+    def create_exception(self, *args):
+        raise TestException('test error')
+
+
+
+    def test_make_deed_effective_date(self):
+
+        deed_model = mock.create_autospec(Deed)
+        deed_model.deed = {}
+        signed_time = 'a time'
+
+        make_deed_effective_date(deed_model, signed_time)
+
+        deed_model.save.assert_called_with()
+        self.assertEqual(deed_model.deed['effective_date'], 'a time')
+
+
+    @mock.patch('application.deed.service.abort')
+    def test_make_deed_effective_date_database_exception(self, mock_abort):
+
+        deed_model = mock.create_autospec(Deed)
+        deed_model.deed = {'effective_date': ''}
+        deed_model.save.side_effect = self.create_exception
+        signed_time = 'a time'
+
+        make_deed_effective_date(deed_model, signed_time)
+
+        deed_model.save.assert_called_with()
+        mock_abort.assert_called_with(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+

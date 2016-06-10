@@ -220,13 +220,10 @@ def make_effective(deed_reference):
 
             signed_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-            stamped_deed_status, stamp_time = make_deed_effective_date(result, signed_time)
+            make_deed_effective_date(result, signed_time)
 
-            if stamped_deed_status == status.HTTP_202_ACCEPTED:
-                return jsonify({"deed": result.deed}
-                               ), status.HTTP_200_OK
-            else:
-                return stamped_deed_status
+            return jsonify({"deed": result.deed}), status.HTTP_200_OK
+
 
         elif deed_status == "EFFECTIVE":
             return jsonify({"message": "This deed has already been made effective."}), \
