@@ -156,7 +156,7 @@ def make_deed_effective_date(deed, signed_time):
 
     try:
         deed.save()
-        return status.HTTP_202_ACCEPTED, deed.deed['effective_date']
+        return status.HTTP_202_ACCEPTED
 
     except Exception as e:
         LOGGER.error("Database Exception - %s" % e)
