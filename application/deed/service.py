@@ -148,11 +148,7 @@ def set_signed_status(deed):
 
 
 def make_deed_effective_date(deed, signed_time):
-    # try:
     deed.deed['effective_date'] = signed_time
     deed.status = "EFFECTIVE-NOT-REGISTRAR-SIGNED"
     deed.save()
-    # except Exception as e:
-    #     LOGGER.error("Exception in make_deed_effective_date - %s" % e)
-    #     abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 

@@ -405,11 +405,8 @@ class TestRoutes(unittest.TestCase):
                                  headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-
     def create_exception(self, *args):
         raise TestException('test error')
-
-
 
     def test_make_deed_effective_date(self):
 
@@ -422,19 +419,13 @@ class TestRoutes(unittest.TestCase):
         deed_model.save.assert_called_with()
         self.assertEqual(deed_model.deed['effective_date'], 'a time')
 
-    #
-    # def test_make_deed_effective_date_database_exception(self, mock_getlogger, mock_abort):
-    #
-    #     deed_model = mock.create_autospec(Deed)
-    #     deed_model.deed = {'effective_date': ''}
-    #     deed_model.save.side_effect = self.create_exception
-    #     mock_getlogger.return_value = TestLogger()
-    #     signed_time = 'a time'
-    #
-    #     make_deed_effective_date(deed_model, signed_time)
-    #
-    #     deed_model.save.assert_called_with()
-
+    def test_global_exception_handler(self):
+        self.assertEqual((self.app.get('/div_zero')).status_code,
+                         status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual((self.app.get('/div_zero')).status,
+                         '500 INTERNAL SERVER ERROR')
+        self.assertEqual((self.app.get('/div_zero').data),
+                         b'{\n  "message": "Unexpected error."\n}')
 
 
 

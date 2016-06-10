@@ -1,11 +1,10 @@
 import json
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
 from application.service_clients.esec import make_esec_client
 import os
 import logging
 from logger import logging_config
-from flask.ext.api import status
 
 logging_config.setup_logging()
 LOGGER = logging.getLogger(__name__)
@@ -39,7 +38,13 @@ def check_status():
     })
 
 
+@app.route("/div_zero")
+def div_zero():
+    app.logger.debug("div_zero")
+    1/0
+
+
 @app.errorhandler(Exception)
 def unhandled_exception(e):
     app.logger.error('Unhandled Exception: %s', (e,), exc_info=True)
-    return status.HTTP_500_INTERNAL_SERVER_ERROR 
+    return jsonify({"message": "Unexpected error."}), 500
