@@ -230,12 +230,12 @@ def make_effective(deed_reference):
 
         elif deed_status == "EFFECTIVE" or "EFFECTIVE-NOT-REGISTRAR-SIGNED":
             return jsonify({"message": "This deed has already been made effective."}), \
-                   status.HTTP_406_NOT_ACCEPTABLE
+                   status.HTTP_400_BAD_REQUEST
 
         else:
             return jsonify({"message": "You cannot make this deed effective as it has not "
                                        "been signed by all borrowers."}), \
-                   status.HTTP_406_NOT_ACCEPTABLE
+                   status.HTTP_400_BAD_REQUEST
 
 
 @deed_bp.route('/<deed_reference>/request-auth-code', methods=['POST'])
