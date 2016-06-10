@@ -5,6 +5,7 @@ from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, Status
 from application.akuma.service import Akuma
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
 from application.deed.service import make_effective_text, make_deed_effective_date
+from application.deed.views import make_effective
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
 from application.borrower.model import generate_hex
@@ -12,16 +13,6 @@ import unittest
 import json
 import mock
 from application.borrower.model import Borrower
-
-
-class TestException(Exception):
-    pass
-
-
-class TestLogger():
-
-    def error(self, a_message):
-        pass
 
 
 class TestRoutes(unittest.TestCase):
@@ -405,9 +396,6 @@ class TestRoutes(unittest.TestCase):
                                  headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def create_exception(self, *args):
-        raise TestException('test error')
-
     def test_make_deed_effective_date(self):
 
         deed_model = mock.create_autospec(Deed)
@@ -426,6 +414,17 @@ class TestRoutes(unittest.TestCase):
                          '500 INTERNAL SERVER ERROR')
         self.assertEqual((self.app.get('/div_zero').data),
                          b'{\n  "message": "Unexpected error."\n}')
+
+    @mock.patch('application.deed.model.Deed.get_deed')
+    @mock.patch('application.deed.views.abort')
+    def test_make_deed_effective(self, mock_abort, mock_get_deed):
+        deed_model = mock.create_autospec(Deed)
+        deed_model.deed = {}
+        mock_get_deed.return_value = None
+
+        make_effective(123)
+
+        mock_abort.assert_called_with(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
