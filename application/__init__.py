@@ -42,4 +42,4 @@ def check_status():
 @app.errorhandler(Exception)
 def unhandled_exception(e):
     app.logger.error('Unhandled Exception: %s', (e,), exc_info=True)
-    return status.HTTP_500_INTERNAL_SERVER_ERROR
+    return status.HTTP_500_INTERNAL_SERVER_ERROR 
