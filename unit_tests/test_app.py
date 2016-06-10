@@ -78,6 +78,10 @@ class TestRoutes(unittest.TestCase):
         mock_deed = DeedModelMock()
         self.assertRaises(AssertionError, check_effective_status, mock_deed.status)
 
+    def test_sign_document_response(self):
+        mock_deed = DeedModelMock()
+        response = sign_document_with_authority(mock_deed.deed_xml)
+
 
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
