@@ -7,6 +7,7 @@ from application.deed.views import make_effective
 from application.deed.utils import convert_json_to_xml, validate_generated_xml, add_effective_date_to_xml
 from application.deed.service import make_effective_text, apply_registrar_signature, check_effective_status, \
     check_effective_date, make_deed_effective_date
+from application.service_clients.esec.implementation import sign_document_with_authority
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
 from application.borrower.model import generate_hex
@@ -80,8 +81,19 @@ class TestRoutes(unittest.TestCase):
 
     def test_sign_document_response(self):
         mock_deed = DeedModelMock()
-        response = sign_document_with_authority(mock_deed.deed_xml)
+        url_string = '/esec/sign_document_with_authority'
+        response_xml = sign_document_with_authority(mock_deed.deed_xml, url_string)
 
+        response = response_xml.decode('utf-8')
+
+        self.assertEqual(response, mock_deed.deed_xml)
+
+    def test_sign_document_response_error(self):
+        mock_deed = DeedModelMock()
+
+        url_string = '/esec/sign_document_with_authorityss'
+
+        self.assertRaises(ValueError, sign_document_with_authority, mock_deed.deed_xml, url_string)
 
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')

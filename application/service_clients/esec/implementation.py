@@ -72,9 +72,12 @@ def auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code):  # pragma: no
         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def sign_document_with_authority(deed_xml):  # pragma: no cover
+def sign_document_with_authority(deed_xml, url_string=None):  # pragma: no cover
     LOGGER.info("Calling dm-esec-client to sign the deed with the registrar's signature")
-    request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/sign_document_with_authority'
+    if url_string is not None:
+        request_url = config.ESEC_CLIENT_BASE_HOST + url_string
+    else:
+        request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/sign_document_with_authority'
 
    # try:
     resp = requests.post(request_url, data=deed_xml)
