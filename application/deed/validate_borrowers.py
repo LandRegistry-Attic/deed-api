@@ -14,6 +14,9 @@ According to the following business rules:
 
 import collections
 import itertools
+import logger
+
+LOGGER = logging.getLogger(__name__)
 
 
 from application.register_adapter.service import RegisterAdapter
@@ -75,4 +78,6 @@ def check_borrower_names(payload):
     proprietor_names = RegisterAdapter.get_proprietor_names(title_number)
     complement = _complement_names(proprietor_names, deed_names)
     if complement:
+        names = ','.join(complement)
+        LOGGER.info("Names on Register but not on Deed '%s'", names)
         raise BorrowerNamesException
