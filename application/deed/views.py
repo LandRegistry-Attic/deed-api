@@ -8,13 +8,14 @@ from application import esec_client
 from application.akuma.service import Akuma
 from application.borrower.model import Borrower
 from application.deed.model import Deed
-from application.deed.service import update_deed, update_deed_signature_timestamp, make_deed_effective_date
 from application.deed.utils import validate_helper, process_organisation_credentials, convert_json_to_xml
 from application.deed.validate_borrowers import check_borrower_names, BorrowerNamesException
 from application.title_adaptor.service import TitleAdaptor
+from application.deed.service import update_deed, update_deed_signature_timestamp, apply_registrar_signature, make_deed_effective_date
 from flask import Blueprint
 from flask import request, abort, jsonify, Response
 from flask.ext.api import status
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -26,7 +27,11 @@ deed_bp = Blueprint('deed', __name__,
 @deed_bp.route('/<deed_reference>', methods=['GET'])
 def get_deed(deed_reference):
     result = Deed.get_deed(deed_reference)
-
+    ####
+    from datetime import datetime
+    sample_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    apply_registrar_signature(result, sample_time)
+    ####
     if result is None:
         abort(status.HTTP_404_NOT_FOUND)
     else:

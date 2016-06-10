@@ -3,6 +3,8 @@ import logging
 from application import config
 from flask.ext.api import status
 from flask import abort
+import sys
+from werkzeug import exceptions
 
 LOGGER = logging.getLogger(__name__)
 
@@ -68,3 +70,22 @@ def auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code):  # pragma: no
     else:
         LOGGER.error("Esecurity Client Exception when trying to verify OTP code and sign the deed ")
         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+def sign_document_with_authority(deed_xml):  # pragma: no cover
+    LOGGER.info("Calling dm-esec-client to sign the deed with the registrar's signature")
+    request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/sign_document_with_authority'
+
+   # try:
+    resp = requests.post(request_url, data=deed_xml)
+
+    if resp.status_code == status.HTTP_200_OK:
+        LOGGER.info("Response XML = {}".format(resp.content))
+        return resp.content
+    else:
+        LOGGER.error("Esecurity client error: {}".format(str(resp.content)))
+        LOGGER.error("Esecurity client error code: {}".format(str(resp.status_code)))
+        raise ValueError
+    #except:
+    #    LOGGER.error("Esecurity Client Exception when trying to post document to Esec")
+    #    raise ConnectionError
