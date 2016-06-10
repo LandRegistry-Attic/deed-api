@@ -12,6 +12,7 @@ import datetime
 import copy
 from application import esec_client
 import sys
+from lxml import etree
 
 
 LOGGER = logging.getLogger(__name__)
@@ -31,39 +32,42 @@ def valid_borrowers(borrowers):
     return valid
 
 
-def apply_registrar_signature(deed_reference, deed, effective_date):
-    if deed is None:
-        LOGGER.error("No deed object passed for deed document - {}".format(deed_reference))
-        abort(status.HTTP_404_NOT_FOUND)
+def check_effective_status(deed_status):
+    if DeedStatus.effective_not_signed.value not in deed_status:
+        LOGGER.error("Deed has a wrong status. Status should be {0}".format(DeedStatus.effective_not_signed.value))
+        raise AssertionError
 
-    #check deed status is effective-not-signed
-    if DeedStatus.effective_not_signed.value in deed.status:
-        LOGGER.error("Deed with ref {1} has a wrong status. Status should be {0}".format(DeedStatus.effective_not_signed.value,
-                                                                                         deed_reference))
-        return status.HTTP_400_BAD_REQUEST
+def check_effective_date(effective_date):
+    if effective_date is None:
+        LOGGER.error("No effective date passed for deed document.")
+        raise ValueError
 
-    #altering xml structure to add effective_not_signed status
-    deed_xml = copy.deepcopy(deed.deed_xml)
+def apply_registrar_signature(deed, effective_date):
+    check_effective_date(effective_date)
+
+    #check_effective_status(deed.status)
+
+    deed_xml = deed.deed_xml
 
     effective_xml = add_effective_date_to_xml(deed_xml, effective_date)
 
-    LOGGER.info("Applying registrar's signature to deed {}".format(deed_reference))
+    LOGGER.info("Applying registrar's signature to deed {}".format(deed.token))
 
-    try:
-        response_content, status_code = esec_client.sign_document_with_authority(effective_xml)
-        LOGGER.info("signature application status: {}".format(str(status_code)))
+#    try:
+    deed.deed_xml = esec_client.sign_document_with_authority(effective_xml)
+    LOGGER.info("Saving signed document to DB")
 
-        deed.deed_xml = response_content
+    deed.status = DeedStatus.effective.value
 
-        LOGGER.info("Saving signed document to DB")
-        deed.save()
+    #deed.save()
+    LOGGER.info("Signed document saved to DB")
 
-        LOGGER.info("Signed document saved to DB")
-        return status.HTTP_200_OK
-    except:
-        msg = str(sys.exc_info())
-        LOGGER.error("Failed to apply registrar's signature: {}".format(msg))
-        return status.HTTP_500_INTERNAL_SERVER_ERROR
+
+#        return status.HTTP_200_OK
+#    except:
+#        msg = str(sys.exc_info())
+#        LOGGER.error("Failed to apply registrar's signature: {}".format(msg))
+#        return status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 def update_borrower(borrower, idx, borrowers, deed_token):

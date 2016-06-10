@@ -3,8 +3,8 @@ from application.deed.model import Deed
 from application.casework.service import get_document
 from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, StatusMock
 from application.akuma.service import Akuma
-from application.deed.utils import convert_json_to_xml, validate_generated_xml
-from application.deed.service import make_effective_text
+from application.deed.utils import convert_json_to_xml, validate_generated_xml, add_effective_date_to_xml
+from application.deed.service import make_effective_text, apply_registrar_signature, check_effective_status, check_effective_date
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
 from application.borrower.model import generate_hex
@@ -12,6 +12,8 @@ import unittest
 import json
 import mock
 from application.borrower.model import Borrower
+from datetime import datetime
+from lxml import etree
 
 
 class TestRoutes(unittest.TestCase):
@@ -52,6 +54,28 @@ class TestRoutes(unittest.TestCase):
         test_deed = Deed()
         test_token = test_deed.generate_token()
         self.assertTrue(len(test_token) == 36)
+
+    def test_no_effective_date_in_xml(self):
+        effective_date = None
+        self.assertRaises(ValueError, check_effective_date, effective_date)
+
+
+    def test_effective_date_in_xml(self):
+        mock_deed = DeedModelMock()
+        effective_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        result = add_effective_date_to_xml(mock_deed.deed_xml, effective_date)
+
+        mock_xml = etree.fromstring(result)
+        for val in mock_xml.xpath("/dm-application/effectiveDate"):
+            test_result = val.text
+
+        self.assertEqual(effective_date, test_result)
+
+    def test_wrong_effective_status(self):
+        mock_deed = DeedModelMock()
+        self.assertRaises(AssertionError, check_effective_status, mock_deed.status)
+
 
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')

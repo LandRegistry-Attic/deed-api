@@ -10,3 +10,6 @@ class EsecClientInterface(object):  # pragma: no cover
 
     def auth_sms(self, deed_xml, borrower_pos, user_id, borrower_auth_code):
         return self.implementation.auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code)
+
+    def sign_document_with_authority(self, deed_xml):
+        return self.implementation.sign_document_with_authority(deed_xml)
