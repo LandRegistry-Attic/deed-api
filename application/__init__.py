@@ -5,6 +5,7 @@ from application.service_clients.esec import make_esec_client
 import os
 import logging
 from logger import logging_config
+from flask.ext.api import status
 
 logging_config.setup_logging()
 LOGGER = logging.getLogger(__name__)
@@ -36,3 +37,9 @@ def check_status():
         "headers": str(request.headers),
         "commit": str(os.getenv("COMMIT", "LOCAL"))
     })
+
+
+@app.errorhandler(Exception)
+def unhandled_exception(e):
+    app.logger.error('Unhandled Exception: %s', (e,), exc_info=True)
+    return status.HTTP_500_INTERNAL_SERVER_ERROR

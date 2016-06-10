@@ -17,6 +17,13 @@ from application.borrower.model import Borrower
 class TestException(Exception):
     pass
 
+
+class TestLogger():
+
+    def error(self, a_message):
+        pass
+
+
 class TestRoutes(unittest.TestCase):
     DEED_ENDPOINT = "/deed/"
     DEED_QUERY = "/deed"
@@ -415,18 +422,20 @@ class TestRoutes(unittest.TestCase):
         deed_model.save.assert_called_with()
         self.assertEqual(deed_model.deed['effective_date'], 'a time')
 
+    #
+    # def test_make_deed_effective_date_database_exception(self, mock_getlogger, mock_abort):
+    #
+    #     deed_model = mock.create_autospec(Deed)
+    #     deed_model.deed = {'effective_date': ''}
+    #     deed_model.save.side_effect = self.create_exception
+    #     mock_getlogger.return_value = TestLogger()
+    #     signed_time = 'a time'
+    #
+    #     make_deed_effective_date(deed_model, signed_time)
+    #
+    #     deed_model.save.assert_called_with()
 
-    @mock.patch('application.deed.service.abort')
-    def test_make_deed_effective_date_database_exception(self, mock_abort):
 
-        deed_model = mock.create_autospec(Deed)
-        deed_model.deed = {'effective_date': ''}
-        deed_model.save.side_effect = self.create_exception
-        signed_time = 'a time'
 
-        make_deed_effective_date(deed_model, signed_time)
-
-        deed_model.save.assert_called_with()
-        mock_abort.assert_called_with(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
