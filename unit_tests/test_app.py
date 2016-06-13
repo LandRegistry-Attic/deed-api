@@ -456,7 +456,7 @@ class TestRoutes(unittest.TestCase):
         self.assertEqual(response_status_code, 400)
 
         # test where not registrar signed
-        deed_model.status = "LR-NOT-SIGNED"
+        deed_model.status = "NOT-LR-SIGNED"
         mock_get_deed.return_value = deed_model
         response_status_code = make_effective(123)[1]
         mock_jsonify.assert_called_with({"message": "This deed has already been made effective."})
