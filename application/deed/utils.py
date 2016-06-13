@@ -11,7 +11,6 @@ import application.deed.generated.deed_xmlify as api
 from flask import request
 import urllib
 from application import config
-from lxml import etree
 
 LOGGER = logging.getLogger(__name__)
 
@@ -29,17 +28,6 @@ def call_once_only(func):
             decorated._once_result = func(*args, **kwargs)
             return decorated._once_result
     return decorated
-
-
-def add_effective_date_to_xml(deed_xml, effective_date):
-    try:
-        tree = etree.fromstring(deed_xml)
-
-        for val in tree.xpath("/dm-application/effectiveDate"):
-            val.text = effective_date
-            return etree.tostring(tree)
-    except ValueError as e:
-        raise ValueError(e)
 
 
 def validate_helper(json_to_validate):

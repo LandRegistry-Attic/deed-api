@@ -3,15 +3,17 @@ from application.deed.model import Deed
 from application.casework.service import get_document
 from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, StatusMock
 from application.akuma.service import Akuma
-from application.deed.utils import convert_json_to_xml, validate_generated_xml, add_effective_date_to_xml
-from application.deed.service import make_effective_text, apply_registrar_signature, check_effective_status, check_effective_date
-from application.service_clients.esec.implementation import sign_document_with_authority
+from application.deed.utils import convert_json_to_xml, validate_generated_xml
+from application.deed.service import make_effective_text, apply_registrar_signature, check_effective_status, add_effective_date_to_xml
+from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
 from application.borrower.model import generate_hex
 import unittest
 import json
 import mock
+import requests
+from unittest.mock import patch
 from application.borrower.model import Borrower
 from datetime import datetime
 from lxml import etree
@@ -56,10 +58,16 @@ class TestRoutes(unittest.TestCase):
         test_token = test_deed.generate_token()
         self.assertTrue(len(test_token) == 36)
 
-    def test_no_effective_date_in_xml(self):
-        effective_date = None
-        self.assertRaises(ValueError, check_effective_date, effective_date)
+    @patch('application.deed.model.Deed.save')
+    @patch('application.service_clients.esec.implementation.sign_document_with_authority')
+    def test_sign_document_is_called(self, mock_sign_with_authority, mock_save):
+        mock_deed = DeedModelMock()
+        mock_deed.status = "NOT-REGISTRAR-SIGNED"
+        effective_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
+        apply_registrar_signature(mock_deed, effective_date)
+        self.assertTrue(mock_sign_with_authority.called)
+        self.assertTrue(mock_save.called)
 
     def test_effective_date_in_xml(self):
         mock_deed = DeedModelMock()
@@ -77,21 +85,36 @@ class TestRoutes(unittest.TestCase):
         mock_deed = DeedModelMock()
         self.assertRaises(ValueError, check_effective_status, mock_deed.status)
 
-    def test_sign_document_response(self):
-        mock_deed = DeedModelMock()
-        url_string = '/esec/sign_document_with_authority'
-        response_xml = sign_document_with_authority(mock_deed.deed_xml, url_string)
+    @patch('requests.post')
+    def test_post_request_200(self, mock_post):
+        class ResponseStub:
+            status_code = 200
+            content = 'foo'
 
+        mock_post.return_value = ResponseStub()
+        mock_deed = DeedModelMock()
+        ret_val = _post_request('dummy/url/string', mock_deed.deed_xml)
+        self.assertEqual('foo', ret_val)
+
+    @patch('requests.post')
+    def test_post_request_500(self, mock_post):
+        class ResponseStub:
+            status_code = 500
+            content = 'bar'
+
+        mock_post.return_value = ResponseStub()
+        mock_deed = DeedModelMock()
+        self.assertRaises(ExternalServiceError,
+                          _post_request, 'dummy/url/string', mock_deed.deed_xml)
+
+    def test_sign_document_with_authority(self):
+        mock_deed = DeedModelMock()
+
+        response_xml = sign_document_with_authority(mock_deed.deed_xml)
         response = response_xml.decode('utf-8')
 
         self.assertEqual(response, mock_deed.deed_xml)
 
-    def test_sign_document_response_error(self):
-        mock_deed = DeedModelMock()
-
-        url_string = '/esec/sign_document_with_authorityss'
-
-        self.assertRaises(ValueError, sign_document_with_authority, mock_deed.deed_xml, url_string)
 
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')

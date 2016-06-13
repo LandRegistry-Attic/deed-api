@@ -9,7 +9,6 @@ class DeedStatus(Enum):
     stopped = "STOPPED"
     all_signed = "ALL-SIGNED"
     effective = "EFFECTIVE"
-    effective_not_signed = "EFFECTIVE-NOT-SIGNED"
     submitted = "SUBMITTED"
     stored = "STORED"
-    registered = "REGISTERED"
+    not_registrar_signed = "NOT-REGISTRAR-SIGNED"

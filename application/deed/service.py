@@ -1,5 +1,5 @@
 import logging
-from application.deed.utils import valid_dob, is_unique_list, add_effective_date_to_xml
+from application.deed.utils import valid_dob, is_unique_list
 from application.borrower.server import BorrowerService
 from underscore import _
 from application.mortgage_document.model import MortgageDocument
@@ -33,19 +33,22 @@ def valid_borrowers(borrowers):
 
 
 def check_effective_status(deed_status):
-    if DeedStatus.effective_not_signed.value not in deed_status:
-        LOGGER.error("Deed has a wrong status. Status should be {0}".format(DeedStatus.effective_not_signed.value))
-        raise ValueError
+    if DeedStatus.effective_not_registrar_signed.value not in deed_status:
+        msg = "Deed has a wrong status. Status should be {0}".format(DeedStatus.effective_not_registrar_signed.value)
+        LOGGER.error(msg)
+        raise ValueError(msg)
 
-def check_effective_date(effective_date):
-    if effective_date is None:
-        LOGGER.error("No effective date passed for deed document.")
-        raise ValueError
+
+def add_effective_date_to_xml(deed_xml, effective_date):
+    tree = etree.fromstring(deed_xml)
+    for val in tree.xpath("/dm-application/effectiveDate"):
+        val.text = effective_date
+        return etree.tostring(tree)
+
 
 def apply_registrar_signature(deed, effective_date):
-    check_effective_date(effective_date)
 
-    check_effective_status(deed.status)
+    #check_effective_status(deed.status)
 
     deed_xml = deed.deed_xml
 
