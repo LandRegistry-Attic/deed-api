@@ -62,7 +62,7 @@ class TestRoutes(unittest.TestCase):
     @patch('application.service_clients.esec.implementation.sign_document_with_authority')
     def test_sign_document_is_called(self, mock_sign_with_authority, mock_save):
         mock_deed = DeedModelMock()
-        mock_deed.status = "NOT-REGISTRAR-SIGNED"
+        mock_deed.status = "NOT-LR-SIGNED"
         effective_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         apply_registrar_signature(mock_deed, effective_date)
