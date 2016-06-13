@@ -82,7 +82,6 @@ def sign_document_with_authority(deed_xml, url_string=None):  # pragma: no cover
     resp = requests.post(request_url, data=deed_xml)
 
     if resp.status_code == status.HTTP_200_OK:
-        LOGGER.info("Response XML = {}".format(resp.content))
         return resp.content
     else:
         LOGGER.error("Esecurity client error: {}".format(str(resp.content)))

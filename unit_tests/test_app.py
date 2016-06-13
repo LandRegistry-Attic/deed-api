@@ -75,7 +75,7 @@ class TestRoutes(unittest.TestCase):
 
     def test_wrong_effective_status(self):
         mock_deed = DeedModelMock()
-        self.assertRaises(AssertionError, check_effective_status, mock_deed.status)
+        self.assertRaises(ValueError, check_effective_status, mock_deed.status)
 
     def test_sign_document_response(self):
         mock_deed = DeedModelMock()
