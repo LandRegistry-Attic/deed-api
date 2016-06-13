@@ -79,7 +79,6 @@ def sign_document_with_authority(deed_xml, url_string=None):  # pragma: no cover
     else:
         request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/sign_document_with_authority'
 
-   # try:
     resp = requests.post(request_url, data=deed_xml)
 
     if resp.status_code == status.HTTP_200_OK:
@@ -89,6 +88,3 @@ def sign_document_with_authority(deed_xml, url_string=None):  # pragma: no cover
         LOGGER.error("Esecurity client error: {}".format(str(resp.content)))
         LOGGER.error("Esecurity client error code: {}".format(str(resp.status_code)))
         raise ValueError
-    #except:
-    #    LOGGER.error("Esecurity Client Exception when trying to post document to Esec")
-    #    raise ConnectionError

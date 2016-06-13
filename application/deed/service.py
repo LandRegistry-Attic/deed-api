@@ -35,7 +35,7 @@ def valid_borrowers(borrowers):
 def check_effective_status(deed_status):
     if DeedStatus.effective_not_signed.value not in deed_status:
         LOGGER.error("Deed has a wrong status. Status should be {0}".format(DeedStatus.effective_not_signed.value))
-        raise AssertionError
+        raise ValueError
 
 def check_effective_date(effective_date):
     if effective_date is None:
@@ -45,7 +45,7 @@ def check_effective_date(effective_date):
 def apply_registrar_signature(deed, effective_date):
     check_effective_date(effective_date)
 
-    #check_effective_status(deed.status)
+    check_effective_status(deed.status)
 
     deed_xml = deed.deed_xml
 
@@ -53,21 +53,12 @@ def apply_registrar_signature(deed, effective_date):
 
     LOGGER.info("Applying registrar's signature to deed {}".format(deed.token))
 
-#    try:
     deed.deed_xml = esec_client.sign_document_with_authority(effective_xml)
-    LOGGER.info("Saving signed document to DB")
 
     deed.status = DeedStatus.effective.value
 
-    #deed.save()
-    LOGGER.info("Signed document saved to DB")
-
-
-#        return status.HTTP_200_OK
-#    except:
-#        msg = str(sys.exc_info())
-#        LOGGER.error("Failed to apply registrar's signature: {}".format(msg))
-#        return status.HTTP_500_INTERNAL_SERVER_ERROR
+    deed.save()
+    LOGGER.info("Signed and saved document to DB")
 
 
 def update_borrower(borrower, idx, borrowers, deed_token):
