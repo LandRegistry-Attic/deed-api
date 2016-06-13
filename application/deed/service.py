@@ -149,6 +149,6 @@ def set_signed_status(deed):
 
 def make_deed_effective_date(deed, signed_time):
     deed.deed['effective_date'] = signed_time
-    deed.status = "EFFECTIVE-NOT-REGISTRAR-SIGNED"
+    deed.status = "NOT-LR-SIGNED"
     deed.save()
 
