@@ -14,12 +14,13 @@ According to the following business rules:
 
 import collections
 import itertools
-import logger
-
-LOGGER = logging.getLogger(__name__)
+import logging
 
 
 from application.register_adapter.service import RegisterAdapter
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 def _unpack_borrowers(payload):
