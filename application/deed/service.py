@@ -33,8 +33,8 @@ def valid_borrowers(borrowers):
 
 
 def check_effective_status(deed_status):
-    if DeedStatus.effective_not_registrar_signed.value not in deed_status:
-        msg = "Deed has a wrong status. Status should be {0}".format(DeedStatus.effective_not_registrar_signed.value)
+    if DeedStatus.not_lr_signed.value not in deed_status:
+        msg = "Deed has a wrong status. Status should be {0}".format(DeedStatus.not_lr_signed.value)
         LOGGER.error(msg)
         raise ValueError(msg)
 
@@ -48,7 +48,7 @@ def add_effective_date_to_xml(deed_xml, effective_date):
 
 def apply_registrar_signature(deed, effective_date):
 
-    #check_effective_status(deed.status)
+    check_effective_status(deed.status)
 
     deed_xml = deed.deed_xml
 
