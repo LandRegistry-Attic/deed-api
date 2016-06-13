@@ -242,7 +242,7 @@ class TestRoutes(unittest.TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_schema_checks(self, mock_proprietor_names):
+    def test_schema_checks(self):
         self.assertTrue(run_schema_checks())
 
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
