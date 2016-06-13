@@ -229,7 +229,7 @@ def make_effective(deed_reference):
             return jsonify({"deed": result.deed}), status.HTTP_200_OK
 
         elif deed_status == "EFFECTIVE" or deed_status == "NOT-LR-SIGNED":
-            return jsonify({"message": "This deed is already been made effective."}), \
+            return jsonify({"message": "This deed is already made effective."}), \
                    status.HTTP_400_BAD_REQUEST
 
         else:
