@@ -5,6 +5,7 @@ from application.service_clients.esec import make_esec_client
 import os
 import logging
 from logger import logging_config
+from flask import jsonify
 
 logging_config.setup_logging()
 LOGGER = logging.getLogger(__name__)
