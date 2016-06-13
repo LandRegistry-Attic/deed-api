@@ -13,6 +13,7 @@ import unittest
 import json
 import mock
 from application.borrower.model import Borrower
+from datetime import datetime
 
 
 class TestRoutes(unittest.TestCase):
@@ -397,13 +398,10 @@ class TestRoutes(unittest.TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_make_deed_effective_date(self):
-
         deed_model = mock.create_autospec(Deed)
         deed_model.deed = {}
         signed_time = 'a time'
-
         make_deed_effective_date(deed_model, signed_time)
-
         deed_model.save.assert_called_with()
         self.assertEqual(deed_model.deed['effective_date'], 'a time')
 
@@ -417,15 +415,53 @@ class TestRoutes(unittest.TestCase):
 
     @mock.patch('application.deed.model.Deed.get_deed')
     @mock.patch('application.deed.views.abort')
-    def test_make_deed_effective(self, mock_abort, mock_get_deed):
+    def test_make_deed_effective_404(self, mock_abort, mock_get_deed):
+        mock_get_deed.return_value = None
+        make_effective(123)
+        mock_abort.assert_called_with(status.HTTP_404_NOT_FOUND)
+
+    @mock.patch('application.deed.model.Deed.get_deed')
+    @mock.patch('application.deed.views.Akuma.do_check')
+    @mock.patch('application.deed.views.jsonify')
+    @mock.patch('application.deed.views.datetime')
+    def test_make_deed_effective_200(self, mock_datetime, mock_jsonify, mock_akuma,
+                                     mock_get_deed):
         deed_model = mock.create_autospec(Deed)
         deed_model.deed = {}
-        mock_get_deed.return_value = None
+        deed_model.status = "ALL-SIGNED"
+        mock_datetime.now.return_value = datetime(1900, 1, 1)
+        mock_get_deed.return_value = deed_model
+        response_status_code = make_effective(123)[1]
+        mock_jsonify.assert_called_with({'deed': {'effective_date': '1900-01-01 00:00:00'}})
+        self.assertEqual(response_status_code, 200)
 
-        make_effective(123)
+    @mock.patch('application.deed.model.Deed.get_deed')
+    @mock.patch('application.deed.views.Akuma.do_check')
+    @mock.patch('application.deed.views.jsonify')
+    def test_make_deed_effective_400(self, mock_jsonify, mock_akuma, mock_get_deed):
+        deed_model = mock.create_autospec(Deed)
+        deed_model.deed = {}
 
-        mock_abort.assert_called_with(status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # test where already effective
+        deed_model.status = "EFFECTIVE"
+        mock_get_deed.return_value = deed_model
+        response_status_code = make_effective(123)[1]
+        mock_jsonify.assert_called_with({"message": "This deed has already been made effective."})
+        self.assertEqual(response_status_code, 400)
 
+        # test where not registrar signed
+        deed_model.status = "EFFECTIVE-NOT-REGISTRAR-SIGNED"
+        mock_get_deed.return_value = deed_model
+        response_status_code = make_effective(123)[1]
+        mock_jsonify.assert_called_with({"message": "This deed has already been made effective."})
+        self.assertEqual(response_status_code, 400)
 
+        # test anything else
+        deed_model.status = "Foo"
+        mock_get_deed.return_value = deed_model
+        response_status_code = make_effective(123)[1]
+        mock_jsonify.assert_called_with({"message": "You cannot make this deed effective as it has not "
+                                                    "been signed by all borrowers."})
+        self.assertEqual(response_status_code, 400)
 
 

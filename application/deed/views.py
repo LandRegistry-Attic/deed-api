@@ -208,7 +208,6 @@ def issue_sms(deed_reference, borrower_token):
 @deed_bp.route('/<deed_reference>/make-effective', methods=['POST'])
 def make_effective(deed_reference):
     result = Deed.get_deed(deed_reference)
-
     if result is None:
         abort(status.HTTP_404_NOT_FOUND)
     else:
@@ -224,8 +223,7 @@ def make_effective(deed_reference):
 
             return jsonify({"deed": result.deed}), status.HTTP_200_OK
 
-
-        elif deed_status == "EFFECTIVE" or "EFFECTIVE-NOT-REGISTRAR-SIGNED":
+        elif deed_status == "EFFECTIVE" or deed_status == "EFFECTIVE-NOT-REGISTRAR-SIGNED":
             return jsonify({"message": "This deed has already been made effective."}), \
                    status.HTTP_400_BAD_REQUEST
 
