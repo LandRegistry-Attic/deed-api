@@ -152,7 +152,7 @@ def make_deed_effective_date(deed, signed_time):
     # Assigning effective date directly to the existing deed will not generate the key.
     modify_deed = copy.deepcopy(deed.deed)
     modify_deed['effective_date'] = signed_time
-    deed.status = "EFFECTIVE-NOT-REGISTRAR-SIGNED"
+    deed.status = "NOT-LR-SIGNED"
     deed.deed = modify_deed
     deed.save()
 
