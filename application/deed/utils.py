@@ -12,6 +12,7 @@ from flask import request
 import urllib
 from application import config
 
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -34,7 +35,6 @@ def validate_helper(json_to_validate):
     error_message = ""
     error_list = sorted(_title_validator.iter_errors(json_to_validate),
                         key=str, reverse=True)
-
     for count, error in enumerate(error_list, start=1):
         error_message += "Problem %s:\n\n%s\n\n" % (count, str(error))
 
