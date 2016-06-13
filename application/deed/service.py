@@ -148,7 +148,11 @@ def set_signed_status(deed):
 
 
 def make_deed_effective_date(deed, signed_time):
-    deed.deed['effective_date'] = signed_time
-    deed.status = "NOT-LR-SIGNED"
+    # We deepcopy to ensure that effective_date key is generated.
+    # Assigning effective date directly to the existing deed will not generate the key.
+    modify_deed = copy.deepcopy(deed.deed)
+    modify_deed['effective_date'] = signed_time
+    deed.status = "EFFECTIVE-NOT-REGISTRAR-SIGNED"
+    deed.deed = modify_deed
     deed.save()
 
