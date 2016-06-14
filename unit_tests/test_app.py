@@ -12,7 +12,7 @@ from application.borrower.model import generate_hex
 import unittest
 import json
 import mock
-import requests
+import requests  # pragma: no cover
 from unittest.mock import patch
 from application.borrower.model import Borrower
 from datetime import datetime
@@ -114,7 +114,6 @@ class TestRoutes(unittest.TestCase):
         response = response_xml.decode('utf-8')
 
         self.assertEqual(response, mock_deed.deed_xml)
-
 
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')
