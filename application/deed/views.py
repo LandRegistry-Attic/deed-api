@@ -17,6 +17,7 @@ from flask import request, abort, jsonify, Response
 from flask.ext.api import status
 
 
+
 LOGGER = logging.getLogger(__name__)
 
 deed_bp = Blueprint('deed', __name__,
