@@ -1,5 +1,5 @@
 import json
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
 from application.service_clients.esec import make_esec_client
 import os
@@ -36,3 +36,15 @@ def check_status():
         "headers": str(request.headers),
         "commit": str(os.getenv("COMMIT", "LOCAL"))
     })
+
+
+@app.route("/div_zero")
+def div_zero():
+    app.logger.debug("div_zero")
+    1/0
+
+
+@app.errorhandler(Exception)
+def unhandled_exception(e):
+    app.logger.error('Unhandled Exception: %s', (e,), exc_info=True)
+    return jsonify({"message": "Unexpected error."}), 500
