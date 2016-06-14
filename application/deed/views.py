@@ -1,19 +1,20 @@
-import logging
-from application.akuma.service import Akuma
-from application.title_adaptor.service import TitleAdaptor
-from application.deed.model import Deed
-from application.deed.utils import validate_helper, process_organisation_credentials, convert_json_to_xml
-from application.deed.service import update_deed, update_deed_signature_timestamp, make_deed_effective_date
-from flask import request, abort, jsonify, Response
-from flask import Blueprint
-from flask.ext.api import status
-from application.borrower.model import Borrower
-from application import esec_client
-import json
-import sys
 import copy
+import json
+import logging
+import sys
 from datetime import datetime
+
+from application import esec_client
+from application.akuma.service import Akuma
+from application.borrower.model import Borrower
+from application.deed.model import Deed
+from application.deed.service import update_deed, update_deed_signature_timestamp, make_deed_effective_date
+from application.deed.utils import validate_helper, process_organisation_credentials, convert_json_to_xml
 from application.deed.validate_borrowers import check_borrower_names, BorrowerNamesException
+from application.title_adaptor.service import TitleAdaptor
+from flask import Blueprint
+from flask import request, abort, jsonify, Response
+from flask.ext.api import status
 
 LOGGER = logging.getLogger(__name__)
 
@@ -230,12 +231,12 @@ def make_effective(deed_reference):
 
         elif deed_status == "EFFECTIVE" or deed_status == "NOT-LR-SIGNED":
             return jsonify({"message": "This deed is already made effective."}), \
-                            status.HTTP_400_BAD_REQUEST
+                status.HTTP_400_BAD_REQUEST
 
         else:
             return jsonify({"message": "You can not make this deed effective "
                                        "as it is not fully signed."}), \
-                            status.HTTP_400_BAD_REQUEST
+                status.HTTP_400_BAD_REQUEST
 
 
 @deed_bp.route('/<deed_reference>/request-auth-code', methods=['POST'])
