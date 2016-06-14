@@ -230,12 +230,12 @@ def make_effective(deed_reference):
 
         elif deed_status == "EFFECTIVE" or deed_status == "NOT-LR-SIGNED":
             return jsonify({"message": "This deed is already made effective."}), \
-                   status.HTTP_400_BAD_REQUEST
+                            status.HTTP_400_BAD_REQUEST
 
         else:
             return jsonify({"message": "You can not make this deed effective "
                                        "as it is not fully signed."}), \
-                   status.HTTP_400_BAD_REQUEST
+                            status.HTTP_400_BAD_REQUEST
 
 
 @deed_bp.route('/<deed_reference>/request-auth-code', methods=['POST'])
