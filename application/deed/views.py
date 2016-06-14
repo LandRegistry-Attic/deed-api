@@ -3,7 +3,7 @@ from application.akuma.service import Akuma
 from application.title_adaptor.service import TitleAdaptor
 from application.deed.model import Deed
 from application.deed.utils import validate_helper, process_organisation_credentials, convert_json_to_xml
-from application.deed.service import update_deed, update_deed_signature_timestamp
+from application.deed.service import update_deed, update_deed_signature_timestamp, apply_registrar_signature
 from flask import request, abort, jsonify, Response
 from flask import Blueprint
 from flask.ext.api import status
