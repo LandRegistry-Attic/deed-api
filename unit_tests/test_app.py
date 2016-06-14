@@ -12,7 +12,7 @@ from application.borrower.model import generate_hex
 import unittest
 import json
 import mock
-import requests  # pragma: no cover
+import requests  # NOQA
 from unittest.mock import patch
 from application.borrower.model import Borrower
 from datetime import datetime
