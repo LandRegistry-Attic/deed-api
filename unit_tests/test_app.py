@@ -469,5 +469,3 @@ class TestRoutes(unittest.TestCase):
         mock_jsonify.assert_called_with({"message": "You can not make this deed effective "
                                         "as it is not fully signed."})
         self.assertEqual(response_status_code, 400)
-
-

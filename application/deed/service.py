@@ -155,4 +155,3 @@ def make_deed_effective_date(deed, signed_time):
     deed.status = "NOT-LR-SIGNED"
     deed.deed = modify_deed
     deed.save()
-
