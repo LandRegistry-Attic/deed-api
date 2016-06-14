@@ -466,8 +466,8 @@ class TestRoutes(unittest.TestCase):
         deed_model.status = "Foo"
         mock_get_deed.return_value = deed_model
         response_status_code = make_effective(123)[1]
-        mock_jsonify.assert_called_with({"message": "You cannot make this deed effective as it has not "
-                                                    "been signed by all borrowers."})
+        mock_jsonify.assert_called_with({"message": "You cannot make this deed effective as it is not "
+                                                    "fully signed"})
         self.assertEqual(response_status_code, 400)
 
 
