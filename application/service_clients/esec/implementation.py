@@ -3,8 +3,6 @@ import logging
 from application import config
 from flask.ext.api import status
 from flask import abort
-import sys
-from werkzeug import exceptions
 
 LOGGER = logging.getLogger(__name__)
 

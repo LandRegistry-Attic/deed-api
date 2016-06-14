@@ -24,7 +24,7 @@ deed_bp = Blueprint('deed', __name__,
 @deed_bp.route('/<deed_reference>', methods=['GET'])
 def get_deed(deed_reference):
     result = Deed.get_deed(deed_reference)
-    
+
     if result is None:
         abort(status.HTTP_404_NOT_FOUND)
     else:

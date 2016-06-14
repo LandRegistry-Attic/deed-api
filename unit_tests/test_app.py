@@ -12,7 +12,7 @@ from application.borrower.model import generate_hex
 import unittest
 import json
 import mock
-import requests
+import requests  # pragma: no cover
 from unittest.mock import patch
 from application.borrower.model import Borrower
 from datetime import datetime
@@ -113,7 +113,6 @@ class TestRoutes(unittest.TestCase):
         sign_document_with_authority(mock_deed.deed_xml)
         mock_post_request.assert_called_with('http://127.0.0.1:9040/esec/sign_document_with_authority',
                                              mock_deed.deed_xml)
-
 
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')

@@ -11,7 +11,6 @@ import json
 import datetime
 import copy
 from application import esec_client
-import sys
 from lxml import etree
 
 
@@ -47,19 +46,13 @@ def add_effective_date_to_xml(deed_xml, effective_date):
 
 
 def apply_registrar_signature(deed, effective_date):
-
     check_effective_status(deed.status)
-
     deed_xml = deed.deed_xml
-
     effective_xml = add_effective_date_to_xml(deed_xml, effective_date)
 
     LOGGER.info("Applying registrar's signature to deed {}".format(deed.token))
-
     deed.deed_xml = esec_client.sign_document_with_authority(effective_xml)
-
     deed.status = DeedStatus.effective.value
-
     deed.save()
     LOGGER.info("Signed and saved document to DB")
 

@@ -38,6 +38,7 @@ def check_status():
         "commit": str(os.getenv("COMMIT", "LOCAL"))
     })
 
+
 @app.errorhandler(Exception)
 def unhandled_exception(e):
     app.logger.error('Unhandled Exception: %s', (e,), exc_info=True)
