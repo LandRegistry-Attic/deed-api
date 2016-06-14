@@ -108,13 +108,12 @@ class TestRoutes(unittest.TestCase):
         self.assertRaises(ExternalServiceError,
                           _post_request, 'dummy/url/string', mock_deed.deed_xml)
 
-    def test_sign_document_with_authority(self):
+    @patch('application.service_clients.esec.implementation._post_request')
+    def test_sign_document_with_authority(self, mock_post_request):
         mock_deed = DeedModelMock()
-
-        response_xml = sign_document_with_authority(mock_deed.deed_xml)
-        response = response_xml.decode('utf-8')
-
-        self.assertEqual(response, mock_deed.deed_xml)
+        sign_document_with_authority(mock_deed.deed_xml)
+        mock_post_request.assert_called_with('http://127.0.0.1:9040/esec/sign_document_with_authority',
+                                             mock_deed.deed_xml)
 
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
