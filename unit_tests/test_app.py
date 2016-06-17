@@ -471,14 +471,6 @@ class TestRoutes(unittest.TestCase):
         deed_model.save.assert_called_with()
         self.assertEqual(deed_model.deed['effective_date'], 'a time')
 
-    def test_global_exception_handler(self):
-        self.assertEqual((self.app.get('/div_zero')).status_code,
-                         status.HTTP_500_INTERNAL_SERVER_ERROR)
-        self.assertEqual((self.app.get('/div_zero')).status,
-                         '500 INTERNAL SERVER ERROR')
-        self.assertEqual((self.app.get('/div_zero').data),
-                         b'{\n  "message": "Unexpected error."\n}')
-
     @mock.patch('application.deed.model.Deed.get_deed')
     @mock.patch('application.deed.views.abort')
     def test_make_deed_effective_404(self, mock_abort, mock_get_deed):

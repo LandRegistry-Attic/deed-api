@@ -57,12 +57,6 @@ def check_status():
     })
 
 
-@app.route("/div_zero")
-def div_zero():
-    app.logger.debug("div_zero")
-    1/0
-
-
 @app.errorhandler(EsecDownException)
 def esecurity_error(e):
     app.logger.error('ESecurity is Down: %s', (e,), exc_info=True)
