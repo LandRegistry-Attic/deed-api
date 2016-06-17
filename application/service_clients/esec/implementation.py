@@ -94,5 +94,5 @@ def sign_document_with_authority(deed_xml):
     request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/sign_document_with_authority'
     try:
         _post_request(request_url, deed_xml)
-    except ConnectionError:
-         raise EsecDownException
+    except requests.exceptions.ConnectionError:
+        raise EsecDownException
