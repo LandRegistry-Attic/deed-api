@@ -530,8 +530,6 @@ class TestRoutes(unittest.TestCase):
         mock_request.side_effect = requests.ConnectionError
         self.assertRaises(EsecDownException, sign_document_with_authority, "Foo")
 
-    import application
-
     @mock.patch('json.dumps')
     def test_check_health(self, mock_status):
         mock_status.side_effect = EsecDownException
