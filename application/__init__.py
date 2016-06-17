@@ -31,8 +31,25 @@ app.register_blueprint(casework_bp, url_prefix='/casework')
 app.url_map.strict_slashes = False
 
 
+class InvalidUsage(Exception):
+    status_code = 400
+
+    def __init__(self, message, status_code=None, payload=None):
+        Exception.__init__(self)
+        self.message = message
+        if status_code is not None:
+            self.status_code = status_code
+        self.payload = payload
+
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        return rv
+
+
 @app.route("/health")
 def check_status():
+
     return json.dumps({
         "Status": "OK",
         "headers": str(request.headers),
@@ -46,13 +63,13 @@ def div_zero():
     1/0
 
 
-@app.errorhandler(Exception)
-def unhandled_exception(e):
-    app.logger.error('Unhandled Exception: %s', (e,), exc_info=True)
-    return jsonify({"message": "Unexpected error."}), 500
-
-
 @app.errorhandler(EsecDownException)
 def esecurity_error(e):
     app.logger.error('ESecurity is Down: %s', (e,), exc_info=True)
     return jsonify({"message": "Make Effective Successful"}), 200
+
+
+@app.errorhandler(Exception)
+def unhandled_exception(e):
+    app.logger.error('Unhandled Exception: %s', (e,), exc_info=True)
+    return jsonify({"message": "Unexpected error."}), 500
