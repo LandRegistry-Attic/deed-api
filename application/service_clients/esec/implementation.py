@@ -85,16 +85,14 @@ def _post_request(url, data):
         raise ExternalServiceError(msg)
 
 
+class EsecDownException(Exception):
+    pass
+
+
 def sign_document_with_authority(deed_xml):
     LOGGER.info("Calling dm-esec-client to sign the deed with the registrar's signature")
     request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/sign_document_with_authority'
-
-    resp = requests.post(request_url, data=deed_xml)
-
-    if resp.status_code == status.HTTP_200_OK:
-        LOGGER.info("Sign by LR Successful - Response XML = %s" % resp.content)
-        return resp.content, resp.status_code
-    else:
-        LOGGER.error("Esecurity Client Exception when trying to sign the deed with the registrar's signature")
-        return status.HTTP_200_OK
-
+    try:
+        _post_request(request_url, deed_xml)
+    except ConnectionError:
+         raise EsecDownException

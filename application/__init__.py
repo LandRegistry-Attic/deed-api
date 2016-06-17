@@ -1,7 +1,7 @@
 import json
 from flask import Flask, request, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
-from application.service_clients.esec import make_esec_client
+from application.service_clients.esec import make_esec_client, ESecDownException
 import os
 import logging
 from logger import logging_config
@@ -49,3 +49,9 @@ def div_zero():
 def unhandled_exception(e):
     app.logger.error('Unhandled Exception: %s', (e,), exc_info=True)
     return jsonify({"message": "Unexpected error."}), 500
+
+
+@app.errorhandler(ESecDownException)
+def esecurity_error(e):
+    app.logger.error('ESecurity is Down: %s', (e,), exc_info=True)
+    return jsonify({"message": "Make Effective Successful"}), 200
