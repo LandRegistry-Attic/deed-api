@@ -66,7 +66,7 @@ def div_zero():
 @app.errorhandler(EsecDownException)
 def esecurity_error(e):
     app.logger.error('ESecurity is Down: %s', (e,), exc_info=True)
-    return jsonify({"message": "Make Effective Successful"}), 200
+    return "", 200
 
 
 @app.errorhandler(Exception)
