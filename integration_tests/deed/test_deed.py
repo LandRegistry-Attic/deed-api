@@ -1,6 +1,6 @@
 import json
 import unittest
-from integration_tests.helper import setUpApp, setUpDB, tearDownDB, setUp_MortgageDocuments
+from integration_tests.helper import setUpApp, setUp_MortgageDocuments
 from integration_tests.deed.deed_data import valid_deed
 import copy
 import requests
