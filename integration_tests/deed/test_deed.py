@@ -25,11 +25,8 @@ class TestDeedRoutes(unittest.TestCase):
 
     def setUp(self):
         setUpApp(self)
-        setUpDB(self)
         setUp_MortgageDocuments(self)
 
-    def tearDown(self):
-        tearDownDB(self)
 
     def test_deed_create_and_get(self):
         create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
