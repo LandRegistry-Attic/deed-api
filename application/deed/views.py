@@ -230,7 +230,7 @@ def make_effective(deed_reference):
 
             apply_registrar_signature(result, signed_time)
 
-            return status.HTTP_200_OK
+            return '', status.HTTP_200_OK
 
         elif deed_status == "EFFECTIVE" or deed_status == "NOT-LR-SIGNED":
             return jsonify({"message": "This deed is already made effective."}), \

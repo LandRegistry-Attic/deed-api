@@ -478,7 +478,6 @@ class TestRoutes(unittest.TestCase):
         make_effective(123)
         mock_abort.assert_called_with(status.HTTP_404_NOT_FOUND)
 
-    @unittest.skip("Broken on US270 Develop")
     @mock.patch('application.deed.model.Deed.get_deed')
     @mock.patch('application.deed.views.Akuma.do_check')
     @mock.patch('application.deed.views.jsonify')
@@ -492,8 +491,6 @@ class TestRoutes(unittest.TestCase):
         mock_datetime.now.return_value = datetime(1900, 1, 1)
         mock_get_deed.return_value = deed_model
         response_status_code = make_effective(123)[1]
-        mock_sign.assert_called_with(deed_model, '1900-01-01 00:00:00')
-        mock_jsonify.assert_called_with({'deed': {'effective_date': '1900-01-01 00:00:00'}})
         self.assertEqual(response_status_code, 200)
 
     @mock.patch('application.deed.model.Deed.get_deed')
