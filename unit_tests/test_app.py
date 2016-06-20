@@ -76,7 +76,6 @@ class TestRoutes(unittest.TestCase):
 
     def test_effective_date_in_xml(self):
         mock_deed = DeedModelMock()
-        #effective_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         effective_date = '1900-01-01 00:00:00'
 
         result = add_effective_date_to_xml(mock_deed.deed_xml, effective_date)

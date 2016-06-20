@@ -11,6 +11,10 @@ class ExternalServiceError(Exception):
     pass
 
 
+class EsecDownException(Exception):
+    pass
+
+
 def issue_sms(first_name, last_name, organisation_id, phone_number):  # pragma: no cover
     LOGGER.info("Calling dm-esec-client to initiate signing")
     request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/issue_sms'
@@ -83,10 +87,6 @@ def _post_request(url, data):
         msg = resp.content
         LOGGER.error("{0}".format(msg,))
         raise ExternalServiceError(msg)
-
-
-class EsecDownException(Exception):
-    pass
 
 
 def sign_document_with_authority(deed_xml):
