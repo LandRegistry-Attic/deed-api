@@ -2,7 +2,7 @@ import json
 from flask import Flask, request, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
 from application.service_clients.esec import make_esec_client
-from application.service_clients.esec.implementation import EsecDownException
+from application.service_clients.esec.implementation import EsecException
 import os
 import logging
 from logger import logging_config
@@ -57,9 +57,9 @@ def check_status():
     })
 
 
-@app.errorhandler(EsecDownException)
+@app.errorhandler(EsecException)
 def esecurity_error(e):
-    app.logger.error('ESecurity is Down: %s', (e,), exc_info=True)
+    app.logger.error('ESecurity has raised an Exception: %s', (e,), exc_info=True)
     return "", 200
 
 

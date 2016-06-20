@@ -6,22 +6,18 @@ from application.akuma.service import Akuma
 from application.deed.views import make_effective
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
 from application.deed.service import make_effective_text, make_deed_effective_date, apply_registrar_signature, check_effective_status, add_effective_date_to_xml
-from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecDownException
+from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
 from application.borrower.model import generate_hex
 import unittest
 import json
 import mock
-<<<<<<< HEAD
 import requests  # NOQA
-=======
->>>>>>> c70f3feb9d6d2d0895b057e2ba7f48afb9715ee4
 from unittest.mock import patch
 from application.borrower.model import Borrower
 from datetime import datetime
 from lxml import etree
-import requests
 
 
 class TestRoutes(unittest.TestCase):
@@ -529,11 +525,11 @@ class TestRoutes(unittest.TestCase):
     @mock.patch('application.service_clients.esec.implementation._post_request')
     def test_esec_down_gives_200(self, mock_request):
         mock_request.side_effect = requests.ConnectionError
-        self.assertRaises(EsecDownException, sign_document_with_authority, "Foo")
+        self.assertRaises(EsecException, sign_document_with_authority, "Foo")
 
     @mock.patch('json.dumps')
     def test_check_health(self, mock_status):
-        mock_status.side_effect = EsecDownException
+        mock_status.side_effect = EsecException
         response = self.app.get('/health')
         self.assertEqual(response.data, b'')
         self.assertEqual(response.status_code, 200)
