@@ -164,7 +164,7 @@ class DeedHelper:
             "dob": "23/01/1986",
             "phone_number": "07502154062"
         }
-    ]},
+    ]}
     _invalid_blanks_on_required_fields = {
         "borrowers": [
             {

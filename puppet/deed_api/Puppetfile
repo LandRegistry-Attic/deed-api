@@ -1,7 +1,7 @@
 forge 'https://forgeapi.puppetlabs.com'
 
 mod 'LandRegistry/standard_env',
-  :git => 'git://github.com/LandRegistry/standard-env',
+  :git => 'git@192.168.249.38:common/standard-env.git',
   :ref => 'master'
 
 mod 'puppetlabs/postgresql'

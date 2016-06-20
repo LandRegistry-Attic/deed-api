@@ -11,4 +11,5 @@ class DeedStatus(Enum):
     effective = "EFFECTIVE"
     submitted = "SUBMITTED"
     stored = "STORED"
+    registered = "REGISTERED"
     not_lr_signed = "NOT-LR-SIGNED"

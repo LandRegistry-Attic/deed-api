@@ -85,7 +85,14 @@ def _post_request(url, data):
         raise ExternalServiceError(msg)
 
 
+class EsecDownException(Exception):
+    pass
+
+
 def sign_document_with_authority(deed_xml):
     LOGGER.info("Calling dm-esec-client to sign the deed with the registrar's signature")
     request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/sign_document_with_authority'
-    return _post_request(request_url, deed_xml)
+    try:
+        _post_request(request_url, deed_xml)
+    except requests.exceptions.ConnectionError:
+        raise EsecDownException

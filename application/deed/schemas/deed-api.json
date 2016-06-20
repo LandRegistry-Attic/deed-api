@@ -85,6 +85,41 @@
                     }
                 }
             }
+        },
+        "/deed/{deed_reference}/make-effective": {
+            "post": {
+                "summary": "Make Effective",
+                "description": "The Make Effective endpoint triggers the service to make a deed effective, dating it with the timestamp of when this call is made.\nThe response includes the Title Number, Property information, Borrower(s) information and deed information, as well as the timestamp that is saved onto the deed.\n",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "deed_reference",
+                        "in": "path",
+                        "description": "Unique reference of the deed.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "Make Effective"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A specific deed is returned.",
+                        "schema": {
+                            "$ref": "#/definitions/Operative_Deed"
+                        }
+                    },
+                    "404": {
+                        "description": "Deed not found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -256,6 +291,10 @@
                         "deed_status": {
                             "type": "string",
                             "description": "Current state of the deed"
+                        },
+                        "effective_date": {
+                            "type": "string",
+                            "description": "An effective date is shown if the deed is made effective"
                         }
                     }
                 }

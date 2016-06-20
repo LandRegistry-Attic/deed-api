@@ -173,3 +173,13 @@ def set_signed_status(deed):
         deed.status = DeedStatus.all_signed.value
     elif signed_count > 0:
         deed.status = DeedStatus.partial.value
+
+
+def make_deed_effective_date(deed, signed_time):
+    # We deepcopy to ensure that effective_date key is generated.
+    # Assigning effective date directly to the existing deed will not generate the key.
+    modify_deed = copy.deepcopy(deed.deed)
+    modify_deed['effective_date'] = signed_time
+    deed.status = "NOT-LR-SIGNED"
+    deed.deed = modify_deed
+    deed.save()
