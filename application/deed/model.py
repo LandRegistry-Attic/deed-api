@@ -4,6 +4,7 @@ from application import db
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.operators import and_
 from application.deed.utils import process_organisation_credentials
+from application.deed.deed_status import DeedStatus
 import logging
 
 LOGGER = logging.getLogger(__name__)
@@ -63,6 +64,21 @@ class Deed(db.Model):
             result = Deed.query.filter_by(token=str(deed_reference)).first()
 
         return result
+
+    @staticmethod
+    def get_signed_deeds():
+        conveyancer_credentials = process_organisation_credentials()
+        organisation_id = conveyancer_credentials["O"][1]
+
+        result = Deed.query.filter_by(organisation_id=organisation_id, status=DeedStatus.all_signed.value).all()
+
+        all_signed_deeds = list(
+            map(lambda deed: {
+                "Deed token": deed.token
+            }, result)
+        )
+
+        return all_signed_deeds
 
     def get_borrower_position(self, borrower_token):
         for idx, borrower in enumerate(self.deed['borrowers'], start=1):

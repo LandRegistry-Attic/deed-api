@@ -211,6 +211,16 @@ def issue_sms(deed_reference, borrower_token):
     return status.HTTP_200_OK
 
 
+@deed_bp.route('/retrieve-signed', methods=['GET'])
+def retrieve_signed_deed():
+    result = Deed.get_signed_deeds()
+
+    if not result:
+        return "There are no deeds which have been fully signed", status.HTTP_404_NOT_FOUND
+    else:
+        return "The following deeds have been fully signed by all borrowers: {}".format(result), status.HTTP_200_OK
+
+
 @deed_bp.route('/<deed_reference>/make-effective', methods=['POST'])
 def make_effective(deed_reference):
     result = Deed.get_deed(deed_reference)
