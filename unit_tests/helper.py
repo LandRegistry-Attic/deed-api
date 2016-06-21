@@ -46,6 +46,24 @@ class DeedModelMock(Deed):
         "identity_checked": "Y"
     }
     status = "DRAFT"
+    deed_xml = "<dm-application xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"http://localhost:9080/schemas/deed-schema-v0-2.xsd\">\
+                <operativeDeed><deedData Id=\"deedData\"><titleNumber>GR515835</titleNumber><propertyDescription>5 The Drive, This Town, This County, PL4 4TH</propertyDescription>\
+                <borrowers><borrower><name><privateIndividual><forename>Paul</forename><middlename>James</middlename><surname>Smythe</surname>\
+                </privateIndividual></name><address>borrower address</address></borrower><borrower><name><privateIndividual><forename>Jane</forename><surname>Smythe</surname>\
+                </privateIndividual></name><address>borrower address</address></borrower></borrowers><mdRef>e-MD12344</mdRef><chargeClause><creCode>CRE001</creCode>\
+                <entryText>The borrower, with full title guarantee, charges to the lender the property by way of legal mortgage with payment of all money secured by this charge.</entryText>\
+                </chargeClause><additionalProvisions><provision><code>addp001</code><entryText>This Mortgage Deed incorporates the &lt;a href=\'#\' rel=\'external\'&gt;Lenders Mortgage Conditions\
+                 and Explanation 2006&lt;/a&gt;, a copy of which the borrower has received.</entryText><sequenceNumber>0</sequenceNumber></provision><provision><code>addp002</code>\
+                 <entryText>The lender is obliged to make further advances and applies for the obligation to be entered in the register.</entryText>\
+                 <sequenceNumber>1</sequenceNumber></provision><provision><code>addp003</code><entryText>The borrower applies to enter a restriction in the register that no disposition \
+                 of the registered estate by the proprietor of the registered estate is to be registered without a written consent signed by the proprietor for the time being of the \
+                 charge dated [the date of this charge] in favour of Bank of England Plc referred to in the charges register.</entryText><sequenceNumber>2</sequenceNumber>\
+                 </provision></additionalProvisions><lender><organisationName><company><name>Bank of England Plc</name></company></organisationName>\
+                 <address>12 Trinity Place, Regents Street, London NW10 6TQ</address><companyRegistrationDetails>Company registration number: 2347676</companyRegistrationDetails>\
+                 </lender><effectiveClause>This charge takes effect when the registrar receives notification from Land Registry Devices that the charge is to take effect.</effectiveClause>\
+                 </deedData><signatureSlots><borrower_signature><signature/><signatory><privateIndividual><forename>Paul</forename><middlename>James</middlename><surname>Smythe</surname>\
+                 </privateIndividual></signatory></borrower_signature><borrower_signature><signature/><signatory><privateIndividual><forename>Jane</forename><surname>Smythe</surname>\
+                 </privateIndividual></signatory></borrower_signature></signatureSlots></operativeDeed><effectiveDate></effectiveDate><authSignature/></dm-application>"
 
 
 class MortgageDocMock:
