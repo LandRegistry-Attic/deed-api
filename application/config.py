@@ -14,3 +14,5 @@ ESEC_SCHEMA_LOCATION = os.getenv('ESEC_SCHEMA_LOCATION', 'http://localhost:9080/
 TITLE_ADAPTOR_BASE_HOST = os.getenv('TITLE_ADAPTOR_URI', 'http://localhost:5010')
 
 DM_REGISTER_ADAPTER = os.getenv('REGISTER_ADAPTER', 'http://localhost:5011/')
+
+DEED_API_BASE_HOST = os.getenv('DEED_API_ADDRESS', 'http://0.0.0.0:9020')
