@@ -69,3 +69,21 @@ class Deed(db.Model):
             if borrower_token == borrower['token']:
                 return idx
         return -1
+
+
+def get_enriched_deed(deed_reference):
+    """
+    Get a Deed with token and status attributes copied to the
+    Deed.deed level.
+
+    FIXME: The current nested deed model is confusing and needs revisiting
+
+    :param deed_reference:
+    :return:
+    """
+    ret_val = Deed.get_deed(deed_reference)
+    if ret_val is None:
+        raise FileNotFoundError
+    ret_val.deed['token'] = ret_val.token
+    ret_val.deed['status'] = ret_val.status
+    return ret_val
