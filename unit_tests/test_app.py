@@ -55,6 +55,11 @@ class TestRoutes(unittest.TestCase):
         test_token = test_deed.generate_token()
         self.assertTrue(len(test_token) == 36)
 
+    @mock.patch('application.deed.model.Deed.query')
+    def test_signed_deeds(self, mock_query):
+        mock_query.return_value = "blah"
+        pass
+
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')
