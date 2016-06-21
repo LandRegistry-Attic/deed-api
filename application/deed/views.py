@@ -24,17 +24,18 @@ deed_bp = Blueprint('deed', __name__,
                     static_folder='static')
 
 
+def _get_deed(deed_reference):
+    result = Deed.get_deed(deed_reference)
+    if result is None:
+        raise FileNotFoundError
+    result.deed['token'] = result.token #FIXME
+    result.deed['status'] = result.status #FIXME
+    return {"deed": result.deed}
+
+
 @deed_bp.route('/<deed_reference>', methods=['GET'])
 def get_deed(deed_reference):
-    result = Deed.get_deed(deed_reference)
-
-    if result is None:
-        abort(status.HTTP_404_NOT_FOUND)
-    else:
-        result.deed['token'] = result.token
-        result.deed['status'] = result.status
-
-    return jsonify({"deed": result.deed}), status.HTTP_200_OK
+    return jsonify(_get_deed(deed_reference)), status.HTTP_200_OK
 
 
 @deed_bp.route('', methods=['GET'])
