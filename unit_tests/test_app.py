@@ -20,7 +20,7 @@ from datetime import datetime
 from lxml import etree
 
 
-class TestRoutes(unittest.TestCase):
+class TestRoutesBase(unittest.TestCase):
     DEED_ENDPOINT = "/deed/"
     DEED_QUERY = "/deed"
     BORROWER_ENDPOINT = "/borrower/"
@@ -41,6 +41,9 @@ class TestRoutes(unittest.TestCase):
     def setUp(self):
         app.config.from_pyfile("config.py")
         self.app = app.test_client()
+
+
+class TestRoutes(TestRoutesBase):
 
     def test_health(self):
         self.assertEqual((self.app.get('/health')).status_code,
@@ -203,16 +206,6 @@ class TestRoutes(unittest.TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @mock.patch('application.deed.model.Deed.query', autospec=True)
-    def test_get_endpoint(self, mock_query):
-        mock_instance_response = mock_query.filter_by.return_value
-        mock_instance_response.first.return_value = DeedModelMock()
-
-        response = self.app.get(self.DEED_ENDPOINT + 'AB1234',
-                                headers=self.webseal_headers)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue("DN100" in response.data.decode())
-
     @mock.patch('application.deed.model.Deed.get_deed_status', autospec=True)
     def test_get_status_with_mdref_and_titleno_endpoint(self, get_deed_status):
         get_deed_status.return_value = StatusMock()._status_with_mdref_and_titleno
@@ -229,15 +222,6 @@ class TestRoutes(unittest.TestCase):
 
         response = self.app.get(self.DEED_QUERY + '?md_ref=e-MD12344&title_number=DN100')
 
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    @mock.patch('application.deed.model.Deed.query', autospec=True)
-    def test_get_endpoint_not_found(self, mock_query):
-        mock_instance_response = mock_query.filter_by.return_value
-        mock_instance_response.first.return_value = None
-
-        response = self.app.get(self.DEED_ENDPOINT + 'CD3456',
-                                headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     @mock.patch('application.borrower.model.Borrower.delete')
@@ -533,3 +517,25 @@ class TestRoutes(unittest.TestCase):
         response = self.app.get('/health')
         self.assertEqual(response.data, b'')
         self.assertEqual(response.status_code, 200)
+
+
+
+class TestGetDeed(TestRoutesBase):
+
+    @mock.patch('application.deed.model.Deed.query', autospec=True)
+    def test_get_endpoint(self, mock_query):
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = DeedModelMock()
+
+        response = self.app.get(self.DEED_ENDPOINT + 'AB1234',
+                                headers=self.webseal_headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue("DN100" in response.data.decode())
+
+    @mock.patch('application.deed.model.Deed.get_deed_status', autospec=True)
+    def test_get_no_status_with_mdref_and_titleno_endpoint_no_status(self, get_deed_status):
+        get_deed_status.return_value = StatusMock()._no_status_with_mdref_and_titleno
+
+        response = self.app.get(self.DEED_QUERY + '?md_ref=e-MD12344&title_number=DN100')
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
