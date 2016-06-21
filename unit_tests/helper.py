@@ -1,5 +1,7 @@
 from application.deed.model import Deed
 
+# flake8: noqa
+
 
 class DeedModelMock(Deed):
     token = "ABC1234"
