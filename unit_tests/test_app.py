@@ -506,11 +506,6 @@ class TestRoutes(TestRoutesBase):
                                         "as it is not fully signed."})
         self.assertEqual(response_status_code, 400)
 
-    @mock.patch('application.service_clients.esec.implementation._post_request')
-    def test_esec_down_gives_200(self, mock_request):
-        mock_request.side_effect = requests.ConnectionError
-        self.assertRaises(EsecException, sign_document_with_authority, "Foo")
-
     @mock.patch('json.dumps')
     def test_check_health(self, mock_status):
         mock_status.side_effect = EsecException
@@ -540,5 +535,20 @@ class TestGetDeed(TestRoutesBase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+
+class TestRoutesErrorHandlers(TestRoutesBase):
+
+    @mock.patch('application.service_clients.esec.implementation._post_request')
+    def test_esec_down_gives_200(self, mock_request):
+        mock_request.side_effect = requests.ConnectionError
+        self.assertRaises(EsecException, sign_document_with_authority, "Foo")
+
+    @mock.patch('application.deed.model.Deed.get_deed')
+    def test_file_not_found_exception(self, mock_get_deed):
+        mock_get_deed.return_value = None
+
+        response = self.app.get(self.DEED_ENDPOINT + 'AB1234',
+                                headers=self.webseal_headers)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 

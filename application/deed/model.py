@@ -77,17 +77,17 @@ class Deed(db.Model):
 
 def get_enriched_deed(deed_reference):
     """
-    Get a Deed with token and status attributes copied to the
-    Deed.deed level.
+    An adapter for the deed to create a dictionary of the required form.
 
     FIXME: The current nested deed model is confusing and needs revisiting
 
     :param deed_reference:
-    :return:
+    :return: The deed dictionary with status and token attributes set
+    :rtype: dict
     """
-    ret_val = Deed.get_deed(deed_reference)
-    if ret_val is None:
-        raise FileNotFoundError
-    ret_val.deed['token'] = ret_val.token
-    ret_val.deed['status'] = ret_val.status
-    return ret_val
+    deed = Deed.get_deed(deed_reference)
+    if deed is None:
+        raise FileNotFoundError("Deed reference '{0}' not found".format(deed_reference,))
+    deed.deed['token'] = deed.token
+    deed.deed['status'] = deed.status
+    return deed.deed

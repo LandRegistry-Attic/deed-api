@@ -6,22 +6,22 @@ import mock
 
 
 from application.deed.model import Deed, get_enriched_deed
-from unit_tests.helper import DeedModelMock
 
 class TestDeed(unittest.TestCase):
 
-    def test_get_deed_not_found(self):
-        deed = Deed()
-        def _get_deed_mock(*args):
-            return None
-        deed.get_deed = _get_deed_mock
+    @mock.patch('application.deed.model.Deed.get_deed')
+    def test_get_deed_not_found(self, mock_get_deed):
+        mock_get_deed.return_value = None
         self.assertRaises(FileNotFoundError, get_enriched_deed, 'ref')
 
-    def _test_get_deed(self):
+
+    @mock.patch('application.deed.model.Deed.get_deed')
+    def test_get_deed(self, mock_get_deed):
         deed = Deed()
-        def _get_deed_mock(*args):
-            return DeedModelMock()
-        deed.get_deed = _get_deed_mock
+        deed.deed = {}
+        deed.token = 'token'
+        deed.status = 'status'
+        mock_get_deed.return_value = deed
         result = get_enriched_deed('1234')
-        self.assertEqual(result.token, result.deed['token'])
-        self.assertEqual(result.status, result.deed['status'])
+        self.assertEqual(deed.token, result['token'])
+        self.assertEqual(deed.status, result['status'])
