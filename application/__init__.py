@@ -63,6 +63,12 @@ def esecurity_error(e):
     return "", 200
 
 
+@app.errorhandler(FileNotFoundError)
+def not_found_exception(e):
+    app.logger.error('Not found error: %s', (e,), exc_info=True)
+    return jsonify({"message": "Not found error."}), 404
+
+
 @app.errorhandler(Exception)
 def unhandled_exception(e):
     app.logger.error('Unhandled Exception: %s', (e,), exc_info=True)
