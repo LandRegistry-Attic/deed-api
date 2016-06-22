@@ -525,9 +525,10 @@ class TestGetDeed(TestRoutesBase):
     def test_get_endpoint(self, mock_query):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = DeedModelMock()
-
+        headers = self.webseal_headers.copy()
+        headers["Accept"] = 'application/json'
         response = self.app.get(self.DEED_ENDPOINT + 'AB1234',
-                                headers=self.webseal_headers)
+                                headers=headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue("DN100" in response.data.decode())
 
@@ -544,10 +545,8 @@ class TestGetDeed(TestRoutesBase):
     def test_get_endpoint_no_specified_content_type(self, mock_query):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = DeedModelMock()
-        headers = self.webseal_headers.copy()
-        headers.pop("Content-Type")
         response = self.app.get(self.DEED_ENDPOINT + 'AB1234',
-                                headers=headers)
+                                headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue("DN100" in response.data.decode())
 
@@ -556,12 +555,13 @@ class TestGetDeed(TestRoutesBase):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = DeedModelMock()
         headers = self.webseal_headers.copy()
-        headers["Content-Type"] = 'application/pdf'
+        headers["Accept"] = 'application/pdf'
         response = self.app.get(self.DEED_ENDPOINT + 'AB1234',
                                 headers=headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # self.assertTrue("A PDF" in response.data.decode())
-        PyPDF2.PdfFileReader(io.BytesIO(response.data))
+        obj = PyPDF2.PdfFileReader(io.BytesIO(response.data))
+        txt = obj.getPage(0).extractText()
+        self.assertTrue('Digital Mortgage Deed' in txt)
 
 
 class TestRoutesErrorHandlers(TestRoutesBase):

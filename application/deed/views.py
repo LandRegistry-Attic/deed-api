@@ -28,7 +28,8 @@ deed_bp = Blueprint('deed', __name__,
 @deed_bp.route('/<deed_reference>', methods=['GET'])
 def get_deed(deed_reference):
     if 'application/pdf' in request.headers.get("Accept", ""):
-        return weasyprint.HTML(url='http://www.google.co.uk').write_pdf()
+        pdf = weasyprint.HTML(url='http://www.google.co.uk').write_pdf()
+        return pdf
     return jsonify(get_enriched_deed(deed_reference)), status.HTTP_200_OK
 
 
