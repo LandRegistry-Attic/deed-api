@@ -4,6 +4,7 @@ import logging
 import sys
 from datetime import datetime
 
+import weasyprint
 from flask import Blueprint
 from flask import request, abort, jsonify, Response
 from flask.ext.api import status
@@ -26,6 +27,8 @@ deed_bp = Blueprint('deed', __name__,
 
 @deed_bp.route('/<deed_reference>', methods=['GET'])
 def get_deed(deed_reference):
+    if 'application/pdf' in request.headers.get("Accept", ""):
+        return weasyprint.HTML(url='http://www.google.co.uk').write_pdf()
     return jsonify(get_enriched_deed(deed_reference)), status.HTTP_200_OK
 
 

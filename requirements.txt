@@ -31,4 +31,5 @@ dicttoxml
 xmltodict
 lxml
 generateDS
+PyPDF2==1.26.0
 
