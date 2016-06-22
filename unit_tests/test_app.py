@@ -1,3 +1,15 @@
+import unittest
+import json
+import mock
+import io
+from unittest.mock import patch
+from datetime import datetime
+
+import requests  # NOQA
+import PyPDF2
+from flask.ext.api import status
+from lxml import etree
+
 from application import app
 from application.deed.model import Deed
 from application.casework.service import get_document
@@ -7,17 +19,9 @@ from application.deed.views import make_effective
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
 from application.deed.service import make_effective_text, make_deed_effective_date, apply_registrar_signature, check_effective_status, add_effective_date_to_xml
 from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
-from flask.ext.api import status
+from application.borrower.model import Borrower
 from unit_tests.schema_tests import run_schema_checks
 from application.borrower.model import generate_hex
-import unittest
-import json
-import mock
-import requests  # NOQA
-from unittest.mock import patch
-from application.borrower.model import Borrower
-from datetime import datetime
-from lxml import etree
 
 
 class TestRoutesBase(unittest.TestCase):
@@ -534,6 +538,30 @@ class TestGetDeed(TestRoutesBase):
         response = self.app.get(self.DEED_QUERY + '?md_ref=e-MD12344&title_number=DN100')
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+    @mock.patch('application.deed.model.Deed.query', autospec=True)
+    def test_get_endpoint_no_specified_content_type(self, mock_query):
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = DeedModelMock()
+        headers = self.webseal_headers.copy()
+        headers.pop("Content-Type")
+        response = self.app.get(self.DEED_ENDPOINT + 'AB1234',
+                                headers=headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue("DN100" in response.data.decode())
+
+    @mock.patch('application.deed.model.Deed.query', autospec=True)
+    def test_get_endpoint_pdf_content_type(self, mock_query):
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = DeedModelMock()
+        headers = self.webseal_headers.copy()
+        headers["Content-Type"] = 'application/pdf'
+        response = self.app.get(self.DEED_ENDPOINT + 'AB1234',
+                                headers=headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # self.assertTrue("A PDF" in response.data.decode())
+        PyPDF2.PdfFileReader(io.BytesIO(response.data))
 
 
 class TestRoutesErrorHandlers(TestRoutesBase):
