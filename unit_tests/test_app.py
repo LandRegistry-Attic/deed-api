@@ -542,7 +542,7 @@ class TestGetDeed(TestRoutesBase):
 
 
     @mock.patch('application.deed.model.Deed.query', autospec=True)
-    def test_get_endpoint_no_specified_content_type(self, mock_query):
+    def test_get_endpoint_no_specified_accept_type(self, mock_query):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = DeedModelMock()
         response = self.app.get(self.DEED_ENDPOINT + 'AB1234',
@@ -561,8 +561,8 @@ class TestGetDeed(TestRoutesBase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         obj = PyPDF2.PdfFileReader(io.BytesIO(response.data))
         txt = obj.getPage(0).extractText()
-        self.assertTrue('Digital Mortgage Deed' in txt)
-
+        # self.assertTrue('Digital Mortgage Deed' in txt)
+        self.assertEquals('Digital Mortgage Deed', txt)
 
 class TestRoutesErrorHandlers(TestRoutesBase):
 

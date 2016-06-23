@@ -1,0 +1,63 @@
+{% set page_title = 'Sign your mortgage deed' %}
+{% set asset_path = '/static/govuk_template/assets/' %}
+{% set assets_main = '/static/elements/main.css' %}
+
+<link rel="stylesheet" href="/static/font-awesome/css/font-awesome.min.css">
+<link href="{{assets_main}}" media="screen" rel="stylesheet" type="text/css">
+
+<!--[if IE 7]>
+  <link rel="stylesheet" href="/static/font-awesome/css/font-awesome-ie7.min.css">
+<![endif]-->
+
+{% extends "base/govuk_base_template.html" %}
+
+
+{% block head %}
+  <link href="/static/landregistry/assets/stylesheets/application.css" media="screen" rel="stylesheet" type="text/css">
+
+<!-- google analytics code -->
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create','{{ config["GOOGLE_ANALYTICS_CODE"] }}', 'auto');
+    ga('send', 'pageview');
+    ga('set', 'anonymizeIp', true);
+
+</script>
+
+{% endblock %}
+
+{% block body_end %}
+{% endblock %}
+
+{% block content %}
+<div class="beta-banner">
+  <p>
+      <strong class="beta-tag">BETA</strong>
+      <span>This is a new service – your
+          <a href="mailto:digital-mortgage-feedback@digital.landregistry.gov.uk">feedback</a>
+          will help us to improve it.</span>
+  </p>
+</div>
+{% endblock %}
+
+{% macro render_field(field) %}
+    <div class="{% if field.errors %}error{% endif %}">
+        <label for="example-{{ field.name }}" id="error-{{ field.name }}">
+            <span class="form-label-bold">{{ field.name }}</span>
+            {% if field.errors %}<span class="error-message" id="error-message-{{ field.name }}">Error message about {{ field.name }} goes here</span>{% endif %}
+        </label>
+    <input class="form-control" id="fieldname-{{ field.name }}" type="text" name="{{ field.name }}" value="{{ field.data }}" aria-describedby="error-message-{{field.name}}">
+    </div>
+    <br/>
+{% endmacro %}

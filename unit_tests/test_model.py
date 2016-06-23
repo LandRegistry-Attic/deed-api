@@ -1,9 +1,5 @@
-__author__ = 'paultrelease'
-
 import unittest
-
 import mock
-
 
 from application.deed.model import Deed, get_enriched_deed
 
