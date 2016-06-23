@@ -10,11 +10,9 @@ def setup_logging():
         dirname = os.path.dirname(os.path.abspath(__file__))
         with open(os.path.join(dirname, 'logging_config.json'), 'rt') as file:
             config = json.load(file)
-            application_path = os.path.split(os.path.abspath('application'))[0]
-            project_path = os.path.split(application_path)[0]
+            log_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
             config['handlers']['log_file']['filename'] = \
-                os.path.join(project_path, 'logs/dm-api-info.log')
-
+                os.path.join(log_path, 'logs/dm-api-info.log')
             dictConfig(config)
     except IOError as e:
         raise(Exception('Failed to load logging configuration', e))
