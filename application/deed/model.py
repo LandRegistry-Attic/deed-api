@@ -17,6 +17,7 @@ class Deed(db.Model):
     token = db.Column(db.String, nullable=False)
     deed = db.Column(JSON)
     identity_checked = db.Column(db.String(1), nullable=False)
+
     status = db.Column(db.String(16), default='DRAFT')
     deed_xml = db.Column(db.LargeBinary, nullable=True)
     checksum = db.Column(db.Integer, nullable=True, default=-1)
@@ -73,9 +74,7 @@ class Deed(db.Model):
         result = Deed.query.filter_by(organisation_id=organisation_id, status=DeedStatus.all_signed.value).all()
 
         all_signed_deeds = list(
-            map(lambda deed: {
-                "Deed token": deed.token
-            }, result)
+            map(lambda deed: deed.token, result)
         )
 
         return all_signed_deeds

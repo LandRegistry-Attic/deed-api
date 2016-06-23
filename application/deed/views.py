@@ -218,7 +218,7 @@ def retrieve_signed_deed():
     if not result:
         return "There are no deeds which have been fully signed", status.HTTP_404_NOT_FOUND
     else:
-        return "The following deeds have been fully signed by all borrowers: {}".format(result), status.HTTP_200_OK
+        return jsonify({"deeds": result}), status.HTTP_200_OK
 
 
 @deed_bp.route('/<deed_reference>/make-effective', methods=['POST'])
