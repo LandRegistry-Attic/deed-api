@@ -4,7 +4,6 @@ import logging
 import sys
 from datetime import datetime
 
-import weasyprint
 from flask import Blueprint
 from flask import request, abort, jsonify, Response
 from flask.ext.api import status
@@ -17,6 +16,7 @@ from application.deed.utils import validate_helper, process_organisation_credent
 from application.deed.validate_borrowers import check_borrower_names, BorrowerNamesException
 from application.title_adaptor.service import TitleAdaptor
 from application.deed.service import update_deed, update_deed_signature_timestamp, apply_registrar_signature, make_deed_effective_date
+from application.deed.deed_format import create_deed_pdf
 
 
 LOGGER = logging.getLogger(__name__)
@@ -28,8 +28,7 @@ deed_bp = Blueprint('deed', __name__,
 @deed_bp.route('/<deed_reference>', methods=['GET'])
 def get_deed(deed_reference):
     if 'application/pdf' in request.headers.get("Accept", ""):
-        pdf = weasyprint.HTML(url='http://www.google.co.uk').write_pdf()
-        return pdf
+        return create_deed_pdf(get_enriched_deed(deed_reference))
     return jsonify(get_enriched_deed(deed_reference)), status.HTTP_200_OK
 
 
