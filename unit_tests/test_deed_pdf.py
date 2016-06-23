@@ -1,13 +1,16 @@
 import unittest
+import mock
 
 from application import app
-from application.deed.deed_format import create_deed_html
+from application.deed.deed_render import create_deed_html
 from unit_tests.helper import DeedModelMock
 
 
 class TestDeedPdf(unittest.TestCase):
 
-    def test_create_deed_html(self):
+    @mock.patch('application.deed.address_utils.format_address_string')
+    def test_create_deed_html(self, mock_format):
         deed = DeedModelMock
+        mock_format.return_value = 'a house'
         with app.app_context():
             self.assertTrue('Digital Mortgage Deed' in create_deed_html(deed.deed))

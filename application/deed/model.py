@@ -1,10 +1,15 @@
+import logging
 import copy
 import uuid
-from application import db
+from datetime import datetime
+
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.operators import and_
+
+from application import db
 from application.deed.utils import process_organisation_credentials
-import logging
+from application.deed.address_utils import format_address_string
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -75,7 +80,7 @@ class Deed(db.Model):
         return -1
 
 
-def get_enriched_deed(deed_reference):
+def deed_json_adapter(deed_reference):
     """
     An adapter for the deed to create a dictionary of the required form.
 
@@ -91,3 +96,11 @@ def get_enriched_deed(deed_reference):
     deed.deed['token'] = deed.token
     deed.deed['status'] = deed.status
     return deed.deed
+
+def deed_pdf_adapter(deed_reference):
+    deed_dict = deed_json_adapter(deed_reference)
+    if 'effective_date' in deed_dict:
+        temp = datetime.datetime.strptime(deed_dict['effective_date'], "%Y-%m-%d %H:%M:%S")
+        deed_dict["effective_date"] = temp.strftime("%d/%m/%Y")
+    deed_dict["property_address"] = format_address_string(deed_dict["property_address"])
+    return deed_dict
