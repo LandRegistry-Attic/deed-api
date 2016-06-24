@@ -102,5 +102,6 @@ def deed_pdf_adapter(deed_reference):
     if 'effective_date' in deed_dict:
         temp = datetime.datetime.strptime(deed_dict['effective_date'], "%Y-%m-%d %H:%M:%S")
         deed_dict["effective_date"] = temp.strftime("%d/%m/%Y")
-    deed_dict["property_address"] = format_address_string(deed_dict["property_address"])
+    property_address = ','.join(deed_dict["property_address"])# FIXME check this
+    deed_dict["property_address"] = format_address_string(property_address)
     return deed_dict
