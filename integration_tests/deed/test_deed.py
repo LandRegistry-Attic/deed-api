@@ -6,7 +6,7 @@ import copy
 import requests
 from application import config
 from application.deed.model import _get_deed_internal
-
+from lxml import etree
 
 class TestDeedRoutes(unittest.TestCase):
     webseal_headers = {
@@ -274,3 +274,9 @@ class TestDeedRoutes(unittest.TestCase):
         result = _get_deed_internal(response_json["path"].replace("/deed/", ""), "*")
 
         self.assertIsNotNone(result.deed_xml)
+
+        mock_xml = etree.fromstring(result.deed_xml)
+        for val in mock_xml.xpath("/dm-application/effectiveDate"):
+            test_result = val.text
+
+        self.assertIsNotNone(test_result)
