@@ -8,6 +8,7 @@ from application import config
 from application.deed.model import _get_deed_internal
 from lxml import etree
 
+
 class TestDeedRoutes(unittest.TestCase):
     webseal_headers = {
         "Content-Type": "application/json",
