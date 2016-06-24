@@ -531,16 +531,6 @@ class TestRoutes(unittest.TestCase):
                                         "as it is not fully signed."})
         self.assertEqual(response_status_code, 400)
 
-    @mock.patch('application.deed.model.Deed.get_signed_deeds')
-    def test_retrieve_signed_deeds(self, mock_get_status):
-        mock_get_status.return_value = []
-        result = retrieve_signed_deed()
-        self.assertTrue('There are no deeds which have been fully signed' in str(result))
-
-        mock_get_status.return_value = "RandomText"
-        result = retrieve_signed_deed()
-        self.assertTrue("The following deeds have been fully signed by all borrowers" in str(result))
-
     @mock.patch('application.service_clients.esec.implementation._post_request')
     def test_esec_down_gives_200(self, mock_request):
         mock_request.side_effect = requests.ConnectionError
