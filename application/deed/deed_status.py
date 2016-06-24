@@ -12,4 +12,4 @@ class DeedStatus(Enum):
     submitted = "SUBMITTED"
     stored = "STORED"
     registered = "REGISTERED"
-    effective_not_registrar_signed = "NOT-LR-SIGNED"
+    not_lr_signed = "NOT-LR-SIGNED"

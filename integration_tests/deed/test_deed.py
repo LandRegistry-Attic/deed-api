@@ -5,6 +5,8 @@ from integration_tests.deed.deed_data import valid_deed
 import copy
 import requests
 from application import config
+from application.deed.model import _get_deed_internal
+from lxml import etree
 
 
 class TestDeedRoutes(unittest.TestCase):
@@ -228,3 +230,54 @@ class TestDeedRoutes(unittest.TestCase):
         get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
                                         headers=self.webseal_headers_internal)
         self.assertEqual(get_created_deed.status_code, 200)
+
+    def test_save_make_effective(self):
+        create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
+                                    data=json.dumps(valid_deed),
+                                    headers=self.webseal_headers)
+        self.assertEqual(create_deed.status_code, 201)
+
+        response_json = create_deed.json()
+
+        get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                        headers=self.webseal_headers)
+
+        self.assertEqual(get_created_deed.status_code, 200)
+
+        created_deed = get_created_deed.json()
+
+        code_payload = {
+            "borrower_token": created_deed["deed"]["borrowers"][0]["token"]
+        }
+
+        request_code = requests.post(config.DEED_API_BASE_HOST + response_json["path"] + '/request-auth-code',
+                                     data=json.dumps(code_payload),
+                                     headers=self.webseal_headers)
+
+        self.assertEqual(request_code.status_code, 200)
+
+        sign_payload = {
+            "borrower_token": created_deed["deed"]["borrowers"][0]["token"],
+            "authentication_code": "aaaa"
+        }
+
+        sign_deed = requests.post(config.DEED_API_BASE_HOST + response_json["path"] + '/verify-auth-code',
+                                  data=json.dumps(sign_payload),
+                                  headers=self.webseal_headers)
+
+        self.assertEqual(sign_deed.status_code, 200)
+
+        make_effective = requests.post(config.DEED_API_BASE_HOST + response_json["path"] + '/make-effective',
+                                       headers=self.webseal_headers)
+
+        self.assertEqual(make_effective.status_code, 200)
+
+        result = _get_deed_internal(response_json["path"].replace("/deed/", ""), "*")
+
+        self.assertIsNotNone(result.deed_xml)
+
+        mock_xml = etree.fromstring(result.deed_xml)
+        for val in mock_xml.xpath("/dm-application/effectiveDate"):
+            test_result = val.text
+
+        self.assertIsNotNone(test_result)

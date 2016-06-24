@@ -6,14 +6,21 @@ from application.akuma.service import Akuma
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
 from application.deed.service import make_effective_text, make_deed_effective_date
 from application.deed.views import make_effective, retrieve_signed_deed
+from application.deed.views import make_effective
+from application.deed.utils import convert_json_to_xml, validate_generated_xml
+from application.deed.service import make_effective_text, make_deed_effective_date, apply_registrar_signature, check_effective_status, add_effective_date_to_xml
+from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
 from application.borrower.model import generate_hex
 import unittest
 import json
 import mock
+import requests  # NOQA
+from unittest.mock import patch
 from application.borrower.model import Borrower
 from datetime import datetime
+from lxml import etree
 
 
 class TestRoutes(unittest.TestCase):
@@ -59,6 +66,63 @@ class TestRoutes(unittest.TestCase):
     def test_signed_deeds(self, mock_query):
         mock_query.return_value = "blah"
         pass
+
+    @patch('application.deed.model.Deed.save')
+    @patch('application.service_clients.esec.implementation.sign_document_with_authority')
+    def test_sign_document_is_called(self, mock_sign_with_authority, mock_save):
+        mock_deed = DeedModelMock()
+        mock_deed.status = "NOT-LR-SIGNED"
+        effective_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        apply_registrar_signature(mock_deed, effective_date)
+        self.assertTrue(mock_sign_with_authority.called)
+        self.assertTrue(mock_save.called)
+
+    def test_effective_date_in_xml(self):
+        mock_deed = DeedModelMock()
+        effective_date = '1900-01-01 00:00:00'
+
+        result = add_effective_date_to_xml(mock_deed.deed_xml, effective_date)
+
+        mock_xml = etree.fromstring(result)
+        for val in mock_xml.xpath("/dm-application/effectiveDate"):
+            test_result = val.text
+
+        self.assertEqual(effective_date, test_result)
+
+    def test_wrong_effective_status(self):
+        mock_deed = DeedModelMock()
+        self.assertRaises(ValueError, check_effective_status, mock_deed.status)
+
+    @patch('requests.post')
+    def test_post_request_200(self, mock_post):
+        class ResponseStub:
+            status_code = 200
+            content = 'foo'
+
+        mock_post.return_value = ResponseStub()
+        mock_deed = DeedModelMock()
+        ret_val = _post_request('dummy/url/string', mock_deed.deed_xml)
+        self.assertEqual('foo', ret_val)
+
+    @patch('requests.post')
+    def test_post_request_500(self, mock_post):
+        class ResponseStub:
+            status_code = 500
+            content = 'bar'
+
+        mock_post.return_value = ResponseStub()
+        mock_deed = DeedModelMock()
+        self.assertRaises(ExternalServiceError,
+                          _post_request, 'dummy/url/string', mock_deed.deed_xml)
+
+    @patch('application.service_clients.esec.implementation._post_request')
+    def test_sign_document_with_authority(self, mock_post_request):
+        mock_deed = DeedModelMock()
+        sign_document_with_authority(mock_deed.deed_xml)
+        mock_post_request.assert_called_with('http://127.0.0.1:9040/esec/sign_document_with_authority',
+                                             mock_deed.deed_xml)
+
 
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
@@ -416,14 +480,6 @@ class TestRoutes(unittest.TestCase):
         deed_model.save.assert_called_with()
         self.assertEqual(deed_model.deed['effective_date'], 'a time')
 
-    def test_global_exception_handler(self):
-        self.assertEqual((self.app.get('/div_zero')).status_code,
-                         status.HTTP_500_INTERNAL_SERVER_ERROR)
-        self.assertEqual((self.app.get('/div_zero')).status,
-                         '500 INTERNAL SERVER ERROR')
-        self.assertEqual((self.app.get('/div_zero').data),
-                         b'{\n  "message": "Unexpected error."\n}')
-
     @mock.patch('application.deed.model.Deed.get_deed')
     @mock.patch('application.deed.views.abort')
     def test_make_deed_effective_404(self, mock_abort, mock_get_deed):
@@ -435,15 +491,15 @@ class TestRoutes(unittest.TestCase):
     @mock.patch('application.deed.views.Akuma.do_check')
     @mock.patch('application.deed.views.jsonify')
     @mock.patch('application.deed.views.datetime')
-    def test_make_deed_effective_200(self, mock_datetime, mock_jsonify, mock_akuma,
-                                     mock_get_deed):
+    @mock.patch('application.deed.views.apply_registrar_signature')
+    def test_make_deed_effective_200(self, mock_sign, mock_datetime, mock_jsonify,
+                                     mock_akuma, mock_get_deed):
         deed_model = mock.create_autospec(Deed)
         deed_model.deed = {}
         deed_model.status = "ALL-SIGNED"
         mock_datetime.now.return_value = datetime(1900, 1, 1)
         mock_get_deed.return_value = deed_model
         response_status_code = make_effective(123)[1]
-        mock_jsonify.assert_called_with({'deed': {'effective_date': '1900-01-01 00:00:00'}})
         self.assertEqual(response_status_code, 200)
 
     @mock.patch('application.deed.model.Deed.get_deed')
@@ -484,3 +540,15 @@ class TestRoutes(unittest.TestCase):
         mock_get_status.return_value = "RandomText"
         result = retrieve_signed_deed()
         self.assertTrue("The following deeds have been fully signed by all borrowers" in str(result))
+
+    @mock.patch('application.service_clients.esec.implementation._post_request')
+    def test_esec_down_gives_200(self, mock_request):
+        mock_request.side_effect = requests.ConnectionError
+        self.assertRaises(EsecException, sign_document_with_authority, "Foo")
+
+    @mock.patch('json.dumps')
+    def test_check_health(self, mock_status):
+        mock_status.side_effect = EsecException
+        response = self.app.get('/health')
+        self.assertEqual(response.data, b'')
+        self.assertEqual(response.status_code, 200)
