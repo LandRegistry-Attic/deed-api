@@ -49,3 +49,8 @@ def format_address_string(address_string):
         .reduce(make_postcode_last, [])\
         .map(uppercase_if_postcode)\
         .value()
+
+
+if __name__ == "__main__":
+    result = format_address_string('5 The Drive, This Town, This County, PL4 4TH')
+    print(result)
