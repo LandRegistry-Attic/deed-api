@@ -80,7 +80,7 @@ class Deed(db.Model):
         all_signed_deeds = list(
             map(lambda deed: deed.token, result)
         )
-
+        
         return all_signed_deeds
 
     def get_borrower_position(self, borrower_token):
