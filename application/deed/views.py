@@ -212,7 +212,7 @@ def issue_sms(deed_reference, borrower_token):
 
 
 @deed_bp.route('/retrieve-signed', methods=['GET'])
-def retrieve_signed_deed():
+def retrieve_signed_deeds():
     result = Deed.get_signed_deeds()
 
     if not result:

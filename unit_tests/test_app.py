@@ -5,7 +5,7 @@ from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, Status
 from application.akuma.service import Akuma
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
 from application.deed.service import make_effective_text, make_deed_effective_date
-from application.deed.views import make_effective
+from application.deed.views import make_effective, retrieve_signed_deeds
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
 from application.borrower.model import generate_hex
@@ -55,10 +55,16 @@ class TestRoutes(unittest.TestCase):
         test_token = test_deed.generate_token()
         self.assertTrue(len(test_token) == 36)
 
-    @mock.patch('application.deed.model.Deed.query')
-    def test_signed_deeds(self, mock_query):
-        mock_query.return_value = "blah"
-        pass
+    @mock.patch('application.deed.model.Deed.get_signed_deeds')
+    def test_retrieve_signed_deeds(self, mock_get_status):
+
+        mock_get_status.return_value = []
+        result = retrieve_signed_deeds()
+        self.assertTrue('There are no deeds which have been fully signed' in str(result))
+
+        mock_get_status.return_value = "RandomText"
+        result = retrieve_signed_deeds()
+        self.assertTrue("The following deeds have been fully signed by all borrowers" in str(result))
 
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
