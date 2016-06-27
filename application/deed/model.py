@@ -10,6 +10,16 @@ import logging
 LOGGER = logging.getLogger(__name__)
 
 
+def _get_deed_internal(deed_reference, organisation_id):
+        if organisation_id != '*':
+            LOGGER.debug("Internal request to view deed reference %s" % deed_reference)
+            result = Deed.query.filter_by(token=str(deed_reference), organisation_id=organisation_id).first()
+        else:
+            result = Deed.query.filter_by(token=str(deed_reference)).first()
+
+        return result
+
+
 class Deed(db.Model):
     __tablename__ = 'deed'
 
@@ -17,6 +27,7 @@ class Deed(db.Model):
     token = db.Column(db.String, nullable=False)
     deed = db.Column(JSON)
     identity_checked = db.Column(db.String(1), nullable=False)
+
     status = db.Column(db.String(16), default='DRAFT')
     deed_xml = db.Column(db.LargeBinary, nullable=True)
     checksum = db.Column(db.Integer, nullable=True, default=-1)
@@ -57,13 +68,7 @@ class Deed(db.Model):
         conveyancer_credentials = process_organisation_credentials()
         organisation_id = conveyancer_credentials["O"][1]
 
-        if organisation_id != '*':
-            LOGGER.debug("Internal request to view deed reference %s" % deed_reference)
-            result = Deed.query.filter_by(token=str(deed_reference), organisation_id=organisation_id).first()
-        else:
-            result = Deed.query.filter_by(token=str(deed_reference)).first()
-
-        return result
+        return _get_deed_internal(deed_reference, organisation_id)
 
     @staticmethod
     def get_signed_deeds():
@@ -73,9 +78,7 @@ class Deed(db.Model):
         result = Deed.query.filter_by(organisation_id=organisation_id, status=DeedStatus.all_signed.value).all()
 
         all_signed_deeds = list(
-            map(lambda deed: {
-                "Deed token": deed.token
-            }, result)
+            map(lambda deed: deed.token, result)
         )
 
         return all_signed_deeds

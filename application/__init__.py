@@ -2,6 +2,7 @@ import json
 from flask import Flask, request, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
 from application.service_clients.esec import make_esec_client
+from application.service_clients.esec.implementation import EsecException
 import os
 import logging
 from logger import logging_config
@@ -29,8 +30,25 @@ app.register_blueprint(casework_bp, url_prefix='/casework')
 app.url_map.strict_slashes = False
 
 
+class InvalidUsage(Exception):
+    status_code = 400
+
+    def __init__(self, message, status_code=None, payload=None):
+        Exception.__init__(self)
+        self.message = message
+        if status_code is not None:
+            self.status_code = status_code
+        self.payload = payload
+
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        return rv
+
+
 @app.route("/health")
 def check_status():
+
     return json.dumps({
         "Status": "OK",
         "headers": str(request.headers),
@@ -38,10 +56,10 @@ def check_status():
     })
 
 
-@app.route("/div_zero")
-def div_zero():
-    app.logger.debug("div_zero")
-    1/0
+@app.errorhandler(EsecException)
+def esecurity_error(e):
+    app.logger.error('ESecurity has raised an Exception: %s', (e,), exc_info=True)
+    return "", 200
 
 
 @app.errorhandler(Exception)

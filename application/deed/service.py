@@ -10,6 +10,8 @@ from application.deed.deed_status import DeedStatus
 import json
 import datetime
 import copy
+from application import esec_client
+from lxml import etree
 
 
 LOGGER = logging.getLogger(__name__)
@@ -27,6 +29,32 @@ def valid_borrowers(borrowers):
     valid &= is_unique_list(phone_number_list)
 
     return valid
+
+
+def check_effective_status(deed_status):
+    if DeedStatus.not_lr_signed.value not in deed_status:
+        msg = "Deed has a wrong status. Status should be {0}".format(DeedStatus.not_lr_signed.value)
+        LOGGER.error(msg)
+        raise ValueError(msg)
+
+
+def add_effective_date_to_xml(deed_xml, effective_date):
+    tree = etree.fromstring(deed_xml)
+    for val in tree.xpath("/dm-application/effectiveDate"):
+        val.text = effective_date
+        return etree.tostring(tree)
+
+
+def apply_registrar_signature(deed, effective_date):
+    check_effective_status(deed.status)
+    deed_xml = deed.deed_xml
+    effective_xml = add_effective_date_to_xml(deed_xml, effective_date)
+
+    LOGGER.info("Applying registrar's signature to deed {}".format(deed.token))
+    deed.deed_xml = esec_client.sign_document_with_authority(effective_xml)
+    deed.status = DeedStatus.effective.value
+    deed.save()
+    LOGGER.info("Signed and saved document to DB")
 
 
 def update_borrower(borrower, idx, borrowers, deed_token):
