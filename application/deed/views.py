@@ -217,7 +217,7 @@ def retrieve_signed_deed():
     result = Deed.get_signed_deeds()
 
     if not result:
-        jsonify({"message": "There are no deeds which have been fully signed"}), status.HTTP_404_NOT_FOUND
+        return jsonify({"message": "There are no deeds which have been fully signed"}), status.HTTP_404_NOT_FOUND
     else:
         return jsonify({"deeds": result}), status.HTTP_200_OK
 
