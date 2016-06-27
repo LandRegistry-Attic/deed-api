@@ -5,8 +5,7 @@ from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, Status
 from application.akuma.service import Akuma
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
 from application.deed.service import make_effective_text, make_deed_effective_date
-from application.deed.views import retrieve_signed_deed
-from application.deed.views import make_effective
+from application.deed.views import make_effective, retrieve_signed_deed
 from application.deed.service import apply_registrar_signature, check_effective_status, add_effective_date_to_xml
 from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
 from flask.ext.api import status
