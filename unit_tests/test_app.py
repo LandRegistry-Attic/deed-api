@@ -542,3 +542,23 @@ class TestRoutes(unittest.TestCase):
         response = self.app.get('/health')
         self.assertEqual(response.data, b'')
         self.assertEqual(response.status_code, 200)
+
+    @mock.patch('application.deed.views.jsonify')
+    @mock.patch('application.deed.model.Deed.get_signed_deeds')
+    def test_retrieve_signed_deeds(self, mock_get_status, mock_jsonify):
+
+        mock_get_status.return_value = ["signeddeed1", "signeddeed2"]
+
+        result = retrieve_signed_deed()
+
+        mock_jsonify.assert_called_with({"deeds": ["signeddeed1", "signeddeed2"]})
+
+    @mock.patch('application.deed.views.jsonify')
+    @mock.patch('application.deed.model.Deed.get_signed_deeds')
+    def test_retrieve_signed_deeds_none_found(self, mock_get_status, mock_jsonify):
+
+        mock_get_status.return_value = []
+
+        result = retrieve_signed_deed()
+
+        mock_jsonify.assert_called_with({"message": "There are no deeds which have been fully signed"})
