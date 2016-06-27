@@ -549,7 +549,7 @@ class TestRoutes(unittest.TestCase):
 
         mock_get_status.return_value = ["signeddeed1", "signeddeed2"]
 
-        result = retrieve_signed_deed()
+        retrieve_signed_deed()
 
         mock_jsonify.assert_called_with({"deeds": ["signeddeed1", "signeddeed2"]})
 
@@ -559,6 +559,6 @@ class TestRoutes(unittest.TestCase):
 
         mock_get_status.return_value = []
 
-        result = retrieve_signed_deed()
+        retrieve_signed_deed()
 
         mock_jsonify.assert_called_with({"message": "There are no deeds which have been fully signed"})

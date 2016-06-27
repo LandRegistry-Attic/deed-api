@@ -10,16 +10,6 @@ import logging
 LOGGER = logging.getLogger(__name__)
 
 
-def _get_deed_internal(deed_reference, organisation_id):
-        if organisation_id != '*':
-            LOGGER.debug("Internal request to view deed reference %s" % deed_reference)
-            result = Deed.query.filter_by(token=str(deed_reference), organisation_id=organisation_id).first()
-        else:
-            result = Deed.query.filter_by(token=str(deed_reference)).first()
-
-        return result
-
-
 class Deed(db.Model):
     __tablename__ = 'deed'
 
@@ -63,12 +53,20 @@ class Deed(db.Model):
 
         return deeds_with_status
 
-    @staticmethod
-    def get_deed(deed_reference):
+    def _get_deed_internal(self, deed_reference, organisation_id):
+        if organisation_id != '*':
+            LOGGER.debug("Internal request to view deed reference %s" % deed_reference)
+            result = Deed.query.filter_by(token=str(deed_reference), organisation_id=organisation_id).first()
+        else:
+            result = Deed.query.filter_by(token=str(deed_reference)).first()
+
+        return result
+
+    def get_deed(self, deed_reference):
         conveyancer_credentials = process_organisation_credentials()
         organisation_id = conveyancer_credentials["O"][1]
 
-        return _get_deed_internal(deed_reference, organisation_id)
+        return self._get_deed_internal(deed_reference, organisation_id)
 
     @staticmethod
     def get_signed_deeds():

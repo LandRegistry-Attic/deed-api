@@ -86,6 +86,32 @@
                 }
             }
         },
+        "/deed/retrieve-signed": {
+            "get": {
+                "summary": "Retrieves ALL-SIGNED deed(s).",
+                "description": "The Retrieve Signed endpoint checks the service for all deeds that have been completely signed by the borrowers or borrower. Only the deeds associated with a conveyancer is returned.\nThe response is a json array output containing the deed references.\n",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Retrieve all signed deeds"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ALL-SIGNED deeds are returned.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "No deed found.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/deed/{deed_reference}/make-effective": {
             "post": {
                 "summary": "Make Effective",
