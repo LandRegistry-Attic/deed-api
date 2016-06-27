@@ -5,10 +5,9 @@ from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, Status
 from application.akuma.service import Akuma
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
 from application.deed.service import make_effective_text, make_deed_effective_date
-from application.deed.views import make_effective, retrieve_signed_deed
+from application.deed.views import retrieve_signed_deed
 from application.deed.views import make_effective
-from application.deed.utils import convert_json_to_xml, validate_generated_xml
-from application.deed.service import make_effective_text, make_deed_effective_date, apply_registrar_signature, check_effective_status, add_effective_date_to_xml
+from application.deed.service import apply_registrar_signature, check_effective_status, add_effective_date_to_xml
 from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
@@ -122,7 +121,6 @@ class TestRoutes(unittest.TestCase):
         sign_document_with_authority(mock_deed.deed_xml)
         mock_post_request.assert_called_with('http://127.0.0.1:9040/esec/sign_document_with_authority',
                                              mock_deed.deed_xml)
-
 
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
@@ -549,7 +547,7 @@ class TestRoutes(unittest.TestCase):
 
         mock_get_status.return_value = ["signeddeed1", "signeddeed2"]
 
-        result = retrieve_signed_deed()
+        retrieve_signed_deed()
 
         mock_jsonify.assert_called_with({"deeds": ["signeddeed1", "signeddeed2"]})
 
@@ -559,6 +557,6 @@ class TestRoutes(unittest.TestCase):
 
         mock_get_status.return_value = []
 
-        result = retrieve_signed_deed()
+        retrieve_signed_deed()
 
         mock_jsonify.assert_called_with({"message": "There are no deeds which have been fully signed"})
