@@ -214,10 +214,11 @@ def issue_sms(deed_reference, borrower_token):
 
 @deed_bp.route('/retrieve-signed', methods=['GET'])
 def retrieve_signed_deed():
+
     result = Deed.get_signed_deeds()
 
     if not result:
-        return "There are no deeds which have been fully signed", status.HTTP_404_NOT_FOUND
+        jsonify({"message": "There are no deeds which have been fully signed"}), status.HTTP_404_NOT_FOUND
     else:
         return jsonify({"deeds": result}), status.HTTP_200_OK
 
