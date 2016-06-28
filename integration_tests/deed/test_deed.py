@@ -5,7 +5,7 @@ from integration_tests.deed.deed_data import valid_deed
 import copy
 import requests
 from application import config
-from application.deed.model import _get_deed_internal
+from application.deed.model import Deed
 from lxml import etree
 
 
@@ -277,7 +277,9 @@ class TestDeedRoutes(unittest.TestCase):
 
         self.assertEqual(make_effective.status_code, 200)
 
-        result = _get_deed_internal(response_json["path"].replace("/deed/", ""), "*")
+        deed_model = Deed()
+
+        result = deed_model._get_deed_internal(response_json["path"].replace("/deed/", ""), "*")
 
         self.assertIsNotNone(result.deed_xml)
 
