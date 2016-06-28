@@ -26,7 +26,8 @@ deed_bp = Blueprint('deed', __name__,
 
 @deed_bp.route('/<deed_reference>', methods=['GET'])
 def get_deed(deed_reference):
-    result = Deed.get_deed(deed_reference)
+    deed = Deed()
+    result = deed.get_deed(deed_reference)
 
     if result is None:
         abort(status.HTTP_404_NOT_FOUND)
@@ -121,7 +122,8 @@ def delete_borrower(borrower_id):
 
 
 def auth_sms(deed_reference, borrower_token, borrower_code):
-    deed = Deed.get_deed(deed_reference)
+    deed_instance = Deed()
+    deed = deed_instance.get_deed(deed_reference)
 
     if deed is None:
         LOGGER.error("Database Exception 404 for deed reference - %s" % deed_reference)
@@ -172,7 +174,8 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
 
 
 def issue_sms(deed_reference, borrower_token):
-    deed = Deed.get_deed(deed_reference)
+    deed_instance = Deed()
+    deed = deed_instance.get_deed(deed_reference)
 
     if deed is None:
         LOGGER.error("Database Exception 404 for deed reference - %s" % deed_reference)
@@ -214,7 +217,8 @@ def issue_sms(deed_reference, borrower_token):
 
 @deed_bp.route('/retrieve-signed', methods=['GET'])
 def retrieve_signed_deed():
-    result = Deed.get_signed_deeds()
+    deed = Deed()
+    result = deed.get_signed_deeds()
 
     if not result:
         return jsonify({"message": "There are no deeds which have been fully signed"}), status.HTTP_404_NOT_FOUND
@@ -224,7 +228,8 @@ def retrieve_signed_deed():
 
 @deed_bp.route('/<deed_reference>/make-effective', methods=['POST'])
 def make_effective(deed_reference):
-    result = Deed.get_deed(deed_reference)
+    deed = Deed()
+    result = deed.get_deed(deed_reference)
     if result is None:
         abort(status.HTTP_404_NOT_FOUND)
     else:
