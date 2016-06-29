@@ -32,4 +32,5 @@ xmltodict
 lxml
 generateDS
 PyPDF2==1.26.0
+WeasyPrint==0.29
 
