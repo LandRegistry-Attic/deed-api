@@ -33,4 +33,6 @@ lxml
 generateDS
 PyPDF2==1.26.0
 WeasyPrint==0.29
+Flask-WeasyPrint==0.5
+
 
