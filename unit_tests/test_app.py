@@ -562,6 +562,8 @@ class TestGetDeed(TestRoutesBase):
         obj = PyPDF2.PdfFileReader(io.BytesIO(response.data))
         txt = obj.getPage(0).extractText()
         self.assertTrue('Digital Mortgage Deed' in txt)
+        txt = obj.getPage(1).extractText()
+        self.assertTrue('e-MD12344' in txt)
 
 class TestRoutesErrorHandlers(TestRoutesBase):
 
