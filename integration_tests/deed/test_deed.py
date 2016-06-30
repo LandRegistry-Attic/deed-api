@@ -1,9 +1,13 @@
 import json
+import io
 import unittest
+import copy
+
+import requests
+import PyPDF2
+
 from integration_tests.helper import setUpApp, setUp_MortgageDocuments
 from integration_tests.deed.deed_data import valid_deed
-import copy
-import requests
 from application import config
 from application.deed.model import _get_deed_internal
 from lxml import etree
@@ -23,6 +27,12 @@ class TestDeedRoutes(unittest.TestCase):
     webseal_headers_internal = {
         "Content-Type": "application/json",
         "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Test,O=*,C=gb"
+    }
+
+    webseal_headers_for_pdf = {
+        "Content-Type": "application/json",
+        "Accept": "application/pdf",
+        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Devices,O=1359.2.1,C=gb"
     }
 
     def setUp(self):
@@ -281,3 +291,20 @@ class TestDeedRoutes(unittest.TestCase):
             test_result = val.text
 
         self.assertIsNotNone(test_result)
+
+    def test_deed_pdf(self):
+        create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
+                                    data=json.dumps(valid_deed),
+                                    headers=self.webseal_headers)
+        response_json = create_deed.json()
+        get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                        headers=self.webseal_headers_for_pdf)
+        obj = PyPDF2.PdfFileReader(io.BytesIO(get_created_deed.content))
+        txt = obj.getPage(0).extractText()
+        self.assertTrue('Digital Mortgage Deed' in txt)
+        txt = obj.getPage(1).extractText()
+        self.assertTrue('e-MD12344' in txt)
+        # Can look at this file if you want.
+        f = open('integration_test_deed.pdf', 'wb')
+        f.write(get_created_deed.content)
+        f.close()
