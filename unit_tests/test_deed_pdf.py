@@ -14,3 +14,4 @@ class TestDeedPdf(unittest.TestCase):
         mock_format.return_value = 'a house'
         with app.app_context():
             self.assertTrue('Digital Mortgage Deed' in create_deed_html(deed.deed))
+            self.assertTrue('e-MD12344' in create_deed_html(deed.deed))
