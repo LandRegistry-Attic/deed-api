@@ -65,7 +65,7 @@ source test.sh
 
 See, the following link for information on how to run the acceptance tests:-
 
-[Acceptance Tests](https://github.com/LandRegistry/dm-acceptance-tests)
+[Acceptance Tests](https://192.168.249.38/digital-mortgage/acceptance-tests)
 
 ## Current Schema
 
@@ -74,7 +74,7 @@ The Deed requires a title number and at least 1 borrower
 ### Deed
 The schema can be found below
 ```
-https://github.com/LandRegistry/dm-deed-api/blob/develop/application/deed/schema.json
+https://192.168.249.38/digital-mortgage/deed-api/blob/develop/application/deed/schema.json
 ```
 Example payload:
 ```

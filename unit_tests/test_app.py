@@ -3,15 +3,21 @@ from application.deed.model import Deed
 from application.casework.service import get_document
 from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, StatusMock
 from application.akuma.service import Akuma
+from application.deed.views import make_effective
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
-from application.deed.service import make_effective_text
+from application.deed.service import make_effective_text, make_deed_effective_date, apply_registrar_signature, check_effective_status, add_effective_date_to_xml
+from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
 from flask.ext.api import status
 from unit_tests.schema_tests import run_schema_checks
 from application.borrower.model import generate_hex
 import unittest
 import json
 import mock
+import requests  # NOQA
+from unittest.mock import patch
 from application.borrower.model import Borrower
+from datetime import datetime
+from lxml import etree
 
 
 class TestRoutes(unittest.TestCase):
@@ -53,84 +59,144 @@ class TestRoutes(unittest.TestCase):
         test_token = test_deed.generate_token()
         self.assertTrue(len(test_token) == 36)
 
+    @patch('application.deed.model.Deed.save')
+    @patch('application.service_clients.esec.implementation.sign_document_with_authority')
+    def test_sign_document_is_called(self, mock_sign_with_authority, mock_save):
+        mock_deed = DeedModelMock()
+        mock_deed.status = "NOT-LR-SIGNED"
+        effective_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        apply_registrar_signature(mock_deed, effective_date)
+        self.assertTrue(mock_sign_with_authority.called)
+        self.assertTrue(mock_save.called)
+
+    def test_effective_date_in_xml(self):
+        mock_deed = DeedModelMock()
+        effective_date = '1900-01-01 00:00:00'
+
+        result = add_effective_date_to_xml(mock_deed.deed_xml, effective_date)
+
+        mock_xml = etree.fromstring(result)
+        for val in mock_xml.xpath("/dm-application/effectiveDate"):
+            test_result = val.text
+
+        self.assertEqual(effective_date, test_result)
+
+    def test_wrong_effective_status(self):
+        mock_deed = DeedModelMock()
+        self.assertRaises(ValueError, check_effective_status, mock_deed.status)
+
+    @patch('requests.post')
+    def test_post_request_200(self, mock_post):
+        class ResponseStub:
+            status_code = 200
+            content = 'foo'
+
+        mock_post.return_value = ResponseStub()
+        mock_deed = DeedModelMock()
+        ret_val = _post_request('dummy/url/string', mock_deed.deed_xml)
+        self.assertEqual('foo', ret_val)
+
+    @patch('requests.post')
+    def test_post_request_500(self, mock_post):
+        class ResponseStub:
+            status_code = 500
+            content = 'bar'
+
+        mock_post.return_value = ResponseStub()
+        mock_deed = DeedModelMock()
+        self.assertRaises(ExternalServiceError,
+                          _post_request, 'dummy/url/string', mock_deed.deed_xml)
+
+    @patch('application.service_clients.esec.implementation._post_request')
+    def test_sign_document_with_authority(self, mock_post_request):
+        mock_deed = DeedModelMock()
+        sign_document_with_authority(mock_deed.deed_xml)
+        mock_post_request.assert_called_with('http://127.0.0.1:9040/esec/sign_document_with_authority',
+                                             mock_deed.deed_xml)
+
+    @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_create_no_auth_headers(self, mock_query, mock_Deed, mock_Borrower, mock_akuma):
+    def test_create_no_auth_headers(self, mock_query, mock_Deed, mock_Borrower, mock_akuma, mock_proprietor_names):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
         mock_akuma.return_value = {
             "result": "A",
             "id": "2b9115b2-d956-11e5-942f-08002719cd16"
         }
-
+        mock_proprietor_names.return_value = ['lisa ann bloggette', 'frank ann bloggette']
         payload = json.dumps(DeedHelper._json_doc)
-
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
                                  headers={"Content-Type": "application/json"})
-
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.title_adaptor.service.TitleAdaptor.do_check', autospec=False)
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_create_webseal_external(self, mock_query, mock_Deed, mock_Borrower, mock_akuma, mock_title):
+    def test_create_webseal_external(self, mock_query, mock_Deed, mock_Borrower, mock_akuma, mock_title, mock_proprietor_names):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
         mock_akuma.return_value = {
             "result": "A",
             "id": "2b9115b2-d956-11e5-942f-08002719cd16"
         }
+
+        mock_proprietor_names.return_value = ['lisa ann bloggette', 'frank ann bloggette']
+        payload = json.dumps(DeedHelper._json_doc)
         mock_title.return_value = "title OK"
         payload = json.dumps(DeedHelper._json_doc)
-
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
                                  headers=self.webseal_headers)
-
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_create_webseal_external_dodgy_headers1(self, mock_query, mock_Deed, mock_Borrower, mock_akuma):
+    def test_create_webseal_external_dodgy_headers1(self, mock_query, mock_Deed, mock_Borrower, mock_akuma, mock_proprietor_names):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
         mock_akuma.return_value = {
             "result": "A",
             "id": "2b9115b2-d956-11e5-942f-08002719cd16"
         }
-
+        mock_proprietor_names.return_value = ['lisa ann bloggette', 'frank ann bloggette']
         payload = json.dumps(DeedHelper._json_doc)
-
+        payload = json.dumps(DeedHelper._json_doc)
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
                                  headers=self.dodgy_webseal_headers1)
-
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
-    def test_create_with_invalid(self, mock_Borrower, mock_Deed):
+    def test_create_with_invalid(self, mock_Borrower, mock_Deed, mock_proprietor_names):
+        mock_proprietor_names.return_value = ['lisa bloggette', 'frank bloggette']
         payload = json.dumps(DeedHelper._invalid_phone_numbers)
-
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
                                  headers={"Content-Type": "application/json"})
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
-    def test_create_with_invalid_blanks(self, mock_Borrower, mock_Deed):
+    def test_create_with_invalid_blanks(self, mock_Borrower, mock_Deed, mock_proprietor_names):
         payload = json.dumps(DeedHelper._invalid_blanks_on_required_fields)
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
                                  headers={"Content-Type": "application/json"})
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_invalid_title_format(self):
+    @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
+    def test_invalid_title_format(self, mock_proprietor_names):
         payload = json.dumps(DeedHelper._invalid_title)
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
                                  headers={"Content-Type": "application/json"})
@@ -158,7 +224,7 @@ class TestRoutes(unittest.TestCase):
         self.assertTrue("c91d57" in response.data.decode())
 
     @mock.patch('application.deed.model.Deed.get_deed_status', autospec=True)
-    def test_get_no_status_with_mdref_and_titleno_endpoint(self, get_deed_status):
+    def test_get_no_status_with_mdref_and_titleno_endpoint_no_status(self, get_deed_status):
         get_deed_status.return_value = StatusMock()._no_status_with_mdref_and_titleno
 
         response = self.app.get(self.DEED_QUERY + '?md_ref=e-MD12344&title_number=DN100')
@@ -228,9 +294,10 @@ class TestRoutes(unittest.TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data.decode(), "Matching deed not found")
 
+    @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
-    def test_create_with_invalid_address(self, mock_Borrower, mock_Deed):
+    def test_create_with_invalid_address(self, mock_Borrower, mock_Deed, mock_proprietor_names):
         payload = json.dumps(DeedHelper._invalid_blank_address)
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
                                  headers={"Content-Type": "application/json"})
@@ -240,13 +307,14 @@ class TestRoutes(unittest.TestCase):
     def test_schema_checks(self):
         self.assertTrue(run_schema_checks())
 
+    @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.service_clients.title_adaptor.interface.TitleAdaptorInterface.perform_check')
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.deed.service', autospec=True)
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_invalid_md_ref(self, mock_query, mock_Deed, mock_Borrower, mock_update, mock_akuma, mock_validator):
+    def test_invalid_md_ref(self, mock_query, mock_Deed, mock_Borrower, mock_update, mock_akuma, mock_validator, mock_proprietor_names):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = None
 
@@ -394,3 +462,74 @@ class TestRoutes(unittest.TestCase):
                                  data=payload,
                                  headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_make_deed_effective_date(self):
+        deed_model = mock.create_autospec(Deed)
+        deed_model.deed = {}
+        signed_time = 'a time'
+        make_deed_effective_date(deed_model, signed_time)
+        deed_model.save.assert_called_with()
+        self.assertEqual(deed_model.deed['effective_date'], 'a time')
+
+    @mock.patch('application.deed.model.Deed.get_deed')
+    @mock.patch('application.deed.views.abort')
+    def test_make_deed_effective_404(self, mock_abort, mock_get_deed):
+        mock_get_deed.return_value = None
+        make_effective(123)
+        mock_abort.assert_called_with(status.HTTP_404_NOT_FOUND)
+
+    @mock.patch('application.deed.model.Deed.get_deed')
+    @mock.patch('application.deed.views.Akuma.do_check')
+    @mock.patch('application.deed.views.jsonify')
+    @mock.patch('application.deed.views.datetime')
+    @mock.patch('application.deed.views.apply_registrar_signature')
+    def test_make_deed_effective_200(self, mock_sign, mock_datetime, mock_jsonify,
+                                     mock_akuma, mock_get_deed):
+        deed_model = mock.create_autospec(Deed)
+        deed_model.deed = {}
+        deed_model.status = "ALL-SIGNED"
+        mock_datetime.now.return_value = datetime(1900, 1, 1)
+        mock_get_deed.return_value = deed_model
+        response_status_code = make_effective(123)[1]
+        self.assertEqual(response_status_code, 200)
+
+    @mock.patch('application.deed.model.Deed.get_deed')
+    @mock.patch('application.deed.views.Akuma.do_check')
+    @mock.patch('application.deed.views.jsonify')
+    def test_make_deed_effective_400(self, mock_jsonify, mock_akuma, mock_get_deed):
+        deed_model = mock.create_autospec(Deed)
+        deed_model.deed = {}
+
+        # test where already effective
+        deed_model.status = "EFFECTIVE"
+        mock_get_deed.return_value = deed_model
+        response_status_code = make_effective(123)[1]
+        mock_jsonify.assert_called_with({"message": "This deed is already made effective."})
+        self.assertEqual(response_status_code, 400)
+
+        # test where not registrar signed
+        deed_model.status = "NOT-LR-SIGNED"
+        mock_get_deed.return_value = deed_model
+        response_status_code = make_effective(123)[1]
+        mock_jsonify.assert_called_with({"message": "This deed is already made effective."})
+        self.assertEqual(response_status_code, 400)
+
+        # test anything else
+        deed_model.status = "Foo"
+        mock_get_deed.return_value = deed_model
+        response_status_code = make_effective(123)[1]
+        mock_jsonify.assert_called_with({"message": "You can not make this deed effective "
+                                        "as it is not fully signed."})
+        self.assertEqual(response_status_code, 400)
+
+    @mock.patch('application.service_clients.esec.implementation._post_request')
+    def test_esec_down_gives_200(self, mock_request):
+        mock_request.side_effect = requests.ConnectionError
+        self.assertRaises(EsecException, sign_document_with_authority, "Foo")
+
+    @mock.patch('json.dumps')
+    def test_check_health(self, mock_status):
+        mock_status.side_effect = EsecException
+        response = self.app.get('/health')
+        self.assertEqual(response.data, b'')
+        self.assertEqual(response.status_code, 200)
