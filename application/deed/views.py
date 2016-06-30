@@ -5,7 +5,7 @@ import sys
 from datetime import datetime
 
 from flask import Blueprint
-from flask import request, abort, jsonify, Response
+from flask import request, abort, jsonify, Response, render_template
 from flask.ext.api import status
 
 from application import esec_client
@@ -16,7 +16,7 @@ from application.deed.utils import validate_helper, process_organisation_credent
 from application.deed.validate_borrowers import check_borrower_names, BorrowerNamesException
 from application.title_adaptor.service import TitleAdaptor
 from application.deed.service import update_deed, update_deed_signature_timestamp, apply_registrar_signature, make_deed_effective_date
-from application.deed.deed_render import create_deed_pdf
+from application.deed.deed_render import create_deed_pdf, create_deed_html
 
 
 LOGGER = logging.getLogger(__name__)
@@ -24,6 +24,54 @@ LOGGER = logging.getLogger(__name__)
 deed_bp = Blueprint('deed', __name__,
                     template_folder='templates',
                     static_folder='static')
+
+
+@deed_bp.route('/testdeedhtml', methods=['GET'])
+def test2():
+    deed_dict = {
+        "title_number": "DN100",
+        "md_ref": "e-MD12344",
+        "property_address": ["5 The Drive", "This Town", "This County", "PL4 4TH"],
+        "borrowers": [
+            {
+                "forename": "Mark",
+                "middle_name": "Jason",
+                "surname": "bloggette",
+                "address": "test address with postcode, PL14 3JR",
+                "token": "AAAAAA"
+            },
+            {
+                "forename": "fran",
+                "middle_name": "ann",
+                "surname": "bloggette",
+                "address": "Test Address With Postcode, PL14 3JR",
+                "token": "BBBBBB"
+            }
+        ],
+        "additional_provisions": [
+            {
+                "additional_provision_code": "addp001",
+                "description": "Description"
+            },
+            {
+                "additional_provision_code": "addp002",
+                "description": "Description"
+            }
+        ],
+        "charge_clause": {
+            "cre_code": "CRE001",
+            "description": "Description"
+        },
+        "lender": {
+            "address": "Test Address, London NW10 7TQ",
+            "name": "Bank of England Plc",
+            "registration": "Company registration number: 123456"
+        },
+        "effective_clause": "Effective clause goes here",
+        "identity_checked": "Y"
+    }
+    return create_deed_html(deed_dict)
+
 
 @deed_bp.route('/<deed_reference>', methods=['GET'])
 def get_deed(deed_reference):
