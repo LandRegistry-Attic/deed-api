@@ -55,14 +55,14 @@ class TestDeedRoutes(unittest.TestCase):
 
         created_deed = get_created_deed.json()
 
-        self.assertIn("title_number", str(created_deed))
-        self.assertIn("borrowers", str(created_deed))
-        self.assertIn("forename", str(created_deed))
-        self.assertIn("surname", str(created_deed))
-        self.assertIn("charge_clause", str(created_deed))
-        self.assertIn("additional_provisions", str(created_deed))
-        self.assertIn("lender", str(created_deed))
-        self.assertIn("property_address", str(created_deed))
+        self.assertIn("title_number", str(created_deed['deed']))
+        self.assertIn("borrowers", str(created_deed['deed']))
+        self.assertIn("forename", str(created_deed['deed']))
+        self.assertIn("surname", str(created_deed['deed']))
+        self.assertIn("charge_clause", str(created_deed['deed']))
+        self.assertIn("additional_provisions", str(created_deed['deed']))
+        self.assertIn("lender", str(created_deed['deed']))
+        self.assertIn("property_address", str(created_deed['deed']))
 
     def test_bad_get(self):
         fake_token_deed = requests.get(config.DEED_API_BASE_HOST + "/deed/fake",

@@ -80,25 +80,43 @@ class Deed(db.Model):
         return -1
 
 
-def deed_json_adapter(deed_reference):
+def deed_adapter(deed_reference):
     """
-    An adapter for the deed to create a dictionary of the required form.
-
-    FIXME: The current nested deed model is confusing and needs revisiting
+    An adapter for the deed to enhance and return in the required form.
 
     :param deed_reference:
-    :return: The deed dictionary with status and token attributes set
-    :rtype: dict
+    :return: The deed with status and token attributes set
+    :rtype: deed
     """
     deed = Deed.get_deed(deed_reference)
     if deed is None:
         raise FileNotFoundError("Deed reference '{0}' not found".format(deed_reference,))
     deed.deed['token'] = deed.token
     deed.deed['status'] = deed.status
-    return deed.deed
+    return deed
+
+
+def deed_json_adapter(deed_reference):
+    """
+    An adapter for the deed to return as a dictionary for conversion to json.
+
+    :param deed_reference:
+    :return: The deed, as a dictionary.
+    :rtype: dict
+    """
+    deed = deed_adapter(deed_reference)
+    return {'deed': deed.deed}
+
 
 def deed_pdf_adapter(deed_reference):
-    deed_dict = deed_json_adapter(deed_reference)
+    """
+    An adapter for the deed to return as a dictionary for conversion to json.
+
+    :param deed_reference:
+    :return: The deed, as a pdf.
+    :rtype: pdf
+    """
+    deed_dict = deed_adapter(deed_reference).deed
     if 'effective_date' in deed_dict:
         temp = datetime.datetime.strptime(deed_dict['effective_date'], "%Y-%m-%d %H:%M:%S")
         deed_dict["effective_date"] = temp.strftime("%d/%m/%Y")
