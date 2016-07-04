@@ -1,0 +1,134 @@
+@import 'landregistry';
+
+.verified-container{
+  margin-top:30px;
+  width: $two-thirds;
+}
+
+.verified-bullets{
+  padding-left:60px;
+  margin-bottom:30px;
+}
+
+.verified-bullets-img{
+  float: left;
+}
+
+.verified-bullets-fa {
+  float: left;
+  font-size:27px;
+}
+
+.verfied-bullet-numbers-fa {
+  font-family: 'nta';
+  color:white;
+}
+
+.awaiting-information{
+  color: #6f777b;
+}
+
+.deed-form-ref {
+  margin-top: ($gutter*2);
+}
+
+.deed-address-list {
+  @extend li;
+  list-style-type:none;
+  padding-bottom: 20px;
+}
+
+//Beta Banner
+
+.beta-banner {
+  padding: 10px 0 8px 0;
+  border-bottom: 1px solid #bfc1c3;
+}
+
+@media (min-width: 641px) {
+ .beta-banner {
+   padding-bottom: 10px;
+ }
+}
+
+.beta-banner p {
+   margin: 0;
+   color: #000;
+   font-family: "nta", Arial, sans-serif;
+   font-size: 14px;
+   line-height: 1.14286;
+   font-weight: 400;
+   text-transform: none;
+}
+
+ @media (min-width: 641px) {
+   .beta-banner p {
+     font-size: 16px;
+     line-height: 1.25; }
+ }
+
+.beta-banner .phase-tag {
+   display: -moz-inline-stack;
+   display: inline-block;
+   vertical-align: top;
+   margin: 0 8px 0 0;
+   padding: 2px 5px 0;
+   font-family: "nta", Arial, sans-serif;
+   font-size: 14px;
+   line-height: 1.14286;
+   font-weight: 700;
+   text-transform: none;
+   text-transform: uppercase;
+   letter-spacing: 1px;
+   text-decoration: none;
+   color: #fff;
+   background-color: #f47738;
+}
+
+ @media (min-width: 641px) {
+   .beta-banner .phase-tag {
+     vertical-align: baseline;
+   }
+ }
+ @media (min-width: 641px) {
+   .beta-banner .phase-tag {
+     font-size: 16px;
+     line-height: 1.25;
+   }
+ }
+
+.beta-banner span {
+ vertical-align: top; }
+ @media (min-width: 641px) {
+   .beta-banner span {
+     vertical-align: baseline; } }
+
+.beta-tag {
+  display: -moz-inline-stack;
+  display: inline-block;
+  vertical-align: top;
+  margin: 0 8px 0 0;
+  padding: 2px 5px 0;
+  font-family: "nta", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.14286;
+  font-weight: 700;
+  text-transform: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-decoration: none;
+  color: #fff;
+  background-color: #f47738;
+}
+
+@media (min-width: 641px) {
+ .beta-tag {
+   vertical-align: baseline;
+  }
+}
+
+@media (min-width: 641px) {
+ .beta-tag {
+   font-size: 16px;
+   line-height: 1.25; }
+ }
