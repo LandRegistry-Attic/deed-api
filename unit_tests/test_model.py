@@ -11,7 +11,6 @@ class TestDeed(unittest.TestCase):
         mock_get_deed.return_value = None
         self.assertRaises(FileNotFoundError, deed_json_adapter, 'ref')
 
-
     @mock.patch('application.deed.model.Deed.get_deed')
     def test_get_deed_adapter(self, mock_get_deed):
         deed = Deed()

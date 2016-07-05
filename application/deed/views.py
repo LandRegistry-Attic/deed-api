@@ -5,7 +5,7 @@ import sys
 from datetime import datetime
 
 from flask import Blueprint
-from flask import request, abort, jsonify, Response, render_template
+from flask import request, abort, jsonify, Response
 from flask.ext.api import status
 
 from application import esec_client
@@ -16,7 +16,7 @@ from application.deed.utils import validate_helper, process_organisation_credent
 from application.deed.validate_borrowers import check_borrower_names, BorrowerNamesException
 from application.title_adaptor.service import TitleAdaptor
 from application.deed.service import update_deed, update_deed_signature_timestamp, apply_registrar_signature, make_deed_effective_date
-from application.deed.deed_render import create_deed_pdf, create_deed_html
+from application.deed.deed_render import create_deed_pdf
 
 
 LOGGER = logging.getLogger(__name__)

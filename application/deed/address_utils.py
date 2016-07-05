@@ -51,6 +51,7 @@ def format_address_string(address_string):
         .value()
 
 
+# flake8: noqa
 if __name__ == "__main__":
     result = format_address_string('5 The Drive, This Town, This County, PL4 4TH')
     print(result)
