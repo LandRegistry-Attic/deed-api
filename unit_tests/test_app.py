@@ -518,7 +518,6 @@ class TestRoutes(TestRoutesBase):
         self.assertEqual(response.status_code, 200)
 
 
-
 class TestGetDeed(TestRoutesBase):
 
     @mock.patch('application.deed.model.Deed.query', autospec=True)
@@ -539,7 +538,6 @@ class TestGetDeed(TestRoutesBase):
         response = self.app.get(self.DEED_QUERY + '?md_ref=e-MD12344&title_number=DN100')
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
 
     @mock.patch('application.deed.model.Deed.query', autospec=True)
     def test_get_endpoint_no_specified_accept_type(self, mock_query):
@@ -564,6 +562,7 @@ class TestGetDeed(TestRoutesBase):
         self.assertTrue('Digital Mortgage Deed' in txt)
         self.assertTrue('e-MD12344' in txt)
 
+
 class TestRoutesErrorHandlers(TestRoutesBase):
 
     @mock.patch('application.service_clients.esec.implementation._post_request')
@@ -578,5 +577,3 @@ class TestRoutesErrorHandlers(TestRoutesBase):
         response = self.app.get(self.DEED_ENDPOINT + 'AB1234',
                                 headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-

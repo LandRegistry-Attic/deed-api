@@ -4,14 +4,13 @@ the pdf will be generated wherever this is run from.  However, the CSS links wil
 fail.  Further needed to determine the correct base_url to give the
 test_request_context. See Flask-WeasyPrint documentation if this is required.
 """
+from flask import render_template, Flask
+import flask_weasyprint
+
 
 import logging
 
-
 LOGGER = logging.getLogger(__name__)
-
-from flask import render_template, Flask
-import flask_weasyprint
 
 
 def create_deed_pdf(deed_dict):
@@ -27,6 +26,7 @@ def create_deed_html(deed_dict):
     return render_template(template, deed_data=deed_data, signed=True)
 
 
+# flake8: noqa
 if __name__ == "__main__":
     import jinja2
     from unit_tests.deed_dict import DEED
@@ -40,5 +40,3 @@ if __name__ == "__main__":
         pdf = create_deed_pdf(test_deed)
         open('mock_deed_model.pdf', 'wb').write(pdf)
     print('PDF generated. Check mock_deed_model.pdf file')
-
-
