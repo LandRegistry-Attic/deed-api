@@ -1,9 +1,13 @@
 import json
+import io
 import unittest
+import copy
+
+import requests
+import PyPDF2
+
 from integration_tests.helper import setUpApp, setUp_MortgageDocuments
 from integration_tests.deed.deed_data import valid_deed
-import copy
-import requests
 from application import config
 from application.deed.model import Deed
 from lxml import etree
@@ -30,6 +34,12 @@ class TestDeedRoutes(unittest.TestCase):
         "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Test2,O=*,C=gb"
     }
 
+    webseal_headers_for_pdf = {
+        "Content-Type": "application/json",
+        "Accept": "application/pdf",
+        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Devices,O=1359.2.1,C=gb"
+    }
+
     def setUp(self):
         setUpApp(self)
         setUp_MortgageDocuments(self)
@@ -50,14 +60,14 @@ class TestDeedRoutes(unittest.TestCase):
 
         created_deed = get_created_deed.json()
 
-        self.assertIn("title_number", str(created_deed))
-        self.assertIn("borrowers", str(created_deed))
-        self.assertIn("forename", str(created_deed))
-        self.assertIn("surname", str(created_deed))
-        self.assertIn("charge_clause", str(created_deed))
-        self.assertIn("additional_provisions", str(created_deed))
-        self.assertIn("lender", str(created_deed))
-        self.assertIn("property_address", str(created_deed))
+        self.assertIn("title_number", str(created_deed['deed']))
+        self.assertIn("borrowers", str(created_deed['deed']))
+        self.assertIn("forename", str(created_deed['deed']))
+        self.assertIn("surname", str(created_deed['deed']))
+        self.assertIn("charge_clause", str(created_deed['deed']))
+        self.assertIn("additional_provisions", str(created_deed['deed']))
+        self.assertIn("lender", str(created_deed['deed']))
+        self.assertIn("property_address", str(created_deed['deed']))
 
     def test_bad_get(self):
         fake_token_deed = requests.get(config.DEED_API_BASE_HOST + "/deed/fake",
@@ -371,3 +381,20 @@ class TestDeedRoutes(unittest.TestCase):
                                    headers=self.webseal_test_headers3)
 
         self.assertEqual(test_result.status_code, 404)
+
+    def test_deed_pdf(self):
+        create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
+                                    data=json.dumps(valid_deed),
+                                    headers=self.webseal_headers)
+        response_json = create_deed.json()
+        get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                        headers=self.webseal_headers_for_pdf)
+        obj = PyPDF2.PdfFileReader(io.BytesIO(get_created_deed.content))
+        txt = obj.getPage(0).extractText()
+        self.assertTrue('Digital Mortgage Deed' in txt)
+        txt = obj.getPage(1).extractText()
+        self.assertTrue('e-MD12344' in txt)
+        # Can look at this file if you want.
+        f = open('integration_test_deed.pdf', 'wb')
+        f.write(get_created_deed.content)
+        f.close()

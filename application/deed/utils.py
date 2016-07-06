@@ -43,8 +43,9 @@ def validate_helper(json_to_validate):
 
 @call_once_only
 def get_swagger_file():
-    return load_json_file(os.getcwd() +
-                          "/application/deed/schemas/deed-api.json")
+    dirname = os.path.dirname(os.path.abspath(__file__))
+    return load_json_file(dirname +
+                          "/schemas/deed-api.json")
 
 
 def load_json_schema():

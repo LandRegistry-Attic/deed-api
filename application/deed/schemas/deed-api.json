@@ -23,7 +23,8 @@
                     "application/json"
                 ],
                 "produces": [
-                    "text/plain"
+                    "text/plain",
+                    "application/pdf"
                 ],
                 "parameters": [
                     {
@@ -33,11 +34,18 @@
                         "schema": {
                             "$ref": "#/definitions/Deed_Application"
                         }
+                    },
+                    {
+                      "name": "Accept",
+                      "in": "header",
+                      "description": "Pass application/json for the deed as JSON or application/pdf to get a pdf",
+                      "required": true,
+                      "type": "string"
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "URL to the GET endpoint for the deed is returned on successful creation.\n",
+                        "description": "Either a) A URL to the GET endpoint for the deed returned on successful creation, or b) The deed text in PDF format.\n",
                         "schema": {
                             "type": "string"
                         }

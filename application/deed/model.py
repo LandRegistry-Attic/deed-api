@@ -1,11 +1,16 @@
+import logging
 import copy
 import uuid
-from application import db
+from datetime import datetime
+
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.operators import and_
+
+from application import db
 from application.deed.utils import process_organisation_credentials
 from application.deed.deed_status import DeedStatus
-import logging
+from application.deed.address_utils import format_address_string
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -86,3 +91,48 @@ class Deed(db.Model):
             if borrower_token == borrower['token']:
                 return idx
         return -1
+
+
+def deed_adapter(deed_reference):
+    """
+    An adapter for the deed to enhance and return in the required form.
+
+    :param deed_reference:
+    :return: The deed with status and token attributes set
+    :rtype: deed
+    """
+    deed = Deed().get_deed(deed_reference)
+    if deed is None:
+        raise FileNotFoundError("Deed reference '{0}' not found".format(deed_reference,))
+    deed.deed['token'] = deed.token
+    deed.deed['status'] = deed.status
+    return deed
+
+
+def deed_json_adapter(deed_reference):
+    """
+    An adapter for the deed to return as a dictionary for conversion to json.
+
+    :param deed_reference:
+    :return: The deed, as a dictionary.
+    :rtype: dict
+    """
+    deed = deed_adapter(deed_reference)
+    return {'deed': deed.deed}
+
+
+def deed_pdf_adapter(deed_reference):
+    """
+    An adapter for the deed to return as a dictionary for conversion to json.
+
+    :param deed_reference:
+    :return: The deed, as a pdf.
+    :rtype: pdf
+    """
+    deed_dict = deed_adapter(deed_reference).deed
+    if 'effective_date' in deed_dict:
+        temp = datetime.strptime(deed_dict['effective_date'], "%Y-%m-%d %H:%M:%S")
+        deed_dict["effective_date"] = temp.strftime("%d/%m/%Y")
+    property_address = (deed_dict["property_address"])
+    deed_dict["property_address"] = format_address_string(property_address)
+    return deed_dict
