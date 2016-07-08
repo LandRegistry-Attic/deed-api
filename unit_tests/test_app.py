@@ -67,17 +67,6 @@ class TestRoutes(TestRoutesBase):
         test_token = test_deed.generate_token()
         self.assertTrue(len(test_token) == 36)
 
-    @mock.patch('application.deed.model.Deed.get_signed_deeds')
-    def test_retrieve_signed_deeds(self, mock_get_status):
-
-        mock_get_status.return_value = []
-        result = retrieve_signed_deeds()
-        self.assertTrue('There are no deeds which have been fully signed' in str(result))
-
-        mock_get_status.return_value = "RandomText"
-        result = retrieve_signed_deeds()
-        self.assertTrue("The following deeds have been fully signed by all borrowers" in str(result))
-
     @patch('application.deed.model.Deed.save')
     @patch('application.service_clients.esec.implementation.sign_document_with_authority')
     def test_sign_document_is_called(self, mock_sign_with_authority, mock_save):
@@ -532,22 +521,17 @@ class TestRoutes(TestRoutesBase):
     @mock.patch('application.deed.views.jsonify')
     @mock.patch('application.deed.model.Deed.get_signed_deeds')
     def test_retrieve_signed_deeds(self, mock_get_status, mock_jsonify):
-
         mock_get_status.return_value = ["signeddeed1", "signeddeed2"]
-
         retrieve_signed_deed()
-
         mock_jsonify.assert_called_with({"deeds": ["signeddeed1", "signeddeed2"]})
 
     @mock.patch('application.deed.views.jsonify')
     @mock.patch('application.deed.model.Deed.get_signed_deeds')
     def test_retrieve_signed_deeds_none_found(self, mock_get_status, mock_jsonify):
-
         mock_get_status.return_value = []
-
         retrieve_signed_deed()
-
         mock_jsonify.assert_called_with({"message": "There are no deeds which have been fully signed"})
+
 
 class TestGetDeed(TestRoutesBase):
 

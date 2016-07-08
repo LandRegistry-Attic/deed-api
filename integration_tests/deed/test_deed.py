@@ -336,7 +336,7 @@ class TestDeedRoutes(unittest.TestCase):
         self.assertEqual(sign_deed.status_code, 200)
 
         test_result = requests.get(config.DEED_API_BASE_HOST + '/deed/retrieve-signed',
-                                     headers=self.webseal_headers)
+                                   headers=self.webseal_headers)
 
         signed_deeds = test_result.json()
         self.assertIn("deeds", str(signed_deeds))
