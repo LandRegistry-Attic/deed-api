@@ -1,0 +1,93 @@
+{% extends "base/lr_base_layout.html" %}
+
+{% block content %}
+
+<article class="text deed-document-bounds">
+    <h2 class="heading-large">Digital Mortgage Deed</h2>
+
+    <h3 class="heading-medium">Property</h3>
+
+    <div class="deed-address-list ">
+        {% for address_line in deed_data.deed.property_address %}
+        <li>{{ address_line }}</li>
+        {% endfor %}
+    </div>
+
+    <dl class="definition-inline">
+        <dt class="bold-text">Title number</dt>
+        <dd>{{ deed_data.deed.title_number }}</dd>
+    </dl>
+
+    <h3 class="heading-medium">Lender</h3>
+
+    <p itemscope itemtype="http://schema.org/Corporation">
+        <span itemprop="name">{{ deed_data.deed.lender.name }}</span>
+        <br>
+            <span itemprop="address" itemscope itemtype="http://schema.org/PostalAddress" class="address-inline">
+            <span itemprop="streetAddress">{{ deed_data.deed.lender.address }}</span>
+            </span>
+    </p>
+
+    <dl class="definition-inline">
+        <dd>{{ deed_data.deed.lender.registration }}</dd>
+    </dl>
+
+    <h3 class="heading-medium">Borrower</h3>
+
+    <ul>
+        {% for borrower in deed_data.deed.borrowers %}
+        <li class="bold-text">
+            {{ borrower.forename }}
+            {{ borrower.middle_name }}{% if borrower.middle_name %} {% endif %}{{ borrower.surname }}
+        </li>
+        {% endfor %}
+    </ul>
+
+    <h3 class="heading-medium">Charging clause</h3>
+
+    <p>{{ deed_data.deed.charge_clause.description }}</p>
+
+    <h3 class="heading-medium">Additional provisions</h3>
+    <ol class="list-number">
+        {% for provision in deed_data.deed.additional_provisions %}
+        <li>
+            {{ provision.description|safe }}
+        </li>
+        {% endfor %}
+    </ol>
+
+    <h3 class="heading-medium">Effective date and time</h3>
+
+    <p>{{ deed_data.deed.effective_clause|safe }}</p>
+
+    {% if deed_data.deed.effective_date %}
+    <b class="bold-small">Made effective on: {{ deed_data.deed.effective_date }}
+        {% else %}
+        <p class="awaiting-information">[Effective date will be shown here]</p>
+        {% endif %}
+        <h3 class="heading-medium">Borrower's digital signature(s)</h3>
+        {% for borrower in deed_data.deed.borrowers %}
+        {% if borrower.signature %}
+        <p id="signature{{ loop.index }}">Confirmed by
+            <b class="bold-small"> {{ borrower.forename }}
+                {{ borrower.middle_name }}{% if borrower.middle_name %} {% endif %}{{ borrower.surname }} </b>
+        </p>
+        {% else %}
+        <p class="awaiting-information" id="signature{{ loop.index }}">[Awaiting confirmation
+            from {{ borrower.forename }}
+            {{ borrower.middle_name }}{% if borrower.middle_name %} {% endif %}{{ borrower.surname }}]
+        </p>
+        {% endif %}
+        {% endfor %}
+
+        <div class="deed-form-ref">
+            <h3 class="visuallyhidden">Form of digital mortgage deed filed at HM Land Registry under reference</h3>
+            {% if deed_data.deed.society_ref %}
+            <p>{{ deed_data.deed.society_ref }}</p>
+            {% endif %}
+            <p>{{ deed_data.deed.md_ref }}</p>
+        </div>
+
+</article>
+
+{% endblock %}

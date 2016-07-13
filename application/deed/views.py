@@ -4,17 +4,19 @@ import logging
 import sys
 from datetime import datetime
 
+from flask import Blueprint
+from flask import request, abort, jsonify, Response
+from flask.ext.api import status
+
 from application import esec_client
 from application.akuma.service import Akuma
 from application.borrower.model import Borrower
-from application.deed.model import Deed
+from application.deed.model import Deed, deed_json_adapter, deed_pdf_adapter
 from application.deed.utils import validate_helper, process_organisation_credentials, convert_json_to_xml
 from application.deed.validate_borrowers import check_borrower_names, BorrowerNamesException
 from application.title_adaptor.service import TitleAdaptor
 from application.deed.service import update_deed, update_deed_signature_timestamp, apply_registrar_signature, make_deed_effective_date
-from flask import Blueprint
-from flask import request, abort, jsonify, Response
-from flask.ext.api import status
+from application.deed.deed_render import create_deed_pdf
 
 
 LOGGER = logging.getLogger(__name__)
@@ -26,15 +28,9 @@ deed_bp = Blueprint('deed', __name__,
 
 @deed_bp.route('/<deed_reference>', methods=['GET'])
 def get_deed(deed_reference):
-    result = Deed.get_deed(deed_reference)
-
-    if result is None:
-        abort(status.HTTP_404_NOT_FOUND)
-    else:
-        result.deed['token'] = result.token
-        result.deed['status'] = result.status
-
-    return jsonify({"deed": result.deed}), status.HTTP_200_OK
+    if 'application/pdf' in request.headers.get("Accept", ""):
+        return create_deed_pdf(deed_pdf_adapter(deed_reference))
+    return jsonify(deed_json_adapter(deed_reference)), status.HTTP_200_OK
 
 
 @deed_bp.route('', methods=['GET'])
@@ -121,7 +117,8 @@ def delete_borrower(borrower_id):
 
 
 def auth_sms(deed_reference, borrower_token, borrower_code):
-    deed = Deed.get_deed(deed_reference)
+    deed_instance = Deed()
+    deed = deed_instance.get_deed(deed_reference)
 
     if deed is None:
         LOGGER.error("Database Exception 404 for deed reference - %s" % deed_reference)
@@ -172,7 +169,8 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
 
 
 def issue_sms(deed_reference, borrower_token):
-    deed = Deed.get_deed(deed_reference)
+    deed_instance = Deed()
+    deed = deed_instance.get_deed(deed_reference)
 
     if deed is None:
         LOGGER.error("Database Exception 404 for deed reference - %s" % deed_reference)
@@ -212,9 +210,21 @@ def issue_sms(deed_reference, borrower_token):
     return status.HTTP_200_OK
 
 
+@deed_bp.route('/retrieve-signed', methods=['GET'])
+def retrieve_signed_deed():
+    deed = Deed()
+    result = deed.get_signed_deeds()
+
+    if not result:
+        return jsonify({"message": "There are no deeds which have been fully signed"}), status.HTTP_404_NOT_FOUND
+    else:
+        return jsonify({"deeds": result}), status.HTTP_200_OK
+
+
 @deed_bp.route('/<deed_reference>/make-effective', methods=['POST'])
 def make_effective(deed_reference):
-    result = Deed.get_deed(deed_reference)
+    deed = Deed()
+    result = deed.get_deed(deed_reference)
     if result is None:
         abort(status.HTTP_404_NOT_FOUND)
     else:

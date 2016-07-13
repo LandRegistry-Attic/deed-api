@@ -23,7 +23,8 @@
                     "application/json"
                 ],
                 "produces": [
-                    "text/plain"
+                    "text/plain",
+                    "application/pdf"
                 ],
                 "parameters": [
                     {
@@ -33,11 +34,18 @@
                         "schema": {
                             "$ref": "#/definitions/Deed_Application"
                         }
+                    },
+                    {
+                      "name": "Accept",
+                      "in": "header",
+                      "description": "Pass application/json for the deed as JSON or application/pdf to get a pdf",
+                      "required": true,
+                      "type": "string"
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "URL to the GET endpoint for the deed is returned on successful creation.\n",
+                        "description": "Either a) A URL to the GET endpoint for the deed returned on successful creation, or b) The deed text in PDF format.\n",
                         "schema": {
                             "type": "string"
                         }
@@ -81,6 +89,32 @@
                         "description": "Deed not found",
                         "schema": {
                             "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/deed/retrieve-signed": {
+            "get": {
+                "summary": "Retrieves ALL-SIGNED deed(s).",
+                "description": "The Retrieve Signed endpoint checks the service for all deeds that have been completely signed by the borrowers or borrower. Only the deeds associated with a conveyancer is returned.\nThe response is a json array output containing the deed references.\n",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Retrieve all signed deeds"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ALL-SIGNED deeds are returned.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "No deed found.",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }

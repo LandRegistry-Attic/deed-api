@@ -1,4 +1,5 @@
 import json
+from builtins import FileNotFoundError
 from flask import Flask, request, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
 from application.service_clients.esec import make_esec_client
@@ -60,6 +61,12 @@ def check_status():
 def esecurity_error(e):
     app.logger.error('ESecurity has raised an Exception: %s', (e,), exc_info=True)
     return "", 200
+
+
+@app.errorhandler(FileNotFoundError)
+def not_found_exception(e):
+    app.logger.error('Not found error: %s', (e,), exc_info=True)
+    return jsonify({"message": "Not found error."}), 404
 
 
 @app.errorhandler(Exception)

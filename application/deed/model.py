@@ -1,22 +1,19 @@
+import logging
 import copy
 import uuid
-from application import db
+from datetime import datetime
+from builtins import FileNotFoundError
+
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.operators import and_
+
+from application import db
 from application.deed.utils import process_organisation_credentials
-import logging
+from application.deed.deed_status import DeedStatus
+from application.deed.address_utils import format_address_string
+
 
 LOGGER = logging.getLogger(__name__)
-
-
-def _get_deed_internal(deed_reference, organisation_id):
-        if organisation_id != '*':
-            LOGGER.debug("Internal request to view deed reference %s" % deed_reference)
-            result = Deed.query.filter_by(token=str(deed_reference), organisation_id=organisation_id).first()
-        else:
-            result = Deed.query.filter_by(token=str(deed_reference)).first()
-
-        return result
 
 
 class Deed(db.Model):
@@ -26,6 +23,7 @@ class Deed(db.Model):
     token = db.Column(db.String, nullable=False)
     deed = db.Column(JSON)
     identity_checked = db.Column(db.String(1), nullable=False)
+
     status = db.Column(db.String(16), default='DRAFT')
     deed_xml = db.Column(db.LargeBinary, nullable=True)
     checksum = db.Column(db.Integer, nullable=True, default=-1)
@@ -61,15 +59,81 @@ class Deed(db.Model):
 
         return deeds_with_status
 
-    @staticmethod
-    def get_deed(deed_reference):
+    def _get_deed_internal(self, deed_reference, organisation_id):
+        if organisation_id != '*':
+            LOGGER.debug("Internal request to view deed reference %s" % deed_reference)
+            result = Deed.query.filter_by(token=str(deed_reference), organisation_id=organisation_id).first()
+        else:
+            result = Deed.query.filter_by(token=str(deed_reference)).first()
+
+        return result
+
+    def get_deed(self, deed_reference):
         conveyancer_credentials = process_organisation_credentials()
         organisation_id = conveyancer_credentials["O"][1]
 
-        return _get_deed_internal(deed_reference, organisation_id)
+        return self._get_deed_internal(deed_reference, organisation_id)
+
+    @staticmethod
+    def get_signed_deeds():
+        conveyancer_credentials = process_organisation_credentials()
+        organisation_id = conveyancer_credentials["O"][1]
+
+        result = Deed.query.filter_by(organisation_id=organisation_id, status=DeedStatus.all_signed.value).all()
+
+        all_signed_deeds = list(
+            map(lambda deed: deed.token, result)
+        )
+
+        return all_signed_deeds
 
     def get_borrower_position(self, borrower_token):
         for idx, borrower in enumerate(self.deed['borrowers'], start=1):
             if borrower_token == borrower['token']:
                 return idx
         return -1
+
+
+def deed_adapter(deed_reference):
+    """
+    An adapter for the deed to enhance and return in the required form.
+
+    :param deed_reference:
+    :return: The deed with status and token attributes set
+    :rtype: deed
+    """
+    deed = Deed().get_deed(deed_reference)
+    if deed is None:
+        raise FileNotFoundError("Deed reference '{0}' not found".format(deed_reference,))
+    deed.deed['token'] = deed.token
+    deed.deed['status'] = deed.status
+    return deed
+
+
+def deed_json_adapter(deed_reference):
+    """
+    An adapter for the deed to return as a dictionary for conversion to json.
+
+    :param deed_reference:
+    :return: The deed, as a dictionary.
+    :rtype: dict
+    """
+    deed = deed_adapter(deed_reference)
+    return {'deed': deed.deed}
+
+
+def deed_pdf_adapter(deed_reference):
+    """
+    An adapter for the deed to return as a dictionary for conversion to json.
+
+    :param deed_reference:
+    :return: The deed, as a pdf.
+    :rtype: pdf
+    """
+    deed_dict = deed_adapter(deed_reference).deed
+    if 'effective_date' in deed_dict:
+        temp = datetime.strptime(deed_dict['effective_date'], "%Y-%m-%d %H:%M:%S")
+        deed_dict["effective_date"] = temp.strftime("%d/%m/%Y")
+    property_address = (deed_dict["property_address"])
+    deed_dict["property_address"] = format_address_string(property_address)
+    return deed_dict

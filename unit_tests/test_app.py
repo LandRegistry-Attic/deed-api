@@ -1,26 +1,31 @@
+import unittest
+import json
+import mock
+import io
+from unittest.mock import patch
+from datetime import datetime
+
+import requests  # NOQA
+import PyPDF2
+from flask.ext.api import status
+from lxml import etree
+
 from application import app
 from application.deed.model import Deed
 from application.casework.service import get_document
 from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, StatusMock
 from application.akuma.service import Akuma
-from application.deed.views import make_effective
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
-from application.deed.service import make_effective_text, make_deed_effective_date, apply_registrar_signature, check_effective_status, add_effective_date_to_xml
+from application.deed.service import make_effective_text, make_deed_effective_date
+from application.deed.views import make_effective, retrieve_signed_deed
+from application.deed.service import apply_registrar_signature, check_effective_status, add_effective_date_to_xml
 from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
-from flask.ext.api import status
+from application.borrower.model import Borrower
 from unit_tests.schema_tests import run_schema_checks
 from application.borrower.model import generate_hex
-import unittest
-import json
-import mock
-import requests  # NOQA
-from unittest.mock import patch
-from application.borrower.model import Borrower
-from datetime import datetime
-from lxml import etree
 
 
-class TestRoutes(unittest.TestCase):
+class TestRoutesBase(unittest.TestCase):
     DEED_ENDPOINT = "/deed/"
     DEED_QUERY = "/deed"
     BORROWER_ENDPOINT = "/borrower/"
@@ -41,6 +46,9 @@ class TestRoutes(unittest.TestCase):
     def setUp(self):
         app.config.from_pyfile("config.py")
         self.app = app.test_client()
+
+
+class TestRoutes(TestRoutesBase):
 
     def test_health(self):
         self.assertEqual((self.app.get('/health')).status_code,
@@ -203,16 +211,6 @@ class TestRoutes(unittest.TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @mock.patch('application.deed.model.Deed.query', autospec=True)
-    def test_get_endpoint(self, mock_query):
-        mock_instance_response = mock_query.filter_by.return_value
-        mock_instance_response.first.return_value = DeedModelMock()
-
-        response = self.app.get(self.DEED_ENDPOINT + 'AB1234',
-                                headers=self.webseal_headers)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue("DN100" in response.data.decode())
-
     @mock.patch('application.deed.model.Deed.get_deed_status', autospec=True)
     def test_get_status_with_mdref_and_titleno_endpoint(self, get_deed_status):
         get_deed_status.return_value = StatusMock()._status_with_mdref_and_titleno
@@ -229,15 +227,6 @@ class TestRoutes(unittest.TestCase):
 
         response = self.app.get(self.DEED_QUERY + '?md_ref=e-MD12344&title_number=DN100')
 
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    @mock.patch('application.deed.model.Deed.query', autospec=True)
-    def test_get_endpoint_not_found(self, mock_query):
-        mock_instance_response = mock_query.filter_by.return_value
-        mock_instance_response.first.return_value = None
-
-        response = self.app.get(self.DEED_ENDPOINT + 'CD3456',
-                                headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     @mock.patch('application.borrower.model.Borrower.delete')
@@ -522,14 +511,84 @@ class TestRoutes(unittest.TestCase):
                                         "as it is not fully signed."})
         self.assertEqual(response_status_code, 400)
 
-    @mock.patch('application.service_clients.esec.implementation._post_request')
-    def test_esec_down_gives_200(self, mock_request):
-        mock_request.side_effect = requests.ConnectionError
-        self.assertRaises(EsecException, sign_document_with_authority, "Foo")
-
     @mock.patch('json.dumps')
     def test_check_health(self, mock_status):
         mock_status.side_effect = EsecException
         response = self.app.get('/health')
         self.assertEqual(response.data, b'')
         self.assertEqual(response.status_code, 200)
+
+    @mock.patch('application.deed.views.jsonify')
+    @mock.patch('application.deed.model.Deed.get_signed_deeds')
+    def test_retrieve_signed_deeds(self, mock_get_status, mock_jsonify):
+        mock_get_status.return_value = ["signeddeed1", "signeddeed2"]
+        retrieve_signed_deed()
+        mock_jsonify.assert_called_with({"deeds": ["signeddeed1", "signeddeed2"]})
+
+    @mock.patch('application.deed.views.jsonify')
+    @mock.patch('application.deed.model.Deed.get_signed_deeds')
+    def test_retrieve_signed_deeds_none_found(self, mock_get_status, mock_jsonify):
+        mock_get_status.return_value = []
+        retrieve_signed_deed()
+        mock_jsonify.assert_called_with({"message": "There are no deeds which have been fully signed"})
+
+
+class TestGetDeed(TestRoutesBase):
+
+    @mock.patch('application.deed.model.Deed.query', autospec=True)
+    def test_get_endpoint(self, mock_query):
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = DeedModelMock()
+        headers = self.webseal_headers.copy()
+        headers["Accept"] = 'application/json'
+        response = self.app.get(self.DEED_ENDPOINT + 'AB1234',
+                                headers=headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue("DN100" in response.data.decode())
+
+    @mock.patch('application.deed.model.Deed.get_deed_status', autospec=True)
+    def test_get_no_status_with_mdref_and_titleno_endpoint_no_status(self, get_deed_status):
+        get_deed_status.return_value = StatusMock()._no_status_with_mdref_and_titleno
+
+        response = self.app.get(self.DEED_QUERY + '?md_ref=e-MD12344&title_number=DN100')
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    @mock.patch('application.deed.model.Deed.query', autospec=True)
+    def test_get_endpoint_no_specified_accept_type(self, mock_query):
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = DeedModelMock()
+        response = self.app.get(self.DEED_ENDPOINT + 'AB1234',
+                                headers=self.webseal_headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue("DN100" in response.data.decode())
+
+    @mock.patch('application.deed.model.Deed.query', autospec=True)
+    def test_get_endpoint_pdf_content_type(self, mock_query):
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = DeedModelMock()
+        headers = self.webseal_headers.copy()
+        headers["Accept"] = 'application/pdf'
+        response = self.app.get(self.DEED_ENDPOINT + 'AB1234',
+                                headers=headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        obj = PyPDF2.PdfFileReader(io.BytesIO(response.data))
+        txt = obj.getPage(0).extractText()
+        self.assertTrue('Digital Mortgage Deed' in txt)
+        self.assertTrue('e-MD12344' in txt)
+
+
+class TestRoutesErrorHandlers(TestRoutesBase):
+
+    @mock.patch('application.service_clients.esec.implementation._post_request')
+    def test_esec_down_gives_200(self, mock_request):
+        mock_request.side_effect = requests.ConnectionError
+        self.assertRaises(EsecException, sign_document_with_authority, "Foo")
+
+    @mock.patch('application.deed.model.Deed.get_deed')
+    def test_file_not_found_exception(self, mock_get_deed):
+        mock_get_deed.return_value = None
+
+        response = self.app.get(self.DEED_ENDPOINT + 'AB1234',
+                                headers=self.webseal_headers)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
