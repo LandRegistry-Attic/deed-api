@@ -364,14 +364,6 @@ class TestRoutes(TestRoutesBase):
 
         self.assertEqual(effective_clause, correct_effective_clause)
 
-    def test_uuid_generation(self):
-        a = {}
-        for f in range(0, 100000):
-            new_hash = generate_hex()
-            a[new_hash] = True
-
-        self.assertEqual(100000, len(a))
-
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.borrower.model.Borrower.get_by_token')
     @mock.patch('application.service_clients.esec.interface.EsecClientInterface.issue_sms')
