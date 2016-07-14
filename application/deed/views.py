@@ -33,6 +33,22 @@ def get_deed(deed_reference):
     return jsonify(deed_json_adapter(deed_reference)), status.HTTP_200_OK
 
 
+@deed_bp.route('/<deed_reference>', methods=['PUT'])
+def get_existing_deed_and_update(deed_reference):
+
+    # Firstly check payload coming in is valid:
+    updated_deed_json = request.get_json()
+
+    error_count, error_message = validate_helper(updated_deed_json)
+
+    if error_count > 0:
+        return error_message, status.HTTP_400_BAD_REQUEST
+    else:
+        # If Valid: Get Current Deed
+        result = Deed.query.filter_by(token=str(deed_reference)).first()
+        
+
+
 @deed_bp.route('', methods=['GET'])
 def get_deeds_status_with_mdref_and_title_number():
     md_ref = request.args.get("md_ref")
