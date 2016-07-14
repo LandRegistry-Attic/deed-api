@@ -49,7 +49,16 @@ def get_existing_deed_and_update(deed_reference):
 
         # If Valid: Get Current Deed using Deed Ref in request
         result = deed_json_adapter(deed_reference)
-        
+
+        if result is None:
+            abort(status.HTTP_404_NOT_FOUND)
+
+        #Inform Akuma
+        check_result = Akuma.do_check(updated_deed_json, "modify deed",
+                                      result.deed.organisation_name, result.deed.organisation_locale)
+        LOGGER.info("Check ID - MODIFY: " + check_result['id'])
+
+
         #########################################################################
         # Code not reformatted from here onwards                                #
         #########################################################################
@@ -60,8 +69,7 @@ def get_existing_deed_and_update(deed_reference):
         for (i, existing_borrower) in enumerate(existing_deed_borrowers):
             updated_deed_json['borrowers'][i]['id'] = existing_borrower['id']
 
-    if result is None:
-        abort(status.HTTP_404_NOT_FOUND)
+
     else:
         result.deed = updated_deed_json
         json_doc = {
