@@ -2,7 +2,7 @@ from sqlalchemy import ForeignKey
 from application import db
 import uuid
 
-charset = list("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+charset = list("0123456789ABCDEFHJKLMNPRSTUV")
 
 
 class Borrower(db.Model):
