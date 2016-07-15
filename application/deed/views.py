@@ -61,6 +61,13 @@ def get_existing_deed_and_update(deed_reference):
                                       result.deed.organisation_name, result.deed.organisation_locale)
         LOGGER.info("Check ID - MODIFY: " + check_result['id'])
 
+        #Title Check
+        valid_title = TitleAdaptor.do_check(updated_deed_json['title_number'])
+        if valid_title != "title OK":
+            return jsonify({"message": valid_title}), status.HTTP_400_BAD_REQUEST
+
+        success, msg = update_deed(result, updated_deed_json, check_result['result'])
+
         #########################################################################
         # Code not reformatted from here onwards                                #
         #########################################################################
