@@ -4,20 +4,19 @@ import logging
 import sys
 from datetime import datetime
 
-from flask import Blueprint
-from flask import request, abort, jsonify, Response
-from flask.ext.api import status
-
 from application import esec_client
 from application.akuma.service import Akuma
 from application.borrower.model import Borrower
+from application.deed.deed_render import create_deed_pdf
 from application.deed.model import Deed, deed_json_adapter, deed_pdf_adapter
+from application.deed.service import update_deed, update_deed_signature_timestamp, apply_registrar_signature, \
+    make_deed_effective_date
 from application.deed.utils import validate_helper, process_organisation_credentials, convert_json_to_xml
 from application.deed.validate_borrowers import check_borrower_names, BorrowerNamesException
 from application.title_adaptor.service import TitleAdaptor
-from application.deed.service import update_deed, update_deed_signature_timestamp, apply_registrar_signature, make_deed_effective_date
-from application.deed.deed_render import create_deed_pdf
-
+from flask import Blueprint
+from flask import request, abort, jsonify, Response
+from flask.ext.api import status
 
 LOGGER = logging.getLogger(__name__)
 
@@ -35,7 +34,6 @@ def get_deed(deed_reference):
 
 @deed_bp.route('/<deed_reference>', methods=['PUT'])
 def get_existing_deed_and_update(deed_reference):
-
     # Firstly check payload coming in is valid:
     updated_deed_json = request.get_json()
 
@@ -53,11 +51,15 @@ def get_existing_deed_and_update(deed_reference):
         if result is None:
             abort(status.HTTP_404_NOT_FOUND)
 
-        #Inform Akuma
+        # Deed Status check
+        if result.status != "DRAFT":
+            return jsonify({"message": "This deed is not in a draft state"}), \
+                   status.HTTP_400_BAD_REQUEST
+
+        # Inform Akuma
         check_result = Akuma.do_check(updated_deed_json, "modify deed",
                                       result.deed.organisation_name, result.deed.organisation_locale)
         LOGGER.info("Check ID - MODIFY: " + check_result['id'])
-
 
         #########################################################################
         # Code not reformatted from here onwards                                #
@@ -70,13 +72,13 @@ def get_existing_deed_and_update(deed_reference):
             updated_deed_json['borrowers'][i]['id'] = existing_borrower['id']
 
 
-    else:
-        result.deed = updated_deed_json
-        json_doc = {
-            "title_number": updated_deed_json['title_number'],
-            "md_ref": updated_deed_json['md_ref'],
-            "borrowers": []
-        }
+        else:
+            result.deed = updated_deed_json
+            json_doc = {
+                "title_number": updated_deed_json['title_number'],
+                "md_ref": updated_deed_json['md_ref'],
+                "borrowers": []
+            }
 
         # Make a deed out of new information
         valid_dob_result = _(updated_deed_json['borrowers']).chain() \
@@ -179,7 +181,7 @@ def create():
             return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
         except BorrowerNamesException:
             return (jsonify({'message':
-                            "a digital mortgage cannot be created as there is a discrepancy between the names given and those held on the register."}),
+                                 "a digital mortgage cannot be created as there is a discrepancy between the names given and those held on the register."}),
                     status.HTTP_400_BAD_REQUEST)
         except:
             msg = str(sys.exc_info())
@@ -330,12 +332,12 @@ def make_effective(deed_reference):
 
         elif deed_status == "EFFECTIVE" or deed_status == "NOT-LR-SIGNED":
             return jsonify({"message": "This deed is already made effective."}), \
-                status.HTTP_400_BAD_REQUEST
+                   status.HTTP_400_BAD_REQUEST
 
         else:
             return jsonify({"message": "You can not make this deed effective "
                                        "as it is not fully signed."}), \
-                status.HTTP_400_BAD_REQUEST
+                   status.HTTP_400_BAD_REQUEST
 
 
 @deed_bp.route('/<deed_reference>/request-auth-code', methods=['POST'])
