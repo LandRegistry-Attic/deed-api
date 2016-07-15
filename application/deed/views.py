@@ -42,90 +42,113 @@ def get_existing_deed_and_update(deed_reference):
     if error_count > 0:
         return error_message, status.HTTP_400_BAD_REQUEST
     else:
-        # Borrower Validation on new JSON
-        check_borrower_names(updated_deed_json)
 
-        # If Valid: Get Current Deed using Deed Ref in request
-        result = deed_json_adapter(deed_reference)
-
-        if result is None:
-            abort(status.HTTP_404_NOT_FOUND)
-
-        # Deed Status check
-        if result.status != "DRAFT":
-            return jsonify({"message": "This deed is not in a draft state"}), \
-                   status.HTTP_400_BAD_REQUEST
-
-        # Inform Akuma
-        check_result = Akuma.do_check(updated_deed_json, "modify deed",
-                                      result.deed.organisation_name, result.deed.organisation_locale)
-        LOGGER.info("Check ID - MODIFY: " + check_result['id'])
-
-        #Title Check
-        valid_title = TitleAdaptor.do_check(updated_deed_json['title_number'])
-        if valid_title != "title OK":
-            return jsonify({"message": valid_title}), status.HTTP_400_BAD_REQUEST
-
-        success, msg = update_deed(result, updated_deed_json, check_result['result'])
-
-        #########################################################################
-        # Code not reformatted from here onwards                                #
-        #########################################################################
-        #  Get existing borrowers and loop through to get
-        #  the ID's that the pasted JSON will overwrite
-        LOGGER.info("Interpreting Existing Borrowers")
-        existing_deed_borrowers = result.deed['borrowers']
-        for (i, existing_borrower) in enumerate(existing_deed_borrowers):
-            updated_deed_json['borrowers'][i]['id'] = existing_borrower['id']
-
-
-        else:
-            result.deed = updated_deed_json
-            json_doc = {
-                "title_number": updated_deed_json['title_number'],
-                "md_ref": updated_deed_json['md_ref'],
-                "borrowers": []
-            }
-
-        # Make a deed out of new information
-        valid_dob_result = _(updated_deed_json['borrowers']).chain() \
-            .map(lambda x, *a: x['dob']) \
-            .reduce(valid_dob, True).value()
-
-        if not valid_dob_result:
-            abort(status.HTTP_400_BAD_REQUEST)
-
-        phone_number_list = _(updated_deed_json['borrowers']).chain() \
-            .map(lambda x, *a: x['phone_number']) \
-            .value()
-
-        if not is_unique_list(phone_number_list):
-            abort(status.HTTP_400_BAD_REQUEST)
-        LOGGER.info("New Deed Created")
         try:
-            LOGGER.info("Iterating PUT borrowers into existing borrowers")
-            for borrower in updated_deed_json['borrowers']:
-                borrower_json = {
-                    "id": borrower['id'],
-                    "forename": borrower['forename'],
-                    "surname": borrower['surname']
-                }
-                if 'middle_name' in borrower:
-                    borrower_json['middle_name'] = borrower['middle_name']
-                json_doc['borrowers'].append(borrower_json)
+            # Borrower Validation on new JSON
+            check_borrower_names(updated_deed_json)
 
-            LOGGER.info("Saving the borrowers")
-            borrowerService.saveBorrower(borrower, borrower_json["id"])
+            # If Valid: Get Current Deed using Deed Ref in request
+            result = deed_json_adapter(deed_reference)
 
-            result.deed = json_doc
-            LOGGER.info("Saving the deed")
-            result.save()
-            url = request.base_url
-            LOGGER.info("Deed Saved, returned URL = " + url)
-            return url, status.HTTP_200_OK
-        except Exception as e:
-            print("Database Exception - %s" % e)
+            if result is None:
+                abort(status.HTTP_404_NOT_FOUND)
+
+            # Deed Status check
+            if result.status != "DRAFT":
+                return jsonify({"message": "This deed is not in a draft state"}), \
+                       status.HTTP_400_BAD_REQUEST
+
+            # Inform Akuma
+            check_result = Akuma.do_check(updated_deed_json, "modify deed",
+                                          result.deed.organisation_name, result.deed.organisation_locale)
+            LOGGER.info("Check ID - MODIFY: " + check_result['id'])
+
+            # Title Check
+            valid_title = TitleAdaptor.do_check(updated_deed_json['title_number'])
+            if valid_title != "title OK":
+                return jsonify({"message": valid_title}), status.HTTP_400_BAD_REQUEST
+
+            # Deed update call from CREATE
+            success, msg = update_deed(result, updated_deed_json, check_result['result'])
+
+            if not success:
+                LOGGER.error("Update deed 400_BAD_REQUEST")
+                return msg, status.HTTP_400_BAD_REQUEST
+
+            return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
+
+            ##Unhappy verification
+            # else:
+            #     LOGGER.error("Unable to process headers")
+            #     return "Unable to process headers", status.HTTP_401_UNAUTHORIZED
+
+        except BorrowerNamesException:
+            return (jsonify({'message':
+                                 "a digital mortgage cannot be created as there is a discrepancy between the names given and those held on the register."}),
+                    status.HTTP_400_BAD_REQUEST)
+        except:
+            msg = str(sys.exc_info())
+            LOGGER.error("Database Exception - %s" % msg)
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    #########################################################################
+    # Code not reformatted from here onwards                                #
+    #########################################################################
+    #  Get existing borrowers and loop through to get
+    #  the ID's that the pasted JSON will overwrite
+    LOGGER.info("Interpreting Existing Borrowers")
+    existing_deed_borrowers = result.deed['borrowers']
+    for (i, existing_borrower) in enumerate(existing_deed_borrowers):
+        updated_deed_json['borrowers'][i]['id'] = existing_borrower['id']
+
+
+    else:
+        result.deed = updated_deed_json
+        json_doc = {
+            "title_number": updated_deed_json['title_number'],
+            "md_ref": updated_deed_json['md_ref'],
+            "borrowers": []
+        }
+
+    # Make a deed out of new information
+    valid_dob_result = _(updated_deed_json['borrowers']).chain() \
+        .map(lambda x, *a: x['dob']) \
+        .reduce(valid_dob, True).value()
+
+    if not valid_dob_result:
+        abort(status.HTTP_400_BAD_REQUEST)
+
+    phone_number_list = _(updated_deed_json['borrowers']).chain() \
+        .map(lambda x, *a: x['phone_number']) \
+        .value()
+
+    if not is_unique_list(phone_number_list):
+        abort(status.HTTP_400_BAD_REQUEST)
+    LOGGER.info("New Deed Created")
+    try:
+        LOGGER.info("Iterating PUT borrowers into existing borrowers")
+        for borrower in updated_deed_json['borrowers']:
+            borrower_json = {
+                "id": borrower['id'],
+                "forename": borrower['forename'],
+                "surname": borrower['surname']
+            }
+            if 'middle_name' in borrower:
+                borrower_json['middle_name'] = borrower['middle_name']
+            json_doc['borrowers'].append(borrower_json)
+
+        LOGGER.info("Saving the borrowers")
+        borrowerService.saveBorrower(borrower, borrower_json["id"])
+
+        result.deed = json_doc
+        LOGGER.info("Saving the deed")
+        result.save()
+        url = request.base_url
+        LOGGER.info("Deed Saved, returned URL = " + url)
+        return url, status.HTTP_200_OK
+    except Exception as e:
+        print("Database Exception - %s" % e)
+        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @deed_bp.route('', methods=['GET'])
