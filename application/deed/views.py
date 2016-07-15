@@ -54,7 +54,8 @@ def get_existing_deed_and_update(deed_reference):
                 abort(status.HTTP_404_NOT_FOUND)
 
             # Deed Status check
-            if result.status != "DRAFT":
+            deed_status = str(result.status)
+            if deed_status != "DRAFT":
                 return jsonify({"message": "This deed is not in a draft state"}), \
                        status.HTTP_400_BAD_REQUEST
 
