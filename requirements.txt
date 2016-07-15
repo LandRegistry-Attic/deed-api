@@ -1,3 +1,4 @@
+setuptools==24.0.3
 alembic==0.8.3
 cov-core==1.15.0
 coverage==3.7.1
