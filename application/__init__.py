@@ -66,7 +66,7 @@ def esecurity_error(e):
 @app.errorhandler(FileNotFoundError)
 def not_found_exception(e):
     app.logger.error('Not found error: %s', (e,), exc_info=True)
-    return jsonify({"message": "Not found error."}), 404
+    return jsonify({"message": "Deed not Found"}), 404
 
 
 @app.errorhandler(Exception)
