@@ -586,7 +586,7 @@ class TestRoutesErrorHandlers(TestRoutesBase):
 
     def test_borrower_token(self):
         token = Borrower.generate_token()
-        char_list = ['G','I','O','Q','W','X','Y','Z']
+        char_list = ['G', 'I', 'O', 'Q', 'W', 'X', 'Y', 'Z']
         res = False
 
         if any((c in char_list) for c in token):
