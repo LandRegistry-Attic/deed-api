@@ -52,7 +52,8 @@ def get_existing_deed_and_update(deed_reference):
             result = deed.get_deed(deed_reference)
 
             if result is None:
-                abort(status.HTTP_404_NOT_FOUND)
+                return jsonify({"message": "Deed not Found"}), \
+                       status.HTTP_400_BAD_REQUEST
 
             # Deed Status check
             deed_status = str(result.status)
@@ -77,7 +78,7 @@ def get_existing_deed_and_update(deed_reference):
                 LOGGER.error("Update deed 400_BAD_REQUEST")
                 return msg, status.HTTP_400_BAD_REQUEST
 
-            return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
+            return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_200_OK
 
             ##Unhappy verification
             # else:
