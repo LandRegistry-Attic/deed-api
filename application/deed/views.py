@@ -35,6 +35,7 @@ def get_deed(deed_reference):
 @deed_bp.route('/<deed_reference>', methods=['PUT'])
 def get_existing_deed_and_update(deed_reference):
     # Firstly check payload coming in is valid:
+    deed = Deed()
     updated_deed_json = request.get_json()
 
     error_count, error_message = validate_helper(updated_deed_json)
@@ -48,7 +49,7 @@ def get_existing_deed_and_update(deed_reference):
             check_borrower_names(updated_deed_json)
 
             # If Valid: Get Current Deed using Deed Ref in request
-            result = deed_json_adapter(deed_reference)
+            result = deed.get_deed(deed_reference)
 
             if result is None:
                 abort(status.HTTP_404_NOT_FOUND)
