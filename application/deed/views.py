@@ -62,7 +62,7 @@ def get_existing_deed_and_update(deed_reference):
 
             # Inform Akuma
             check_result = Akuma.do_check(updated_deed_json, "modify deed",
-                                          result.deed.organisation_name, result.deed.organisation_locale)
+                                          result.organisation_name, "GB")
             LOGGER.info("Check ID - MODIFY: " + check_result['id'])
 
             # Title Check
