@@ -61,9 +61,11 @@ def get_existing_deed_and_update(deed_reference):
                 return jsonify({"message": "This deed is not in a draft state"}), \
                        status.HTTP_400_BAD_REQUEST
 
+            organisation_credentials = process_organisation_credentials()
+
             # Inform Akuma
             check_result = Akuma.do_check(updated_deed_json, "modify deed",
-                                          result.organisation_name, "GB")
+                                          organisation_credentials["O"][0], organisation_credentials["C"][0])
             LOGGER.info("Check ID - MODIFY: " + check_result['id'])
 
             # Title Check
@@ -78,8 +80,7 @@ def get_existing_deed_and_update(deed_reference):
                 LOGGER.error("Update deed 400_BAD_REQUEST")
                 return msg, status.HTTP_400_BAD_REQUEST
 
-            return jsonify({"path": '/deed/' + str(deed_reference),
-                            "message": "Deed modified", status.HTTP_200_OK
+            return jsonify({"path": '/deed/' + str(deed_reference)}), status.HTTP_200_OK
 
             ##Unhappy verification
             # else:
