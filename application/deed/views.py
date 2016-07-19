@@ -41,6 +41,7 @@ def get_existing_deed_and_update(deed_reference):
     error_count, error_message = validate_helper(updated_deed_json)
 
     if error_count > 0:
+        LOGGER.error("Schema validation 400_BAD_REQUEST")
         return error_message, status.HTTP_400_BAD_REQUEST
     else:
 
