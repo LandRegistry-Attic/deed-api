@@ -10,7 +10,7 @@ from application.borrower.model import Borrower
 from application.deed.deed_render import create_deed_pdf
 from application.deed.model import Deed, deed_json_adapter, deed_pdf_adapter
 from application.deed.service import update_deed, update_deed_signature_timestamp, apply_registrar_signature, \
-    make_deed_effective_date
+    make_deed_effective_date, modify_deed
 from application.deed.utils import validate_helper, process_organisation_credentials, convert_json_to_xml
 from application.deed.validate_borrowers import check_borrower_names, BorrowerNamesException
 from application.title_adaptor.service import TitleAdaptor
@@ -74,7 +74,7 @@ def get_existing_deed_and_update(deed_reference):
                 return jsonify({"message": valid_title}), status.HTTP_400_BAD_REQUEST
 
             # Deed update call from CREATE
-            success, msg = update_deed(result, updated_deed_json, check_result['result'])
+            success, msg = modify_deed(result, updated_deed_json, check_result['result'])
 
             if not success:
                 LOGGER.error("Update deed 400_BAD_REQUEST")
