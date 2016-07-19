@@ -419,3 +419,16 @@ class TestDeedRoutes(unittest.TestCase):
         modify_deed = requests.put(config.DEED_API_BASE_HOST + '/deed/',
                                     data=json.dumps(valid_deed),
                                     headers=self.webseal_headers)
+        modify_response_json = modify_deed.json()
+
+        self.assertIn("/deed/", str(modify_response_json))
+
+        get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                        headers=self.webseal_headers)
+        self.assertEqual(get_created_deed.status_code, 200)
+
+        created_deed = get_created_deed.json()
+
+        self.assertIn("title_number", str(created_deed['deed']))
+
+        self.assertEqual(create_deed['deed']['title_number'],'CYM123456')
