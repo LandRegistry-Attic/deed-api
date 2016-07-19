@@ -71,3 +71,15 @@ def generate_hex():
         bin_str = bin_str[15:]
 
     return result
+
+
+def delete_borrower_by_deed_token(deed_token):
+
+    deed_borrowers = Borrower.query.filter_by(deed_token=deed_token)
+
+    for borrower in deed_borrowers:
+        db.session.delete(borrower)
+        db.session.commit()
+
+    return  deed_token
+
