@@ -78,7 +78,8 @@ def get_existing_deed_and_update(deed_reference):
                 LOGGER.error("Update deed 400_BAD_REQUEST")
                 return msg, status.HTTP_400_BAD_REQUEST
 
-            return jsonify({"path": '/deed/' + str(deed_reference)}), status.HTTP_200_OK
+            return jsonify({"path": '/deed/' + str(deed_reference),
+                            "message": "Deed modified", status.HTTP_200_OK
 
             ##Unhappy verification
             # else:
