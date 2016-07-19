@@ -74,7 +74,7 @@ def get_existing_deed_and_update(deed_reference):
                 return jsonify({"message": valid_title}), status.HTTP_400_BAD_REQUEST
 
             # Deed update call from CREATE
-            success, msg = modify_deed(result, updated_deed_json, check_result['result'])
+            success, msg = update_deed(result, updated_deed_json, check_result['result'])
 
             if not success:
                 LOGGER.error("Update deed 400_BAD_REQUEST")
