@@ -48,6 +48,16 @@ class Borrower(db.Model):
     def get_by_verify_pid(verify_pid):
         return Borrower.query.join(VerifyMatch).filter(VerifyMatch.verify_pid == verify_pid).first()
 
+    def delete_borrower_by_deed_token(deed_token):
+
+        deed_borrowers = Borrower.query.filter_by(deed_token=deed_token)
+
+        for borrower in deed_borrowers:
+            db.session.delete(borrower)
+            db.session.commit()
+
+        return deed_token
+
 
 class VerifyMatch(db.Model):
     __tablename__ = 'verify_match'
@@ -73,13 +83,5 @@ def generate_hex():
     return result
 
 
-def delete_borrower_by_deed_token(deed_token):
 
-    deed_borrowers = Borrower.query.filter_by(deed_token=deed_token)
-
-    for borrower in deed_borrowers:
-        db.session.delete(borrower)
-        db.session.commit()
-
-    return  deed_token
 

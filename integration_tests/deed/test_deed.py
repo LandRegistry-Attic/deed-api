@@ -414,21 +414,24 @@ class TestDeedRoutes(unittest.TestCase):
                                         headers=self.webseal_headers)
         self.assertEqual(get_created_deed.status_code, 200)
 
-        valid_deed['title_number'] = 'CYM123456'
+        new_deed = copy.deepcopy(valid_deed)
 
-        modify_deed = requests.put(config.DEED_API_BASE_HOST + '/deed/',
-                                    data=json.dumps(valid_deed),
+        new_deed["title_number"] = "CYM123457"
+
+        modify_deed = requests.put(config.DEED_API_BASE_HOST + response_json["path"],
+                                    data=json.dumps(new_deed),
                                     headers=self.webseal_headers)
+
         modify_response_json = modify_deed.json()
 
         self.assertIn("/deed/", str(modify_response_json))
 
-        get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+        get_modified_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
                                         headers=self.webseal_headers)
-        self.assertEqual(get_created_deed.status_code, 200)
+        self.assertEqual(get_modified_deed.status_code, 200)
 
-        created_deed = get_created_deed.json()
+        modified_deed = get_modified_deed.json()
 
-        self.assertIn("title_number", str(created_deed['deed']))
+        self.assertIn("title_number", str(modified_deed['deed']))
 
-        self.assertEqual(create_deed['deed']['title_number'],'CYM123456')
+        self.assertEqual(modified_deed["deed"]["title_number"], "CYM123457")
