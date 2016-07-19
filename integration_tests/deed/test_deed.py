@@ -398,3 +398,24 @@ class TestDeedRoutes(unittest.TestCase):
         f = open('integration_test_deed.pdf', 'wb')
         f.write(get_created_deed.content)
         f.close()
+
+    def test_modify_existing_deed(self):
+        create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
+                                    data=json.dumps(valid_deed),
+                                    headers=self.webseal_headers)
+
+        self.assertEqual(create_deed.status_code, 201)
+
+        response_json = create_deed.json()
+
+        self.assertIn("/deed/", str(response_json))
+
+        get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                        headers=self.webseal_headers)
+        self.assertEqual(get_created_deed.status_code, 200)
+
+        valid_deed['title_number'] = 'CYM123456'
+
+        modify_deed = requests.put(config.DEED_API_BASE_HOST + '/deed/',
+                                    data=json.dumps(valid_deed),
+                                    headers=self.webseal_headers)
