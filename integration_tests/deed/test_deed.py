@@ -1,15 +1,14 @@
-import json
-import io
-import unittest
 import copy
+import io
+import json
+import unittest
 
-import requests
 import PyPDF2
-
-from integration_tests.helper import setUpApp, setUp_MortgageDocuments
-from integration_tests.deed.deed_data import valid_deed
+import requests
 from application import config
 from application.deed.model import Deed
+from integration_tests.deed.deed_data import valid_deed
+from integration_tests.helper import setUpApp, setUp_MortgageDocuments
 from lxml import etree
 
 
@@ -414,18 +413,17 @@ class TestDeedRoutes(unittest.TestCase):
 
         borrower_id = get_created_deed.json()["deed"]["borrowers"][0]["id"]
 
-        print(borrower_id)
-
         new_deed = copy.deepcopy(valid_deed)
         new_deed["title_number"] = "CYM123457"
+        new_deed["borrowers"][0]["id"] = str(borrower_id)
         modify_deed = requests.put(config.DEED_API_BASE_HOST + response_json["path"],
-                                    data=json.dumps(new_deed),
-                                    headers=self.webseal_headers)
+                                   data=json.dumps(new_deed),
+                                   headers=self.webseal_headers)
 
         modify_response_json = modify_deed.json()
         self.assertIn("/deed/", str(modify_response_json))
         get_modified_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
-                                        headers=self.webseal_headers)
+                                         headers=self.webseal_headers)
 
         self.assertEqual(get_modified_deed.status_code, 200)
         modified_deed = get_modified_deed.json()
