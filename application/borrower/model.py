@@ -51,7 +51,7 @@ class Borrower(db.Model):
     def update_borrower_by_id(borrower, deed_reference):
 
         borrower_id = borrower["id"]
-        print("Borrower ID coming in is" + (str(borrower_id)))
+        print("Borrower ID coming in is " + (str(borrower_id)))
 
         existing_borrower = Borrower.query.filter_by(id=borrower_id).first()
 
