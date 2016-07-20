@@ -412,6 +412,10 @@ class TestDeedRoutes(unittest.TestCase):
 
         self.assertEqual(get_created_deed.status_code, 200)
 
+        borrower_id = get_created_deed.json()["deed"]["borrowers"][0]["id"]
+
+        print(borrower_id)
+
         new_deed = copy.deepcopy(valid_deed)
         new_deed["title_number"] = "CYM123457"
         modify_deed = requests.put(config.DEED_API_BASE_HOST + response_json["path"],
