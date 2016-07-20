@@ -81,15 +81,15 @@ def get_existing_deed_and_update(deed_reference):
 
             # Update existing borrower
             for borrower in updated_deed_json["borrowers"]:
-                borrower_id = borrower["id"]
+                try:
+                    borrower_id = borrower["id"]
+                except:
+                    return (jsonify({'message': "Borrowers are missing ID variable"}),
+                            status.HTTP_400_BAD_REQUEST)
 
-                if borrower_id is not None:
-                    modify_borrower = Borrower.update_borrower_by_id(borrower, deed_reference)
-                    if modify_borrower == "error":
-                        return "Borrower id is not associated with deed supplied", status.HTTP_400_BAD_REQUEST
-                else:
-                        return (jsonify({'message': "Borrowers are missing ID variable"}),
-                                status.HTTP_400_BAD_REQUEST)
+                modify_borrower = Borrower.update_borrower_by_id(borrower, deed_reference)
+                if modify_borrower == "error":
+                    return "Borrower id is not associated with deed supplied", status.HTTP_400_BAD_REQUEST
 
             # Deed update call from CREATE - new tokens generated
             success, msg = modify_deed(result, updated_deed_json, check_result['result'])
