@@ -91,7 +91,7 @@ def get_existing_deed_and_update(deed_reference):
                 if modify_borrower == "error":
                     return "Borrower id is not associated with deed supplied", status.HTTP_400_BAD_REQUEST
 
-            # Deed update call from CREATE - new tokens generated
+            # Deed modify call - using existing tokens
             success, msg = modify_deed(result, updated_deed_json, check_result['result'])
 
             if not success:
