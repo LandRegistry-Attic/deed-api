@@ -189,20 +189,6 @@ def modify_deed(deed, deed_json, akuma_flag):
     deed.identity_checked = deed_json["identity_checked"]
     json_doc = build_json_deed_document(deed_json)
 
-    # borrowers = deed_json["borrowers"]
-    #
-    # if not valid_borrowers(borrowers):
-    #     msg = "borrower data failed validation"
-    #     LOGGER.error(msg)
-    #     return False, msg
-    #
-    # update_borrower_for_token = partial(update_borrower, deed_token=deed.token)
-    #
-    # borrower_json = _(borrowers).chain()\
-    #     .map(update_borrower_for_token).value()
-    #
-    # json_doc['borrowers'] = borrower_json
-
     if not update_md_clauses(json_doc, deed_json["md_ref"], deed.organisation_name):
         msg = "mortgage document associated with supplied md_ref is not found"
         LOGGER.error(msg)
