@@ -184,7 +184,7 @@ def make_deed_effective_date(deed, signed_time):
     deed.deed = modify_deed
     deed.save()
 
-g
+
 def modify_deed(deed, deed_json, akuma_flag):
     deed.identity_checked = deed_json["identity_checked"]
     json_doc = build_json_deed_document(deed_json)
