@@ -3,7 +3,7 @@
     "info": {
         "title": "Deed API",
         "description": "Land Registry Deed API",
-        "version": "1.2.0"
+        "version": "1.2.2"
     },
     "host": "api.landregistry.gov.uk",
     "schemes": [
@@ -96,6 +96,9 @@
             "put": {
                 "summary": "Modify Deed",
                 "description": "The Modify Deed endpoint modifies a deed based on the unique deed reference provided in the path.\nThe response will give the relative path to access the deed via the \"Get\" endpoint if an update is successful. Any modifications which arent aren't successful will show the relevant error messages.\n",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -106,6 +109,14 @@
                         "description": "Unique reference of the deed.",
                         "required": true,
                         "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Deed_Application"
+                        }
                     }
                 ],
                 "tags": [
@@ -263,6 +274,10 @@
                 "address": {
                     "type": "string",
                     "pattern": "[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9](?:A-Z-245|[^CIKMOV]){2}"
+                },
+                "id": {
+                    "type": "string",
+                    "description": "Borrower ID used in Modify Deed case only"
                 }
             }
         },
