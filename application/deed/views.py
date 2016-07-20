@@ -84,7 +84,7 @@ def get_existing_deed_and_update(deed_reference):
                 try:
                     borrower_id = borrower["id"]
                 except:
-                    return (jsonify({'message': "Borrowers are missing ID variable"}),
+                    return (jsonify({'message': "Borrower is missing ID"}),
                             status.HTTP_400_BAD_REQUEST)
 
                 modify_borrower = Borrower.update_borrower_by_id(borrower, deed_reference)
