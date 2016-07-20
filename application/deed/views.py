@@ -105,8 +105,7 @@ def get_existing_deed_and_update(deed_reference):
                                  "a digital mortgage cannot be created as there is a discrepancy between the names given and those held on the register."}),
                     status.HTTP_400_BAD_REQUEST)
         except:
-            msg = str(sys.exc_info())
-            LOGGER.error("Database Exception - %s" % msg)
+            LOGGER.error("Database Exception - %s" % str(sys.exc_info()))
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
