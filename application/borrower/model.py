@@ -68,7 +68,7 @@ class Borrower(db.Model):
         existing_borrower.phonenumber = borrower["phone_number"]
         existing_borrower.address = borrower["address"]
 
-        if borrower["middle_name"]:
+        if 'middle_name' in borrower:
             existing_borrower.middlename = borrower["middle_name"]
 
         db.session.commit()
