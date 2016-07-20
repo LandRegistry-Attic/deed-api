@@ -69,6 +69,9 @@ def get_existing_deed_and_update(deed_reference):
             LOGGER.error("Unable to process headers")
             return "Unable to process headers", status.HTTP_401_UNAUTHORIZED
 
+            # Deed modify call - using existing tokens
+            success, msg = modify_deed(result, updated_deed_json, check_result['result'])
+
 
         # Update existing borrower
         for borrower in updated_deed_json["borrowers"]:

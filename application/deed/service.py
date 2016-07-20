@@ -1,6 +1,7 @@
 import logging
 from application.deed.utils import valid_dob, is_unique_list
 from application.borrower.server import BorrowerService
+from application.borrower.model import Borrower as BorrowerModel
 from underscore import _
 from application.mortgage_document.model import MortgageDocument
 from functools import partial
@@ -194,8 +195,35 @@ def modify_deed(deed, deed_json, akuma_flag):
         LOGGER.error(msg)
         return False, msg
 
+    borrowers = deed_json["borrowers"]
+
+    if not valid_borrowers(borrowers):
+        msg = "borrower data failed validation"
+        LOGGER.error(msg)
+        return False, msg
+
+    for borrower in borrowers:
+        json_doc['borrowers'].append(modify_borrower(borrower))
+
     deed.deed = json_doc
 
     deed.save()
 
     return True, "OK"
+
+
+def modify_borrower(borrower):
+
+    new_borrower = BorrowerModel.get_by_id(borrower['id'])
+
+    borrower_json = {
+        "id": str(new_borrower.id),
+        "token": new_borrower.token,
+        "forename": new_borrower.forename,
+        "surname": new_borrower.surname
+    }
+
+    if 'middle_name' in borrower:
+        borrower_json["middle_name"] = borrower.middlename
+
+    return borrower_json
