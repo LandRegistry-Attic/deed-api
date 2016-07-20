@@ -58,6 +58,23 @@ class Borrower(db.Model):
 
         return deed_token
 
+    def update_borrower_by_id(borrower):
+
+        existing_borrower = Borrower.query.filter_by(id=borrower["id"])
+
+        existing_borrower.forename = borrower["forename"]
+        existing_borrower.surname = borrower["surname"]
+        existing_borrower.dob = borrower["dob"]
+        existing_borrower.phonenumber = borrower["phone_number"]
+        existing_borrower.address = borrower["address"]
+
+        if borrower["middle_name"]:
+            existing_borrower.middlename = borrower["middle_name"]
+
+        db.session.commit()
+
+        return borrower
+
 
 class VerifyMatch(db.Model):
     __tablename__ = 'verify_match'

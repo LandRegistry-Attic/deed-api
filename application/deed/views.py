@@ -79,8 +79,9 @@ def get_existing_deed_and_update(deed_reference):
             if valid_title != "title OK":
                 return jsonify({"message": valid_title}), status.HTTP_400_BAD_REQUEST
 
-            # Delete old borrowers
-            Borrower.delete_borrower_by_deed_token(deed_reference)
+            # Update existing borrower
+            for borrower in updated_deed_json["borrowers"]
+                Borrower.update_borrower_by_id(borrower)
 
             # Deed update call from CREATE - new tokens generated
             success, msg = update_deed(result, updated_deed_json, check_result['result'])
