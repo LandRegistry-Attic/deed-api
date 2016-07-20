@@ -51,12 +51,8 @@ class Borrower(db.Model):
     def update_borrower_by_id(borrower, deed_reference):
 
         borrower_id = borrower["id"]
-        print("Borrower ID coming in is " + (str(borrower_id)))
 
         existing_borrower = Borrower.query.filter_by(id=borrower_id).first()
-
-        print(existing_borrower.deed_token)
-        print(deed_reference)
 
         if str(existing_borrower.deed_token) != str(deed_reference):
             return "error"
@@ -66,8 +62,6 @@ class Borrower(db.Model):
         existing_borrower.dob = borrower["dob"]
         existing_borrower.phonenumber = borrower["phone_number"]
         existing_borrower.address = borrower["address"]
-
-        print(existing_borrower.address)
 
         if 'middle_name' in borrower:
             existing_borrower.middlename = borrower["middle_name"]
