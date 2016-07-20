@@ -154,7 +154,7 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
                     LOGGER.info("updating JSON with Signature")
                     deed.deed = update_deed_signature_timestamp(deed, borrower_token)
                     Akuma.do_check(deed.deed, "borrower sign",
-                                   deed.organisation_name, "SIGN")
+                                   deed.organisation_name, "")
                 else:
                     LOGGER.error("Failed to sign Mortgage document")
                     return "Failed to sign Mortgage document", status_code
