@@ -11,9 +11,7 @@ from application.deed.deed_render import create_deed_pdf
 from application.deed.model import Deed, deed_json_adapter, deed_pdf_adapter
 from application.deed.service import update_deed, update_deed_signature_timestamp, apply_registrar_signature, \
     make_deed_effective_date, modify_deed
-from application.deed.utils import validate_helper, process_organisation_credentials, convert_json_to_xml
-from application.deed.validate_borrowers import check_borrower_names, BorrowerNamesException
-from application.title_adaptor.service import TitleAdaptor
+from application.deed.utils import process_organisation_credentials, convert_json_to_xml
 from flask import Blueprint
 from flask import request, abort, jsonify, Response
 from flask.ext.api import status
@@ -62,7 +60,7 @@ def get_existing_deed_and_update(deed_reference):
         if organisation_credentials:
             # Inform Akuma
             check_result = Akuma.do_check(updated_deed_json, "modify deed",
-                                             organisation_credentials["O"][0], organisation_credentials["C"][0])
+                                          organisation_credentials["O"][0], organisation_credentials["C"][0])
             LOGGER.info("Check ID - MODIFY: " + check_result['id'])
         # Unhappy verification
         else:
@@ -72,12 +70,9 @@ def get_existing_deed_and_update(deed_reference):
             # Deed modify call - using existing tokens
             success, msg = modify_deed(result, updated_deed_json, check_result['result'])
 
-
         # Update existing borrower
         for borrower in updated_deed_json["borrowers"]:
-            try:
-                borrower_id = borrower["id"]
-            except:
+            if 'id' not in borrower:
                 return (jsonify({'message': "Borrower is missing ID"}),
                         status.HTTP_400_BAD_REQUEST)
 
@@ -142,7 +137,6 @@ def create():
             check_result = Akuma.do_check(deed_json, "create deed",
                                           deed.organisation_name, organisation_locale)
             LOGGER.info("Check ID: " + check_result['id'])
-
 
             success, msg = update_deed(deed, deed_json, check_result['result'])
 

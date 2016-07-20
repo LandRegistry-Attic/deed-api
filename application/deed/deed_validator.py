@@ -7,6 +7,7 @@ from flask import jsonify
 
 LOGGER = logging.getLogger(__name__)
 
+
 def deed_validator(deed):
 
     error_count, error_message = validate_helper(deed)
@@ -26,6 +27,6 @@ def deed_validator(deed):
     except BorrowerNamesException:
         return (jsonify({'message':
                         "a digital mortgage cannot be created as there is a discrepancy between the names given and those held on the register."}),
-                        status.HTTP_400_BAD_REQUEST)
+                status.HTTP_400_BAD_REQUEST)
 
     return "passed", status.HTTP_200_OK
