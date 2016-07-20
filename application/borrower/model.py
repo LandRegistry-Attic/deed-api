@@ -93,7 +93,3 @@ def generate_hex():
         bin_str = bin_str[15:]
 
     return result
-
-
-
-

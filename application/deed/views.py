@@ -54,13 +54,13 @@ def get_existing_deed_and_update(deed_reference):
 
             if result is None:
                 return jsonify({"message": "Deed not Found"}), \
-                       status.HTTP_400_BAD_REQUEST
+                    status.HTTP_400_BAD_REQUEST
 
             # Deed Status check
             deed_status = str(result.status)
             if deed_status != "DRAFT":
                 return jsonify({"message": "This deed is not in a draft state"}), \
-                       status.HTTP_400_BAD_REQUEST
+                    status.HTTP_400_BAD_REQUEST
 
             organisation_credentials = process_organisation_credentials()
 
@@ -102,7 +102,7 @@ def get_existing_deed_and_update(deed_reference):
 
         except BorrowerNamesException:
             return (jsonify({'message':
-                                 "a digital mortgage cannot be created as there is a discrepancy between the names given and those held on the register."}),
+                             "a digital mortgage cannot be created as there is a discrepancy between the names given and those held on the register."}),
                     status.HTTP_400_BAD_REQUEST)
         except:
             LOGGER.error("Database Exception - %s" % str(sys.exc_info()))
@@ -169,7 +169,7 @@ def create():
             return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
         except BorrowerNamesException:
             return (jsonify({'message':
-                                 "a digital mortgage cannot be created as there is a discrepancy between the names given and those held on the register."}),
+                             "a digital mortgage cannot be created as there is a discrepancy between the names given and those held on the register."}),
                     status.HTTP_400_BAD_REQUEST)
         except:
             msg = str(sys.exc_info())
@@ -320,12 +320,12 @@ def make_effective(deed_reference):
 
         elif deed_status == "EFFECTIVE" or deed_status == "NOT-LR-SIGNED":
             return jsonify({"message": "This deed is already made effective."}), \
-                   status.HTTP_400_BAD_REQUEST
+                status.HTTP_400_BAD_REQUEST
 
         else:
             return jsonify({"message": "You can not make this deed effective "
                                        "as it is not fully signed."}), \
-                   status.HTTP_400_BAD_REQUEST
+                status.HTTP_400_BAD_REQUEST
 
 
 @deed_bp.route('/<deed_reference>/request-auth-code', methods=['POST'])
