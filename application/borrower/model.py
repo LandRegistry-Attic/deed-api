@@ -69,8 +69,7 @@ class Borrower(db.Model):
         print(deed_reference)
 
         if str(existing_borrower.deed_token) != str(deed_reference):
-            return "Nope"
-
+            return "error"
 
         existing_borrower.forename = borrower["forename"]
         existing_borrower.surname = borrower["surname"]
