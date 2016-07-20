@@ -54,21 +54,25 @@ class Borrower(db.Model):
 
         existing_borrower = Borrower.query.filter_by(id=borrower_id).first()
 
-        if str(existing_borrower.deed_token) != str(deed_reference):
-            return "error"
+        if existing_borrower:
 
-        existing_borrower.forename = borrower["forename"]
-        existing_borrower.surname = borrower["surname"]
-        existing_borrower.dob = borrower["dob"]
-        existing_borrower.phonenumber = borrower["phone_number"]
-        existing_borrower.address = borrower["address"]
+            if str(existing_borrower.deed_token) != str(deed_reference):
+                return "Error Token Mismatch"
 
-        if 'middle_name' in borrower:
-            existing_borrower.middlename = borrower["middle_name"]
+            existing_borrower.forename = borrower["forename"]
+            existing_borrower.surname = borrower["surname"]
+            existing_borrower.dob = borrower["dob"]
+            existing_borrower.phonenumber = borrower["phone_number"]
+            existing_borrower.address = borrower["address"]
 
-        db.session.commit()
+            if 'middle_name' in borrower:
+                existing_borrower.middlename = borrower["middle_name"]
 
-        return borrower
+            db.session.commit()
+
+            return borrower
+        else:
+            return "Error No Borrower"
 
 
 class VerifyMatch(db.Model):
