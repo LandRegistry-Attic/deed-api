@@ -80,7 +80,7 @@ def get_existing_deed_and_update(deed_reference):
                 return jsonify({"message": valid_title}), status.HTTP_400_BAD_REQUEST
 
             # Update existing borrower
-            for borrower in updated_deed_json["borrowers"]
+            for borrower in updated_deed_json["borrowers"]:
                 Borrower.update_borrower_by_id(borrower)
 
             # Deed update call from CREATE - new tokens generated
