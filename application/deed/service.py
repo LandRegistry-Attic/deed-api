@@ -6,7 +6,7 @@ from underscore import _
 from application.mortgage_document.model import MortgageDocument
 from functools import partial
 from flask.ext.api import status
-from flask import abort
+from flask import abort, jsonify
 from application.deed.deed_status import DeedStatus
 import json
 import datetime
@@ -113,7 +113,7 @@ def update_deed(deed, deed_json, akuma_flag):
     borrowers = deed_json["borrowers"]
 
     if not valid_borrowers(borrowers):
-        msg = "borrower data failed validation"
+        msg = jsonify({"message": "borrower data failed validation"})
         LOGGER.error(msg)
         return False, msg
 
@@ -125,7 +125,7 @@ def update_deed(deed, deed_json, akuma_flag):
     json_doc['borrowers'] = borrower_json
 
     if not update_md_clauses(json_doc, deed_json["md_ref"], deed.organisation_name):
-        msg = "mortgage document associated with supplied md_ref is not found"
+        msg = jsonify({"message": "mortgage document associated with supplied md_ref is not found"})
         LOGGER.error(msg)
         return False, msg
 
@@ -191,14 +191,14 @@ def modify_deed(deed, deed_json, akuma_flag):
     json_doc = build_json_deed_document(deed_json)
 
     if not update_md_clauses(json_doc, deed_json["md_ref"], deed.organisation_name):
-        msg = "mortgage document associated with supplied md_ref is not found"
+        msg = jsonify({"message": "mortgage document associated with supplied md_ref is not found"})
         LOGGER.error(msg)
         return False, msg
 
     borrowers = deed_json["borrowers"]
 
     if not valid_borrowers(borrowers):
-        msg = "borrower data failed validation"
+        msg = jsonify({"message": "borrower data failed validation"})
         LOGGER.error(msg)
         return False, msg
 
