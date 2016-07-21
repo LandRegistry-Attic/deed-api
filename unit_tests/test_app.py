@@ -593,31 +593,34 @@ class TestRoutesErrorHandlers(TestRoutesBase):
                                 headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-class TestModifyDeed(TestRoutesBase):
-    @mock.patch('application.borrower.model.update_borrower_by_id')
-    def test_update_borrower_by_id(self, mock_modify_borrower):
-
-        modify_payload = DeedHelper._modify_existing_deed
-
-        borrower_id = modify_payload["borrower"][0]["id"]
-
-        mock_modify_borrower(borrower_id, "AAABBB111")
-
-
-# Consider unit tests for:
+# class TestModifyDeed(TestRoutesBase):
+#     @mock.patch('application.borrower.model.Borrower.query')
+#     @mock.patch('application.borrower.model.update_borrower_by_id')
+#     def test_update_borrower_by_id(self, mock_modify_borrower, mock_borrower_lookup):
 #
-# update_borrower_by_id in model.py (or as a task in the story if more relevant to the later borrower story).
+#         modify_payload = DeedHelper._modify_existing_deed
 #
-
-
-# deed_validator in deed_validator.py - This is Ramin's code
+#         existing_borrower =
 #
-    def test_modify_deed_service(self):
-# modify_deed in service.py
+#         borrower_id = modify_payload["borrower"][0]["id"]
 #
-# modify_borrower in service.py (or a task in the borrower story)
-    def test_modify_borrower_service(self):
+#         mock_modify_borrower(borrower_id, "AAABBB111")
 #
-# get_existing_deed_and_update in views.py. This is a large (possibly untestable) function. May need breaking down.
 #
-# create function in views.py never had a unit test? Should we write one as the function has now been refactored?
+# # Consider unit tests for:
+# #
+# # update_borrower_by_id in model.py (or as a task in the story if more relevant to the later borrower story).
+# #
+#
+#
+# # deed_validator in deed_validator.py - This is Ramin's code
+# #
+#     def test_modify_deed_service(self):
+# # modify_deed in service.py
+# #
+# # modify_borrower in service.py (or a task in the borrower story)
+#     def test_modify_borrower_service(self):
+# #
+# # get_existing_deed_and_update in views.py. This is a large (possibly untestable) function. May need breaking down.
+# #
+# # create function in views.py never had a unit test? Should we write one as the function has now been refactored?
