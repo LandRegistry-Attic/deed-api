@@ -97,6 +97,7 @@ def get_existing_deed_and_update(deed_reference):
                 pass
             else:
                 print("Extra borrower found with ID " + str(borrower_id) + " and will be deleted")
+                Borrower.delete_borrower_by_id(str(borrower_id))
 
         # Deed update call from CREATE - new tokens generated
         success, msg = modify_deed(result, updated_deed_json, check_result['result'])

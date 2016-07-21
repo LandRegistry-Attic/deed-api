@@ -74,6 +74,17 @@ class Borrower(db.Model):
         else:
             return "Error No Borrower"
 
+    def delete_borrower_by_id(borrower_id):
+        borrower = Borrower.query.filter_by(id=borrower_id).first()
+
+        if borrower is None:
+            return borrower
+
+        db.session.delete(borrower)
+        db.session.commit()
+
+        return borrower
+
 
 class VerifyMatch(db.Model):
     __tablename__ = 'verify_match'
