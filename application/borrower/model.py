@@ -2,7 +2,7 @@ from sqlalchemy import ForeignKey
 from application import db
 import uuid
 
-charset = list("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+charset = list("0123456789ABCDEFGHJKLMNPQRSTUVXY")
 
 
 class Borrower(db.Model):
@@ -57,13 +57,14 @@ class VerifyMatch(db.Model):
 
 
 def bin_to_char(bin_str):
-    pos = min(int(bin_str[:6], 2), len(charset)-1)
-    return charset[pos]
+    # Converts 5 character binary string to a 2 digit integer. Then takes minimum between the 2 digit number and the lenght of the charset - 1.
+    pos = min(int(bin_str[:5], 2), len(charset)-1)
+    return charset[pos]  # Return character from charset based on position established above
 
 
 def generate_hex():
     val = str(bin(uuid.uuid4().int))
-    bin_str = val[2:]
+    bin_str = val[2:]  # Remove 0b from beginning of string
     result = ""
 
     while len(bin_str) > 15:

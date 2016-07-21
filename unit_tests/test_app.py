@@ -22,7 +22,6 @@ from application.deed.service import apply_registrar_signature, check_effective_
 from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
 from application.borrower.model import Borrower
 from unit_tests.schema_tests import run_schema_checks
-from application.borrower.model import generate_hex
 
 
 class TestRoutesBase(unittest.TestCase):
@@ -364,14 +363,6 @@ class TestRoutes(TestRoutesBase):
 
         self.assertEqual(effective_clause, correct_effective_clause)
 
-    def test_uuid_generation(self):
-        a = {}
-        for f in range(0, 100000):
-            new_hash = generate_hex()
-            a[new_hash] = True
-
-        self.assertEqual(100000, len(a))
-
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.borrower.model.Borrower.get_by_token')
     @mock.patch('application.service_clients.esec.interface.EsecClientInterface.issue_sms')
@@ -592,3 +583,14 @@ class TestRoutesErrorHandlers(TestRoutesBase):
         response = self.app.get(self.DEED_ENDPOINT + 'AB1234',
                                 headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_borrower_token(self):
+        token = Borrower.generate_token()
+        char_list = ['I', 'O', 'W', 'Z']
+        res = False
+
+        if any((c in char_list) for c in token):
+            res = True
+
+        self.assertTrue(token.isupper())
+        self.assertFalse(res)
