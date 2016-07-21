@@ -90,12 +90,13 @@ def get_existing_deed_and_update(deed_reference):
                         status.HTTP_400_BAD_REQUEST)
 
         # Remove Spare Borrowers
-        for id in existing_borrower_id_list:
-            if id in borrower_id_list:
-                print("Borrower found in both updates")
+        for borrower_id in existing_borrower_id_list['existing_id']:
+            print(str(borrower_id) + " to be checked")
+            if str(borrower_id) in borrower_id_list['borrower_id']:
+                print(str(borrower_id) + " found in both payloads")
                 pass
             else:
-                Borrower.delete(id)
+                print("Extra borrower found with ID " + str(borrower_id) + " and will be deleted")
 
         # Deed update call from CREATE - new tokens generated
         success, msg = modify_deed(result, updated_deed_json, check_result['result'])
