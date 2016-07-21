@@ -186,6 +186,35 @@ class DeedHelper:
     _verify_and_sign = {"borrower_token": "3",
                         "authentication_code": "aW23xw"}
 
+    _modify_existing_deed = {
+        "title_number": "GR515835",
+        "md_ref": "e-MD12344",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "borrowers": [
+            {
+                "forename": "lisa",
+                "middle_name": "ann",
+                "surname": "bloggette",
+                "gender": "Male",
+                "address": "test address with postcode, PL14 3JR",
+                "dob": "23/01/1986",
+                "phone_number": "07502154062",
+                "id": "1"
+            },
+            {
+                "forename": "frank",
+                "middle_name": "ann",
+                "surname": "bloggette",
+                "gender": "Female",
+                "address": "Test Address With Postcode, PL14 3JR",
+                "dob": "23/01/1986",
+                "phone_number": "07502154061",
+                "id": "2"
+            }
+        ],
+        "identity_checked": "Y"
+    }
+
 
 class StatusMock:
     _status_with_mdref_and_titleno = [
