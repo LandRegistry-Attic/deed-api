@@ -67,11 +67,20 @@ def get_existing_deed_and_update(deed_reference):
             LOGGER.error("Unable to process headers")
             return "Unable to process headers", status.HTTP_401_UNAUTHORIZED
 
+        # Check for Borrower Number Matches
+        existing_borrower_id_list = {"existing_id": []}
+        for borrower in result.deed["borrowers"]:
+            existing_borrower_id_list['existing_id'].append(borrower["id"])
+
+        borrower_id_list = {"borrower_id": []}
+
         # Update existing borrower
         for borrower in updated_deed_json["borrowers"]:
             if 'id' not in borrower:
                 return (jsonify({'message': "Borrower is missing ID"}),
                         status.HTTP_400_BAD_REQUEST)
+
+            borrower_id_list['borrower_id'].append(borrower["id"])
 
             modify_borrower = Borrower.update_borrower_by_id(borrower, deed_reference)
             if modify_borrower == "Error Token Mismatch":
@@ -79,6 +88,14 @@ def get_existing_deed_and_update(deed_reference):
             elif modify_borrower == "Error No Borrower":
                 return (jsonify({'message': "Borrower not found"}),
                         status.HTTP_400_BAD_REQUEST)
+
+        # Remove Spare Borrowers
+        for id in existing_borrower_id_list:
+            if id in borrower_id_list:
+                print("Borrower found in both updates")
+                pass
+            else:
+                Borrower.delete(id)
 
         # Deed update call from CREATE - new tokens generated
         success, msg = modify_deed(result, updated_deed_json, check_result['result'])
