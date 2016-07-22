@@ -10,7 +10,7 @@ from application.borrower.model import Borrower
 from application.deed.deed_render import create_deed_pdf
 from application.deed.model import Deed, deed_json_adapter, deed_pdf_adapter
 from application.deed.service import update_deed, update_deed_signature_timestamp, apply_registrar_signature, \
-    make_deed_effective_date, modify_deed
+    make_deed_effective_date, modify_deed, update_borrower
 from application.deed.utils import process_organisation_credentials, convert_json_to_xml
 from flask import Blueprint
 from flask import request, abort, jsonify, Response
@@ -74,28 +74,30 @@ def get_existing_deed_and_update(deed_reference):
 
         borrower_id_list = {"borrower_id": []}
 
-        # Update existing borrower
+        # Update existing borrower / add a new one
         for borrower in updated_deed_json["borrowers"]:
             if 'id' not in borrower:
-                return (jsonify({'message': "Borrower is missing ID"}),
-                        status.HTTP_400_BAD_REQUEST)
+                # Add Borrower borrower store (modify below will add to Deed)
+                print("Found a borrower with no Id here :) ")
+                print(borrower)
+                print ("calling add borrower function")
+                update_borrower(borrower, "", "", deed_token=deed_reference)
+            else:
+                borrower_id_list['borrower_id'].append(borrower["id"])
 
-            borrower_id_list['borrower_id'].append(borrower["id"])
-
-            modify_borrower = Borrower.update_borrower_by_id(borrower, deed_reference)
-            if modify_borrower == "Error Token Mismatch":
-                return "Borrower id is not associated with deed supplied", status.HTTP_400_BAD_REQUEST
-            elif modify_borrower == "Error No Borrower":
-                return (jsonify({'message': "Borrower not found"}),
-                        status.HTTP_400_BAD_REQUEST)
+                modify_borrower = Borrower.update_borrower_by_id(borrower, deed_reference)
+                if modify_borrower == "Error Token Mismatch":
+                    return "Borrower id is not associated with deed supplied", status.HTTP_400_BAD_REQUEST
+                elif modify_borrower == "Error No Borrower":
+                    return (jsonify({'message': "Borrower not found"}),
+                            status.HTTP_400_BAD_REQUEST)
 
         # Remove Spare Borrowers - these have already been checked they are on the deed above
         for borrower_id in existing_borrower_id_list['existing_id']:
-
             if str(borrower_id) not in borrower_id_list['borrower_id']:
                 Borrower.delete_borrower_by_id(str(borrower_id))
 
-        # Deed update call from CREATE - new tokens generated
+        # Deed update call from Modify - keep existing tokens
         success, msg = modify_deed(result, updated_deed_json, check_result['result'])
 
         if not success:
