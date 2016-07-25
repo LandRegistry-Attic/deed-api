@@ -153,6 +153,9 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
 
                     LOGGER.info("updating JSON with Signature")
                     deed.deed = update_deed_signature_timestamp(deed, borrower_token)
+                    check_result = Akuma.do_check(deed.deed, "borrower sign",
+                                   deed.organisation_name, "")
+                    LOGGER.info("Check ID - Borrower SIGNING: " + check_result['id'])
                 else:
                     LOGGER.error("Failed to sign Mortgage document")
                     return "Failed to sign Mortgage document", status_code
@@ -232,7 +235,8 @@ def make_effective(deed_reference):
         deed_status = str(result.status)
 
         if deed_status == "ALL-SIGNED":
-            Akuma.do_check(result.deed, "make effective", result.organisation_id, result.organisation_name)
+            check_result = Akuma.do_check(result.deed, "make effective", result.organisation_id, result.organisation_name)
+            LOGGER.info("Check ID - Make Effective: " + check_result['id'])
 
             signed_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 

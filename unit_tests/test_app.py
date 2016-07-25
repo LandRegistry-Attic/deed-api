@@ -345,13 +345,24 @@ class TestRoutes(TestRoutesBase):
         self.assertTrue("application/pdf" in response.mimetype)
 
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
-    def test_akuma_check(self, mock_api):
+    def test_akuma_check_create(self, mock_api):
         mock_api.return_value = {
             "result": "A",
             "id": "2b9115b2-d956-11e5-942f-08002719cd16"
         }
 
         check_result = Akuma.do_check(DeedHelper._json_doc, "create deed", "Land Registry Devices", "gb")
+
+        self.assertEqual(check_result["result"], "A")
+
+    @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
+    def test_akuma_check_sign(self, mock_api):
+        mock_api.return_value = {
+            "result": "A",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
+
+        check_result = Akuma.do_check(DeedHelper._json_doc, "borrower sign", "", "")
 
         self.assertEqual(check_result["result"], "A")
 
