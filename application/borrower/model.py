@@ -48,11 +48,13 @@ class Borrower(db.Model):
     def get_by_verify_pid(verify_pid):
         return Borrower.query.join(VerifyMatch).filter(VerifyMatch.verify_pid == verify_pid).first()
 
-    def update_borrower_by_id(borrower, deed_reference):
+    def _get_borrower_internal(self, borrower_id):
+        return Borrower.query.filter_by(id=borrower_id).first()
 
+    def update_borrower_by_id(self, borrower, deed_reference):
         borrower_id = borrower["id"]
 
-        existing_borrower = Borrower.query.filter_by(id=borrower_id).first()
+        existing_borrower = self._get_borrower_internal(borrower_id)
 
         if existing_borrower:
 
@@ -70,7 +72,7 @@ class Borrower(db.Model):
 
             db.session.commit()
 
-            return borrower
+            return existing_borrower
         else:
             return "Error No Borrower"
 
