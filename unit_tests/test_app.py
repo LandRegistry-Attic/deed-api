@@ -22,6 +22,7 @@ from application.deed.service import apply_registrar_signature, check_effective_
 from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
 from application.borrower.model import Borrower
 from unit_tests.schema_tests import run_schema_checks
+from application.deed.deed_validator import deed_validator
 
 
 class TestRoutesBase(unittest.TestCase):
@@ -645,3 +646,14 @@ class TestRoutesErrorHandlers(TestRoutesBase):
         self.assertTrue(token.isupper())
         self.assertFalse(res)
 
+    @mock.patch('application.deed.deed_validator.check_borrower_names', autospec=True)
+    @mock.patch('application.deed.deed_validator.TitleAdaptor', autospec=False)
+    @mock.patch('application.deed.deed_validator.validate_helper', autospec=False)
+    def test_deed_validator(self, mock_schema, mock_title_validator, mock_borrower_validator):
+
+        mock_schema.return_value = 0, ""
+        mock_title_validator.do_check.return_value = "title OK"
+
+        error_message, error_code = deed_validator(DeedHelper._json_doc)
+
+        self.assertEqual(error_message, "passed")
