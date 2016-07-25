@@ -587,6 +587,18 @@ class TestGetDeed(TestRoutesBase):
         self.assertTrue('e-MD12344' in txt)
 
 
+    def test_borrower_token(self):
+        token = Borrower.generate_token()
+        char_list = ['I', 'O', 'W', 'Z']
+        res = False
+
+        if any((c in char_list) for c in token):
+            res = True
+
+        self.assertTrue(token.isupper())
+        self.assertFalse(res)
+
+
 class TestRoutesErrorHandlers(TestRoutesBase):
 
     @mock.patch('application.service_clients.esec.implementation._post_request')
@@ -635,17 +647,8 @@ class TestRoutesErrorHandlers(TestRoutesBase):
 # #
 # # create function in views.py never had a unit test? Should we write one as the function has now been refactored?
 
-    def test_borrower_token(self):
-        token = Borrower.generate_token()
-        char_list = ['I', 'O', 'W', 'Z']
-        res = False
 
-        if any((c in char_list) for c in token):
-            res = True
-
-        self.assertTrue(token.isupper())
-        self.assertFalse(res)
-
+class TestValidators(TestRoutesBase):
     @mock.patch('application.deed.deed_validator.check_borrower_names', autospec=True)
     @mock.patch('application.deed.deed_validator.TitleAdaptor', autospec=False)
     @mock.patch('application.deed.deed_validator.validate_helper', autospec=False)
