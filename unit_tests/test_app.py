@@ -656,6 +656,7 @@ class TestRoutesErrorHandlers(TestRoutesBase):
 
         error_message, error_code = deed_validator(DeedHelper._json_doc)
 
+        self.assertEqual(error_code, status.HTTP_200_OK)
         self.assertEqual(error_message, "passed")
 
     @mock.patch('application.deed.deed_validator.check_borrower_names', autospec=True)
