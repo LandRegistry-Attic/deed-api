@@ -657,3 +657,16 @@ class TestRoutesErrorHandlers(TestRoutesBase):
         error_message, error_code = deed_validator(DeedHelper._json_doc)
 
         self.assertEqual(error_message, "passed")
+
+    @mock.patch('application.deed.deed_validator.check_borrower_names', autospec=True)
+    @mock.patch('application.deed.deed_validator.TitleAdaptor', autospec=False)
+    @mock.patch('application.deed.deed_validator.validate_helper', autospec=False)
+    def test_deed_validator_unhappy_path(self, mock_schema, mock_title_validator, mock_borrower_validator):
+
+        mock_schema.return_value = 3, "Schema Failures"
+        mock_title_validator.do_check.return_value = "title OK"
+
+        error_message, error_code = deed_validator(DeedHelper._json_doc)
+
+        self.assertEqual(error_message, "Schema Failures")
+        self.assertEqual(error_code, status.HTTP_400_BAD_REQUEST)
