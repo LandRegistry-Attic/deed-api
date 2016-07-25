@@ -1,7 +1,7 @@
 import unittest
 from application.borrower.model import Borrower
 import mock
-from unit_tests.helper import DeedHelper
+from unit_tests.helper import DeedHelper, borrower_object_helper
 import copy
 
 
@@ -24,19 +24,7 @@ class TestBorrowerModel(unittest.TestCase):
 
         updated_borrower = copy.deepcopy(DeedHelper._valid_single_borrower_update)
 
-        testBorrower = Borrower()
-
-        testBorrower.id = updated_borrower['id']
-        testBorrower.token = "AAAA"
-        testBorrower.deed_token = "AAAA"
-        testBorrower.forename = updated_borrower['forename']
-        testBorrower.middlename = updated_borrower['middle_name']
-        testBorrower.surname = updated_borrower['surname']
-        testBorrower.dob = updated_borrower['dob']
-        testBorrower.gender = updated_borrower['gender']
-        testBorrower.phonenumber = updated_borrower['phone_number']
-        testBorrower.address = updated_borrower['address']
-        testBorrower.esec_user_name = ""
+        testBorrower = borrower_object_helper(updated_borrower)
 
         mock_query.return_value = testBorrower
 
@@ -51,25 +39,13 @@ class TestBorrowerModel(unittest.TestCase):
     @mock.patch('application.borrower.model.db', autospec=True)
     def test_update_borrower_by_id_token_mismatch(self, mock_db, mock_query):
 
-        updated_borrower = copy.deepcopy(DeedHelper._valid_single_borrower_update)
+        borrower = DeedHelper._valid_single_borrower_update
 
-        testBorrower = Borrower()
-
-        testBorrower.id = updated_borrower['id']
-        testBorrower.token = "AAAA"
-        testBorrower.deed_token = "AAAA"
-        testBorrower.forename = updated_borrower['forename']
-        testBorrower.middlename = updated_borrower['middle_name']
-        testBorrower.surname = updated_borrower['surname']
-        testBorrower.dob = updated_borrower['dob']
-        testBorrower.gender = updated_borrower['gender']
-        testBorrower.phonenumber = updated_borrower['phone_number']
-        testBorrower.address = updated_borrower['address']
-        testBorrower.esec_user_name = ""
+        testBorrower = borrower_object_helper(borrower)
 
         mock_query.return_value = testBorrower
 
-        borrower = Borrower()
-        res = borrower.update_borrower_by_id(updated_borrower, "BBBB")
+        borrower_update = Borrower()
+        res = borrower_update.update_borrower_by_id(borrower, "BBBB")
 
         self.assertEqual(res, "Error Token Mismatch")

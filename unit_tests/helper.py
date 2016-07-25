@@ -1,4 +1,5 @@
 from application.deed.model import Deed
+from application.borrower.model import Borrower
 from .deed_dict import DEED
 
 # flake8: noqa
@@ -273,3 +274,20 @@ class AkumaMock:
         "activity": "create deed"
 
     }
+
+def borrower_object_helper(borrower):
+    new_borrower = Borrower()
+
+    new_borrower.id = borrower['id']
+    new_borrower.token = "AAAA"
+    new_borrower.deed_token = "AAAA"
+    new_borrower.forename = borrower['forename']
+    new_borrower.middlename = borrower['middle_name']
+    new_borrower.surname = borrower['surname']
+    new_borrower.dob = borrower['dob']
+    new_borrower.gender = borrower['gender']
+    new_borrower.phonenumber = borrower['phone_number']
+    new_borrower.address = borrower['address']
+    new_borrower.esec_user_name = ""
+
+    return new_borrower
