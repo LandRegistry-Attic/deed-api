@@ -22,7 +22,6 @@ from application.deed.service import apply_registrar_signature, check_effective_
 from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
 from application.borrower.model import Borrower
 from unit_tests.schema_tests import run_schema_checks
-from application.borrower.model import generate_hex
 
 
 class TestRoutesBase(unittest.TestCase):
@@ -346,13 +345,24 @@ class TestRoutes(TestRoutesBase):
         self.assertTrue("application/pdf" in response.mimetype)
 
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
-    def test_akuma_check(self, mock_api):
+    def test_akuma_check_create(self, mock_api):
         mock_api.return_value = {
             "result": "A",
             "id": "2b9115b2-d956-11e5-942f-08002719cd16"
         }
 
         check_result = Akuma.do_check(DeedHelper._json_doc, "create deed", "Land Registry Devices", "gb")
+
+        self.assertEqual(check_result["result"], "A")
+
+    @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
+    def test_akuma_check_sign(self, mock_api):
+        mock_api.return_value = {
+            "result": "A",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
+
+        check_result = Akuma.do_check(DeedHelper._json_doc, "borrower sign", "", "")
 
         self.assertEqual(check_result["result"], "A")
 
@@ -363,14 +373,6 @@ class TestRoutes(TestRoutesBase):
                                    "Test Organisation that the charge is to take effect."
 
         self.assertEqual(effective_clause, correct_effective_clause)
-
-    def test_uuid_generation(self):
-        a = {}
-        for f in range(0, 100000):
-            new_hash = generate_hex()
-            a[new_hash] = True
-
-        self.assertEqual(100000, len(a))
 
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.borrower.model.Borrower.get_by_token')
@@ -421,6 +423,7 @@ class TestRoutes(TestRoutesBase):
                                  headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.borrower.model.Borrower.get_by_token')
     @mock.patch('application.deed.utils.get_borrower_position')
@@ -428,9 +431,14 @@ class TestRoutes(TestRoutesBase):
     @mock.patch('application.deed.model.Deed.save', autospec=True)
     @mock.patch('application.deed.model.Deed.query', autospec=True)
     def test_add_authenticate_and_sign(self, mock_query, mock_Deed_save,
-                                       mock_auth, mock_position, mock_borrower, mock_borrower_save):
+                                       mock_auth, mock_position, mock_borrower, mock_borrower_save, mock_api):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = DeedModelMock()
+
+        mock_api.return_value = {
+            "result": "A",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
 
         class ReturnedBorrower(Borrower):
             deed_token = "aaaaaa"
@@ -593,6 +601,7 @@ class TestRoutesErrorHandlers(TestRoutesBase):
                                 headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+
 # class TestModifyDeed(TestRoutesBase):
 #     @mock.patch('application.borrower.model.Borrower.query')
 #     @mock.patch('application.borrower.model.update_borrower_by_id')
@@ -624,3 +633,15 @@ class TestRoutesErrorHandlers(TestRoutesBase):
 # # get_existing_deed_and_update in views.py. This is a large (possibly untestable) function. May need breaking down.
 # #
 # # create function in views.py never had a unit test? Should we write one as the function has now been refactored?
+
+    def test_borrower_token(self):
+        token = Borrower.generate_token()
+        char_list = ['I', 'O', 'W', 'Z']
+        res = False
+
+        if any((c in char_list) for c in token):
+            res = True
+
+        self.assertTrue(token.isupper())
+        self.assertFalse(res)
+
