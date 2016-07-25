@@ -587,18 +587,6 @@ class TestGetDeed(TestRoutesBase):
         self.assertTrue('e-MD12344' in txt)
 
 
-    def test_borrower_token(self):
-        token = Borrower.generate_token()
-        char_list = ['I', 'O', 'W', 'Z']
-        res = False
-
-        if any((c in char_list) for c in token):
-            res = True
-
-        self.assertTrue(token.isupper())
-        self.assertFalse(res)
-
-
 class TestRoutesErrorHandlers(TestRoutesBase):
 
     @mock.patch('application.service_clients.esec.implementation._post_request')
