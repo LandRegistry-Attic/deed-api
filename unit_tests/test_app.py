@@ -423,6 +423,7 @@ class TestRoutes(TestRoutesBase):
                                  headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.borrower.model.Borrower.get_by_token')
     @mock.patch('application.deed.utils.get_borrower_position')
@@ -430,9 +431,14 @@ class TestRoutes(TestRoutesBase):
     @mock.patch('application.deed.model.Deed.save', autospec=True)
     @mock.patch('application.deed.model.Deed.query', autospec=True)
     def test_add_authenticate_and_sign(self, mock_query, mock_Deed_save,
-                                       mock_auth, mock_position, mock_borrower, mock_borrower_save):
+                                       mock_auth, mock_position, mock_borrower, mock_borrower_save, mock_api):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = DeedModelMock()
+
+        mock_api.return_value = {
+            "result": "A",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
 
         class ReturnedBorrower(Borrower):
             deed_token = "aaaaaa"
