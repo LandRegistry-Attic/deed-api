@@ -98,7 +98,7 @@ def get_existing_deed_and_update(deed_reference):
                 Borrower.delete_borrower_by_id(str(borrower_id))
 
         # Deed update call from Modify - keep existing tokens
-        success, msg = modify_deed(result, updated_deed_json, check_result['result'])
+        success, msg = modify_deed(result, updated_deed_json)
 
         if not success:
             LOGGER.error("Update deed 400_BAD_REQUEST")
@@ -155,7 +155,7 @@ def create():
                                           deed.organisation_name, organisation_locale)
             LOGGER.info("Check ID: " + check_result['id'])
 
-            success, msg = update_deed(deed, deed_json, check_result['result'])
+            success, msg = update_deed(deed, deed_json)
 
             if not success:
                 LOGGER.error("Update deed 400_BAD_REQUEST")
