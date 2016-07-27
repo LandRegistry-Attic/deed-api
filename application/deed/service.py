@@ -70,7 +70,10 @@ def update_borrower(borrower, idx, borrowers, deed_token):
 
     if 'middle_name' in borrower:
         borrower_json["middle_name"] = borrower["middle_name"]
+
+    print("Checking Ramin ID in Borrower")
     if 'id' not in borrower:
+        print("Bororwer has no ID R")
         created_borrower = borrower_service.saveBorrower(borrower, deed_token)
 
         borrower_json["id"] = created_borrower.id
@@ -79,8 +82,11 @@ def update_borrower(borrower, idx, borrowers, deed_token):
         borrower_updater = BorrowerModel()
         updated_borrower = borrower_updater.update_borrower_by_id(borrower,deed_token)
 
-        borrower_json["id"] = borrower["id"]
+        borrower_json["id"] = int(borrower["id"])
         borrower_json["token"] = updated_borrower.token
+
+    print("Returning R Functions")
+    print(borrower_json)
     return borrower_json
 
 
@@ -110,7 +116,8 @@ def build_json_deed_document(deed_json):
 
     return json_doc
 
-##############ORIGINAL CODE
+
+# ORIGINAL CODE
 def update_deed(deed, deed_json):
     deed.identity_checked = deed_json["identity_checked"]
     json_doc = build_json_deed_document(deed_json)
@@ -139,10 +146,10 @@ def update_deed(deed, deed_json):
     deed.save()
 
     return True, "OK"
-    return True, "OK"
 
 
 def update_deed_signature_timestamp(deed, borrower_token):
+
     modify_deed = copy.deepcopy(deed.deed)
     for borrower in modify_deed['borrowers']:
         if borrower['token'] == borrower_token:
@@ -191,7 +198,8 @@ def make_deed_effective_date(deed, signed_time):
     deed.deed = modify_deed
     deed.save()
 
-###########DANS CODE################
+
+# DANS CODE
 def modify_deed(deed, deed_json):
     deed.identity_checked = deed_json["identity_checked"]
     json_doc = build_json_deed_document(deed_json)
@@ -233,6 +241,7 @@ def modify_borrower(borrower):
         borrower_json["middle_name"] = borrower.middlename
 
     return borrower_json
+
 
 def add_borrowers_to_deed(borrowers, deed_id, json_doc):
     if not valid_borrowers(borrowers):
