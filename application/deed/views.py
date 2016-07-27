@@ -72,37 +72,14 @@ def get_existing_deed_and_update(deed_reference):
         for borrower in result.deed["borrowers"]:
             existing_borrower_id_list['existing_id'].append(borrower["id"])
 
-        borrower_id_list = {"borrower_id": []}
-
         success, msg = update_deed(result,updated_deed_json)
 
-        # Update existing borrower / add a new one
-        # for borrower in updated_deed_json["borrowers"]:
+        call_new_deed = deed.get_deed(deed_reference)
 
-            # borrower_updater = Borrower()
-            # modify_borrower = update_borrower(borrower, "", "", deed_reference)
-
-            # if 'id' not in borrower:
-            #     # Add Borrower borrower store (modify below will add to Deed)
-            #     print("Found a borrower with no Id here :) ")
-            #     print(borrower)
-            #     print ("calling add borrower function")
-            #     new_borrower = update_borrower(borrower, "", "", deed_token=deed_reference)
-            #     borrower_id_list['borrower_id'].append(new_borrower["id"])
-            # else:
-            #
-            #     borrower_updater = Borrower()
-            #
-            #     modify_borrower = borrower_updater.update_borrower_by_id(borrower, deed_reference)
-            #     if modify_borrower == "Error Token Mismatch":
-            #         return "Borrower id is not associated with deed supplied", status.HTTP_400_BAD_REQUEST
-            #     elif modify_borrower == "Error No Borrower":
-            #         return (jsonify({'message': "Borrower not found"}),
-            #                 status.HTTP_400_BAD_REQUEST)
-            #     else:
-            #         borrower_id_list['borrower_id'].append(borrower["id"])
-
-        # Remove Spare Borrowers - these have already been checked they are on the deed above
+        # Check for New Borrower Matches
+        borrower_id_list = {"borrower_id": []}
+        for borrower in call_new_deed.deed["borrowers"]:
+            borrower_id_list['borrower_id'].append(borrower["id"])
 
         print("Existing Borrower ID's = " + str(existing_borrower_id_list))
         print("Payload Borrower ID's = " + str(borrower_id_list))
