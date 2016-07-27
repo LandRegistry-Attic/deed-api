@@ -70,7 +70,7 @@ def update_borrower(borrower, idx, borrowers, deed_token):
 
     if 'middle_name' in borrower:
         borrower_json["middle_name"] = borrower["middle_name"]
-    if not 'id' in borrower:
+    if 'id' not in borrower:
         created_borrower = borrower_service.saveBorrower(borrower, deed_token)
 
         borrower_json["id"] = created_borrower.id
