@@ -70,12 +70,16 @@ def update_borrower(borrower, idx, borrowers, deed_token):
 
     if 'middle_name' in borrower:
         borrower_json["middle_name"] = borrower["middle_name"]
+    if not 'id' in borrower:
+        created_borrower = borrower_service.saveBorrower(borrower, deed_token)
 
-    created_borrower = borrower_service.saveBorrower(borrower, deed_token)
+        borrower_json["id"] = created_borrower.id
+        borrower_json["token"] = created_borrower.token
+    else:
+        updated_borrower = update_borrower_by_id(borrower,deed_token)
 
-    borrower_json["id"] = created_borrower.id
-    borrower_json["token"] = created_borrower.token
-
+        borrower_json["id"] = borrower["id"]
+        borrower_json["token"] = updated_borrower.token
     return borrower_json
 
 
@@ -105,7 +109,7 @@ def build_json_deed_document(deed_json):
 
     return json_doc
 
-
+##############ORIGINAL CODE
 def update_deed(deed, deed_json):
     deed.identity_checked = deed_json["identity_checked"]
     json_doc = build_json_deed_document(deed_json)
@@ -113,7 +117,7 @@ def update_deed(deed, deed_json):
     borrowers = deed_json["borrowers"]
 
     if not valid_borrowers(borrowers):
-        msg = jsonify({"message": "borrower data failed validation"})
+        msg = "borrower data failed validation"
         LOGGER.error(msg)
         return False, msg
 
@@ -125,7 +129,7 @@ def update_deed(deed, deed_json):
     json_doc['borrowers'] = borrower_json
 
     if not update_md_clauses(json_doc, deed_json["md_ref"], deed.organisation_name):
-        msg = jsonify({"message": "mortgage document associated with supplied md_ref is not found"})
+        msg = "mortgage document associated with supplied md_ref is not found"
         LOGGER.error(msg)
         return False, msg
 
@@ -133,6 +137,7 @@ def update_deed(deed, deed_json):
 
     deed.save()
 
+    return True, "OK"
     return True, "OK"
 
 
@@ -185,7 +190,7 @@ def make_deed_effective_date(deed, signed_time):
     deed.deed = modify_deed
     deed.save()
 
-
+###########DANS CODE################
 def modify_deed(deed, deed_json):
     deed.identity_checked = deed_json["identity_checked"]
     json_doc = build_json_deed_document(deed_json)
@@ -225,5 +230,18 @@ def modify_borrower(borrower):
 
     if 'middle_name' in borrower:
         borrower_json["middle_name"] = borrower.middlename
+
+    return borrower_json
+
+def add_borrowers_to_deed(borrowers, deed_id, json_doc):
+    if not valid_borrowers(borrowers):
+        msg = jsonify({"message": "borrower data failed validation"})
+        LOGGER.error(msg)
+        return False, msg
+
+    update_borrower_for_token = partial(update_borrower, deed_token=deed.token)
+
+    borrower_json = _(borrowers).chain()\
+        .map(update_borrower_for_token).value()
 
     return borrower_json
