@@ -85,7 +85,9 @@ def get_existing_deed_and_update(deed_reference):
             else:
                 borrower_id_list['borrower_id'].append(borrower["id"])
 
-                modify_borrower = Borrower.update_borrower_by_id(borrower, deed_reference)
+                borrower_updater = Borrower()
+
+                modify_borrower = borrower_updater.update_borrower_by_id(borrower, deed_reference)
                 if modify_borrower == "Error Token Mismatch":
                     return "Borrower id is not associated with deed supplied", status.HTTP_400_BAD_REQUEST
                 elif modify_borrower == "Error No Borrower":
