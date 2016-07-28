@@ -58,9 +58,6 @@ class Borrower(db.Model):
 
         if existing_borrower:
 
-            if str(existing_borrower.deed_token) != str(deed_reference):
-                return "Error Token Mismatch"
-
             existing_borrower.forename = borrower["forename"]
             existing_borrower.surname = borrower["surname"]
             existing_borrower.dob = borrower["dob"]

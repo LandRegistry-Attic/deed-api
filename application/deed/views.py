@@ -67,37 +67,20 @@ def get_existing_deed_and_update(deed_reference):
             LOGGER.error("Unable to process headers")
             return "Unable to process headers", status.HTTP_401_UNAUTHORIZED
 
-        # Check for Borrower Number Matches
-        existing_borrower_id_list = {"existing_id": []}
-        for borrower in result.deed["borrowers"]:
-            existing_borrower_id_list['existing_id'].append(borrower["id"])
+        for borrower in updated_deed_json["borrowers"]:
+            if 'id' in borrower:
+                borrower_check = Borrower.get_by_id(borrower["id"])
+
+                if borrower_check is None or borrower_check.deed_token != deed_reference:
+                    return jsonify({"message": "error borrowers provided do not match deed"}), status.HTTP_400_BAD_REQUEST
 
         success, msg = update_deed(result,updated_deed_json)
-
-        call_new_deed = deed.get_deed(deed_reference)
-
-        # Check for New Borrower Matches
-        borrower_id_list = {"borrower_id": []}
-        for borrower in call_new_deed.deed["borrowers"]:
-            borrower_id_list['borrower_id'].append(borrower["id"])
-
-        print("Existing Borrower ID's = " + str(existing_borrower_id_list))
-        print("Payload Borrower ID's = " + str(borrower_id_list))
-        for borrower_id in existing_borrower_id_list['existing_id']:
-            if str(borrower_id) not in borrower_id_list['borrower_id']:
-                print("Deleting Borrower " + str(borrower_id))
-                Borrower.delete_borrower_by_id(str(borrower_id))
-
-        # # Deed update call from Modify - keep existing tokens
-        # print("Going to do and update now - ciao!")
-        # success, msg = modify_deed(result, updated_deed_json)
 
         if not success:
             LOGGER.error("Update deed 400_BAD_REQUEST")
             return msg, status.HTTP_400_BAD_REQUEST
 
         return jsonify({"path": '/deed/' + str(deed_reference)}), status.HTTP_200_OK
-
     except:
         LOGGER.error("Database Exception - %s" % str(sys.exc_info()))
         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)

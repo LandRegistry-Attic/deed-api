@@ -227,7 +227,7 @@
                     "pattern": "^([a-zA-Z0-9]{8})$"
                 },
                 "id": {
-                    "type": "string",
+                    "type": "integer",
                     "pattern": "^[0-9]+$"
                 }
             }
@@ -276,7 +276,7 @@
                     "pattern": "[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9](?:A-Z-245|[^CIKMOV]){2}"
                 },
                 "id": {
-                    "type": "string",
+                    "type": "integer",
                     "description": "Borrower ID used in Modify Deed case only"
                 }
             }

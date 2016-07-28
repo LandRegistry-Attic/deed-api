@@ -82,13 +82,6 @@ def update_borrower(borrower, idx, borrowers, deed_token):
         borrower_updater = BorrowerModel()
         updated_borrower = borrower_updater.update_borrower_by_id(borrower,deed_token)
 
-        if updated_borrower == "Error Token Mismatch":
-            LOGGER.error("Borrower id is not associated with deed supplied")
-            abort(status.HTTP_400_BAD_REQUEST)
-        elif updated_borrower == "Error No Borrower":
-            LOGGER.error("Borrower not found")
-            abort(status.HTTP_400_BAD_REQUEST)
-
         borrower_json["id"] = int(borrower["id"])
         borrower_json["token"] = updated_borrower.token
 
