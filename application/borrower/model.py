@@ -63,6 +63,7 @@ class Borrower(db.Model):
             existing_borrower.dob = borrower["dob"]
             existing_borrower.phonenumber = borrower["phone_number"]
             existing_borrower.address = borrower["address"]
+            existing_borrower.gender = borrower["gender"]
 
             if 'middle_name' in borrower:
                 existing_borrower.middlename = borrower["middle_name"]
@@ -89,7 +90,7 @@ class Borrower(db.Model):
         print(deed)
         borrowers = Borrower.query.filter(not_(Borrower.id.in_(ids)), Borrower.deed_token==deed).all()
 
-        for borrower in borrowers:            
+        for borrower in borrowers:
             db.session.delete(borrower)
             db.session.commit()
 
