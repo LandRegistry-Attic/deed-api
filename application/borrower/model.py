@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, not_
 from application import db
 import uuid
 
@@ -83,6 +83,15 @@ class Borrower(db.Model):
         db.session.commit()
 
         return borrower
+
+    def delete_borrowers_not_on_deed(self, ids, deed):
+        print(ids)
+        print(deed)
+        borrowers = Borrower.query.filter(not_(Borrower.id.in_(ids)), Borrower.deed_token==deed).all()
+
+        for borrower in borrowers:            
+            db.session.delete(borrower)
+            db.session.commit()
 
 
 class VerifyMatch(db.Model):
