@@ -10,7 +10,7 @@ from application.borrower.model import Borrower
 from application.deed.deed_render import create_deed_pdf
 from application.deed.model import Deed, deed_json_adapter, deed_pdf_adapter
 from application.deed.service import update_deed, update_deed_signature_timestamp, apply_registrar_signature, \
-    make_deed_effective_date, modify_deed, update_borrower
+    make_deed_effective_date
 from application.deed.utils import process_organisation_credentials, convert_json_to_xml
 from flask import Blueprint
 from flask import request, abort, jsonify, Response
@@ -74,7 +74,7 @@ def get_existing_deed_and_update(deed_reference):
                 if borrower_check is None or borrower_check.deed_token != deed_reference:
                     return jsonify({"message": "error borrowers provided do not match deed"}), status.HTTP_400_BAD_REQUEST
 
-        success, msg = update_deed(result,updated_deed_json)
+        success, msg = update_deed(result, updated_deed_json)
 
         if not success:
             LOGGER.error("Update deed 400_BAD_REQUEST")

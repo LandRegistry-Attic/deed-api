@@ -85,10 +85,10 @@ class Borrower(db.Model):
 
         return borrower
 
-    def delete_borrowers_not_on_deed(self, ids, deed):
+    def delete_borrowers_not_on_deed(self, ids, deed_reference):
         print(ids)
-        print(deed)
-        borrowers = Borrower.query.filter(not_(Borrower.id.in_(ids)), Borrower.deed_token==deed).all()
+        print(deed_reference)
+        borrowers = Borrower.query.filter(not_(Borrower.id.in_(ids)), Borrower.deed_token == deed_reference).all()
 
         for borrower in borrowers:
             db.session.delete(borrower)

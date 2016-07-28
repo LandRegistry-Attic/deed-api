@@ -80,7 +80,7 @@ def update_borrower(borrower, idx, borrowers, deed_token):
         borrower_json["token"] = created_borrower.token
     else:
         borrower_updater = BorrowerModel()
-        updated_borrower = borrower_updater.update_borrower_by_id(borrower,deed_token)
+        updated_borrower = borrower_updater.update_borrower_by_id(borrower, deed_token)
 
         borrower_json["id"] = int(borrower["id"])
         borrower_json["token"] = updated_borrower.token
@@ -153,7 +153,6 @@ def update_deed(deed, deed_json):
         delete = BorrowerModel()
 
     delete.delete_borrowers_not_on_deed(borrower_list, deed.token)
-
 
     return True, "OK"
 
@@ -249,19 +248,5 @@ def modify_borrower(borrower):
 
     if 'middle_name' in borrower:
         borrower_json["middle_name"] = borrower.middlename
-
-    return borrower_json
-
-
-def add_borrowers_to_deed(borrowers, deed_id, json_doc):
-    if not valid_borrowers(borrowers):
-        msg = jsonify({"message": "borrower data failed validation"})
-        LOGGER.error(msg)
-        return False, msg
-
-    update_borrower_for_token = partial(update_borrower, deed_token=deed.token)
-
-    borrower_json = _(borrowers).chain()\
-        .map(update_borrower_for_token).value()
 
     return borrower_json
