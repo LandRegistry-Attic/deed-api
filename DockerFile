@@ -12,7 +12,7 @@ ENV SQLALCHEMY_DATABASE_URI = 'postgres://root:root/deed_api'
 # Put your app-specific stuff here (extra yum installs etc).
 # Any unique environment variables your config.py needs should also be added as ENV entries here
 
-RUN yum -y install python-cffi cairo pango gdk-pixbuf2
+RUN yum -y install libffi-devel libxslt-devel libxml2-devel python-lxml python-cffi cairo pango gdk-pixbuf2
 
 ENV DEBUG True
 ENV AKUMA_BASE_HOST 'http://127.0.0.1:5055'
