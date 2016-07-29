@@ -4,7 +4,7 @@ FROM lr_base_python_flask
 # ---- Database stuff start
 
 RUN yum install -y -q postgresql-devel
-ENV SQLALCHEMY_DATABASE_URI = 'postgres://root:root/deed_api'
+ENV DEED_DATABASE_URI postgres://root:superroot@postgres/deed_api
 
 # ---- Database stuff end
 
