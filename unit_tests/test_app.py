@@ -681,3 +681,20 @@ class TestCreateDeed(TestRoutesBase):
         res, msg = update_deed(new_deed, DeedHelper._json_doc)
 
         self.assertTrue(res)
+
+    @mock.patch('application.borrower.model.Borrower')
+    @mock.patch('application.deed.model.Deed.save')
+    @mock.patch('application.deed.service.update_md_clauses')
+    @mock.patch('application.deed.service.update_borrower')
+    @mock.patch('application.deed.service.build_json_deed_document')
+    def test_update_deed_invalid(self, mock_json_doc, mock_updated_borrower, mock_update_md, mock_save_deed, mock_borrower):
+        new_deed = DeedModelMock()
+
+        mock_json_doc.return_value = DeedHelper._valid_initial_deed
+        mock_updated_borrower.return_value = DeedHelper._valid_single_borrower_update_response
+
+        mock_update_md.return_value = None
+
+        res, msg = update_deed(new_deed, DeedHelper._json_doc)
+
+        self.assertFalse(res)
