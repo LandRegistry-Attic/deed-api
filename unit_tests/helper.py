@@ -67,6 +67,16 @@ class DeedHelper:
         "identity_checked": "Y"
     }
 
+    _valid_initial_deed = {
+                "title_number": "GR515835",
+                "md_ref": "e-MD12344",
+                "borrowers": [],
+                "charge_clause": [],
+                "additional_provisions": [],
+                "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+                "effective_clause": ""
+            }
+
     _invalid_title = {
         "title_number": "BBBB12313212BB",
         "property_address": "5 The Drive, This Town, This County, PL4 4TH",
@@ -116,6 +126,13 @@ class DeedHelper:
                 "address": "test address with postcode, PL14 3JR",
                 "dob": "23/01/1986",
                 "phone_number": "07502154062"
+                }
+    _valid_single_borrower_update_response = {
+                "id": "9999",
+                "token": "AAAAAAAA",
+                "forename": "Lisa",
+                "middle_name": "Ann",
+                "surname": "Bloggette"
                 }
 
     _invalid_phone_numbers = {"borrowers": [

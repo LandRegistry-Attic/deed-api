@@ -16,7 +16,7 @@ from application.casework.service import get_document
 from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, StatusMock
 from application.akuma.service import Akuma
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
-from application.deed.service import make_effective_text, make_deed_effective_date
+from application.deed.service import make_effective_text, make_deed_effective_date, update_deed
 from application.deed.views import make_effective, retrieve_signed_deed
 from application.deed.service import apply_registrar_signature, check_effective_status, add_effective_date_to_xml
 from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
@@ -141,13 +141,14 @@ class TestRoutes(TestRoutesBase):
                                  headers={"Content-Type": "application/json"})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    @mock.patch('application.borrower.model.Borrower')
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.title_adaptor.service.TitleAdaptor.do_check', autospec=False)
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_create_webseal_external(self, mock_query, mock_Deed, mock_Borrower, mock_akuma, mock_title, mock_proprietor_names):
+    def test_create_webseal_external(self, mock_query, mock_Deed, mock_Borrower, mock_akuma, mock_title, mock_proprietor_names, mock_borrower):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
         mock_akuma.return_value = {
@@ -662,3 +663,21 @@ class TestValidators(TestRoutesBase):
 
         self.assertEqual(error_message, "Schema Failures")
         self.assertEqual(error_code, status.HTTP_400_BAD_REQUEST)
+
+
+class TestCreateDeed(TestRoutesBase):
+
+    @mock.patch('application.borrower.model.Borrower')
+    @mock.patch('application.deed.model.Deed.save')
+    @mock.patch('application.deed.service.update_md_clauses', autospec=True)
+    @mock.patch('application.deed.service.update_borrower')
+    @mock.patch('application.deed.service.build_json_deed_document')
+    def test_update_deed(self, mock_json_doc, mock_updated_borrower, mock_update_md, mock_save_deed, mock_borrower):
+        new_deed = DeedModelMock()
+
+        mock_json_doc.return_value = DeedHelper._valid_initial_deed
+        mock_updated_borrower.return_value = DeedHelper._valid_single_borrower_update_response
+
+        res, msg = update_deed(new_deed, DeedHelper._json_doc)
+
+        self.assertTrue(res)
