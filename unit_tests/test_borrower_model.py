@@ -34,18 +34,3 @@ class TestBorrowerModel(unittest.TestCase):
         res = borrower.update_borrower_by_id(updated_borrower, "AAAA")
 
         self.assertEqual(res.forename, "Frank")
-
-    @mock.patch('application.borrower.model.Borrower._get_borrower_internal')
-    @mock.patch('application.borrower.model.db', autospec=True)
-    def test_update_borrower_by_id_token_mismatch(self, mock_db, mock_query):
-
-        borrower = DeedHelper._valid_single_borrower_update
-
-        testBorrower = borrower_object_helper(borrower)
-
-        mock_query.return_value = testBorrower
-
-        borrower_update = Borrower()
-        res = borrower_update.update_borrower_by_id(borrower, "BBBB")
-
-        self.assertEqual(res, "Error Token Mismatch")
