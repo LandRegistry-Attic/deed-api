@@ -6,7 +6,7 @@ from underscore import _
 from application.mortgage_document.model import MortgageDocument
 from functools import partial
 from flask.ext.api import status
-from flask import abort, jsonify
+from flask import abort
 from application.deed.deed_status import DeedStatus
 import json
 import datetime
@@ -206,47 +206,3 @@ def make_deed_effective_date(deed, signed_time):
     deed.status = "NOT-LR-SIGNED"
     deed.deed = modify_deed
     deed.save()
-
-
-# DANS CODE
-def modify_deed(deed, deed_json):
-    deed.identity_checked = deed_json["identity_checked"]
-    json_doc = build_json_deed_document(deed_json)
-
-    if not update_md_clauses(json_doc, deed_json["md_ref"], deed.organisation_name):
-        msg = jsonify({"message": "mortgage document associated with supplied md_ref is not found"})
-        LOGGER.error(msg)
-        return False, msg
-
-    borrowers = deed_json["borrowers"]
-
-    if not valid_borrowers(borrowers):
-        msg = jsonify({"message": "borrower data failed validation"})
-        LOGGER.error(msg)
-        return False, msg
-
-    for borrower in borrowers:
-        json_doc['borrowers'].append(modify_borrower(borrower))
-
-    deed.deed = json_doc
-
-    deed.save()
-
-    return True, "OK"
-
-
-def modify_borrower(borrower):
-
-    new_borrower = BorrowerModel.get_by_id(borrower['id'])
-
-    borrower_json = {
-        "id": str(new_borrower.id),
-        "token": new_borrower.token,
-        "forename": new_borrower.forename,
-        "surname": new_borrower.surname
-    }
-
-    if 'middle_name' in borrower:
-        borrower_json["middle_name"] = borrower.middlename
-
-    return borrower_json
