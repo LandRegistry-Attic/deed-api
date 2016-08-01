@@ -71,9 +71,7 @@ def update_borrower(borrower, idx, borrowers, deed_token):
     if 'middle_name' in borrower:
         borrower_json["middle_name"] = borrower["middle_name"]
 
-    print("Checking Ramin ID in Borrower")
     if 'id' not in borrower:
-        print("Bororwer has no ID R")
         created_borrower = borrower_service.saveBorrower(borrower, deed_token)
 
         borrower_json["id"] = created_borrower.id
@@ -84,9 +82,7 @@ def update_borrower(borrower, idx, borrowers, deed_token):
 
         borrower_json["id"] = int(borrower["id"])
         borrower_json["token"] = updated_borrower.token
-
-    print("Returning R Functions")
-    print(borrower_json)
+        
     return borrower_json
 
 

@@ -110,8 +110,6 @@ def get_deeds_status_with_mdref_and_title_number():
 def create():
     deed_json = request.get_json()
     error_message, error_code = deed_validator(deed_json)
-    print(error_message)
-    print(error_code)
 
     if error_code != status.HTTP_200_OK:
         return error_message, error_code
@@ -121,7 +119,6 @@ def create():
         deed.token = Deed.generate_token()
 
         organisation_credentials = process_organisation_credentials()
-        print("processing credentials")
         if organisation_credentials:
             deed.organisation_id = organisation_credentials["O"][1]
             deed.organisation_name = organisation_credentials["O"][0]
