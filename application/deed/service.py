@@ -82,7 +82,7 @@ def update_borrower(borrower, idx, borrowers, deed_token):
 
         borrower_json["id"] = int(borrower["id"])
         borrower_json["token"] = updated_borrower.token
-        
+
     return borrower_json
 
 
@@ -113,7 +113,6 @@ def build_json_deed_document(deed_json):
     return json_doc
 
 
-# ORIGINAL CODE
 def update_deed(deed, deed_json):
     deed.identity_checked = deed_json["identity_checked"]
     json_doc = build_json_deed_document(deed_json)
