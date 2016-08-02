@@ -19,6 +19,7 @@ def deed_validator(deed):
     valid_title = TitleAdaptor.do_check(deed['title_number'])
 
     if valid_title != "title OK":
+        LOGGER.error("Title Validation - Title error = " + str(valid_title))
         return jsonify({"message": valid_title}), status.HTTP_400_BAD_REQUEST
 
     try:
