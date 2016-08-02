@@ -675,9 +675,6 @@ class TestCreateDeed(TestRoutesBase):
     @mock.patch('application.deed.views.Deed.get_deed')
     @mock.patch('application.deed.views.deed_validator')
     def test_get_existing_deed_and_update(self, mock_deed_validator, mock_deed, mock_org_creds, mock_akuma, mock_borrower, mock_update):
-        import pdb; pdb.set_trace()
-
-
         mock_deed_validator.return_value = "success", status.HTTP_200_OK
 
         mock_deed.return_value = DeedModelMock()
@@ -685,27 +682,27 @@ class TestCreateDeed(TestRoutesBase):
 
         payload = json.dumps(DeedHelper._json_doc)
 
-
         response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
                                  headers=self.webseal_headers)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
-    #@mock.patch('application.deed.views.update_deed')
-    #@mock.patch('application.deed.views.Borrower')
-    #@mock.patch('application.deed.views.Akuma')
-    #@mock.patch('application.deed.views.process_organisation_credentials')
-    #@mock.patch('application.deed.views.Deed')
-    #@mock.patch('application.deed.views.deed_validator')
-    #def test_get_existing_deed_and_update_invalid(self, mock_deed_validator, mock_deed, mock_org_creds, mock_akuma, mock_borrower, mock_update):
+    @mock.patch('application.deed.views.update_deed')
+    @mock.patch('application.deed.views.Borrower')
+    @mock.patch('application.deed.views.Akuma')
+    @mock.patch('application.deed.views.process_organisation_credentials')
+    @mock.patch('application.deed.views.Deed.get_deed')
+    @mock.patch('application.deed.views.deed_validator')
+    def test_get_existing_deed_and_update_fail(self, mock_deed_validator, mock_deed, mock_org_creds, mock_akuma, mock_borrower, mock_update):
+        mock_deed_validator.return_value = "success", status.HTTP_200_OK
 
-        #mock_update.return_value = None, None
+        mock_deed.return_value = DeedModelMock()
+        mock_update.return_value = False, "FAIL"
 
-        #payload = DeedHelper._json_doc
-        #resp =  self.app.put(self.DEED_ENDPOINT + 'AAAAAAAAAAA',
-        #                    data=payload,
-        #                    headers=self.webseal_headers)
+        payload = json.dumps(DeedHelper._json_doc)
 
+        response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
+                                 headers=self.webseal_headers)
 
-        #self.assertEqual(resp.status_code == status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
