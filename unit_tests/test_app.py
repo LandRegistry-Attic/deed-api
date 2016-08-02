@@ -17,7 +17,7 @@ from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, Status
 from application.akuma.service import Akuma
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
 from application.deed.service import make_effective_text, make_deed_effective_date, update_deed
-from application.deed.views import make_effective, retrieve_signed_deed
+from application.deed.views import make_effective, retrieve_signed_deed, get_existing_deed_and_update
 from application.deed.service import apply_registrar_signature, check_effective_status, add_effective_date_to_xml
 from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
 from application.borrower.model import Borrower
@@ -604,39 +604,6 @@ class TestRoutesErrorHandlers(TestRoutesBase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
-# class TestModifyDeed(TestRoutesBase):
-#     @mock.patch('application.borrower.model.Borrower.query')
-#     @mock.patch('application.borrower.model.update_borrower_by_id')
-#     def test_update_borrower_by_id(self, mock_modify_borrower, mock_borrower_lookup):
-#
-#         modify_payload = DeedHelper._modify_existing_deed
-#
-#         existing_borrower =
-#
-#         borrower_id = modify_payload["borrower"][0]["id"]
-#
-#         mock_modify_borrower(borrower_id, "AAABBB111")
-#
-#
-# # Consider unit tests for:
-# #
-# # update_borrower_by_id in model.py (or as a task in the story if more relevant to the later borrower story).
-# #
-#
-#
-# # deed_validator in deed_validator.py - This is Ramin's code
-# #
-#     def test_modify_deed_service(self):
-# # modify_deed in service.py
-# #
-# # modify_borrower in service.py (or a task in the borrower story)
-#     def test_modify_borrower_service(self):
-# #
-# # get_existing_deed_and_update in views.py. This is a large (possibly untestable) function. May need breaking down.
-# #
-# # create function in views.py never had a unit test? Should we write one as the function has now been refactored?
-
-
 class TestValidators(TestRoutesBase):
     @mock.patch('application.deed.deed_validator.check_borrower_names', autospec=True)
     @mock.patch('application.deed.deed_validator.TitleAdaptor', autospec=False)
@@ -682,6 +649,7 @@ class TestCreateDeed(TestRoutesBase):
 
         self.assertTrue(res)
 
+
     @mock.patch('application.borrower.model.Borrower')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.deed.service.update_md_clauses')
@@ -698,3 +666,46 @@ class TestCreateDeed(TestRoutesBase):
         res, msg = update_deed(new_deed, DeedHelper._json_doc)
 
         self.assertFalse(res)
+
+
+    @mock.patch('application.deed.views.update_deed')
+    @mock.patch('application.deed.views.Borrower')
+    @mock.patch('application.deed.views.Akuma')
+    @mock.patch('application.deed.views.process_organisation_credentials')
+    @mock.patch('application.deed.views.Deed.get_deed')
+    @mock.patch('application.deed.views.deed_validator')
+    def test_get_existing_deed_and_update(self, mock_deed_validator, mock_deed, mock_org_creds, mock_akuma, mock_borrower, mock_update):
+        import pdb; pdb.set_trace()
+
+
+        mock_deed_validator.return_value = "success", status.HTTP_200_OK
+
+        mock_deed.return_value = DeedModelMock()
+        mock_update.return_value = True, "OK"
+
+        payload = json.dumps(DeedHelper._json_doc)
+
+
+        response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
+                                 headers=self.webseal_headers)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+    #@mock.patch('application.deed.views.update_deed')
+    #@mock.patch('application.deed.views.Borrower')
+    #@mock.patch('application.deed.views.Akuma')
+    #@mock.patch('application.deed.views.process_organisation_credentials')
+    #@mock.patch('application.deed.views.Deed')
+    #@mock.patch('application.deed.views.deed_validator')
+    #def test_get_existing_deed_and_update_invalid(self, mock_deed_validator, mock_deed, mock_org_creds, mock_akuma, mock_borrower, mock_update):
+
+        #mock_update.return_value = None, None
+
+        #payload = DeedHelper._json_doc
+        #resp =  self.app.put(self.DEED_ENDPOINT + 'AAAAAAAAAAA',
+        #                    data=payload,
+        #                    headers=self.webseal_headers)
+
+
+        #self.assertEqual(resp.status_code == status.HTTP_400_BAD_REQUEST)
