@@ -35,9 +35,9 @@ def get_deed(deed_reference):
 def get_existing_deed_and_update(deed_reference):
     # Firstly check payload coming in is valid:
     deed = Deed()
-    updated_deed_json = request.get_json()
+    deed_update_json = request.get_json()
 
-    error_message, error_code = deed_validator(updated_deed_json)
+    error_message, error_code = deed_validator(deed_update_json)
 
     if error_code != status.HTTP_200_OK:
         return error_message, error_code
