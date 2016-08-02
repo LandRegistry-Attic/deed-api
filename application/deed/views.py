@@ -290,7 +290,7 @@ def make_effective(deed_reference):
             return '', status.HTTP_200_OK
 
         elif deed_status == "EFFECTIVE" or deed_status == "NOT-LR-SIGNED":
-            LOGGER.error("Deed with reference - %s is in %s status and can not be registrar signed" %
+            LOGGER.error("Deed with reference - %s has status %s and can not be registrar signed" %
                          (str(deed_reference), str(deed_status)))
             return jsonify({"message": "This deed is already made effective."}), \
                 status.HTTP_400_BAD_REQUEST
