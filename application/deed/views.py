@@ -60,7 +60,7 @@ def get_existing_deed_and_update(deed_reference):
 
         if organisation_credentials:
             # Inform Akuma
-            check_result = Akuma.do_check(updated_deed_json, "modify deed",
+            check_result = Akuma.do_check(deed_update_json, "modify deed",
                                           organisation_credentials["O"][0], organisation_credentials["C"][0])
             LOGGER.info("Check ID - MODIFY: " + check_result['id'])
         # Unhappy verification
@@ -68,13 +68,13 @@ def get_existing_deed_and_update(deed_reference):
             LOGGER.error("Unable to process headers")
             return "Unable to process headers", status.HTTP_401_UNAUTHORIZED
 
-        for borrower in updated_deed_json["borrowers"]:
+        for borrower in deed_update_json["borrowers"]:
             if 'id' in borrower:
                 borrower_check = Borrower.get_by_id(borrower["id"])
 
                 if borrower_check is None or borrower_check.deed_token != deed_reference:
                     return jsonify({"message": "error borrowers provided do not match deed"}), status.HTTP_400_BAD_REQUEST
-        success, msg = update_deed(result, updated_deed_json)
+        success, msg = update_deed(result, deed_update_json)
 
         if not success:
             LOGGER.error("Update deed 400_BAD_REQUEST")
@@ -291,7 +291,7 @@ def make_effective(deed_reference):
 
         elif deed_status == "EFFECTIVE" or deed_status == "NOT-LR-SIGNED":
             LOGGER.error("Deed with reference - %s is in %s status and can not be registrar signed" %
-                         str(deed_reference), str(deed_status))
+                         (str(deed_reference), str(deed_status)))
             return jsonify({"message": "This deed is already made effective."}), \
                 status.HTTP_400_BAD_REQUEST
 
