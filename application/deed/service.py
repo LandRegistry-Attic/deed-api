@@ -145,9 +145,9 @@ def update_deed(deed, deed_json):
     for borrower in deed.deed["borrowers"]:
         borrower_list.append(borrower["id"])
 
-        delete = BorrowerModel()
+        borrower_model_delete = BorrowerModel()
 
-    delete.delete_borrowers_not_on_deed(borrower_list, deed.token)
+    borrower_model_delete.delete_borrowers_not_on_deed(borrower_list, deed.token)
 
     return True, "OK"
 
