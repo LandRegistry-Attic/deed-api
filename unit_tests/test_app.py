@@ -17,7 +17,7 @@ from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, Status
 from application.akuma.service import Akuma
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
 from application.deed.service import make_effective_text, make_deed_effective_date, update_deed
-from application.deed.views import make_effective, retrieve_signed_deed, get_existing_deed_and_update
+from application.deed.views import make_effective, retrieve_signed_deed
 from application.deed.service import apply_registrar_signature, check_effective_status, add_effective_date_to_xml
 from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
 from application.borrower.model import Borrower
@@ -649,7 +649,6 @@ class TestCreateDeed(TestRoutesBase):
 
         self.assertTrue(res)
 
-
     @mock.patch('application.borrower.model.Borrower')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.deed.service.update_md_clauses')
@@ -667,7 +666,6 @@ class TestCreateDeed(TestRoutesBase):
 
         self.assertFalse(res)
 
-
     @mock.patch('application.deed.views.update_deed')
     @mock.patch('application.deed.views.Borrower')
     @mock.patch('application.deed.views.Akuma')
@@ -683,10 +681,9 @@ class TestCreateDeed(TestRoutesBase):
         payload = json.dumps(DeedHelper._json_doc)
 
         response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
-                                 headers=self.webseal_headers)
+                                headers=self.webseal_headers)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
 
     @mock.patch('application.deed.views.update_deed')
     @mock.patch('application.deed.views.Borrower')
@@ -703,6 +700,6 @@ class TestCreateDeed(TestRoutesBase):
         payload = json.dumps(DeedHelper._json_doc)
 
         response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
-                                 headers=self.webseal_headers)
+                                headers=self.webseal_headers)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

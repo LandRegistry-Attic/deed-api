@@ -73,7 +73,6 @@ def get_existing_deed_and_update(deed_reference):
 
                 if borrower_check is None or borrower_check.deed_token != deed_reference:
                     return jsonify({"message": "error borrowers provided do not match deed"}), status.HTTP_400_BAD_REQUEST
-
         success, msg = update_deed(result, updated_deed_json)
 
         if not success:
