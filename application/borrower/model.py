@@ -74,17 +74,6 @@ class Borrower(db.Model):
         else:
             return "Error No Borrower"
 
-    def delete_borrower_by_id(borrower_id):
-        borrower = Borrower.query.filter_by(id=borrower_id).first()
-
-        if borrower is None:
-            return borrower
-
-        db.session.delete(borrower)
-        db.session.commit()
-
-        return borrower
-
     def delete_borrowers_not_on_deed(self, ids, deed_reference):
         borrowers = Borrower.query.filter(not_(Borrower.id.in_(ids)), Borrower.deed_token == deed_reference).all()
 
