@@ -78,7 +78,7 @@ def update_borrower(borrower, idx, borrowers, deed_token):
         borrower_json["token"] = created_borrower.token
     else:
         borrower_updater = BorrowerModel()
-        updated_borrower = borrower_updater.update_borrower_by_id(borrower, deed_token)
+        updated_borrower = borrower_updater.update_borrower_by_id(borrower)
 
         borrower_json["id"] = int(borrower["id"])
         borrower_json["token"] = updated_borrower.token

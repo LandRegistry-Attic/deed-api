@@ -51,7 +51,7 @@ class Borrower(db.Model):
     def _get_borrower_internal(self, borrower_id):
         return Borrower.query.filter_by(id=borrower_id).first()
 
-    def update_borrower_by_id(self, borrower, deed_reference):
+    def update_borrower_by_id(self, borrower):
         borrower_id = borrower["id"]
 
         existing_borrower = self._get_borrower_internal(borrower_id)
