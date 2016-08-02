@@ -603,6 +603,16 @@ class TestRoutesErrorHandlers(TestRoutesBase):
                                 headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+        def test_borrower_token(self):
+            token = Borrower.generate_token()
+            char_list = ['I', 'O', 'W', 'Z']
+            res = False
+
+            if any((c in char_list) for c in token):
+                res = True
+
+            self.assertTrue(token.isupper())
+            self.assertFalse(res)
 
 class TestValidators(TestRoutesBase):
     @mock.patch('application.deed.deed_validator.check_borrower_names', autospec=True)
