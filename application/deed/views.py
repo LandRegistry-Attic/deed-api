@@ -112,6 +112,7 @@ def create():
     error_message, error_code = deed_validator(deed_json)
 
     if error_code != status.HTTP_200_OK:
+        LOGGER.error(error_message)
         return error_message, error_code
 
     try:
