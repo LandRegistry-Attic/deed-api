@@ -46,6 +46,7 @@ def get_existing_deed_and_update(deed_reference):
         result = deed.get_deed(deed_reference)
 
         if result is None:
+            LOGGER.error("Deed with reference - %s not found" % str(deed_reference))
             return jsonify({"message": "Deed not Found"}), \
                 status.HTTP_400_BAD_REQUEST
 
@@ -270,6 +271,7 @@ def make_effective(deed_reference):
     deed = Deed()
     result = deed.get_deed(deed_reference)
     if result is None:
+        LOGGER.error("Deed with reference - %s not found" % str(deed_reference))
         abort(status.HTTP_404_NOT_FOUND)
     else:
 
@@ -288,10 +290,14 @@ def make_effective(deed_reference):
             return '', status.HTTP_200_OK
 
         elif deed_status == "EFFECTIVE" or deed_status == "NOT-LR-SIGNED":
+            LOGGER.error("Deed with reference - %s is in %s status and can not be registrar signed" %
+                         str(deed_reference), str(deed_status))
             return jsonify({"message": "This deed is already made effective."}), \
                 status.HTTP_400_BAD_REQUEST
 
         else:
+            LOGGER.error("Deed with reference - %s is not fully signed and can not be registrar signed" %
+                         str(deed_reference))
             return jsonify({"message": "You can not make this deed effective "
                                        "as it is not fully signed."}), \
                 status.HTTP_400_BAD_REQUEST
