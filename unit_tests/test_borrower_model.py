@@ -31,6 +31,6 @@ class TestBorrowerModel(unittest.TestCase):
         updated_borrower["forename"] = "Frank"
 
         borrower = Borrower()
-        res = borrower.update_borrower_by_id(updated_borrower, "AAAA")
+        res = borrower.update_borrower_by_id(updated_borrower)
 
         self.assertEqual(res.forename, "Frank")
