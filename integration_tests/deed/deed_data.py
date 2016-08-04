@@ -5,8 +5,8 @@ valid_deed = {
     "identity_checked": "Y",
     "borrowers": [
         {
-            "forename": "Ann",
-            "surname": "Smith",
+            "forename": "Barry",
+            "surname": "Jones",
             "gender": "Male",
             "address": "test address with postcode, PL14 3JR",
             "dob": "23/01/1986",

@@ -12,16 +12,17 @@ ENV DEED_DATABASE_URI postgres://root:superroot@postgres/deed_api
 # Put your app-specific stuff here (extra yum installs etc).
 # Any unique environment variables your config.py needs should also be added as ENV entries here
 
-RUN yum -y install libffi-devel libxslt-devel libxml2-devel python-lxml python-cffi cairo pango gdk-pixbuf2
+RUN yum -y install libffi-devel libxslt-devel libxml2-devel python-lxml python-cffi cairo pango gdk-pixbuf2 xorg-x11-fonts-Type1
 
 ENV DEBUG True
-ENV AKUMA_BASE_HOST 'http://127.0.0.1:5055'
-ENV ESEC_CLIENT_BASE_HOST 'http://127.0.0.1:9040'
+ENV AKUMA_ADDRESS 'http://cf-api-stub:8080'
+ENV ESEC_CLIENT_URI 'http://esec-client:8080'
 ENV ESEC_SCHEMA_LOCATION 'http://localhost:9080/schemas/'
-ENV TITLE_ADAPTOR_BASE_HOST 'http://localhost:5010'
-ENV DM_REGISTER_ADAPTER 'http://localhost:5011/'
-ENV DEED_API_BASE_HOST 'http://0.0.0.0:9020'
+ENV TITLE_ADAPTOR_URI 'http://title-adapter-api:8080'
+ENV REGISTER_ADAPTER 'http://register-adapter-stub:8080/'
+ENV DEED_API_ADDRESS 'http://0.0.0.0:8080'
 
+WORKDIR /src
 # ----
 
 # The command to run the app.

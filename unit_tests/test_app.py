@@ -119,7 +119,7 @@ class TestRoutes(TestRoutesBase):
     def test_sign_document_with_authority(self, mock_post_request):
         mock_deed = DeedModelMock()
         sign_document_with_authority(mock_deed.deed_xml)
-        mock_post_request.assert_called_with('http://127.0.0.1:9040/esec/sign_document_with_authority',
+        mock_post_request.assert_called_with('{}/esec/sign_document_with_authority'.format(app.config["ESEC_CLIENT_BASE_HOST"]),
                                              mock_deed.deed_xml)
 
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
