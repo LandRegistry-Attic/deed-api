@@ -23,6 +23,7 @@ from application.service_clients.esec.implementation import sign_document_with_a
 from application.borrower.model import Borrower
 from unit_tests.schema_tests import run_schema_checks
 from application.deed.deed_validator import deed_validator
+from application.title_adaptor.service import TitleAdaptor
 
 
 class TestRoutesBase(unittest.TestCase):
@@ -641,21 +642,19 @@ class TestValidators(TestRoutesBase):
         self.assertEqual(error_message, "Schema Failures")
         self.assertEqual(error_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_title_validator_do_check_invalid_title(self):
 
-    @mock.patch('application.deed.views.jsonify')
-    @mock.patch('application.deed.deed_validator.check_borrower_names', autospec=True)
-    @mock.patch('application.title_adaptor.service.TitleAdaptor.do_check')
-    @mock.patch('application.deed.deed_validator.validate_helper', autospec=False)
-    def test_deed_validator_invalid_title(self, mock_schema, mock_title_validator, mock_borrower_validator, mock_jsonify):
+        title_stub = DeedHelper._invalid_title["title_number"]
+        result = TitleAdaptor.do_check(title_stub)
 
-        mock_schema.return_value = 0, ""
-        mock_title_validator.return_value = "title not OK"
+        self.assertEqual(result, "Title does not exist")
 
-        deed_validator(DeedHelper._invalid_title)
+    def test_title_validator_do_check_valid_title(self):
 
-        mock_jsonify.assert_called_with({"message": "blah"})
-        #self.assertEqual(mock_deed_validator.return_value, 400)
+        title_stub = DeedHelper._json_doc["title_number"]
+        result = TitleAdaptor.do_check(title_stub)
 
+        self.assertEqual(result, "title OK")
 
 class TestCreateDeed(TestRoutesBase):
 

@@ -20,7 +20,7 @@ def deed_validator(deed):
 
     if valid_title != "title OK":
         LOGGER.error("Title Validation - Title error = " + str(valid_title))
-        return jsonify({"message": "blah"})#, status.HTTP_400_BAD_REQUEST
+        return jsonify({"message": str(valid_title)}), status.HTTP_400_BAD_REQUEST
 
     try:
         check_borrower_names(deed)
