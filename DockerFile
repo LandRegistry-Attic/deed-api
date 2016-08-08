@@ -18,7 +18,7 @@ ENV DEBUG True
 ENV AKUMA_ADDRESS 'http://cf-api-stub:8080'
 ENV ESEC_CLIENT_URI 'http://esec-client:8080'
 ENV ESEC_SCHEMA_LOCATION 'http://localhost:9080/schemas/'
-ENV TITLE_ADAPTOR_URI 'http://title-adapter-api:8080'
+ENV TITLE_ADAPTOR_URI 'http://title-adapter-stub:8080'
 ENV REGISTER_ADAPTER 'http://register-adapter-stub:8080/'
 ENV DEED_API_ADDRESS 'http://0.0.0.0:8080'
 
