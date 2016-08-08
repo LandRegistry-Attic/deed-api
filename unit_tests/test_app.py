@@ -642,6 +642,21 @@ class TestValidators(TestRoutesBase):
         self.assertEqual(error_code, status.HTTP_400_BAD_REQUEST)
 
 
+    @mock.patch('application.deed.views.jsonify')
+    @mock.patch('application.deed.deed_validator.check_borrower_names', autospec=True)
+    @mock.patch('application.title_adaptor.service.TitleAdaptor.do_check')
+    @mock.patch('application.deed.deed_validator.validate_helper', autospec=False)
+    def test_deed_validator_invalid_title(self, mock_schema, mock_title_validator, mock_borrower_validator, mock_jsonify):
+
+        mock_schema.return_value = 0, ""
+        mock_title_validator.return_value = "title not OK"
+
+        deed_validator(DeedHelper._invalid_title)
+
+        mock_jsonify.assert_called_with({"message": "blah"})
+        #self.assertEqual(mock_deed_validator.return_value, 400)
+
+
 class TestCreateDeed(TestRoutesBase):
 
     @mock.patch('application.borrower.model.Borrower')
