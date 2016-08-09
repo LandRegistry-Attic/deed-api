@@ -7,7 +7,7 @@ valid_deed = {
         {
             "forename": "Ann",
             "surname": "Smith",
-            "gender": "Male",
+            "gender": "Female",
             "address": "test address with postcode, PL14 3JR",
             "dob": "23/01/1986",
             "phone_number": "07502154062"
