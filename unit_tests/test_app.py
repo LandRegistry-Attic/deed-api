@@ -18,7 +18,7 @@ from application.akuma.service import Akuma
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
 from application.deed.service import make_effective_text, make_deed_effective_date, update_deed
 from application.deed.views import make_effective, retrieve_signed_deed
-from application.deed.service import apply_registrar_signature, check_effective_status, add_effective_date_to_xml
+from application.deed.service import apply_registrar_signature, check_effective_status, add_effective_date_to_xml, valid_borrowers
 from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
 from application.borrower.model import Borrower
 from unit_tests.schema_tests import run_schema_checks
@@ -655,6 +655,18 @@ class TestValidators(TestRoutesBase):
         result = TitleAdaptor.do_check(title_stub)
 
         self.assertEqual(result, "title OK")
+
+    def test_valid_borrowers_good(self):
+        correct_borrowers = DeedHelper._json_doc["borrowers"]
+        result = valid_borrowers(correct_borrowers)
+
+        self.assertTrue(result)
+
+    def test_valid_borrowers_bad(self):
+        borrowers_details = DeedHelper._borrowers_with_same_phonenumber["borrowers"]
+        result = valid_borrowers(borrowers_details)
+
+        self.assertFalse(result)
 
 class TestCreateDeed(TestRoutesBase):
 

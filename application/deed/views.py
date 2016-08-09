@@ -82,7 +82,7 @@ def get_existing_deed_and_update(deed_reference):
 
         return jsonify({"path": '/deed/' + str(deed_reference)}), status.HTTP_200_OK
     except:
-        LOGGER.error("Exception - %s" % str(sys.exc_info()))
+        LOGGER.error("Database Exception - %s" % str(sys.exc_info()))
         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -140,7 +140,7 @@ def create():
 
     except:
         msg = str(sys.exc_info())
-        LOGGER.error("Exception - %s" % msg)
+        LOGGER.error("Database Exception - %s" % msg)
         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -291,7 +291,7 @@ def make_effective(deed_reference):
             return '', status.HTTP_200_OK
 
         elif deed_status == "EFFECTIVE" or deed_status == "NOT-LR-SIGNED":
-            LOGGER.error("Deed with reference - %s has status %s and can not be registrar signed" %
+            LOGGER.error("Deed with reference - %s is in %s status and can not be registrar signed" %
                          (str(deed_reference), str(deed_status)))
             return jsonify({"message": "This deed is already made effective."}), \
                 status.HTTP_400_BAD_REQUEST

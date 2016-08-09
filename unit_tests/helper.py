@@ -95,6 +95,28 @@ class DeedHelper:
         "identity_checked": "Y"
     }
 
+    _borrowers_with_same_phonenumber = {
+        "title_number": "BBBB12313212BB",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "md_ref": "mortgageref",
+        "borrowers": [
+            {
+                "forename": "fred",
+                "middle_name": "joe",
+                "surname": "bloggs",
+                "dob": "23/01/1982",
+                "phone_number": "07502154061"
+            },
+            {
+                "forename": "lisa",
+                "surname": "bloggette",
+                "dob": "23/01/1986",
+                "phone_number": "07502154061"
+            }
+        ],
+        "identity_checked": "Y"
+    }
+
     _valid_borrowers = {
         "borrowers": [
             {
