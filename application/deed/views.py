@@ -82,7 +82,7 @@ def get_existing_deed_and_update(deed_reference):
 
         return jsonify({"path": '/deed/' + str(deed_reference)}), status.HTTP_200_OK
     except:
-        LOGGER.error("Database Exception - %s" % str(sys.exc_info()))
+        LOGGER.error("Exception - %s" % str(sys.exc_info()))
         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -140,7 +140,7 @@ def create():
 
     except:
         msg = str(sys.exc_info())
-        LOGGER.error("Database Exception - %s" % msg)
+        LOGGER.error("Exception - %s" % msg)
         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
