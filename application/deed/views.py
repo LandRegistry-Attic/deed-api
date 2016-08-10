@@ -29,7 +29,7 @@ deed_bp = Blueprint('deed', __name__,
 @deed_bp.route('/<deed_reference>', methods=['GET'])
 def get_deed(deed_reference):
     if 'application/pdf' in request.headers.get("Accept", ""):
-        return create_deed_pdf(deed_pdf_adapter(deed_reference))
+        return create_deed_pdf(deed_pdf_adapter(deed_reference)), status.HTTP_202_ACCEPTED
     return jsonify(deed_json_adapter(deed_reference)), status.HTTP_200_OK
 
 
