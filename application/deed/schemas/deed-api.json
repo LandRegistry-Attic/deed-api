@@ -3,7 +3,7 @@
     "info": {
         "title": "Deed API",
         "description": "Land Registry Deed API",
-        "version": "1.3.2"
+        "version": "1.3.3"
     },
     "host": "api.landregistry.gov.uk",
     "schemes": [
@@ -86,9 +86,9 @@
                         }
                     },
                     "202": {
-                        "description": "A specfic deed as a PDF Document (application/pdf header)\n",
+                        "description": "A specfic deed as a PDF Document (application/pdf header).\n",
                         "schema": {
-                            "type": "PDF Document (Download)"
+                            "type": "object"
                         }
                     },
                     "404": {
