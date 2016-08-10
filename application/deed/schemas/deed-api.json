@@ -3,7 +3,7 @@
     "info": {
         "title": "Deed API",
         "description": "Land Registry Deed API",
-        "version": "1.3.6"
+        "version": "1.3.7"
     },
     "host": "api.landregistry.gov.uk",
     "schemes": [
@@ -89,50 +89,6 @@
                         "description": "A specfic deed as a PDF Document (application/pdf header).\n",
                         "schema": {
                             "type": "object"
-                        }
-                    },
-                    "404": {
-                        "description": "Deed not found",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "summary": "Modify Deed",
-                "description": "The Modify Deed endpoint modifies a deed based on the unique deed reference provided in the path.\nThe response will give the relative path to access the deed via the \"Get\" endpoint if an update is successful. Any modifications which arent aren't successful will show the relevant error messages.\n",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "deed_reference",
-                        "in": "path",
-                        "description": "Unique reference of the deed.",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/Deed_Application"
-                        }
-                    }
-                ],
-                "tags": [
-                    "Deed"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "A specific deed is modified and the path returned",
-                        "schema": {
-                            "type": "string"
                         }
                     },
                     "404": {
