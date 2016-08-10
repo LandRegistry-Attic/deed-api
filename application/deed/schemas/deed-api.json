@@ -3,7 +3,7 @@
     "info": {
         "title": "Deed API",
         "description": "Land Registry Deed API",
-        "version": "1.3.5"
+        "version": "1.3.6"
     },
     "host": "api.landregistry.gov.uk",
     "schemes": [
@@ -147,7 +147,7 @@
         "/deed/retrieve-signed": {
             "get": {
                 "summary": "Retrieves ALL-SIGNED deed(s).",
-                "description": "The Retrieve Signed endpoint checks the service for all deeds that have been completely signed by the borrowers or borrower. Only the deeds associated with the conveyancer are returned.\nThe response is a json array output containing the deed references.\n",
+                "description": "The Retrieve Signed endpoint checks the service for all deeds that have been completely signed by the borrowers or borrower. Only the deeds associated with the conveyancer are returned.\nThe response is a json array output containing the deed references e.g. 93e806ab-f1bc-4671-be3e-4cc68b21b77a.\n",
                 "produces": [
                     "application/json"
                 ],
