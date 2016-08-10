@@ -3,7 +3,7 @@
     "info": {
         "title": "Deed API",
         "description": "Land Registry Deed API",
-        "version": "1.3.3"
+        "version": "1.3.4"
     },
     "host": "api.landregistry.gov.uk",
     "schemes": [
@@ -235,6 +235,10 @@
                 "id": {
                     "type": "integer",
                     "pattern": "^[0-9]+$"
+                },
+                "signature": {
+                    "description": "Date and time the signature was applied.",
+                    "type": "string"
                 }
             }
         },
