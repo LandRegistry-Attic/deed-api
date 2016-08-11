@@ -739,3 +739,13 @@ class TestCreateDeed(TestRoutesBase):
                                 headers=self.webseal_headers)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+class TestUpdateDeed(TestRoutesBase):
+
+    @mock.patch('application.borrower.model.Borrower._delete_borrower')
+    @mock.patch('application.borrower.model.Borrower._get_borrowers_not_on_deed')
+    def test_delete_borrowers_not_on_deed(self, mock_get_borrowers, mock_delete):
+        delete_borrowers = Borrower()
+        res = delete_borrowers.delete_borrowers_not_on_deed([1,2], "AAAAA")
+
+        self.assertTrue(res)
