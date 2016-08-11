@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
 from application.service_clients.esec import make_esec_client
 from application.service_clients.esec.implementation import EsecException
+
 import os
 import logging
 from logger import logging_config
@@ -16,6 +17,9 @@ LOGGER.info("Starting the server")
 
 app = Flask(__name__, static_folder='static')
 db = SQLAlchemy(app)
+
+from application.borrower.model import DatabaseException
+
 esec_client = make_esec_client()
 
 # Register routes after establishing the db prevents improperly loaded modules
@@ -73,3 +77,8 @@ def not_found_exception(e):
 def unhandled_exception(e):
     app.logger.error('Unhandled Exception: %s', (e,), exc_info=True)
     return jsonify({"message": "Unexpected error."}), 500
+
+@app.errorhandler(DatabaseException)
+def database_exception(e):
+    app.logger.error('Database Exception: %s', (e,), exc_info=True)
+    return jsonify({"message": "Database Error."}), 500

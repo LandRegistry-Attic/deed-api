@@ -2,8 +2,11 @@ from sqlalchemy import ForeignKey, not_
 from application import db
 import uuid
 
+
 charset = list("0123456789ABCDEFGHJKLMNPQRSTUVXY")
 
+class DatabaseException(Exception):
+    pass
 
 class Borrower(db.Model):
     __tablename__ = 'borrower'
@@ -79,23 +82,26 @@ class Borrower(db.Model):
 
         for borrower in borrowers:
             res = self._delete_borrower(borrower)
-
-            if not res:
-                return False
-
-        return True
+            
 
     def _get_borrowers_not_on_deed(self, ids, deed_reference):
-        borrowers = Borrower.query.filter(not_(Borrower.id.in_(ids)), Borrower.deed_token == deed_reference).all()
 
-        return borrowers
+        try:
+            borrowers = Borrower.query.filter(not_(Borrower.id.in_(ids)), Borrower.deed_token == deed_reference).all()
 
+            return borrowers
+        except Exception as e:
+            raise DatabaseException(e)
 
     def _delete_borrower(self, borrower):
-        db.session.delete(borrower)
-        db.session.commit()
+        try:
+            db.session.delete(borrower)
+            db.session.commit()
 
-        return True
+            return True
+
+        except Exception as e:
+            raise DatabaseException(e)
 
 
 class VerifyMatch(db.Model):
