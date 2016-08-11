@@ -75,7 +75,7 @@ def create():
                 deed.organisation_name = organisation_credentials["O"][0]
                 organisation_locale = organisation_credentials["C"][0]
                 check_result = Akuma.do_check(deed_json, "create deed",
-                                              deed.organisation_name, organisation_locale)
+                                              deed.organisation_name, organisation_locale, deed.token)
                 LOGGER.info("Check ID: " + check_result['id'])
                 valid_title = TitleAdaptor.do_check(deed_json['title_number'])
                 if valid_title != "title OK":
@@ -154,7 +154,7 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
                     LOGGER.info("updating JSON with Signature")
                     deed.deed = update_deed_signature_timestamp(deed, borrower_token)
                     check_result = Akuma.do_check(deed.deed, "borrower sign",
-                                                  deed.organisation_name, "")
+                                                  deed.organisation_name, "", deed.token)
                     LOGGER.info("Check ID - Borrower SIGNING: " + check_result['id'])
                 else:
                     LOGGER.error("Failed to sign Mortgage document")
@@ -235,7 +235,8 @@ def make_effective(deed_reference):
         deed_status = str(result.status)
 
         if deed_status == "ALL-SIGNED":
-            check_result = Akuma.do_check(result.deed, "make effective", result.organisation_id, result.organisation_name)
+            check_result = Akuma.do_check(result.deed, "make effective", result.organisation_id,
+                                          result.organisation_name, result.token)
             LOGGER.info("Check ID - Make Effective: " + check_result['id'])
 
             signed_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')

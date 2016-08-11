@@ -351,7 +351,8 @@ class TestRoutes(TestRoutesBase):
             "id": "2b9115b2-d956-11e5-942f-08002719cd16"
         }
 
-        check_result = Akuma.do_check(DeedHelper._json_doc, "create deed", "Land Registry Devices", "gb")
+        check_result = Akuma.do_check(DeedHelper._json_doc, "create deed", "Land Registry Devices", "gb",
+                                      "2b9115b2-d956-11e5-942f-08002719cd16")
 
         self.assertEqual(check_result["result"], "A")
 
@@ -362,7 +363,8 @@ class TestRoutes(TestRoutesBase):
             "id": "2b9115b2-d956-11e5-942f-08002719cd16"
         }
 
-        check_result = Akuma.do_check(DeedHelper._json_doc, "borrower sign", "", "")
+        check_result = Akuma.do_check(DeedHelper._json_doc, "borrower sign", "", "",
+                                      "2b9115b2-d956-11e5-942f-08002719cd16")
 
         self.assertEqual(check_result["result"], "A")
 
