@@ -67,6 +67,24 @@ class DeedHelper:
         "identity_checked": "Y"
     }
 
+    _json_doc_update = {
+        "title_number": "DN100",
+        "md_ref": "e-MD12345",
+        "property_address": "100 The Drive, This Town, This County, PL4 4TH",
+        "borrowers": [
+            {
+                "forename": "Luke",
+                "middle_name": "ann",
+                "surname": "Jedi",
+                "gender": "Male",
+                "address": "test address with postcode, PL14 3JX",
+                "dob": "23/01/1900",
+                "phone_number": "07502154062"
+            },
+        ],
+        "identity_checked": "Y"
+    }
+
     _valid_initial_deed = {
                 "title_number": "GR515835",
                 "md_ref": "e-MD12344",

@@ -714,7 +714,7 @@ class TestCreateDeed(TestRoutesBase):
         mock_deed.return_value = DeedModelMock()
         mock_update.return_value = True, "OK"
 
-        payload = json.dumps(DeedHelper._json_doc)
+        payload = json.dumps(DeedHelper._json_doc_update)
 
         response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
                                 headers=self.webseal_headers)
