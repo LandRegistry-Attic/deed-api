@@ -1,0 +1,14 @@
+version: '2'
+services:
+  # Notice how the service name, container name and repo directory (where the Dockerfile lives) all match.
+  deed-api:
+    container_name: deed-api
+    build: /vagrant/apps/deed-api
+    restart: on-failure
+    ports:
+      # Dockerfiles should always expose 8080 by default, we map it here ot a unique port for the app
+      # which is subsequently used to expose outside of vagrant too
+      - "9020:8080"
+    volumes:
+      # Our convention is (for python) to always map the app files to /src within the container
+      - /vagrant/apps/deed-api:/src
