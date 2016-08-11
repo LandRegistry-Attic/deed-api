@@ -78,8 +78,20 @@ class Borrower(db.Model):
         borrowers = Borrower.query.filter(not_(Borrower.id.in_(ids)), Borrower.deed_token == deed_reference).all()
 
         for borrower in borrowers:
-            db.session.delete(borrower)
-            db.session.commit()
+            res = self._delete_borrower(borrower)
+
+            if not res:
+                return False
+
+        return True
+
+
+
+    def _delete_borrower(self, borrower):
+        db.session.delete(borrower)
+        db.session.commit()
+
+        return True
 
 
 class VerifyMatch(db.Model):
