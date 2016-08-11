@@ -579,7 +579,7 @@ class TestGetDeed(TestRoutesBase):
         headers["Accept"] = 'application/pdf'
         response = self.app.get(self.DEED_ENDPOINT + 'AB1234',
                                 headers=headers)
-        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         obj = PyPDF2.PdfFileReader(io.BytesIO(response.data))
         txt = obj.getPage(0).extractText()
         self.assertTrue('Digital Mortgage Deed' in txt)
