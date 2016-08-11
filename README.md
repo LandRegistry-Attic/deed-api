@@ -58,7 +58,7 @@ python manage.py db revision --autogenerate
 Run the unit tests
 
 ```
-source test.sh
+source unit_test.sh
 ```
 
 ## Acceptance tests
@@ -103,4 +103,38 @@ Example payload:
     "identity_checked": "Y",
     "property_address": "5 The Drive, This Town, This County, PL4 4TH"
 }
+```
+
+# Useful curl commands
+
+Add deed
+
+```
+curl -i -X POST localhost:9020/deed/ \
+-H "Content-Type:application/json"  \
+-H "Iv-User-L:CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Devices,O=1359.2.1,C=gb"  \
+-d @- << EOF
+{
+    "title_number": "GR999999",
+    "md_ref": "e-MD12344",
+    "borrowers": [
+      {
+           "forename": "Barry",
+           "surname": "Jones",
+           "gender": "Male",
+           "address": "2 The Street, Plymouth, PL1 2PP",
+           "dob": "01/10/1976",
+           "phone_number": "07502159062"
+       }
+    ],
+    "identity_checked": "Y",
+    "property_address": "5 The Drive, This Town, This County, PL4 4TH"
+}
+EOF
+```
+
+Validate borrower
+
+```
+curl -X POST -d '{"borrower_token":"AHDHDI", "dob":"13/05/79"}' -H "Content-Type:application/json" localhost:9020/borrower/validate
 ```
