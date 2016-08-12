@@ -41,8 +41,21 @@ def get_existing_deed_and_update(deed_reference):
 
     error_message, error_code = deed_validator(deed_update_json)
 
+
     if error_code != status.HTTP_200_OK:
         return error_message, error_code
+
+    ids = []
+
+    for borrower in deed_update_json["borrowers"]:
+        if 'id' in borrower:
+            ids.append(borrower['id'])
+
+    duplicates = [item for item, count in collections.Counter(ids).items() if count > 1]
+
+    if duplicates:
+        return jsonify({"message": "Error duplicate borrower ID's in payload"}), \
+            status.HTTP_400_BAD_REQUEST
 
     try:
         result = deed.get_deed(deed_reference)
@@ -69,18 +82,6 @@ def get_existing_deed_and_update(deed_reference):
         else:
             LOGGER.error("Unable to process headers")
             return "Unable to process headers", status.HTTP_401_UNAUTHORIZED
-
-        ids = []
-
-        for borrower in deed_update_json["borrowers"]:
-            if 'id' in borrower:
-                ids.append(borrower['id'])
-
-        duplicates = [item for item, count in collections.Counter(ids).items() if count > 1]
-
-        if duplicates:
-            return jsonify({"message": "Error duplicate borrower ID's in payload"}), \
-                status.HTTP_400_BAD_REQUEST
 
         for borrower_id in ids:
             borrower_check = Borrower.get_by_id(borrower_id)
