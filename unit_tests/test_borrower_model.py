@@ -34,3 +34,18 @@ class TestBorrowerModel(unittest.TestCase):
         res = borrower.update_borrower_by_id(updated_borrower)
 
         self.assertEqual(res.forename, "Frank")
+
+    @mock.patch('application.borrower.model.Borrower._get_borrower_internal')
+    @mock.patch('application.borrower.model.db', autospec=True)
+    def test_update_borrower_by_id_no_borrower(self, mock_db, mock_query):
+
+        updated_borrower = copy.deepcopy(DeedHelper._valid_single_borrower_update)
+
+        testBorrower = borrower_object_helper(updated_borrower)
+
+        mock_query.return_value = None
+        borrower = Borrower()
+
+        res = borrower.update_borrower_by_id(updated_borrower)
+
+        self.assertEqual(res, "Error No Borrower")
