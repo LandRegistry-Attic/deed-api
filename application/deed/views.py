@@ -75,7 +75,8 @@ def get_existing_deed_and_update(deed_reference):
         if organisation_credentials:
             # Inform Akuma
             check_result = Akuma.do_check(deed_update_json, "modify deed",
-                                          organisation_credentials["O"][0], organisation_credentials["C"][0])
+                                          organisation_credentials["O"][0],
+                                          organisation_credentials["C"][0], result.token)
             LOGGER.info("Check ID - MODIFY: " + check_result['id'])
         # Unhappy verification
         else:
@@ -139,7 +140,7 @@ def create():
             deed.organisation_name = organisation_credentials["O"][0]
             organisation_locale = organisation_credentials["C"][0]
             check_result = Akuma.do_check(deed_json, "create deed",
-                                          deed.organisation_name, organisation_locale)
+                                          deed.organisation_name, organisation_locale, deed.token)
             LOGGER.info("Check ID: " + check_result['id'])
 
             success, msg = update_deed(deed, deed_json)

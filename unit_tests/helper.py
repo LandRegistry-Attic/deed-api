@@ -325,7 +325,8 @@ class AkumaMock:
             "identity_checked": "Y",
             "title_no": "DN100",
             "organisation_locale": "gb",
-            "organisation_name": "Land Registry Devices"
+            "organisation_name": "Land Registry Devices",
+            "deed_token": "bb34300c-ba9b-4d86-b28f-ab793e0d45fa"
         },
         "service": "digital mortgage",
         "activity": "create deed"
