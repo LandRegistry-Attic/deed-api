@@ -2,6 +2,7 @@ import copy
 import json
 import logging
 import sys
+import collections
 from datetime import datetime
 
 from application import esec_client
@@ -16,6 +17,7 @@ from flask import Blueprint
 from flask import request, abort, jsonify, Response
 from flask.ext.api import status
 from application.deed.deed_validator import deed_validator
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -68,12 +70,24 @@ def get_existing_deed_and_update(deed_reference):
             LOGGER.error("Unable to process headers")
             return "Unable to process headers", status.HTTP_401_UNAUTHORIZED
 
+        ids = []
+
         for borrower in deed_update_json["borrowers"]:
             if 'id' in borrower:
-                borrower_check = Borrower.get_by_id(borrower["id"])
+                ids.append(borrower['id'])
 
-                if borrower_check is None or borrower_check.deed_token != deed_reference:
-                    return jsonify({"message": "error borrowers provided do not match deed"}), status.HTTP_400_BAD_REQUEST
+        duplicates = [item for item, count in collections.Counter(ids).items() if count > 1]
+
+        if duplicates:
+            return jsonify({"message": "Error duplicate borrower ID's in payload"}), \
+                status.HTTP_400_BAD_REQUEST
+
+        for borrower_id in ids:
+            borrower_check = Borrower.get_by_id(borrower_id)
+
+            if borrower_check is None or borrower_check.deed_token != deed_reference:
+                return jsonify({"message": "error borrowers provided do not match deed"}), status.HTTP_400_BAD_REQUEST
+
         success, msg = update_deed(result, deed_update_json)
 
         if not success:
