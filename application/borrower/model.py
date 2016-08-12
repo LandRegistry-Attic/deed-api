@@ -81,8 +81,9 @@ class Borrower(db.Model):
         borrowers = self._get_borrowers_not_on_deed(ids,deed_reference)
 
         for borrower in borrowers:
-            res = self._delete_borrower(borrower)
-            
+            self._delete_borrower(borrower)
+
+        return True
 
     def _get_borrowers_not_on_deed(self, ids, deed_reference):
 
