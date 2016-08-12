@@ -5,13 +5,14 @@ from copy import deepcopy
 class Akuma:
 
     @staticmethod
-    def do_check(json_payload, check_type, org_name, org_locale):
+    def do_check(json_payload, check_type, org_name, org_locale, deed_token):
 
         akuma_payload = deepcopy(json_payload)
 
         akuma_payload['title_no'] = str(json_payload['title_number'])
         akuma_payload['organisation_locale'] = org_locale
         akuma_payload['organisation_name'] = org_name
+        akuma_payload['deed_token'] = str(deed_token)
 
         payload = {
             "service": "digital mortgage",
