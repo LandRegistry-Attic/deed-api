@@ -749,12 +749,3 @@ class TestUpdateDeed(TestRoutesBase):
         res = delete_borrowers.delete_borrowers_not_on_deed([1,2], "AAAAA")
 
         self.assertTrue(res)
-
-    @mock.patch('application.borrower.model.Borrower._delete_borrower')
-    @mock.patch('application.borrower.model.Borrower._get_borrowers_not_on_deed')
-    def test_delete_borrowers_not_on_deed_fail(self, mock_get_borrowers, mock_delete):
-        mock_delete.return_value = DatabaseException
-        delete_borrowers = Borrower()
-        res = delete_borrowers.delete_borrowers_not_on_deed([1,2], "AAAAA")
-
-        self.assertRaises(DatabaseException, delete_borrowers.delete_borrowers_not_on_deed, [1,2], "AAAAA")
