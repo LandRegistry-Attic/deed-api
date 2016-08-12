@@ -78,12 +78,15 @@ class Borrower(db.Model):
             return "Error No Borrower"
 
     def delete_borrowers_not_on_deed(self, ids, deed_reference):
-        borrowers = self._get_borrowers_not_on_deed(ids,deed_reference)
+        try:
+            borrowers = self._get_borrowers_not_on_deed(ids,deed_reference)
 
-        for borrower in borrowers:
-            self._delete_borrower(borrower)
+            for borrower in borrowers:
+                self._delete_borrower(borrower)
 
-        return True
+            return True
+        except:
+            raise DatabaseException(e)
 
     def _get_borrowers_not_on_deed(self, ids, deed_reference):
 
@@ -91,7 +94,7 @@ class Borrower(db.Model):
             borrowers = Borrower.query.filter(not_(Borrower.id.in_(ids)), Borrower.deed_token == deed_reference).all()
 
             return borrowers
-        except Exception as e:
+        except:
             raise DatabaseException(e)
 
     def _delete_borrower(self, borrower):
@@ -101,7 +104,7 @@ class Borrower(db.Model):
 
             return True
 
-        except Exception as e:
+        except:
             raise DatabaseException(e)
 
 

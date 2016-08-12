@@ -41,7 +41,6 @@ def get_existing_deed_and_update(deed_reference):
 
     error_message, error_code = deed_validator(deed_update_json)
 
-
     if error_code != status.HTTP_200_OK:
         return error_message, error_code
 
