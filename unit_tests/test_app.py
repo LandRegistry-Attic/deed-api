@@ -615,6 +615,7 @@ class TestRoutesErrorHandlers(TestRoutesBase):
             self.assertTrue(token.isupper())
             self.assertFalse(res)
 
+
 class TestValidators(TestRoutesBase):
     @mock.patch('application.deed.deed_validator.check_borrower_names', autospec=True)
     @mock.patch('application.deed.deed_validator.TitleAdaptor', autospec=False)
@@ -667,6 +668,7 @@ class TestValidators(TestRoutesBase):
         result = valid_borrowers(borrowers_details)
 
         self.assertFalse(result)
+
 
 class TestCreateDeed(TestRoutesBase):
 
@@ -740,13 +742,14 @@ class TestCreateDeed(TestRoutesBase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+
 class TestUpdateDeed(TestRoutesBase):
 
     @mock.patch('application.borrower.model.Borrower._delete_borrower')
     @mock.patch('application.borrower.model.Borrower._get_borrowers_not_on_deed')
     def test_delete_borrowers_not_on_deed(self, mock_get_borrowers, mock_delete):
         delete_borrowers = Borrower()
-        res = delete_borrowers.delete_borrowers_not_on_deed([1,2], "AAAAA")
+        res = delete_borrowers.delete_borrowers_not_on_deed([1, 2], "AAAAA")
 
         self.assertTrue(res)
 
@@ -756,4 +759,4 @@ class TestUpdateDeed(TestRoutesBase):
         mock_get_borrowers.side_effect = DatabaseException('BOOM')
         delete_borrowers = Borrower()
 
-        self.assertRaises(DatabaseException, delete_borrowers.delete_borrowers_not_on_deed, [1,2], "AAAAA")
+        self.assertRaises(DatabaseException, delete_borrowers.delete_borrowers_not_on_deed, [1, 2], "AAAAA")
