@@ -20,7 +20,7 @@ from application.deed.service import make_effective_text, make_deed_effective_da
 from application.deed.views import make_effective, retrieve_signed_deed
 from application.deed.service import apply_registrar_signature, check_effective_status, add_effective_date_to_xml, valid_borrowers
 from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
-from application.borrower.model import Borrower
+from application.borrower.model import Borrower, DatabaseException
 from unit_tests.schema_tests import run_schema_checks
 from application.deed.deed_validator import deed_validator
 from application.title_adaptor.service import TitleAdaptor
@@ -749,3 +749,12 @@ class TestUpdateDeed(TestRoutesBase):
         res = delete_borrowers.delete_borrowers_not_on_deed([1,2], "AAAAA")
 
         self.assertTrue(res)
+
+    @mock.patch('application.borrower.model.Borrower._delete_borrower')
+    @mock.patch('application.borrower.model.Borrower._get_borrowers_not_on_deed')
+    def test_delete_borrowers_not_on_deed_fail(self, mock_get_borrowers, mock_delete):
+        mock_delete.return_value = DatabaseException
+        delete_borrowers = Borrower()
+        res = delete_borrowers.delete_borrowers_not_on_deed([1,2], "AAAAA")
+
+        self.assertRaises(DatabaseException, delete_borrowers.delete_borrowers_not_on_deed, [1,2], "AAAAA")
