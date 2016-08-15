@@ -136,18 +136,11 @@ def update_deed(deed, deed_json):
         LOGGER.error(msg)
         return False, msg
 
-    deed.deed = json_doc
+    assign_deed(deed, json_doc)
 
     deed.save()
 
-    borrower_list = []
-
-    for borrower in deed.deed["borrowers"]:
-        borrower_list.append(borrower["id"])
-
-    borrower_model_delete = BorrowerModel()
-
-    borrower_model_delete.delete_borrowers_not_on_deed(borrower_list, deed.token)
+    delete_orphaned_borrowers(deed)
 
     return True, "OK"
 
@@ -201,3 +194,17 @@ def make_deed_effective_date(deed, signed_time):
     deed.status = "NOT-LR-SIGNED"
     deed.deed = modify_deed
     deed.save()
+
+def assign_deed(deed, json_doc):
+    deed.deed = json_doc
+
+def delete_orphaned_borrowers(deed):
+    borrower_list = []
+
+    for borrower in deed.deed["borrowers"]:
+        borrower_list.append(borrower["id"])
+
+        borrower_model_delete = BorrowerModel()
+
+    borrower_model_delete.delete_borrowers_not_on_deed(borrower_list, deed.token)
+    return True
