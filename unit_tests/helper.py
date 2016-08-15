@@ -283,6 +283,29 @@ class DeedHelper:
         "identity_checked": "Y"
     }
 
+    _update_deed_mock_response = {
+	   "effective_clause": "",
+	   "additional_provisions": [],
+	   "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+	   "charge_clause": [],
+	   "title_number": "GR515835",
+	   "borrowers": [{
+	      "surname": "Bloggette",
+		  "token": "AAAAAAAA",
+		  "middle_name": "Ann",
+		  "id": "9999",
+		  "forename": "Lisa"
+	  },
+      {
+		  "surname": "Bloggette",
+		  "token": "AAAAAAAA",
+		  "middle_name": "Ann",
+		  "id": "9999",
+		  "forename": "Lisa"
+	  }],
+	  "md_ref": "e-MD12344"
+   }
+
 
 class StatusMock:
     _status_with_mdref_and_titleno = [
