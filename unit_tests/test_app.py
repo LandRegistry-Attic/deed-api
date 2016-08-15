@@ -23,7 +23,6 @@ from application.service_clients.esec.implementation import sign_document_with_a
 from application.borrower.model import Borrower, DatabaseException
 from unit_tests.schema_tests import run_schema_checks
 from application.deed.deed_validator import deed_validator
-from application.title_adaptor.service import TitleAdaptor
 
 
 class TestRoutesBase(unittest.TestCase):
@@ -124,18 +123,20 @@ class TestRoutes(TestRoutesBase):
         mock_post_request.assert_called_with('{}/esec/sign_document_with_authority'.format(app.config["ESEC_CLIENT_BASE_HOST"]),
                                              mock_deed.deed_xml)
 
+    @mock.patch('application.deed.views.deed_validator')
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_create_no_auth_headers(self, mock_query, mock_Deed, mock_Borrower, mock_akuma, mock_proprietor_names):
+    def test_create_no_auth_headers(self, mock_query, mock_Deed, mock_Borrower, mock_akuma, mock_proprietor_names, mock_validator):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
         mock_akuma.return_value = {
             "result": "A",
             "id": "2b9115b2-d956-11e5-942f-08002719cd16"
         }
+        mock_validator.return_value = "passed", status.HTTP_200_OK
         mock_proprietor_names.return_value = ['lisa ann bloggette', 'frank ann bloggette']
         payload = json.dumps(DeedHelper._json_doc)
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
@@ -165,12 +166,13 @@ class TestRoutes(TestRoutesBase):
                                  headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    @mock.patch('application.deed.views.deed_validator')
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.service_clients.akuma.interface.AkumaInterface.perform_check')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_create_webseal_external_dodgy_headers1(self, mock_query, mock_Deed, mock_Borrower, mock_akuma, mock_proprietor_names):
+    def test_create_webseal_external_dodgy_headers1(self, mock_query, mock_Deed, mock_Borrower, mock_akuma, mock_proprietor_names, mock_validator):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
         mock_akuma.return_value = {
@@ -178,6 +180,7 @@ class TestRoutes(TestRoutesBase):
             "id": "2b9115b2-d956-11e5-942f-08002719cd16"
         }
         mock_proprietor_names.return_value = ['lisa ann bloggette', 'frank ann bloggette']
+        mock_validator.return_value = "passed", status.HTTP_200_OK
         payload = json.dumps(DeedHelper._json_doc)
         payload = json.dumps(DeedHelper._json_doc)
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
@@ -644,20 +647,6 @@ class TestValidators(TestRoutesBase):
 
         self.assertEqual(error_message, "Schema Failures")
         self.assertEqual(error_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_title_validator_do_check_invalid_title(self):
-
-        title_stub = DeedHelper._invalid_title["title_number"]
-        result = TitleAdaptor.do_check(title_stub)
-
-        self.assertEqual(result, "Title does not exist")
-
-    def test_title_validator_do_check_valid_title(self):
-
-        title_stub = DeedHelper._json_doc["title_number"]
-        result = TitleAdaptor.do_check(title_stub)
-
-        self.assertEqual(result, "title OK")
 
     def test_valid_borrowers_good(self):
         correct_borrowers = DeedHelper._json_doc["borrowers"]
