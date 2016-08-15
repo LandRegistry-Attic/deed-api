@@ -87,7 +87,6 @@ class Borrower(db.Model):
 
         return True
 
-
     def _get_borrowers_not_on_deed(self, ids, deed_reference):
 
         try:

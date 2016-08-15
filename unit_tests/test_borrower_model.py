@@ -41,8 +41,6 @@ class TestBorrowerModel(unittest.TestCase):
 
         updated_borrower = copy.deepcopy(DeedHelper._valid_single_borrower_update)
 
-        testBorrower = borrower_object_helper(updated_borrower)
-
         mock_query.return_value = None
         borrower = Borrower()
 

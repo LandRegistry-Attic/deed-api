@@ -195,8 +195,10 @@ def make_deed_effective_date(deed, signed_time):
     deed.deed = modify_deed
     deed.save()
 
+
 def assign_deed(deed, json_doc):
     deed.deed = json_doc
+
 
 def delete_orphaned_borrowers(deed):
     borrower_list = []
