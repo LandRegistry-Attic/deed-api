@@ -1,4 +1,5 @@
 from application.deed.model import Deed
+from application.borrower.model import Borrower
 from .deed_dict import DEED
 
 # flake8: noqa
@@ -66,6 +67,34 @@ class DeedHelper:
         "identity_checked": "Y"
     }
 
+    _json_doc_update = {
+        "title_number": "DN100",
+        "md_ref": "e-MD12345",
+        "property_address": "100 The Drive, This Town, This County, PL4 4TH",
+        "borrowers": [
+            {
+                "forename": "Luke",
+                "middle_name": "ann",
+                "surname": "Jedi",
+                "gender": "Male",
+                "address": "test address with postcode, PL14 3JX",
+                "dob": "23/01/1900",
+                "phone_number": "07502154062"
+            },
+        ],
+        "identity_checked": "Y"
+    }
+
+    _valid_initial_deed = {
+                "title_number": "GR515835",
+                "md_ref": "e-MD12344",
+                "borrowers": [],
+                "charge_clause": [],
+                "additional_provisions": [],
+                "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+                "effective_clause": ""
+            }
+
     _invalid_title = {
         "title_number": "BBBB12313212BB",
         "property_address": "5 The Drive, This Town, This County, PL4 4TH",
@@ -79,6 +108,28 @@ class DeedHelper:
             {
                 "forename": "lisa",
                 "surname": "bloggette"
+            }
+        ],
+        "identity_checked": "Y"
+    }
+
+    _borrowers_with_same_phonenumber = {
+        "title_number": "BBBB12313212BB",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "md_ref": "mortgageref",
+        "borrowers": [
+            {
+                "forename": "fred",
+                "middle_name": "joe",
+                "surname": "bloggs",
+                "dob": "23/01/1982",
+                "phone_number": "07502154061"
+            },
+            {
+                "forename": "lisa",
+                "surname": "bloggette",
+                "dob": "23/01/1986",
+                "phone_number": "07502154061"
             }
         ],
         "identity_checked": "Y"
@@ -106,6 +157,23 @@ class DeedHelper:
             }
         ]
     }
+    _valid_single_borrower_update = {
+                "id": 25,
+                "forename": "lisa",
+                "middle_name": "ann",
+                "surname": "bloggette",
+                "gender": "M",
+                "address": "test address with postcode, PL14 3JR",
+                "dob": "23/01/1986",
+                "phone_number": "07502154062"
+                }
+    _valid_single_borrower_update_response = {
+                "id": "9999",
+                "token": "AAAAAAAA",
+                "forename": "Lisa",
+                "middle_name": "Ann",
+                "surname": "Bloggette"
+                }
 
     _invalid_phone_numbers = {"borrowers": [
         {
@@ -186,6 +254,58 @@ class DeedHelper:
     _verify_and_sign = {"borrower_token": "3",
                         "authentication_code": "aW23xw"}
 
+    _modify_existing_deed = {
+        "title_number": "GR515835",
+        "md_ref": "e-MD12344",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "borrowers": [
+            {
+                "forename": "lisa",
+                "middle_name": "ann",
+                "surname": "bloggette",
+                "gender": "Male",
+                "address": "test address with postcode, PL14 3JR",
+                "dob": "23/01/1986",
+                "phone_number": "07502154062",
+                "id": "1"
+            },
+            {
+                "forename": "frank",
+                "middle_name": "ann",
+                "surname": "bloggette",
+                "gender": "Female",
+                "address": "Test Address With Postcode, PL14 3JR",
+                "dob": "23/01/1986",
+                "phone_number": "07502154061",
+                "id": "2"
+            }
+        ],
+        "identity_checked": "Y"
+    }
+
+    _update_deed_mock_response = {
+	   "effective_clause": "",
+	   "additional_provisions": [],
+	   "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+	   "charge_clause": [],
+	   "title_number": "GR515835",
+	   "borrowers": [{
+	      "surname": "Bloggette",
+		  "token": "AAAAAAAA",
+		  "middle_name": "Ann",
+		  "id": "9999",
+		  "forename": "Lisa"
+	  },
+      {
+		  "surname": "Bloggette",
+		  "token": "AAAAAAAA",
+		  "middle_name": "Ann",
+		  "id": "9999",
+		  "forename": "Lisa"
+	  }],
+	  "md_ref": "e-MD12344"
+   }
+
 
 class StatusMock:
     _status_with_mdref_and_titleno = [
@@ -228,9 +348,27 @@ class AkumaMock:
             "identity_checked": "Y",
             "title_no": "DN100",
             "organisation_locale": "gb",
-            "organisation_name": "Land Registry Devices"
+            "organisation_name": "Land Registry Devices",
+            "deed_token": "bb34300c-ba9b-4d86-b28f-ab793e0d45fa"
         },
         "service": "digital mortgage",
         "activity": "create deed"
 
     }
+
+def borrower_object_helper(borrower):
+    new_borrower = Borrower()
+
+    new_borrower.id = borrower['id']
+    new_borrower.token = "AAAA"
+    new_borrower.deed_token = "AAAA"
+    new_borrower.forename = borrower['forename']
+    new_borrower.middlename = borrower['middle_name']
+    new_borrower.surname = borrower['surname']
+    new_borrower.dob = borrower['dob']
+    new_borrower.gender = borrower['gender']
+    new_borrower.phonenumber = borrower['phone_number']
+    new_borrower.address = borrower['address']
+    new_borrower.esec_user_name = ""
+
+    return new_borrower

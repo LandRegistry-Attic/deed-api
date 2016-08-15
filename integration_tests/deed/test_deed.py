@@ -1,15 +1,14 @@
-import json
-import io
-import unittest
 import copy
+import io
+import json
+import unittest
 
-import requests
 import PyPDF2
-
-from integration_tests.helper import setUpApp, setUp_MortgageDocuments
-from integration_tests.deed.deed_data import valid_deed
+import requests
 from application import config
 from application.deed.model import Deed
+from integration_tests.deed.deed_data import valid_deed
+from integration_tests.helper import setUpApp, setUp_MortgageDocuments
 from lxml import etree
 
 
@@ -398,3 +397,35 @@ class TestDeedRoutes(unittest.TestCase):
         f = open('integration_test_deed.pdf', 'wb')
         f.write(get_created_deed.content)
         f.close()
+
+    def test_modify_existing_deed(self):
+        create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
+                                    data=json.dumps(valid_deed),
+                                    headers=self.webseal_headers)
+
+        self.assertEqual(create_deed.status_code, 201)
+        response_json = create_deed.json()
+        self.assertIn("/deed/", str(response_json))
+        get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                        headers=self.webseal_headers)
+
+        self.assertEqual(get_created_deed.status_code, 200)
+
+        borrower_id = get_created_deed.json()["deed"]["borrowers"][0]["id"]
+
+        new_deed = copy.deepcopy(valid_deed)
+        new_deed["title_number"] = "CYM123457"
+        new_deed["borrowers"][0]["id"] = str(borrower_id)
+        modify_deed = requests.put(config.DEED_API_BASE_HOST + response_json["path"],
+                                   data=json.dumps(new_deed),
+                                   headers=self.webseal_headers)
+
+        modify_response_json = modify_deed.json()
+        self.assertIn("/deed/", str(modify_response_json))
+        get_modified_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                         headers=self.webseal_headers)
+
+        self.assertEqual(get_modified_deed.status_code, 200)
+        modified_deed = get_modified_deed.json()
+        self.assertIn("title_number", str(modified_deed['deed']))
+        self.assertEqual(modified_deed["deed"]["title_number"], "CYM123457")

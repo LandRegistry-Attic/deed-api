@@ -2,8 +2,10 @@ import json
 from builtins import FileNotFoundError
 from flask import Flask, request, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
+
 from application.service_clients.esec import make_esec_client
 from application.service_clients.esec.implementation import EsecException
+
 import os
 import logging
 from logger import logging_config
@@ -15,7 +17,11 @@ LOGGER.info("Starting the server")
 
 
 app = Flask(__name__, static_folder='static')
+
 db = SQLAlchemy(app)
+
+from .borrower.model import DatabaseException  # noqa
+
 esec_client = make_esec_client()
 
 # Register routes after establishing the db prevents improperly loaded modules
@@ -66,10 +72,16 @@ def esecurity_error(e):
 @app.errorhandler(FileNotFoundError)
 def not_found_exception(e):
     app.logger.error('Not found error: %s', (e,), exc_info=True)
-    return jsonify({"message": "Not found error."}), 404
+    return jsonify({"message": "Deed not found"}), 404
 
 
 @app.errorhandler(Exception)
 def unhandled_exception(e):
     app.logger.error('Unhandled Exception: %s', (e,), exc_info=True)
     return jsonify({"message": "Unexpected error."}), 500
+
+
+@app.errorhandler(DatabaseException)
+def database_exception(e):
+    app.logger.error('Database Exception: %s', (e,), exc_info=True)
+    return jsonify({"message": "Database Error."}), 500
