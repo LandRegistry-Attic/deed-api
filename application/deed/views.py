@@ -121,6 +121,31 @@ def get_deeds_status_with_mdref_and_title_number():
     return abort(status.HTTP_400_BAD_REQUEST)
 
 
+# @deed_bp.route('/', methods=['POST'])
+# def creates():
+#     deed = Deed()
+#     deed.token = Deed.generate_token()
+#     deed_json = request.get_json()
+#
+#     validator = Validation()
+#     credentials = validator.validate_organisation_credentials()
+#
+#     validator.validate_payload(deed_json)
+#
+#     validator.validate_title_number
+#
+#     validator.call_akuma(deed_json, deed.token,
+#                          credentials['organisation_name'],
+#                          credentials['organisation_locale'])
+#
+#
+#     #print ("Variable:", return_val)
+#     return "Deed created", status.HTTP_200_OK
+
+# deed.organisation_id = credentials['organisation_id']
+# deed.organisation_name = credentials['organisation_name']
+
+
 @deed_bp.route('/', methods=['POST'])
 def create():
     deed_json = request.get_json()
