@@ -113,7 +113,7 @@ def get_deeds_status_with_mdref_and_title_number():
             abort(status.HTTP_404_NOT_FOUND)
 
         return Response(
-            json.dumps(deeds_status),
+            json.dumps({"deed_references": deeds_status}),
             status=200,
             mimetype='application/json'
         )
