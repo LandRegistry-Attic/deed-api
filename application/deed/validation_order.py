@@ -1,10 +1,12 @@
 import logging
-from application.deed.utils import process_organisation_credentials, validate_helper, valid_dob
+from application.deed.utils import process_organisation_credentials, validate_helper, valid_dob, is_unique_list
 from application.title_adaptor.service import TitleAdaptor
 from flask import jsonify, abort
 from flask.ext.api import status
 from application.akuma.service import Akuma
-from application.deed.service import valid_borrowers
+from application.deed.service import valid_borrowers, update_md_clauses, update_borrower, build_json_deed_document
+from application.deed.validate_borrowers import check_borrower_names, BorrowerNamesException
+from underscore import _
 
 LOGGER = logging.getLogger(__name__)
 
@@ -19,11 +21,14 @@ class Validation():
         """
         organisation_credentials = process_organisation_credentials()
 
-        if organisation_credentials:
+        if organisation_credentials is not None:
             organisation_credentials = {'organisation_id': organisation_credentials["O"][1],
                                         'organisation_name': organisation_credentials["O"][0],
                                         'organisation_locale': organisation_credentials["C"][0]}
             return organisation_credentials
+        else:
+            error_message = "unable to process organisation credentials"
+            abort(status.HTTP_401_UNAUTHORIZED, error_message)
 
 
     def validate_payload(self, deed_json):
@@ -36,19 +41,29 @@ class Validation():
 
     def  validate_title_number(self, deed_json):
         return_val = TitleAdaptor.do_check(deed_json['title_number'])
+
         if return_val != "title OK":
-            error_message = jsonify({"message": return_val})
-            abort(status.HTTP_400_BAD_REQUEST, error_message)
+            LOGGER.error("Title Validation Error: " + str(return_val))
+            abort(status.HTTP_400_BAD_REQUEST, return_val)
 
 
-    def validate_borrower_names():
-        return True
+    def validate_borrower_names(self, deed_json):
+        try:
+            check_borrower_names(deed_json)
 
-    def call_akuma(self, deed_json, deed_token, organisation_name, organisation_locale):
-        check_result = Akuma.do_check(deed_json, "create_deed",
+        except BorrowerNamesException:
+            msg = "a digital mortgage cannot be created as there is a discrepancy between the names given and those held on the register."
+            abort(status.HTTP_400_BAD_REQUEST, msg)
+
+
+    def call_akuma(self, deed_json, deed_token, organisation_name, organisation_locale, deed_type):
+        check_result = Akuma.do_check(deed_json, deed_type,
                                       organisation_name,
                                       organisation_locale, deed_token)
-        LOGGER.info("Check ID: " + check_result['id'])
+        if deed_type == "create deed":
+            LOGGER.info("Check ID: " + check_result['id'])
+        elif deed_type == "modify deed":
+            LOGGER.info("Check ID - MODIFY: " + check_result['id'])
 
 
     def validate_dob(self, deed_json):
@@ -58,11 +73,22 @@ class Validation():
             .map(lambda x, *a: x['dob'])\
             .reduce(valid_dob, True).value()
 
-        print ("Val", valid)
-        return valid
+        if valid is not True:
+            msg = "borrower data failed validation"
+            LOGGER.error(msg)
+            abort(status.HTTP_400_BAD_REQUEST, msg)
 
-    def validate_phonenumbers():
-        return True
 
-    def validate_md_ref():
-        return True
+    def validate_phonenumbers(self, deed_json):
+        borrowers = deed_json["borrowers"]
+
+        phone_number_list = _(borrowers).chain()\
+            .map(lambda x, *a: x['phone_number'])\
+            .value()
+
+        valid = is_unique_list(phone_number_list)
+
+        if valid is not True:
+            msg = "borrower data failed validation"
+            LOGGER.error(msg)
+            abort(status.HTTP_400_BAD_REQUEST, msg)

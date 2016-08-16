@@ -117,16 +117,6 @@ def update_deed(deed, deed_json):
     deed.identity_checked = deed_json["identity_checked"]
     json_doc = build_json_deed_document(deed_json)
 
-    borrowers = deed_json["borrowers"]
-
-    val = valid_borrowers(borrowers)
-    print ("Val", val)
-
-    if not valid_borrowers(borrowers):
-        msg = "borrower data failed validation"
-        LOGGER.error(msg)
-        return False, msg
-
     update_borrower_for_token = partial(update_borrower, deed_token=deed.token)
 
     borrower_json = _(borrowers).chain()\
