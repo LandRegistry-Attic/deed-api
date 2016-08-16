@@ -17,6 +17,7 @@ from flask import Blueprint
 from flask import request, abort, jsonify, Response
 from flask.ext.api import status
 from application.deed.deed_validator import deed_validator
+from application.deed.validation_order import Validation
 
 
 LOGGER = logging.getLogger(__name__)
@@ -35,70 +36,126 @@ def get_deed(deed_reference):
 
 @deed_bp.route('/<deed_reference>', methods=['PUT'])
 def get_existing_deed_and_update(deed_reference):
-    # Firstly check payload coming in is valid:
     deed = Deed()
     deed_update_json = request.get_json()
 
-    error_message, error_code = deed_validator(deed_update_json)
+    validator = Validation()
+    credentials = validator.validate_organisation_credentials()
 
-    if error_code != status.HTTP_200_OK:
-        return error_message, error_code
+    validator.validate_payload(deed_update_json)
+    validator.validate_title_number(deed_update_json)
+    validator.validate_borrower_names(deed_update_json)
+
+    result_deed = deed.get_deed(deed_reference)
+    if result_deed is None:
+        LOGGER.error("Deed with reference - %s not found" % str(deed_reference))
+        return jsonify({"message": "Deed not Found"}), \
+            status.HTTP_400_BAD_REQUEST
+
+    validator.call_akuma(deed_update_json, result_deed.token,
+                         credentials['organisation_name'],
+                         credentials['organisation_locale'],
+                         deed_type="modify deed")
+
+    validator.validate_dob(deed_update_json)
+    validator.validate_phonenumbers(deed_update_json)
 
     ids = []
-
     for borrower in deed_update_json["borrowers"]:
         if 'id' in borrower:
             ids.append(borrower['id'])
 
     duplicates = [item for item, count in collections.Counter(ids).items() if count > 1]
-
     if duplicates:
         return jsonify({"message": "Error duplicate borrower ID's in payload"}), \
             status.HTTP_400_BAD_REQUEST
 
-    try:
-        result = deed.get_deed(deed_reference)
+    # Deed Status check
+    deed_status = str(result.status)
+    if deed_status != "DRAFT":
+        return jsonify({"message": "This deed is not in a draft state"}), \
+            status.HTTP_400_BAD_REQUEST
 
-        if result is None:
-            LOGGER.error("Deed with reference - %s not found" % str(deed_reference))
-            return jsonify({"message": "Deed not Found"}), \
-                status.HTTP_400_BAD_REQUEST
+    for borrower_id in ids:
+        borrower_check = Borrower.get_by_id(borrower_id)
 
-        # Deed Status check
-        deed_status = str(result.status)
-        if deed_status != "DRAFT":
-            return jsonify({"message": "This deed is not in a draft state"}), \
-                status.HTTP_400_BAD_REQUEST
+        if borrower_check is None or borrower_check.deed_token != deed_reference:
+            return jsonify({"message": "error borrowers provided do not match deed"}), status.HTTP_400_BAD_REQUEST
 
-        organisation_credentials = process_organisation_credentials()
+    success, msg = update_deed(result, deed_update_json)
+    if not success:
+        LOGGER.error("Update deed 400_BAD_REQUEST")
+        return msg, status.HTTP_400_BAD_REQUEST
 
-        if organisation_credentials:
-            # Inform Akuma
-            check_result = Akuma.do_check(deed_update_json, "modify deed",
-                                          organisation_credentials["O"][0],
-                                          organisation_credentials["C"][0], result.token)
-            LOGGER.info("Check ID - MODIFY: " + check_result['id'])
-        # Unhappy verification
-        else:
-            LOGGER.error("Unable to process headers")
-            return "Unable to process headers", status.HTTP_401_UNAUTHORIZED
+    return jsonify({"path": '/deed/' + str(deed_reference)}), status.HTTP_200_OK
 
-        for borrower_id in ids:
-            borrower_check = Borrower.get_by_id(borrower_id)
 
-            if borrower_check is None or borrower_check.deed_token != deed_reference:
-                return jsonify({"message": "error borrowers provided do not match deed"}), status.HTTP_400_BAD_REQUEST
-
-        success, msg = update_deed(result, deed_update_json)
-
-        if not success:
-            LOGGER.error("Update deed 400_BAD_REQUEST")
-            return msg, status.HTTP_400_BAD_REQUEST
-
-        return jsonify({"path": '/deed/' + str(deed_reference)}), status.HTTP_200_OK
-    except:
-        LOGGER.error("Exception - %s" % str(sys.exc_info()))
-        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+# @deed_bp.route('/<deed_reference>', methods=['PUT'])
+# def get_existing_deed_and_update(deed_reference):
+#     # Firstly check payload coming in is valid:
+#     deed = Deed()
+#     deed_update_json = request.get_json()
+#
+#     error_message, error_code = deed_validator(deed_update_json)
+#
+#     if error_code != status.HTTP_200_OK:
+#         return error_message, error_code
+#
+#     ids = []
+#
+#     for borrower in deed_update_json["borrowers"]:
+#         if 'id' in borrower:
+#             ids.append(borrower['id'])
+#
+#     duplicates = [item for item, count in collections.Counter(ids).items() if count > 1]
+#
+#     if duplicates:
+#         return jsonify({"message": "Error duplicate borrower ID's in payload"}), \
+#             status.HTTP_400_BAD_REQUEST
+#
+#     try:
+#         result = deed.get_deed(deed_reference)
+#
+#         if result is None:
+#             LOGGER.error("Deed with reference - %s not found" % str(deed_reference))
+#             return jsonify({"message": "Deed not Found"}), \
+#                 status.HTTP_400_BAD_REQUEST
+#
+#         # Deed Status check
+#         deed_status = str(result.status)
+#         if deed_status != "DRAFT":
+#             return jsonify({"message": "This deed is not in a draft state"}), \
+#                 status.HTTP_400_BAD_REQUEST
+#
+#         organisation_credentials = process_organisation_credentials()
+#
+#         if organisation_credentials:
+#             # Inform Akuma
+#             check_result = Akuma.do_check(deed_update_json, "modify deed",
+#                                           organisation_credentials["O"][0],
+#                                           organisation_credentials["C"][0], result.token)
+#             LOGGER.info("Check ID - MODIFY: " + check_result['id'])
+#         # Unhappy verification
+#         else:
+#             LOGGER.error("Unable to process headers")
+#             return "Unable to process headers", status.HTTP_401_UNAUTHORIZED
+#
+#         for borrower_id in ids:
+#             borrower_check = Borrower.get_by_id(borrower_id)
+#
+#             if borrower_check is None or borrower_check.deed_token != deed_reference:
+#                 return jsonify({"message": "error borrowers provided do not match deed"}), status.HTTP_400_BAD_REQUEST
+#
+#         success, msg = update_deed(result, deed_update_json)
+#
+#         if not success:
+#             LOGGER.error("Update deed 400_BAD_REQUEST")
+#             return msg, status.HTTP_400_BAD_REQUEST
+#
+#         return jsonify({"path": '/deed/' + str(deed_reference)}), status.HTTP_200_OK
+#     except:
+#         LOGGER.error("Exception - %s" % str(sys.exc_info()))
+#         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @deed_bp.route('', methods=['GET'])
@@ -121,67 +178,73 @@ def get_deeds_status_with_mdref_and_title_number():
     return abort(status.HTTP_400_BAD_REQUEST)
 
 
-# @deed_bp.route('/', methods=['POST'])
-# def creates():
-#     deed = Deed()
-#     deed.token = Deed.generate_token()
-#     deed_json = request.get_json()
-#
-#     validator = Validation()
-#     credentials = validator.validate_organisation_credentials()
-#
-#     validator.validate_payload(deed_json)
-#
-#     validator.validate_title_number
-#
-#     validator.call_akuma(deed_json, deed.token,
-#                          credentials['organisation_name'],
-#                          credentials['organisation_locale'])
-#
-#
-#     #print ("Variable:", return_val)
-#     return "Deed created", status.HTTP_200_OK
-
-# deed.organisation_id = credentials['organisation_id']
-# deed.organisation_name = credentials['organisation_name']
-
-
 @deed_bp.route('/', methods=['POST'])
 def create():
+    deed = Deed()
+    deed.token = Deed.generate_token()
     deed_json = request.get_json()
-    error_message, error_code = deed_validator(deed_json)
 
-    if error_code != status.HTTP_200_OK:
-        LOGGER.error(error_message)
-        return error_message, error_code
+    validator = Validation()
+    credentials = validator.validate_organisation_credentials()
+    deed.organisation_id = credentials['organisation_id']
+    deed.organisation_name = credentials['organisation_name']
 
-    try:
-        deed = Deed()
-        deed.token = Deed.generate_token()
+    validator.validate_payload(deed_json)
+    validator.validate_title_number(deed_json)
 
-        organisation_credentials = process_organisation_credentials()
-        if organisation_credentials:
-            deed.organisation_id = organisation_credentials["O"][1]
-            deed.organisation_name = organisation_credentials["O"][0]
-            organisation_locale = organisation_credentials["C"][0]
-            check_result = Akuma.do_check(deed_json, "create deed",
-                                          deed.organisation_name, organisation_locale, deed.token)
-            LOGGER.info("Check ID: " + check_result['id'])
+    validator.validate_borrower_names(deed_json)
+    validator.call_akuma(deed_json, deed.token,
+                         credentials['organisation_name'],
+                         credentials['organisation_locale'],
+                         deed_type="create deed")
 
-            success, msg = update_deed(deed, deed_json)
+    validator.validate_dob(deed_json)
+    validator.validate_phonenumbers(deed_json)
 
-            if not success:
-                LOGGER.error("Update deed 400_BAD_REQUEST")
-                return msg, status.HTTP_400_BAD_REQUEST
-        else:
-            LOGGER.error("Unable to process headers")
-            return "Unable to process headers", status.HTTP_401_UNAUTHORIZED
-        return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
+    success, msg = update_deed(deed, deed_json)
+    if not success:
+        LOGGER.error("Update deed 400_BAD_REQUEST")
+        return msg, status.HTTP_400_BAD_REQUEST
 
-    except:
-        msg = str(sys.exc_info())
-        LOGGER.error("Exception - %s" % msg)
-        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
+
+
+# @deed_bp.route('/', methods=['POST'])
+# def creates():
+#     deed_json = request.get_json()
+#     error_message, error_code = deed_validator(deed_json)
+#
+#     if error_code != status.HTTP_200_OK:
+#         LOGGER.error(error_message)
+#         return error_message, error_code
+#
+#     try:
+#         deed = Deed()
+#         deed.token = Deed.generate_token()
+#
+#         organisation_credentials = process_organisation_credentials()
+#         if organisation_credentials:
+#             deed.organisation_id = organisation_credentials["O"][1]
+#             deed.organisation_name = organisation_credentials["O"][0]
+#             organisation_locale = organisation_credentials["C"][0]
+#             check_result = Akuma.do_check(deed_json, "create deed",
+#                                           deed.organisation_name, organisation_locale, deed.token)
+#             LOGGER.info("Check ID: " + check_result['id'])
+#
+#             success, msg = update_deed(deed, deed_json)
+#
+#             if not success:
+#                 LOGGER.error("Update deed 400_BAD_REQUEST")
+#                 return msg, status.HTTP_400_BAD_REQUEST
+#         else:
+#             LOGGER.error("Unable to process headers")
+#             return "Unable to process headers", status.HTTP_401_UNAUTHORIZED
+#         return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_201_CREATED
+#
+#     except:
+#         msg = str(sys.exc_info())
+#         LOGGER.error("Exception - %s" % msg)
+#         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @deed_bp.route('/borrowers/delete/<borrower_id>', methods=['DELETE'])
