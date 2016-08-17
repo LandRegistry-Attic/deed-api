@@ -41,8 +41,8 @@ def get_existing_deed_and_update(deed_reference):
     validator = Validation()
 
     credentials = validator.validate_organisation_credentials()
-    if credentials == "unable to process organisation credentials":
-        return status.HTTP_401_UNAUTHORIZED
+    if credentials is None:
+        return jsonify({"message": "Unable to process organisation credentials"}), status.HTTP_401_UNAUTHORIZED
 
     error_count, error_message = validator.validate_payload(deed_update_json)
     if error_count > 0:
@@ -202,8 +202,8 @@ def create():
     validator = Validation()
 
     credentials = validator.validate_organisation_credentials()
-    if credentials == "unable to process organisation credentials":
-        return status.HTTP_401_UNAUTHORIZED
+    if credentials is None:
+        return jsonify({"message": "Unable to process organisation credentials"}), status.HTTP_401_UNAUTHORIZED
 
     deed.organisation_id = credentials['organisation_id']
     deed.organisation_name = credentials['organisation_name']

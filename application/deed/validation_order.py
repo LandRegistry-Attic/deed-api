@@ -26,8 +26,8 @@ class Validation():
                                         'organisation_locale': organisation_credentials["C"][0]}
             return organisation_credentials
         else:
-            error_message = "unable to process organisation credentials"
-            return error_message
+            LOGGER.error("Unable to process organisation credentials")
+            return None
 
     def validate_payload(self, deed_json):
         error_count, error_message = validate_helper(deed_json)
