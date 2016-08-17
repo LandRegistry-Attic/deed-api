@@ -213,7 +213,7 @@ def create():
         return error_message, status.HTTP_400_BAD_REQUEST
 
     validate_title_number = validator.validate_title_number(deed_json)
-    if validate_title_number == "Title does not exist":
+    if validate_title_number != "OK":
         return jsonify({"message": validate_title_number}), status.HTTP_400_BAD_REQUEST
 
     validate_borrower_names, msg = validator.validate_borrower_names(deed_json)
