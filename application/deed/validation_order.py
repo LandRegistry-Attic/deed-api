@@ -27,7 +27,7 @@ class Validation():
             return organisation_credentials
         else:
             error_message = "unable to process organisation credentials"
-            abort(status.HTTP_401_UNAUTHORIZED, error_message)
+            return error_message
 
     def validate_payload(self, deed_json):
         error_count, error_message = validate_helper(deed_json)

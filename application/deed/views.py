@@ -185,6 +185,8 @@ def create():
 
     validator = Validation()
     credentials = validator.validate_organisation_credentials()
+    if credentials == "unable to process organisation credentials":
+        return status.HTTP_401_UNAUTHORIZED
     deed.organisation_id = credentials['organisation_id']
     deed.organisation_name = credentials['organisation_name']
 
