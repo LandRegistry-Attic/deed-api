@@ -1,8 +1,6 @@
 import logging
 from application.deed.utils import process_organisation_credentials, validate_helper, valid_dob, is_unique_list
 from application.title_adaptor.service import TitleAdaptor
-from flask import abort, jsonify
-from flask.ext.api import status
 from application.akuma.service import Akuma
 from application.deed.validate_borrowers import check_borrower_names, BorrowerNamesException
 from underscore import _
@@ -36,7 +34,8 @@ class Validation():
 
     def validate_title_number(self, deed_json):
         return_val = TitleAdaptor.do_check(deed_json['title_number'])
-        LOGGER.error("Title Validation Error: " + str(return_val))
+        if return_val != "title OK":
+            LOGGER.error("Title Validation Error: " + str(return_val))
         return return_val
 
     def validate_borrower_names(self, deed_json):

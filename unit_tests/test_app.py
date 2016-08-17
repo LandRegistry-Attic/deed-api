@@ -18,11 +18,11 @@ from application.akuma.service import Akuma
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
 from application.deed.service import make_effective_text, make_deed_effective_date, update_deed
 from application.deed.views import make_effective, retrieve_signed_deed
-from application.deed.service import apply_registrar_signature, check_effective_status, add_effective_date_to_xml, valid_borrowers
+from application.deed.service import apply_registrar_signature, check_effective_status, add_effective_date_to_xml
 from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
 from application.borrower.model import Borrower, DatabaseException
 from unit_tests.schema_tests import run_schema_checks
-from application.deed.deed_validator import deed_validator
+from application.deed.validation_order import Validation
 
 
 class TestRoutesBase(unittest.TestCase):
@@ -641,41 +641,15 @@ class TestRoutesErrorHandlers(TestRoutesBase):
 
 
 class TestValidators(TestRoutesBase):
-    @mock.patch('application.deed.deed_validator.check_borrower_names', autospec=True)
-    @mock.patch('application.deed.deed_validator.TitleAdaptor', autospec=False)
-    @mock.patch('application.deed.deed_validator.validate_helper', autospec=False)
-    def test_deed_validator(self, mock_schema, mock_title_validator, mock_borrower_validator):
+    def test_validation_order(self):
+        obj = Validation()
+        correct_borrowers = DeedHelper._json_doc_future_dob
+        result, msg = obj.validate_dob(correct_borrowers)
 
-        mock_schema.return_value = 0, ""
-        mock_title_validator.do_check.return_value = "title OK"
+        self.assertFalse(result)
 
-        error_message, error_code = deed_validator(DeedHelper._json_doc)
-
-        self.assertEqual(error_code, status.HTTP_200_OK)
-        self.assertEqual(error_message, "passed")
-
-    @mock.patch('application.deed.deed_validator.check_borrower_names', autospec=True)
-    @mock.patch('application.deed.deed_validator.TitleAdaptor', autospec=False)
-    @mock.patch('application.deed.deed_validator.validate_helper', autospec=False)
-    def test_deed_validator_unhappy_path(self, mock_schema, mock_title_validator, mock_borrower_validator):
-
-        mock_schema.return_value = 3, "Schema Failures"
-        mock_title_validator.do_check.return_value = "title OK"
-
-        error_message, error_code = deed_validator(DeedHelper._json_doc)
-
-        self.assertEqual(error_message, "Schema Failures")
-        self.assertEqual(error_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_valid_borrowers_good(self):
-        correct_borrowers = DeedHelper._json_doc["borrowers"]
-        result = valid_borrowers(correct_borrowers)
-
-        self.assertTrue(result)
-
-    def test_valid_borrowers_bad(self):
-        borrowers_details = DeedHelper._borrowers_with_same_phonenumber["borrowers"]
-        result = valid_borrowers(borrowers_details)
+        borrowers_details = DeedHelper._borrowers_with_same_phonenumber
+        result, msg = obj.validate_phonenumbers(borrowers_details)
 
         self.assertFalse(result)
 
@@ -731,18 +705,15 @@ class TestCreateDeed(TestRoutesBase):
                                           mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone):
 
         mock_val_payload.return_value = 0, "No error message"
-        mock_val_tn.return_value = "OK"
+        mock_val_tn.return_value = "title OK"
         mock_val_bor.return_value = True, ""
-
         mock_val_dob.return_value = True, ""
         mock_val_phone.return_value = True, ""
-
 
         mock_deed.return_value = DeedModelMock()
         mock_update.return_value = True, "OK"
 
         payload = json.dumps(DeedHelper._json_doc_update)
-
         response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
                                 headers=self.webseal_headers)
 
@@ -757,8 +728,9 @@ class TestCreateDeed(TestRoutesBase):
     @mock.patch('application.deed.views.update_deed')
     @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
     @mock.patch('application.deed.views.Deed.get_deed')
-    def test_get_existing_deed_and_update_bad_payload(self, mock_deed, mock_org_cred, mock_update, mock_val_payload, mock_val_tn,
-                                          mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone):
+    def test_get_existing_deed_and_update_bad(self, mock_deed, mock_org_cred, mock_update, mock_val_payload, mock_val_tn,
+                                              mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone):
+        # test validate_payload
         mock_val_payload.return_value = 1, "Foo"
         mock_val_tn.return_value = "OK"
         mock_val_bor.return_value = True, ""
@@ -774,17 +746,7 @@ class TestCreateDeed(TestRoutesBase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @mock.patch('application.deed.views.Validation.validate_phonenumbers')
-    @mock.patch('application.deed.views.Validation.validate_dob')
-    @mock.patch('application.deed.views.Validation.call_akuma')
-    @mock.patch('application.deed.views.Validation.validate_borrower_names')
-    @mock.patch('application.deed.views.Validation.validate_title_number')
-    @mock.patch('application.deed.views.Validation.validate_payload')
-    @mock.patch('application.deed.views.update_deed')
-    @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
-    @mock.patch('application.deed.views.Deed.get_deed')
-    def test_get_existing_deed_and_update_bad_titlenumber(self, mock_deed, mock_org_cred, mock_update, mock_val_payload, mock_val_tn,
-                                          mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone):
+        # test validate_title_number
         mock_val_payload.return_value = 0, "No error message"
         mock_val_tn.return_value = "Title does not exist"
         mock_val_bor.return_value = True, ""
@@ -800,17 +762,7 @@ class TestCreateDeed(TestRoutesBase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @mock.patch('application.deed.views.Validation.validate_phonenumbers')
-    @mock.patch('application.deed.views.Validation.validate_dob')
-    @mock.patch('application.deed.views.Validation.call_akuma')
-    @mock.patch('application.deed.views.Validation.validate_borrower_names')
-    @mock.patch('application.deed.views.Validation.validate_title_number')
-    @mock.patch('application.deed.views.Validation.validate_payload')
-    @mock.patch('application.deed.views.update_deed')
-    @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
-    @mock.patch('application.deed.views.Deed.get_deed')
-    def test_get_existing_deed_and_update_bad_borrowername(self, mock_deed, mock_org_cred, mock_update, mock_val_payload, mock_val_tn,
-                                          mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone):
+        # test validate_borrower_names
         mock_val_payload.return_value = 0, "No error message"
         mock_val_tn.return_value = "OK"
         mock_val_bor.return_value = False, "fail"
@@ -826,31 +778,22 @@ class TestCreateDeed(TestRoutesBase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @mock.patch('application.deed.views.Validation.validate_phonenumbers')
-    @mock.patch('application.deed.views.Validation.validate_dob')
-    @mock.patch('application.deed.views.Validation.call_akuma')
-    @mock.patch('application.deed.views.Validation.validate_borrower_names')
-    @mock.patch('application.deed.views.Validation.validate_title_number')
-    @mock.patch('application.deed.views.Validation.validate_payload')
-    @mock.patch('application.deed.views.update_deed')
-    @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
-    @mock.patch('application.deed.views.Deed.get_deed')
-    def test_get_existing_deed_and_update_akuma_called(self, mock_deed, mock_org_cred, mock_update, mock_val_payload, mock_val_tn,
-                                          mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone):
+        # test validate_dob
+        mock_val_payload.return_value = 0, "No error message"
+        mock_val_tn.return_value = "OK"
+        mock_val_bor.return_value = True, ""
+        mock_val_dob.return_value = False, "fail"
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # test validate_phonenumbers
         mock_val_payload.return_value = 0, "No error message"
         mock_val_tn.return_value = "OK"
         mock_val_bor.return_value = True, ""
         mock_val_dob.return_value = True, ""
-        mock_val_phone.return_value = True, ""
+        mock_val_phone.return_value = False, "fail"
 
-        mock_deed.return_value = DeedModelMock()
-        mock_update.return_value = True, "OK"
-
-        payload = json.dumps(DeedHelper._json_doc_update)
-        response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
-                                headers=self.webseal_headers)
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class TestUpdateDeed(TestRoutesBase):
