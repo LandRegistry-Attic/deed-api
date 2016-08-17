@@ -36,9 +36,8 @@ class Validation():
 
     def validate_title_number(self, deed_json):
         return_val = TitleAdaptor.do_check(deed_json['title_number'])
-        if return_val != "title OK":
-            LOGGER.error("Title Validation Error: " + str(return_val))
-            return return_val
+        LOGGER.error("Title Validation Error: " + str(return_val))
+        return return_val
 
     def validate_borrower_names(self, deed_json):
         try:
