@@ -39,11 +39,22 @@ def get_existing_deed_and_update(deed_reference):
     deed_update_json = request.get_json()
 
     validator = Validation()
-    credentials = validator.validate_organisation_credentials()
 
-    validator.validate_payload(deed_update_json)
-    validator.validate_title_number(deed_update_json)
-    validator.validate_borrower_names(deed_update_json)
+    credentials = validator.validate_organisation_credentials()
+    if credentials == "unable to process organisation credentials":
+        return status.HTTP_401_UNAUTHORIZED
+
+    error_count, error_message = validator.validate_payload(deed_update_json)
+    if error_count > 0:
+        return error_message, status.HTTP_400_BAD_REQUEST
+
+    validate_title_number = validator.validate_title_number(deed_update_json)
+    if validate_title_number == "Title does not exist":
+        return jsonify({"message": validate_title_number}), status.HTTP_400_BAD_REQUEST
+
+    validate_borrower_names, msg = validator.validate_borrower_names(deed_update_json)
+    if validate_borrower_names is False:
+        return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
 
     result_deed = deed.get_deed(deed_reference)
     if result_deed is None:
@@ -56,8 +67,13 @@ def get_existing_deed_and_update(deed_reference):
                          credentials['organisation_locale'],
                          deed_type="modify deed")
 
-    validator.validate_dob(deed_update_json)
-    validator.validate_phonenumbers(deed_update_json)
+    dob_validate, msg = validator.validate_dob(deed_update_json)
+    if dob_validate is False:
+        return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
+
+    phone_validate, msg = validator.validate_phonenumbers(deed_update_json)
+    if phone_validate is False:
+        return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
 
     ids = []
     for borrower in deed_update_json["borrowers"]:
@@ -184,23 +200,38 @@ def create():
     deed_json = request.get_json()
 
     validator = Validation()
+
     credentials = validator.validate_organisation_credentials()
     if credentials == "unable to process organisation credentials":
         return status.HTTP_401_UNAUTHORIZED
+
     deed.organisation_id = credentials['organisation_id']
     deed.organisation_name = credentials['organisation_name']
 
-    validator.validate_payload(deed_json)
-    validator.validate_title_number(deed_json)
+    error_count, error_message = validator.validate_payload(deed_json)
+    if error_count > 0:
+        return error_message, status.HTTP_400_BAD_REQUEST
 
-    validator.validate_borrower_names(deed_json)
+    validate_title_number = validator.validate_title_number(deed_json)
+    if validate_title_number == "Title does not exist":
+        return jsonify({"message": validate_title_number}), status.HTTP_400_BAD_REQUEST
+
+    validate_borrower_names, msg = validator.validate_borrower_names(deed_json)
+    if validate_borrower_names is False:
+        return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
+
     validator.call_akuma(deed_json, deed.token,
                          credentials['organisation_name'],
                          credentials['organisation_locale'],
                          deed_type="create deed")
 
-    validator.validate_dob(deed_json)
-    validator.validate_phonenumbers(deed_json)
+    dob_validate, msg = validator.validate_dob(deed_json)
+    if dob_validate is False:
+        return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
+
+    phone_validate, msg = validator.validate_phonenumbers(deed_json)
+    if phone_validate is False:
+        return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
 
     success, msg = update_deed(deed, deed_json)
     if not success:

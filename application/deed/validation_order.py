@@ -1,7 +1,7 @@
 import logging
 from application.deed.utils import process_organisation_credentials, validate_helper, valid_dob, is_unique_list
 from application.title_adaptor.service import TitleAdaptor
-from flask import abort
+from flask import abort, jsonify
 from flask.ext.api import status
 from application.akuma.service import Akuma
 from application.deed.validate_borrowers import check_borrower_names, BorrowerNamesException
@@ -31,24 +31,24 @@ class Validation():
 
     def validate_payload(self, deed_json):
         error_count, error_message = validate_helper(deed_json)
-
-        if error_count > 0:
-            LOGGER.error("Schema validation 400_BAD_REQUEST")
-            abort(status.HTTP_400_BAD_REQUEST, error_message)
+        LOGGER.error("Schema validation 400_BAD_REQUEST")
+        return error_count, error_message
 
     def validate_title_number(self, deed_json):
         return_val = TitleAdaptor.do_check(deed_json['title_number'])
         if return_val != "title OK":
             LOGGER.error("Title Validation Error: " + str(return_val))
-            abort(status.HTTP_400_BAD_REQUEST, return_val)
+            return return_val
 
     def validate_borrower_names(self, deed_json):
         try:
             check_borrower_names(deed_json)
+            return True, ""
 
         except BorrowerNamesException:
+            validation = False
             msg = "a digital mortgage cannot be created as there is a discrepancy between the names given and those held on the register."
-            abort(status.HTTP_400_BAD_REQUEST, msg)
+            return validation, msg
 
     def call_akuma(self, deed_json, deed_token, organisation_name, organisation_locale, deed_type):
         check_result = Akuma.do_check(deed_json, deed_type,
@@ -69,7 +69,9 @@ class Validation():
         if valid is not True:
             msg = "borrower data failed validation"
             LOGGER.error(msg)
-            abort(status.HTTP_400_BAD_REQUEST, msg)
+            return valid, msg
+        else:
+            return True, ""
 
     def validate_phonenumbers(self, deed_json):
         borrowers = deed_json["borrowers"]
@@ -83,4 +85,6 @@ class Validation():
         if valid is not True:
             msg = "borrower data failed validation"
             LOGGER.error(msg)
-            abort(status.HTTP_400_BAD_REQUEST, msg)
+            return valid, msg
+        else:
+            return True, ""
