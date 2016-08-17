@@ -850,7 +850,7 @@ class TestCreateDeed(TestRoutesBase):
         response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
                                 headers=self.webseal_headers)
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
 class TestUpdateDeed(TestRoutesBase):
