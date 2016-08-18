@@ -65,7 +65,7 @@ class Validation():
             .reduce(valid_dob, True).value()
 
         if valid is not True:
-            msg = "borrower data failed validation"
+            msg = "Borrower DOB validation failure"
             LOGGER.error(msg)
             return valid, msg
         else:
@@ -81,7 +81,7 @@ class Validation():
         valid = is_unique_list(phone_number_list)
 
         if valid is not True:
-            msg = "borrower data failed validation"
+            msg = "Borrower phone number validation failure"
             LOGGER.error(msg)
             return valid, msg
         else:
