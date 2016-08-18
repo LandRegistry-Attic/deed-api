@@ -23,6 +23,7 @@ from application.service_clients.esec.implementation import sign_document_with_a
 from application.borrower.model import Borrower, DatabaseException
 from unit_tests.schema_tests import run_schema_checks
 from application.deed.validation_order import Validation
+from application.title_adaptor.service import TitleAdaptor
 
 
 class TestRoutesBase(unittest.TestCase):
@@ -652,6 +653,18 @@ class TestValidators(TestRoutesBase):
         result, msg = obj.validate_phonenumbers(borrowers_details)
 
         self.assertFalse(result)
+
+    def test_title_validator_do_check_invalid_title(self):
+        title_stub = DeedHelper._invalid_title["title_number"]
+        result = TitleAdaptor.do_check(title_stub)
+
+        self.assertEqual(result, "Title does not exist")
+
+    def test_title_validator_do_check_valid_title(self):
+        title_stub = DeedHelper._json_doc["title_number"]
+        result = TitleAdaptor.do_check(title_stub)
+
+        self.assertEqual(result, "title OK")
 
 
 class TestCreateDeed(TestRoutesBase):
