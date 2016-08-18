@@ -652,18 +652,6 @@ class TestValidators(TestRoutesBase):
 
         self.assertFalse(result)
 
-    def test_title_validator_do_check_invalid_title(self):
-        title_stub = DeedHelper._invalid_title["title_number"]
-        result = TitleAdaptor.do_check(title_stub)
-
-        self.assertEqual(result, "Title does not exist")
-
-    def test_title_validator_do_check_valid_title(self):
-        title_stub = DeedHelper._json_doc["title_number"]
-        result = TitleAdaptor.do_check(title_stub)
-
-        self.assertEqual(result, "title OK")
-
 
 class TestCreateDeed(TestRoutesBase):
 
