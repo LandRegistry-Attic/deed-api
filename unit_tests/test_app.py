@@ -23,7 +23,6 @@ from application.service_clients.esec.implementation import sign_document_with_a
 from application.borrower.model import Borrower, DatabaseException
 from unit_tests.schema_tests import run_schema_checks
 from application.deed.validation_order import Validation
-from application.title_adaptor.service import TitleAdaptor
 
 
 class TestRoutesBase(unittest.TestCase):
