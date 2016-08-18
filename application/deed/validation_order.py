@@ -65,7 +65,7 @@ class Validation():
             .reduce(valid_dob, True).value()
 
         if valid is not True:
-            msg = "Borrower DOB validation failure"
+            msg = "Date of birth must not be a date in the future"
             LOGGER.error(msg)
             return valid, msg
         else:
@@ -81,7 +81,7 @@ class Validation():
         valid = is_unique_list(phone_number_list)
 
         if valid is not True:
-            msg = "Borrower phone number validation failure"
+            msg = "A mobile phone number must be unique to an individual"
             LOGGER.error(msg)
             return valid, msg
         else:
