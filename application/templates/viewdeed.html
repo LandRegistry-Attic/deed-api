@@ -68,12 +68,12 @@
         <h3 class="heading-medium">Borrower's digital signature(s)</h3>
         {% for borrower in deed_data.deed.borrowers %}
         {% if borrower.signature %}
-        <p id="signature{{ loop.index }}">Confirmed by
+        <p id="signature{{ loop.index }}">Signed by
             <b class="bold-small"> {{ borrower.forename }}
                 {{ borrower.middle_name }}{% if borrower.middle_name %} {% endif %}{{ borrower.surname }} </b>
         </p>
         {% else %}
-        <p class="awaiting-information" id="signature{{ loop.index }}">[Awaiting confirmation
+        <p class="awaiting-information" id="signature{{ loop.index }}">[Awaiting signature
             from {{ borrower.forename }}
             {{ borrower.middle_name }}{% if borrower.middle_name %} {% endif %}{{ borrower.surname }}]
         </p>
