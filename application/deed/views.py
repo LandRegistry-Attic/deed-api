@@ -61,16 +61,16 @@ def get_existing_deed_and_update(deed_reference):
         if 'id' in borrower:
             ids.append(borrower['id'])
 
-    duplicates = [item for item, count in collections.Counter(ids).items() if count > 1]
-    if duplicates:
-        return jsonify({"message": "Error duplicate borrower ID's in payload"}), \
-               status.HTTP_400_BAD_REQUEST
-
     for borrower_id in ids:
         borrower_check = Borrower.get_by_id(borrower_id)
 
         if borrower_check is None or borrower_check.deed_token != deed_reference:
             return jsonify({"message": "error borrowers provided do not match deed"}), status.HTTP_400_BAD_REQUEST
+
+    duplicates = [item for item, count in collections.Counter(ids).items() if count > 1]
+    if duplicates:
+        return jsonify({"message": "Error duplicate borrower ID's in payload"}), \
+               status.HTTP_400_BAD_REQUEST
 
     error_count, error_message = validator.validate_payload(deed_update_json)
     if error_count > 0:
