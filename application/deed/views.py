@@ -81,7 +81,7 @@ def get_existing_deed_and_update(deed_reference):
         return jsonify({"message": validate_title_number}), status.HTTP_400_BAD_REQUEST
 
     validate_borrower_names, msg = validator.validate_borrower_names(deed_update_json)
-    if validate_borrower_names is False:
+    if not validate_borrower_names:
         return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
 
     validator.call_akuma(deed_update_json, result_deed.token,
@@ -90,11 +90,11 @@ def get_existing_deed_and_update(deed_reference):
                          deed_type="modify deed")
 
     dob_validate, msg = validator.validate_dob(deed_update_json)
-    if dob_validate is False:
+    if not dob_validate:
         return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
 
     phone_validate, msg = validator.validate_phonenumbers(deed_update_json)
-    if phone_validate is False:
+    if not phone_validate:
         return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
 
     success, msg = update_deed(result_deed, deed_update_json)
@@ -149,7 +149,7 @@ def create():
         return jsonify({"message": validate_title_number}), status.HTTP_400_BAD_REQUEST
 
     validate_borrower_names, msg = validator.validate_borrower_names(deed_json)
-    if validate_borrower_names is False:
+    if not validate_borrower_names:
         return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
 
     validator.call_akuma(deed_json, deed.token,
@@ -158,11 +158,11 @@ def create():
                          deed_type="create deed")
 
     dob_validate, msg = validator.validate_dob(deed_json)
-    if dob_validate is False:
+    if not dob_validate:
         return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
 
     phone_validate, msg = validator.validate_phonenumbers(deed_json)
-    if phone_validate is False:
+    if not phone_validate:
         return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
 
     success, msg = update_deed(deed, deed_json)
