@@ -644,13 +644,11 @@ class TestRoutesErrorHandlers(TestRoutesBase):
 class TestValidators(TestRoutesBase):
     def test_validation_order(self):
         obj = Validation()
-        correct_borrowers = DeedHelper._json_doc_future_dob
-        result, msg = obj.validate_dob(correct_borrowers)
+        result, msg = obj.validate_dob(DeedHelper._json_doc_future_dob)
 
         self.assertFalse(result)
 
-        borrowers_details = DeedHelper._borrowers_with_same_phonenumber
-        result, msg = obj.validate_phonenumbers(borrowers_details)
+        result, msg = obj.validate_phonenumbers(DeedHelper._borrowers_with_same_phonenumber)
 
         self.assertFalse(result)
 
