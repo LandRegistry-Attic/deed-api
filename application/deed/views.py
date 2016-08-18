@@ -44,6 +44,34 @@ def get_existing_deed_and_update(deed_reference):
     if credentials is None:
         return jsonify({"message": "Unable to process organisation credentials"}), status.HTTP_401_UNAUTHORIZED
 
+    result_deed = deed.get_deed(deed_reference)
+    if result_deed is None:
+        LOGGER.error("Deed with reference - %s not found" % str(deed_reference))
+        return jsonify({"message": "Deed not Found"}), \
+               status.HTTP_400_BAD_REQUEST
+
+    # Deed Status check
+    deed_status = str(result_deed.status)
+    if deed_status != "DRAFT":
+        return jsonify({"message": "This deed is not in a draft state"}), \
+            status.HTTP_400_BAD_REQUEST
+
+    ids = []
+    for borrower in deed_update_json["borrowers"]:
+        if 'id' in borrower:
+            ids.append(borrower['id'])
+
+    duplicates = [item for item, count in collections.Counter(ids).items() if count > 1]
+    if duplicates:
+        return jsonify({"message": "Error duplicate borrower ID's in payload"}), \
+               status.HTTP_400_BAD_REQUEST
+
+    for borrower_id in ids:
+        borrower_check = Borrower.get_by_id(borrower_id)
+
+        if borrower_check is None or borrower_check.deed_token != deed_reference:
+            return jsonify({"message": "error borrowers provided do not match deed"}), status.HTTP_400_BAD_REQUEST
+
     error_count, error_message = validator.validate_payload(deed_update_json)
     if error_count > 0:
         return error_message, status.HTTP_400_BAD_REQUEST
@@ -55,12 +83,6 @@ def get_existing_deed_and_update(deed_reference):
     validate_borrower_names, msg = validator.validate_borrower_names(deed_update_json)
     if validate_borrower_names is False:
         return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
-
-    result_deed = deed.get_deed(deed_reference)
-    if result_deed is None:
-        LOGGER.error("Deed with reference - %s not found" % str(deed_reference))
-        return jsonify({"message": "Deed not Found"}), \
-            status.HTTP_400_BAD_REQUEST
 
     validator.call_akuma(deed_update_json, result_deed.token,
                          credentials['organisation_name'],
@@ -74,28 +96,6 @@ def get_existing_deed_and_update(deed_reference):
     phone_validate, msg = validator.validate_phonenumbers(deed_update_json)
     if phone_validate is False:
         return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
-
-    ids = []
-    for borrower in deed_update_json["borrowers"]:
-        if 'id' in borrower:
-            ids.append(borrower['id'])
-
-    duplicates = [item for item, count in collections.Counter(ids).items() if count > 1]
-    if duplicates:
-        return jsonify({"message": "Error duplicate borrower ID's in payload"}), \
-            status.HTTP_400_BAD_REQUEST
-
-    # Deed Status check
-    deed_status = str(result_deed.status)
-    if deed_status != "DRAFT":
-        return jsonify({"message": "This deed is not in a draft state"}), \
-            status.HTTP_400_BAD_REQUEST
-
-    for borrower_id in ids:
-        borrower_check = Borrower.get_by_id(borrower_id)
-
-        if borrower_check is None or borrower_check.deed_token != deed_reference:
-            return jsonify({"message": "error borrowers provided do not match deed"}), status.HTTP_400_BAD_REQUEST
 
     success, msg = update_deed(result_deed, deed_update_json)
     if not success:
