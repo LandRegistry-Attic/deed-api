@@ -44,9 +44,8 @@ class Validation():
             return True, ""
 
         except BorrowerNamesException:
-            validation = False
             msg = "a digital mortgage cannot be created as there is a discrepancy between the names given and those held on the register."
-            return validation, msg
+            return False, msg
 
     def call_akuma(self, deed_json, deed_token, organisation_name, organisation_locale, deed_type):
         check_result = Akuma.do_check(deed_json, deed_type,
@@ -64,7 +63,7 @@ class Validation():
             .map(lambda x, *a: x['dob'])\
             .reduce(valid_dob, True).value()
 
-        if valid is not True:
+        if not valid:
             msg = "Date of birth must not be a date in the future"
             LOGGER.error(msg)
             return valid, msg
@@ -80,7 +79,7 @@ class Validation():
 
         valid = is_unique_list(phone_number_list)
 
-        if valid is not True:
+        if not valid:
             msg = "A mobile phone number must be unique to an individual"
             LOGGER.error(msg)
             return valid, msg
