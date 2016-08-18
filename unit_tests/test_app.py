@@ -742,7 +742,7 @@ class TestCreateDeed(TestRoutesBase):
     @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
     @mock.patch('application.deed.views.Deed.get_deed')
     def test_get_existing_deed_and_update_bad_payload(self, mock_deed, mock_org_cred, mock_update, mock_val_payload, mock_val_tn,
-                                              mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone):
+                                                      mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone):
         # test validate_payload
         mock_val_payload.return_value = 1, "Foo"
         mock_val_tn.return_value = "OK"
@@ -769,8 +769,8 @@ class TestCreateDeed(TestRoutesBase):
     @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
     @mock.patch('application.deed.views.Deed.get_deed')
     def test_get_existing_deed_and_update_bad_title(self, mock_deed, mock_org_cred, mock_update, mock_val_payload,
-                                                      mock_val_tn,
-                                                      mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone):
+                                                    mock_val_tn, mock_val_bor, mock_akuma, mock_val_dob,
+                                                    mock_val_phone):
         # test validate_title_number
         mock_val_payload.return_value = 0, "No error message"
         mock_val_tn.return_value = "Title does not exist"
@@ -797,8 +797,8 @@ class TestCreateDeed(TestRoutesBase):
     @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
     @mock.patch('application.deed.views.Deed.get_deed')
     def test_get_existing_deed_and_update_bad_borrowers(self, mock_deed, mock_org_cred, mock_update, mock_val_payload,
-                                                    mock_val_tn,
-                                                    mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone):
+                                                        mock_val_tn, mock_val_bor, mock_akuma, mock_val_dob,
+                                                        mock_val_phone):
         # test validate_borrower_names
         mock_val_payload.return_value = 0, "No error message"
         mock_val_tn.return_value = "OK"
@@ -824,10 +824,8 @@ class TestCreateDeed(TestRoutesBase):
     @mock.patch('application.deed.views.update_deed')
     @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
     @mock.patch('application.deed.views.Deed.get_deed')
-    def test_get_existing_deed_and_update_bad_dob(self, mock_deed, mock_org_cred, mock_update,
-                                                        mock_val_payload,
-                                                        mock_val_tn,
-                                                        mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone):
+    def test_get_existing_deed_and_update_bad_dob(self, mock_deed, mock_org_cred, mock_update, mock_val_payload,
+                                                  mock_val_tn, mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone):
         # test validate_dob
         mock_val_payload.return_value = 0, "No error message"
         mock_val_tn.return_value = "OK"
@@ -853,9 +851,8 @@ class TestCreateDeed(TestRoutesBase):
     @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
     @mock.patch('application.deed.views.Deed.get_deed')
     def test_get_existing_deed_and_update_bad_phone_numbers(self, mock_deed, mock_org_cred, mock_update,
-                                                  mock_val_payload,
-                                                  mock_val_tn,
-                                                      mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone):
+                                                            mock_val_payload, mock_val_tn, mock_val_bor, mock_akuma,
+                                                            mock_val_dob, mock_val_phone):
 
         # test validate_phonenumbers
         mock_val_payload.return_value = 0, "No error message"

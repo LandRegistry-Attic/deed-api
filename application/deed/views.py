@@ -48,7 +48,7 @@ def get_existing_deed_and_update(deed_reference):
     if result_deed is None:
         LOGGER.error("Deed with reference - %s not found" % str(deed_reference))
         return jsonify({"message": "Deed not Found"}), \
-               status.HTTP_400_BAD_REQUEST
+            status.HTTP_400_BAD_REQUEST
 
     # Deed Status check
     deed_status = str(result_deed.status)
@@ -70,7 +70,7 @@ def get_existing_deed_and_update(deed_reference):
     duplicates = [item for item, count in collections.Counter(ids).items() if count > 1]
     if duplicates:
         return jsonify({"message": "Error duplicate borrower ID's in payload"}), \
-               status.HTTP_400_BAD_REQUEST
+            status.HTTP_400_BAD_REQUEST
 
     error_count, error_message = validator.validate_payload(deed_update_json)
     if error_count > 0:
@@ -146,7 +146,6 @@ def create():
 
     validate_title_number = validator.validate_title_number(deed_json)
     if validate_title_number != "title OK":
-        print ("Val", validate_title_number)
         return jsonify({"message": validate_title_number}), status.HTTP_400_BAD_REQUEST
 
     validate_borrower_names, msg = validator.validate_borrower_names(deed_json)
