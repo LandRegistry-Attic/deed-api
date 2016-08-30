@@ -181,11 +181,11 @@ def create():
     # Error List Print Out
     if len(error_list) > 0:
         LOGGER.error("Update deed 400_BAD_REQUEST")
-        error_message = ""
+        error_message = []
         for count, error in enumerate(error_list, start=1):
-            error_message += "Problem %s: %s; " % (count, str(error))
+            error_message.append("Problem %s: %s" % (count, str(error)))
 
-        return jsonify({"Errors": str(error_message)}), status.HTTP_400_BAD_REQUEST
+        return jsonify({"Errors": error_message}), status.HTTP_400_BAD_REQUEST
 
     success, msg = update_deed(deed, deed_json)
     if not success:
