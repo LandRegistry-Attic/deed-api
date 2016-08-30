@@ -45,7 +45,7 @@ class Validation():
             return True, ""
 
         except BorrowerNamesException:
-            msg = "a digital mortgage cannot be created as there is a discrepancy between the names given and those held on the register."
+            msg = "The names supplied do not match those on the register."
             return False, msg
 
     def call_akuma(self, deed_json, deed_token, organisation_name, organisation_locale, deed_type):
@@ -96,6 +96,6 @@ class Validation():
             LOGGER.error("Database Exception - %s" % e)
 
         if mortgage_document is None:
-            msg = "mortgage document associated with supplied md_ref is not found"
+            msg = "MD Ref cannot be found"
             LOGGER.error(msg)
             return False, msg

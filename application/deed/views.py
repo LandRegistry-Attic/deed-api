@@ -46,7 +46,7 @@ def get_existing_deed_and_update(deed_reference):
     result_deed = deed.get_deed(deed_reference)
     if result_deed is None:
         LOGGER.error("Deed with reference - %s not found" % str(deed_reference))
-        return jsonify({"message": "Deed not Found"}), \
+        return jsonify({"message": "There is no deed associated with this deed id."}), \
             status.HTTP_400_BAD_REQUEST
 
     # Deed Status check
@@ -68,7 +68,8 @@ def get_existing_deed_and_update(deed_reference):
         borrower_check = Borrower.get_by_id(borrower_id)
 
         if borrower_check is None or borrower_check.deed_token != deed_reference:
-            return jsonify({"message": "error borrowers provided do not match deed"}), status.HTTP_400_BAD_REQUEST
+            return jsonify({"message": "Borrowers provided do not match the selected deed"}), \
+                   status.HTTP_400_BAD_REQUEST
 
     error_count, error_message = validator.validate_payload(deed_update_json)
     if error_count > 0:
@@ -369,15 +370,14 @@ def make_effective(deed_reference):
         elif deed_status == "EFFECTIVE" or deed_status == "NOT-LR-SIGNED":
             LOGGER.error("Deed with reference - %s is in %s status and can not be registrar signed" %
                          (str(deed_reference), str(deed_status)))
-            return jsonify({"message": "This deed is already made effective."}), \
+            return jsonify({"message": "This deed has already been made effective."}), \
                 status.HTTP_400_BAD_REQUEST
 
         else:
             LOGGER.error("Deed with reference - %s is not fully signed and can not be registrar signed" %
                          str(deed_reference))
-            return jsonify({"message": "You can not make this deed effective "
-                                       "as it is not fully signed."}), \
-                status.HTTP_400_BAD_REQUEST
+            return jsonify({"message": "This deed cannot be made effective as not all borrowers "
+                                       "have signed the deed."}), status.HTTP_400_BAD_REQUEST
 
 
 @deed_bp.route('/<deed_reference>/request-auth-code', methods=['POST'])
