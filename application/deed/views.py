@@ -152,37 +152,34 @@ def create():
 
     validate_borrower_names, msg = validator.validate_borrower_names(deed_json)
     if not validate_borrower_names:
-        error_list.append(msg + "\n")
-        #return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
+        error_list.append(msg)
 
     akuma_call = validator.call_akuma(deed_json, deed.token,
                          credentials['organisation_name'],
                          credentials['organisation_locale'],
                          deed_type="create deed")
 
-
-    print (akuma_call['result'])
+    print(akuma_call['result'])
+    # This will be replaced in full with US329
     if akuma_call['result'] != "B":
         return jsonify({"message": "Unable to use this service. This might be because of technical difficulties or "
                                    "entries on the register not being suitable for digital applications. "
                                    "You will need to complete this transaction using a paper deed."}), \
                                     status.HTTP_200_OK
 
-
     dob_validate, msg = validator.validate_dob(deed_json)
     if not dob_validate:
-        error_list.append(msg + "\n")
-        return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
+        error_list.append(msg)
 
     phone_validate, msg = validator.validate_phonenumbers(deed_json)
     if not phone_validate:
-        error_list.append(msg + "\n")
-        return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
+        error_list.append(msg) 
 
     if len(error_list) > 0:
         LOGGER.error("Update deed 400_BAD_REQUEST")
-        error_list = str(error_list)
-        return error_list, status.HTTP_400_BAD_REQUEST
+        for count, error in enumerate(error_list, start=1):
+            error_message += "Problem %s: %s " % (count, str(error))
+        return jsonify({"Errors": error_message}), status.HTTP_400_BAD_REQUEST
 
     success, msg = update_deed(deed, deed_json)
     if not success:
