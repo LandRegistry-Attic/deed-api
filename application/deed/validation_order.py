@@ -1,4 +1,5 @@
 import logging
+import sys
 from application.deed.utils import process_organisation_credentials, validate_helper, valid_dob, is_unique_list
 from application.title_adaptor.service import TitleAdaptor
 from application.akuma.service import Akuma
@@ -92,9 +93,11 @@ class Validation():
     def validate_md_exists(self, md_ref):
         try:
             mortgage_document = MortgageDocument.query.filter_by(md_ref=str(md_ref)).first()
-            return True, "OK"
-        except:
+            return True, "MD Verified"
+        except Exception as e:
+            LOGGER.error("Database Exception - %s" % e)
+
+        if mortgage_document is None:
             msg = "mortgage document associated with supplied md_ref is not found"
+            LOGGER.error(msg)
             return False, msg
-
-

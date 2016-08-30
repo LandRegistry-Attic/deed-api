@@ -1,8 +1,8 @@
+import collections
 import copy
 import json
 import logging
 import sys
-import collections
 from datetime import datetime
 
 from application import esec_client
@@ -13,11 +13,10 @@ from application.deed.model import Deed, deed_json_adapter, deed_pdf_adapter
 from application.deed.service import update_deed, update_deed_signature_timestamp, apply_registrar_signature, \
     make_deed_effective_date
 from application.deed.utils import convert_json_to_xml
+from application.deed.validation_order import Validation
 from flask import Blueprint
 from flask import request, abort, jsonify, Response
 from flask.ext.api import status
-from application.deed.validation_order import Validation
-
 
 LOGGER = logging.getLogger(__name__)
 
@@ -155,9 +154,9 @@ def create():
         error_list.append(msg)
 
     akuma_call = validator.call_akuma(deed_json, deed.token,
-                         credentials['organisation_name'],
-                         credentials['organisation_locale'],
-                         deed_type="create deed")
+                                      credentials['organisation_name'],
+                                      credentials['organisation_locale'],
+                                      deed_type="create deed")
 
     print(akuma_call['result'])
     # This will be replaced in full with US329
@@ -165,7 +164,7 @@ def create():
         return jsonify({"message": "Unable to use this service. This might be because of technical difficulties or "
                                    "entries on the register not being suitable for digital applications. "
                                    "You will need to complete this transaction using a paper deed."}), \
-                                    status.HTTP_200_OK
+            status.HTTP_200_OK
 
     dob_validate, msg = validator.validate_dob(deed_json)
     if not dob_validate:
@@ -173,13 +172,20 @@ def create():
 
     phone_validate, msg = validator.validate_phonenumbers(deed_json)
     if not phone_validate:
-        error_list.append(msg) 
+        error_list.append(msg)
 
+    md_validate, msg = validator.validate_md_exists(deed_json['md_ref'])
+    if not md_validate:
+        error_list.append(msg)
+
+    # Error List Print Out
     if len(error_list) > 0:
         LOGGER.error("Update deed 400_BAD_REQUEST")
+        error_message = ""
         for count, error in enumerate(error_list, start=1):
-            error_message += "Problem %s: %s " % (count, str(error))
-        return jsonify({"Errors": error_message}), status.HTTP_400_BAD_REQUEST
+            error_message += "Problem %s: %s; " % (count, str(error))
+
+        return jsonify({"Errors": str(error_message)}), status.HTTP_400_BAD_REQUEST
 
     success, msg = update_deed(deed, deed_json)
     if not success:
