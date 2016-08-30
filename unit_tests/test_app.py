@@ -528,22 +528,22 @@ class TestRoutes(TestRoutesBase):
         deed_model.status = "EFFECTIVE"
         mock_get_deed.return_value = deed_model
         response_status_code = make_effective(123)[1]
-        mock_jsonify.assert_called_with({"message": "This deed is already made effective."})
+        mock_jsonify.assert_called_with({"message": "This deed has already been made effective."})
         self.assertEqual(response_status_code, 400)
 
         # test where not registrar signed
         deed_model.status = "NOT-LR-SIGNED"
         mock_get_deed.return_value = deed_model
         response_status_code = make_effective(123)[1]
-        mock_jsonify.assert_called_with({"message": "This deed is already made effective."})
+        mock_jsonify.assert_called_with({"message": "This deed has already been made effective."})
         self.assertEqual(response_status_code, 400)
 
         # test anything else
         deed_model.status = "Foo"
         mock_get_deed.return_value = deed_model
         response_status_code = make_effective(123)[1]
-        mock_jsonify.assert_called_with({"message": "You can not make this deed effective "
-                                        "as it is not fully signed."})
+        mock_jsonify.assert_called_with({"message": "This deed cannot be made effective as not all borrowers have "
+                                                    "signed the deed."})
         self.assertEqual(response_status_code, 400)
 
     @mock.patch('json.dumps')
