@@ -85,7 +85,7 @@ def get_existing_deed_and_update(deed_reference):
     if not validate_borrower_names:
         error_list.append(msg)
 
-    akuma_call = validator.call_akuma(deed_update_jsong, deed.token,
+    akuma_call = validator.call_akuma(deed_update_json, deed.token,
                                       credentials['organisation_name'],
                                       credentials['organisation_locale'],
                                       deed_type="create deed")
