@@ -99,3 +99,5 @@ class Validation():
             msg = "MD Ref cannot be found"
             LOGGER.error(msg)
             return False, msg
+        else:
+            return True, mortgage_document
