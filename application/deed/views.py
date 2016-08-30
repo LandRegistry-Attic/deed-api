@@ -147,9 +147,13 @@ def create():
     if validate_title_number != "title OK":
         return jsonify({"message": validate_title_number}), status.HTTP_400_BAD_REQUEST
 
+    # From here - errors are grouped
+    error_list = []
+
     validate_borrower_names, msg = validator.validate_borrower_names(deed_json)
     if not validate_borrower_names:
-        return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
+        error_list.append(msg + "\n")
+        #return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
 
     validator.call_akuma(deed_json, deed.token,
                          credentials['organisation_name'],
