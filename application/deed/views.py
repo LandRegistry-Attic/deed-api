@@ -96,7 +96,7 @@ def get_existing_deed_and_update(deed_reference):
         return jsonify({"message": "Unable to use this service. This might be because of technical difficulties or "
                                    "entries on the register not being suitable for digital applications. "
                                    "You will need to complete this transaction using a paper deed."}), \
-               status.HTTP_200_OK
+            status.HTTP_200_OK
 
     dob_validate, msg = validator.validate_dob(deed_update_json)
     if not dob_validate:
