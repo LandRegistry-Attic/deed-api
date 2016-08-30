@@ -78,22 +78,46 @@ def get_existing_deed_and_update(deed_reference):
     if validate_title_number != "title OK":
         return jsonify({"message": validate_title_number}), status.HTTP_400_BAD_REQUEST
 
+    # From here - errors are grouped
+    error_list = []
+
     validate_borrower_names, msg = validator.validate_borrower_names(deed_update_json)
     if not validate_borrower_names:
-        return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
+        error_list.append(msg)
 
-    validator.call_akuma(deed_update_json, result_deed.token,
-                         credentials['organisation_name'],
-                         credentials['organisation_locale'],
-                         deed_type="modify deed")
+    akuma_call = validator.call_akuma(deed_update_jsong, deed.token,
+                                      credentials['organisation_name'],
+                                      credentials['organisation_locale'],
+                                      deed_type="create deed")
+
+    print(akuma_call['result'])
+    # This will be replaced in full with US329
+    if akuma_call['result'] != "B":
+        return jsonify({"message": "Unable to use this service. This might be because of technical difficulties or "
+                                   "entries on the register not being suitable for digital applications. "
+                                   "You will need to complete this transaction using a paper deed."}), \
+               status.HTTP_200_OK
 
     dob_validate, msg = validator.validate_dob(deed_update_json)
     if not dob_validate:
-        return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
+        error_list.append(msg)
 
     phone_validate, msg = validator.validate_phonenumbers(deed_update_json)
     if not phone_validate:
-        return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
+        error_list.append(msg)
+
+    md_validate, msg = validator.validate_md_exists(deed_update_json['md_ref'])
+    if not md_validate:
+        error_list.append(msg)
+
+    # Error List Print Out
+    if len(error_list) > 0:
+        LOGGER.error("Update deed 400_BAD_REQUEST")
+        error_message = []
+        for count, error in enumerate(error_list, start=1):
+            error_message.append("Problem %s: %s" % (count, str(error)))
+
+        return jsonify({"Errors": error_message}), status.HTTP_400_BAD_REQUEST
 
     success, msg = update_deed(result_deed, deed_update_json)
     if not success:
