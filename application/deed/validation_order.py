@@ -56,6 +56,8 @@ class Validation():
         elif deed_type == "modify deed":
             LOGGER.info("Check ID - MODIFY: " + check_result['id'])
 
+        return check_result
+
     def validate_dob(self, deed_json):
         borrowers = deed_json["borrowers"]
 
