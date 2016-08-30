@@ -1,5 +1,4 @@
 import logging
-import sys
 from application.deed.utils import process_organisation_credentials, validate_helper, valid_dob, is_unique_list
 from application.title_adaptor.service import TitleAdaptor
 from application.akuma.service import Akuma
