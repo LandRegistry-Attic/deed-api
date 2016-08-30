@@ -90,6 +90,7 @@ class Validation():
             return True, ""
 
     def validate_md_exists(self, md_ref):
+        mortgage_document = None
         try:
             mortgage_document = MortgageDocument.query.filter_by(md_ref=str(md_ref)).first()
         except Exception as e:
