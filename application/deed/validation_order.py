@@ -4,6 +4,7 @@ from application.title_adaptor.service import TitleAdaptor
 from application.akuma.service import Akuma
 from application.deed.validate_borrowers import check_borrower_names, BorrowerNamesException
 from underscore import _
+from application.mortgage_document.model import MortgageDocument
 
 LOGGER = logging.getLogger(__name__)
 
@@ -87,3 +88,13 @@ class Validation():
             return valid, msg
         else:
             return True, ""
+
+    def validate_md_exists(self, md_ref):
+        try:
+            mortgage_document = MortgageDocument.query.filter_by(md_ref=str(md_ref)).first()
+            return True, "OK"
+        except:
+            msg = "mortgage document associated with supplied md_ref is not found"
+            return False, msg
+
+
