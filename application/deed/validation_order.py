@@ -92,7 +92,6 @@ class Validation():
     def validate_md_exists(self, md_ref):
         try:
             mortgage_document = MortgageDocument.query.filter_by(md_ref=str(md_ref)).first()
-            return True, "MD Verified"
         except Exception as e:
             LOGGER.error("Database Exception - %s" % e)
 
