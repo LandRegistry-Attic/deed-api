@@ -67,7 +67,7 @@ class Validation():
             .reduce(valid_dob, True).value()
 
         if not valid:
-            msg = "Date of birth must not be a date in the future"
+            msg = "Date of birth must not be a date in the future."
             LOGGER.error(msg)
             return valid, msg
         else:
@@ -83,7 +83,7 @@ class Validation():
         valid = is_unique_list(phone_number_list)
 
         if not valid:
-            msg = "A mobile phone number must be unique to an individual"
+            msg = "A mobile phone number must be unique to an individual."
             LOGGER.error(msg)
             return valid, msg
         else:
@@ -97,7 +97,7 @@ class Validation():
             LOGGER.error("Database Exception - %s" % e)
 
         if mortgage_document is None:
-            msg = "MD Ref cannot be found"
+            msg = "MD Ref cannot be found."
             LOGGER.error(msg)
             return False, msg
         else:

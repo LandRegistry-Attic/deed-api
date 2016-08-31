@@ -158,7 +158,7 @@ def create():
 
     credentials = validator.validate_organisation_credentials()
     if credentials is None:
-        return jsonify({"message": "Unable to process organisation credentials"}), status.HTTP_401_UNAUTHORIZED
+        return jsonify({"message": "Unable to process organisation credentials."}), status.HTTP_401_UNAUTHORIZED
 
     deed.organisation_id = credentials['organisation_id']
     deed.organisation_name = credentials['organisation_name']
