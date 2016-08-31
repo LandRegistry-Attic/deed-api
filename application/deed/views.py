@@ -163,7 +163,7 @@ def create():
                          credentials['organisation_locale'],
                          deed_type="create deed")
 
-    if create_deed_akuma['result'] == "Z":
+    if create_deed_akuma["result"] == "Z":
         return jsonify({"message": "Unable to use this service. "
                                    "This might be because of technical difficulties or entries on the register not "
                                    "being suitable for digital applications. "
