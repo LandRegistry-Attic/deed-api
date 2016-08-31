@@ -211,6 +211,14 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
     else:
         LOGGER.info("Signing deed for borrower_token %s against deed reference %s" % (borrower_token, deed_reference))
 
+        signing_deed_akuma = Akuma.do_check(deed.deed, "borrower sign",
+                                      deed.organisation_name, "", deed.token)
+        LOGGER.info("Check ID - Borrower SIGNING: " + signing_deed_akuma['id'])
+
+        if signing_deed_akuma["result"] == "Z":
+            LOGGER.error("Failed to sign Mortgage document")
+            return "Failed to sign Mortgage document"
+
         # check if XML already exist
         if deed.deed_xml is None:
             LOGGER.info("Generating DEED_XML")
@@ -238,9 +246,7 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
 
                     LOGGER.info("updating JSON with Signature")
                     deed.deed = update_deed_signature_timestamp(deed, borrower_token)
-                    check_result = Akuma.do_check(deed.deed, "borrower sign",
-                                                  deed.organisation_name, "", deed.token)
-                    LOGGER.info("Check ID - Borrower SIGNING: " + check_result['id'])
+
                 else:
                     LOGGER.error("Failed to sign Mortgage document")
                     return "Failed to sign Mortgage document", status_code
