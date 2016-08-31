@@ -83,10 +83,17 @@ def get_existing_deed_and_update(deed_reference):
     if not validate_borrower_names:
         return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
 
-    validator.call_akuma(deed_update_json, result_deed.token,
+    modify_deed_akuma = validator.call_akuma(deed_update_json, result_deed.token,
                          credentials['organisation_name'],
                          credentials['organisation_locale'],
                          deed_type="modify deed")
+
+    if modify_deed_akuma['result'] == "Z":
+        return jsonify({"message": "Unable to use this service. "
+                                   "This might be because of technical difficulties or entries on the register not "
+                                   "being suitable for digital applications. "
+                                   "You will need to complete this transaction using a paper deed."}), \
+               status.HTTP_400_BAD_REQUEST
 
     dob_validate, msg = validator.validate_dob(deed_update_json)
     if not dob_validate:
@@ -151,10 +158,17 @@ def create():
     if not validate_borrower_names:
         return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
 
-    validator.call_akuma(deed_json, deed.token,
+    create_deed_akuma = validator.call_akuma(deed_json, deed.token,
                          credentials['organisation_name'],
                          credentials['organisation_locale'],
                          deed_type="create deed")
+
+    if create_deed_akuma['result'] == "Z":
+        return jsonify({"message": "Unable to use this service. "
+                                   "This might be because of technical difficulties or entries on the register not "
+                                   "being suitable for digital applications. "
+                                   "You will need to complete this transaction using a paper deed."}), \
+               status.HTTP_400_BAD_REQUEST
 
     dob_validate, msg = validator.validate_dob(deed_json)
     if not dob_validate:
