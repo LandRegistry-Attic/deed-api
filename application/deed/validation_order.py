@@ -45,7 +45,7 @@ class Validation():
             return True, ""
 
         except BorrowerNamesException:
-            msg = "The names supplied do not match those on the register."
+            msg = "The names supplied do not match those held on the register."
             return False, msg
 
     def call_akuma(self, deed_json, deed_token, organisation_name, organisation_locale, deed_type):
