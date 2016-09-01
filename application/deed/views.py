@@ -189,7 +189,7 @@ def create():
         return jsonify({"message": "Unable to use this service. This might be because of technical difficulties or "
                                    "entries on the register not being suitable for digital applications. "
                                    "You will need to complete this transaction using a paper deed."}), \
-            status.HTTP_200_OK
+            status.HTTP_403_FORBIDDEN
 
     dob_validate, msg = validator.validate_dob(deed_json)
     if not dob_validate:
