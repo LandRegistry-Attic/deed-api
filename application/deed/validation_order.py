@@ -67,7 +67,7 @@ class Validation():
             .reduce(valid_dob, True).value()
 
         if not valid:
-            msg = "Date of birth must not be a date in the future."
+            msg = "A date of birth must not be a date in the future."
             LOGGER.error(msg)
             return valid, msg
         else:
