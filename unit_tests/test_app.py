@@ -758,7 +758,7 @@ class TestCreateDeed(TestRoutesBase):
                                                     mock_val_phone):
         # test validate_title_number
         mock_val_payload.return_value = 0, "No error message"
-        mock_val_tn.return_value = "Title does not exist"
+        mock_val_tn.return_value = "Title does not exist."
         mock_val_bor.return_value = True, ""
         mock_val_dob.return_value = True, ""
         mock_val_phone.return_value = True, ""
