@@ -331,6 +331,10 @@ class TestRoutes(TestRoutesBase):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = None
 
+        mock_akuma.return_value = {
+            "result": "B",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
         mock_update.update_deed.return_value = True, "OK"
         mock_validator.return_value.text = "title OK"
 
