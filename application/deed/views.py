@@ -69,7 +69,7 @@ def get_existing_deed_and_update(deed_reference):
 
         if borrower_check is None or borrower_check.deed_token != deed_reference:
             return jsonify({"message": "Borrowers provided do not match the selected deed"}), \
-                   status.HTTP_400_BAD_REQUEST
+                status.HTTP_400_BAD_REQUEST
 
     error_count, error_message = validator.validate_payload(deed_update_json)
     if error_count > 0:
