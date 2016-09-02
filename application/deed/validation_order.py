@@ -5,6 +5,7 @@ from application.akuma.service import Akuma
 from application.deed.validate_borrowers import check_borrower_names, BorrowerNamesException
 from underscore import _
 from application.mortgage_document.model import MortgageDocument
+from application.borrower.model import DatabaseException
 
 LOGGER = logging.getLogger(__name__)
 
@@ -93,8 +94,8 @@ class Validation():
         mortgage_document = None
         try:
             mortgage_document = MortgageDocument.query.filter_by(md_ref=str(md_ref)).first()
-        except Exception as e:
-            LOGGER.error("Database Exception - %s" % e)
+        except:
+            raise DatabaseException
 
         if mortgage_document is None:
             msg = "MD Ref cannot be found."
