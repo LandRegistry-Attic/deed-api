@@ -112,7 +112,8 @@ def get_existing_deed_and_update(deed_reference):
 
     # Error List Print Out
     if len(error_list) > 0:
-        send_error_list(error_list)
+        compiled_list = send_error_list(error_list)
+        return compiled_list
 
     success, msg = update_deed(result_deed, deed_update_json)
     if not success:
@@ -199,7 +200,8 @@ def create():
 
     # Error List Print Out
     if len(error_list) > 0:
-        send_error_list(error_list)
+        compiled_list = send_error_list(error_list)
+        return compiled_list
 
     success, msg = update_deed(deed, deed_json)
     if not success:
