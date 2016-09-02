@@ -4,6 +4,8 @@ from application.title_adaptor.service import TitleAdaptor
 from application.akuma.service import Akuma
 from application.deed.validate_borrowers import check_borrower_names, BorrowerNamesException
 from underscore import _
+from application.mortgage_document.model import MortgageDocument
+from application.borrower.model import DatabaseException
 
 LOGGER = logging.getLogger(__name__)
 
@@ -44,7 +46,7 @@ class Validation():
             return True, ""
 
         except BorrowerNamesException:
-            msg = "a digital mortgage cannot be created as there is a discrepancy between the names given and those held on the register."
+            msg = "The names supplied do not match those held on the register."
             return False, msg
 
     def call_akuma(self, deed_json, deed_token, organisation_name, organisation_locale, deed_type):
@@ -56,6 +58,8 @@ class Validation():
         elif deed_type == "modify deed":
             LOGGER.info("Check ID - MODIFY: " + check_result['id'])
 
+        return check_result
+
     def validate_dob(self, deed_json):
         borrowers = deed_json["borrowers"]
 
@@ -64,7 +68,7 @@ class Validation():
             .reduce(valid_dob, True).value()
 
         if not valid:
-            msg = "Date of birth must not be a date in the future"
+            msg = "A date of birth must not be a date in the future."
             LOGGER.error(msg)
             return valid, msg
         else:
@@ -80,8 +84,22 @@ class Validation():
         valid = is_unique_list(phone_number_list)
 
         if not valid:
-            msg = "A mobile phone number must be unique to an individual"
+            msg = "A mobile phone number must be unique to an individual."
             LOGGER.error(msg)
             return valid, msg
         else:
             return True, ""
+
+    def validate_md_exists(self, md_ref):
+        mortgage_document = None
+        try:
+            mortgage_document = MortgageDocument.query.filter_by(md_ref=str(md_ref)).first()
+        except:
+            raise DatabaseException
+
+        if mortgage_document is None:
+            msg = "MD Ref cannot be found."
+            LOGGER.error(msg)
+            return False, msg
+        else:
+            return True, mortgage_document

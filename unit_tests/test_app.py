@@ -135,7 +135,7 @@ class TestRoutes(TestRoutesBase):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
         mock_akuma.return_value = {
-            "result": "A",
+            "result": "B",
             "id": "2b9115b2-d956-11e5-942f-08002719cd16"
         }
         mock_proprietor_names.return_value = ['lisa ann bloggette', 'frank ann bloggette']
@@ -155,7 +155,7 @@ class TestRoutes(TestRoutesBase):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
         mock_akuma.return_value = {
-            "result": "A",
+            "result": "B",
             "id": "2b9115b2-d956-11e5-942f-08002719cd16"
         }
 
@@ -331,6 +331,10 @@ class TestRoutes(TestRoutesBase):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = None
 
+        mock_akuma.return_value = {
+            "result": "B",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
         mock_update.update_deed.return_value = True, "OK"
         mock_validator.return_value.text = "title OK"
 
@@ -528,22 +532,22 @@ class TestRoutes(TestRoutesBase):
         deed_model.status = "EFFECTIVE"
         mock_get_deed.return_value = deed_model
         response_status_code = make_effective(123)[1]
-        mock_jsonify.assert_called_with({"message": "This deed is already made effective."})
+        mock_jsonify.assert_called_with({"message": "This deed has already been made effective."})
         self.assertEqual(response_status_code, 400)
 
         # test where not registrar signed
         deed_model.status = "NOT-LR-SIGNED"
         mock_get_deed.return_value = deed_model
         response_status_code = make_effective(123)[1]
-        mock_jsonify.assert_called_with({"message": "This deed is already made effective."})
+        mock_jsonify.assert_called_with({"message": "This deed has already been made effective."})
         self.assertEqual(response_status_code, 400)
 
         # test anything else
         deed_model.status = "Foo"
         mock_get_deed.return_value = deed_model
         response_status_code = make_effective(123)[1]
-        mock_jsonify.assert_called_with({"message": "You can not make this deed effective "
-                                        "as it is not fully signed."})
+        mock_jsonify.assert_called_with({"message": "This deed cannot be made effective as not all borrowers have "
+                                                    "signed the deed."})
         self.assertEqual(response_status_code, 400)
 
     @mock.patch('json.dumps')
@@ -758,7 +762,7 @@ class TestCreateDeed(TestRoutesBase):
                                                     mock_val_phone):
         # test validate_title_number
         mock_val_payload.return_value = 0, "No error message"
-        mock_val_tn.return_value = "Title does not exist"
+        mock_val_tn.return_value = "Title does not exist."
         mock_val_bor.return_value = True, ""
         mock_val_dob.return_value = True, ""
         mock_val_phone.return_value = True, ""
