@@ -91,7 +91,6 @@ def get_existing_deed_and_update(deed_reference):
                                       credentials['organisation_locale'],
                                       deed_type="create deed")
 
-    print(akuma_call['result'])
     # This will be replaced in full with US329
     if akuma_call['result'] != "B":
         return jsonify({"message": "Unable to use this service. This might be because of technical difficulties or "
@@ -113,12 +112,7 @@ def get_existing_deed_and_update(deed_reference):
 
     # Error List Print Out
     if len(error_list) > 0:
-        LOGGER.error("Update deed 400_BAD_REQUEST")
-        error_message = []
-        for count, error in enumerate(error_list, start=1):
-            error_message.append("Problem %s: %s" % (count, str(error)))
-
-        return jsonify({"Errors": error_message}), status.HTTP_400_BAD_REQUEST
+        send_error_list(error_list)
 
     success, msg = update_deed(result_deed, deed_update_json)
     if not success:
@@ -205,12 +199,7 @@ def create():
 
     # Error List Print Out
     if len(error_list) > 0:
-        LOGGER.error("Update deed 400_BAD_REQUEST")
-        error_message = []
-        for count, error in enumerate(error_list, start=1):
-            error_message.append("Problem %s: %s" % (count, str(error)))
-
-        return jsonify({"Errors": error_message}), status.HTTP_400_BAD_REQUEST
+        send_error_list(error_list)
 
     success, msg = update_deed(deed, deed_json)
     if not success:
@@ -411,3 +400,12 @@ def verify_auth_code(deed_reference):
     else:
         LOGGER.error("Not able to sign the deed")
         return jsonify({"result": False}), status_code
+
+
+def send_error_list(error_list):
+    LOGGER.error("Update deed 400_BAD_REQUEST - Error List")
+    error_message = []
+    for count, error in enumerate(error_list, start=1):
+        error_message.append("Problem %s: %s" % (count, str(error)))
+
+    return jsonify({"Errors": error_message}), status.HTTP_400_BAD_REQUEST
