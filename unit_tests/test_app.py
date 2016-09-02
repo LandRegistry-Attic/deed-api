@@ -694,6 +694,7 @@ class TestCreateDeed(TestRoutesBase):
 
         self.assertFalse(res)
 
+    @mock.patch('application.borrower.model', autospec=True)
     @mock.patch('application.deed.views.Validation.validate_phonenumbers')
     @mock.patch('application.deed.views.Validation.validate_dob')
     @mock.patch('application.deed.views.Validation.call_akuma')
@@ -704,7 +705,7 @@ class TestCreateDeed(TestRoutesBase):
     @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
     @mock.patch('application.deed.views.Deed.get_deed')
     def test_get_existing_deed_and_update(self, mock_deed, mock_org_cred, mock_update, mock_val_payload, mock_val_tn,
-                                          mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone):
+                                          mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone, mock_borrower_db):
 
         mock_val_payload.return_value = 0, "No error message"
         mock_val_tn.return_value = "title OK"
@@ -751,7 +752,6 @@ class TestCreateDeed(TestRoutesBase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @mock.patch('application.borrower.model', autospec=True)
     @mock.patch('application.deed.views.Validation.validate_phonenumbers')
     @mock.patch('application.deed.views.Validation.validate_dob')
     @mock.patch('application.deed.views.Validation.call_akuma')
@@ -763,7 +763,7 @@ class TestCreateDeed(TestRoutesBase):
     @mock.patch('application.deed.views.Deed.get_deed')
     def test_get_existing_deed_and_update_bad_title(self, mock_deed, mock_org_cred, mock_update, mock_val_payload,
                                                     mock_val_tn, mock_val_bor, mock_akuma, mock_val_dob,
-                                                    mock_val_phone, mock_borrower_db):
+                                                    mock_val_phone):
         # test validate_title_number
         mock_val_payload.return_value = 0, "No error message"
         mock_val_tn.return_value = "Title does not exist."
