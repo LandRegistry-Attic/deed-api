@@ -1,8 +1,9 @@
 import logging
-from application.deed.utils import process_organisation_credentials, validate_helper, valid_dob, is_unique_list
-from application.title_adaptor.service import TitleAdaptor
+
 from application.akuma.service import Akuma
+from application.deed.utils import process_organisation_credentials, validate_helper, valid_dob, is_unique_list
 from application.deed.validate_borrowers import check_borrower_names, BorrowerNamesException
+from application.title_adaptor.service import TitleAdaptor
 from underscore import _
 from application.mortgage_document.model import MortgageDocument
 from application.borrower.model import DatabaseException
@@ -63,8 +64,8 @@ class Validation():
     def validate_dob(self, deed_json):
         borrowers = deed_json["borrowers"]
 
-        valid = _(borrowers).chain()\
-            .map(lambda x, *a: x['dob'])\
+        valid = _(borrowers).chain() \
+            .map(lambda x, *a: x['dob']) \
             .reduce(valid_dob, True).value()
 
         if not valid:
@@ -77,8 +78,8 @@ class Validation():
     def validate_phonenumbers(self, deed_json):
         borrowers = deed_json["borrowers"]
 
-        phone_number_list = _(borrowers).chain()\
-            .map(lambda x, *a: x['phone_number'])\
+        phone_number_list = _(borrowers).chain() \
+            .map(lambda x, *a: x['phone_number']) \
             .value()
 
         valid = is_unique_list(phone_number_list)

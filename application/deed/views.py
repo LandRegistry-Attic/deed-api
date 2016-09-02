@@ -86,17 +86,17 @@ def get_existing_deed_and_update(deed_reference):
     if not validate_borrower_names:
         error_list.append(msg)
 
-    akuma_call = validator.call_akuma(deed_update_json, deed.token,
-                                      credentials['organisation_name'],
-                                      credentials['organisation_locale'],
-                                      deed_type="create deed")
+    modify_deed_akuma = validator.call_akuma(deed_update_json, result_deed.token,
+                                             credentials['organisation_name'],
+                                             credentials['organisation_locale'],
+                                             deed_type="modify deed")
 
-    # This will be replaced in full with US329
-    if akuma_call['result'] != "A":
-        return jsonify({"message": "Unable to use this service. This might be because of technical difficulties or "
-                                   "entries on the register not being suitable for digital applications. "
+    if modify_deed_akuma['result'] == "Z":
+        return jsonify({"message": "Unable to use this service. "
+                                   "This might be because of technical difficulties or entries on the register not "
+                                   "being suitable for digital applications. "
                                    "You will need to complete this transaction using a paper deed."}), \
-            status.HTTP_200_OK
+            status.HTTP_403_FORBIDDEN
 
     dob_validate, msg = validator.validate_dob(deed_update_json)
     if not dob_validate:
@@ -173,16 +173,15 @@ def create():
     if not validate_borrower_names:
         error_list.append(msg)
 
-    akuma_call = validator.call_akuma(deed_json, deed.token,
-                                      credentials['organisation_name'],
-                                      credentials['organisation_locale'],
-                                      deed_type="create deed")
+    create_deed_akuma = validator.call_akuma(deed_json, deed.token,
+                                             credentials['organisation_name'],
+                                             credentials['organisation_locale'],
+                                             deed_type="create deed")
 
-    print(akuma_call['result'])
-    # This will be replaced in full with US329
-    if akuma_call['result'] != "A":
-        return jsonify({"message": "Unable to use this service. This might be because of technical difficulties or "
-                                   "entries on the register not being suitable for digital applications. "
+    if create_deed_akuma["result"] == "Z":
+        return jsonify({"message": "Unable to use this service. "
+                                   "This might be because of technical difficulties or entries on the register not "
+                                   "being suitable for digital applications. "
                                    "You will need to complete this transaction using a paper deed."}), \
             status.HTTP_403_FORBIDDEN
 
@@ -236,6 +235,14 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
     else:
         LOGGER.info("Signing deed for borrower_token %s against deed reference %s" % (borrower_token, deed_reference))
 
+        signing_deed_akuma = Akuma.do_check(deed.deed, "borrower sign",
+                                            deed.organisation_name, "", deed.token)
+        LOGGER.info("Check ID - Borrower SIGNING: " + signing_deed_akuma['id'])
+
+        if signing_deed_akuma["result"] == "Z":
+            LOGGER.error("Failed to sign Mortgage document")
+            return "Failed to sign Mortgage document"
+
         # check if XML already exist
         if deed.deed_xml is None:
             LOGGER.info("Generating DEED_XML")
@@ -263,9 +270,7 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
 
                     LOGGER.info("updating JSON with Signature")
                     deed.deed = update_deed_signature_timestamp(deed, borrower_token)
-                    check_result = Akuma.do_check(deed.deed, "borrower sign",
-                                                  deed.organisation_name, "", deed.token)
-                    LOGGER.info("Check ID - Borrower SIGNING: " + check_result['id'])
+
                 else:
                     LOGGER.error("Failed to sign Mortgage document")
                     return "Failed to sign Mortgage document", status_code

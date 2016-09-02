@@ -134,11 +134,11 @@ class TestRoutes(TestRoutesBase):
 
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
+        mock_proprietor_names.return_value = ['lisa ann bloggette', 'frank ann bloggette']
         mock_akuma.return_value = {
             "result": "A",
             "id": "2b9115b2-d956-11e5-942f-08002719cd16"
         }
-        mock_proprietor_names.return_value = ['lisa ann bloggette', 'frank ann bloggette']
         payload = json.dumps(DeedHelper._json_doc)
         response = self.app.post(self.DEED_ENDPOINT, data=payload,
                                  headers={"Content-Type": "application/json"})
@@ -711,7 +711,10 @@ class TestCreateDeed(TestRoutesBase):
         mock_val_bor.return_value = True, ""
         mock_val_dob.return_value = True, ""
         mock_val_phone.return_value = True, ""
-
+        mock_akuma.return_value = {
+            "result": "A",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
         mock_deed.return_value = DeedModelMock()
         mock_update.return_value = True, "OK"
 
