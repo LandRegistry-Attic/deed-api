@@ -92,7 +92,7 @@ def get_existing_deed_and_update(deed_reference):
                                       deed_type="create deed")
 
     # This will be replaced in full with US329
-    if akuma_call['result'] != "B":
+    if akuma_call['result'] != "A":
         return jsonify({"message": "Unable to use this service. This might be because of technical difficulties or "
                                    "entries on the register not being suitable for digital applications. "
                                    "You will need to complete this transaction using a paper deed."}), \
@@ -180,7 +180,7 @@ def create():
 
     print(akuma_call['result'])
     # This will be replaced in full with US329
-    if akuma_call['result'] != "B":
+    if akuma_call['result'] != "A":
         return jsonify({"message": "Unable to use this service. This might be because of technical difficulties or "
                                    "entries on the register not being suitable for digital applications. "
                                    "You will need to complete this transaction using a paper deed."}), \
