@@ -12,7 +12,7 @@ ENV DEED_DATABASE_URI postgres://root:superroot@postgres/deed_api
 # Put your app-specific stuff here (extra yum installs etc).
 # Any unique environment variables your config.py needs should also be added as ENV entries here
 
-RUN sudo yum -y install libffi-devel libxslt-devel libxml2-devel python-lxml python-cffi cairo pango gdk-pixbuf2 xorg-x11-fonts-Type1
+RUN yum -y install libffi-devel libxslt-devel libxml2-devel python-lxml python-cffi cairo pango gdk-pixbuf2 xorg-x11-fonts-Type1
 
 ENV DEBUG True
 ENV AKUMA_ADDRESS 'http://cf-api-stub:8080'
