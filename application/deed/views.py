@@ -13,7 +13,7 @@ from application.deed.model import Deed, deed_json_adapter, deed_pdf_adapter
 from application.deed.service import update_deed, update_deed_signature_timestamp, apply_registrar_signature, \
     make_deed_effective_date
 from application.deed.utils import convert_json_to_xml
-from application.deed.validation_order import Validation
+from application.deed.deed_validator import Validation
 from flask import Blueprint
 from flask import request, abort, jsonify, Response
 from flask.ext.api import status
