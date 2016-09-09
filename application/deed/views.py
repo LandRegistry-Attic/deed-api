@@ -45,7 +45,7 @@ def get_existing_deed_and_update(deed_reference):
 
     error_count, error_message = validator.validate_payload(deed_update_json)
     if error_count > 0:
-        return error_message, status.HTTP_400_BAD_REQUEST
+        return jsonify({"message": error_message }), status.HTTP_400_BAD_REQUEST
 
     result_deed = deed.get_deed(deed_reference)
     if result_deed is None:
@@ -160,7 +160,7 @@ def create():
 
     error_count, error_message = validator.validate_payload(deed_json)
     if error_count > 0:
-        return error_message, status.HTTP_400_BAD_REQUEST
+        return jsonify({"message": error_message}), status.HTTP_400_BAD_REQUEST
 
     validate_title_number = validator.validate_title_number(deed_json)
     if validate_title_number != "title OK":
