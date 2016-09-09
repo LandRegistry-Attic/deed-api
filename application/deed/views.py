@@ -43,6 +43,10 @@ def get_existing_deed_and_update(deed_reference):
     if credentials is None:
         return jsonify({"message": "Unable to process organisation credentials"}), status.HTTP_401_UNAUTHORIZED
 
+    error_count, error_message = validator.validate_payload(deed_update_json)
+    if error_count > 0:
+        return error_message, status.HTTP_400_BAD_REQUEST
+
     result_deed = deed.get_deed(deed_reference)
     if result_deed is None:
         LOGGER.error("Deed with reference - %s not found" % str(deed_reference))
@@ -70,10 +74,6 @@ def get_existing_deed_and_update(deed_reference):
         if borrower_check is None or borrower_check.deed_token != deed_reference:
             return jsonify({"message": "Borrowers provided do not match the selected deed"}), \
                 status.HTTP_400_BAD_REQUEST
-
-    error_count, error_message = validator.validate_payload(deed_update_json)
-    if error_count > 0:
-        return error_message, status.HTTP_400_BAD_REQUEST
 
     validate_title_number = validator.validate_title_number(deed_update_json)
     if validate_title_number != "title OK":
