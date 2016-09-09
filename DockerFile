@@ -39,6 +39,6 @@ CMD ["/usr/local/bin/gunicorn", "-k", "eventlet", "--pythonpath", "/src", "--acc
 # don't need to be rerun. Same reason why _test is first.
 # This ensures the container always has just what is in the requirements files as it will
 # rerun this in a clean image.
-RUN  pip3 install --upgrade pip==7.1.2
+RUN pip3 install --upgrade pip==7.1.2
 ADD requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
