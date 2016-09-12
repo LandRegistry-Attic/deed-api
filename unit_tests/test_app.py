@@ -22,7 +22,7 @@ from application.deed.service import apply_registrar_signature, check_effective_
 from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
 from application.borrower.model import Borrower, DatabaseException
 from unit_tests.schema_tests import run_schema_checks
-from application.deed.deed_validator import Validation
+from application.deed.validation_order import Validation
 
 
 class TestRoutesBase(unittest.TestCase):
@@ -186,7 +186,7 @@ class TestRoutes(TestRoutesBase):
                                  headers=self.dodgy_webseal_headers1)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    @mock.patch('application.deed.deed_validator.Validation.validate_organisation_credentials')
+    @mock.patch('application.deed.validation_order.Validation.validate_organisation_credentials')
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
@@ -202,7 +202,7 @@ class TestRoutes(TestRoutesBase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @mock.patch('application.deed.deed_validator.Validation.validate_organisation_credentials')
+    @mock.patch('application.deed.validation_order.Validation.validate_organisation_credentials')
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
@@ -217,7 +217,7 @@ class TestRoutes(TestRoutesBase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @mock.patch('application.deed.deed_validator.Validation.validate_organisation_credentials')
+    @mock.patch('application.deed.validation_order.Validation.validate_organisation_credentials')
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     def test_invalid_title_format(self, mock_organisation_cred, mock_proprietor_names):
         mock_organisation_cred.return_value = {'organisation_id': "Foo",
@@ -302,7 +302,7 @@ class TestRoutes(TestRoutesBase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data.decode(), "Matching deed not found")
 
-    @mock.patch('application.deed.deed_validator.Validation.validate_organisation_credentials')
+    @mock.patch('application.deed.validation_order.Validation.validate_organisation_credentials')
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
