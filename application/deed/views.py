@@ -13,7 +13,7 @@ from application.deed.model import Deed, deed_json_adapter, deed_pdf_adapter
 from application.deed.service import update_deed, update_deed_signature_timestamp, apply_registrar_signature, \
     make_deed_effective_date
 from application.deed.utils import convert_json_to_xml
-from application.deed.validation_order import Validation
+from application.deed.deed_validator import Validation
 from flask import Blueprint
 from flask import request, abort, jsonify, Response
 from flask.ext.api import status
@@ -43,15 +43,19 @@ def get_existing_deed_and_update(deed_reference):
     if credentials is None:
         return jsonify({"message": "Unable to process organisation credentials"}), status.HTTP_401_UNAUTHORIZED
 
+    error_count, error_message = validator.validate_payload(deed_update_json)
+    if error_count > 0:
+        return jsonify({"message": error_message}), status.HTTP_400_BAD_REQUEST
+
     result_deed = deed.get_deed(deed_reference)
     if result_deed is None:
         LOGGER.error("Deed with reference - %s not found" % str(deed_reference))
-        return jsonify({"message": "There is no deed associated with this deed id."}), \
+        return jsonify({"message": "There is no deed associated with the deed ID provided."}), \
             status.HTTP_400_BAD_REQUEST
 
     # Deed Status check
     if str(result_deed.status) != "DRAFT":
-        return jsonify({"message": "This deed is not in a draft state"}), \
+        return jsonify({"message": "This deed is not in the correct state to be modified."}), \
             status.HTTP_400_BAD_REQUEST
 
     ids = []
@@ -61,19 +65,15 @@ def get_existing_deed_and_update(deed_reference):
 
     duplicates = [item for item, count in collections.Counter(ids).items() if count > 1]
     if duplicates:
-        return jsonify({"message": "Error duplicate borrower ID's in payload"}), \
+        return jsonify({"message": "A borrower ID must be unique to an individual."}), \
             status.HTTP_400_BAD_REQUEST
 
     for borrower_id in ids:
         borrower_check = Borrower.get_by_id(borrower_id)
 
         if borrower_check is None or borrower_check.deed_token != deed_reference:
-            return jsonify({"message": "Borrowers provided do not match the selected deed"}), \
+            return jsonify({"message": "The borrower ID provided does not match the deed ID provided."}), \
                 status.HTTP_400_BAD_REQUEST
-
-    error_count, error_message = validator.validate_payload(deed_update_json)
-    if error_count > 0:
-        return error_message, status.HTTP_400_BAD_REQUEST
 
     validate_title_number = validator.validate_title_number(deed_update_json)
     if validate_title_number != "title OK":
@@ -160,7 +160,7 @@ def create():
 
     error_count, error_message = validator.validate_payload(deed_json)
     if error_count > 0:
-        return error_message, status.HTTP_400_BAD_REQUEST
+        return jsonify({"message": error_message}), status.HTTP_400_BAD_REQUEST
 
     validate_title_number = validator.validate_title_number(deed_json)
     if validate_title_number != "title OK":
