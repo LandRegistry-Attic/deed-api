@@ -100,14 +100,14 @@ class DeedHelper:
         "property_address": "100 The Drive, This Town, This County, PL4 4TH",
         "borrowers": [
             {
-                "forename": "Luke",
-                "middle_name": "ann",
-                "surname": "Jedi",
+                "forename": "Ann",
+                "middle_name": "Luke",
+                "surname": "Smith",
                 "gender": "Male",
                 "address": "test address with postcode, PL14 3JX",
                 "dob": "23/01/1900",
                 "phone_number": "07502154062"
-            },
+            }
         ],
         "identity_checked": "Y"
     }
