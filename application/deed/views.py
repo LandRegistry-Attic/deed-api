@@ -66,7 +66,7 @@ def get_existing_deed_and_update(deed_reference):
 
     # Deed Status check
     if str(result_deed.status) != "DRAFT":
-        return jsonify({"message": "This deed is not in a draft state"}), \
+        return jsonify({"message": "This deed is not in the correct state to be modified."}), \
             status.HTTP_400_BAD_REQUEST
 
     for borrower_id in ids:
