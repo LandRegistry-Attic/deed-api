@@ -722,7 +722,7 @@ class TestCreateDeed(TestRoutesBase):
         mock_update.return_value = True, "OK"
 
         payload = json.dumps(DeedHelper._json_doc_update)
-        response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
+        response = self.app.post(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
                                 headers=self.webseal_headers)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -749,7 +749,7 @@ class TestCreateDeed(TestRoutesBase):
         mock_update.return_value = True, "OK"
         payload = json.dumps(DeedHelper._json_doc_update)
 
-        response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
+        response = self.app.post(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
                                 headers=self.webseal_headers)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -777,7 +777,7 @@ class TestCreateDeed(TestRoutesBase):
         mock_update.return_value = True, "OK"
 
         payload = json.dumps(DeedHelper._json_doc_update)
-        response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
+        response = self.app.post(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
                                 headers=self.webseal_headers)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -805,7 +805,7 @@ class TestCreateDeed(TestRoutesBase):
         mock_update.return_value = True, "OK"
 
         payload = json.dumps(DeedHelper._json_doc_update)
-        response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
+        response = self.app.post(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
                                 headers=self.webseal_headers)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -831,7 +831,7 @@ class TestCreateDeed(TestRoutesBase):
         mock_update.return_value = True, "OK"
 
         payload = json.dumps(DeedHelper._json_doc_update)
-        response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
+        response = self.app.post(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
                                 headers=self.webseal_headers)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -860,11 +860,10 @@ class TestCreateDeed(TestRoutesBase):
         mock_update.return_value = True, "OK"
 
         payload = json.dumps(DeedHelper._json_doc_update)
-        response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
+        response = self.app.post(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
                                 headers=self.webseal_headers)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
 
 class TestUpdateDeed(TestRoutesBase):
 

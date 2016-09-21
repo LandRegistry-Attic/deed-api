@@ -32,7 +32,7 @@ def get_deed(deed_reference):
     return jsonify(deed_json_adapter(deed_reference)), status.HTTP_200_OK
 
 
-@deed_bp.route('/<deed_reference>', methods=['PUT'])
+@deed_bp.route('/<deed_reference>', methods=['POST'])
 def get_existing_deed_and_update(deed_reference):
     deed = Deed()
     deed_update_json = request.get_json()
