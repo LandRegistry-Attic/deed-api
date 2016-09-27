@@ -418,4 +418,4 @@ def send_error_list(error_list):
     for count, error in enumerate(error_list, start=1):
         error_message.append("Problem %s: %s" % (count, str(error)))
 
-    return jsonify({"Errors": error_message}), status.HTTP_400_BAD_REQUEST
+    return jsonify({"errors": error_message}), status.HTTP_400_BAD_REQUEST
