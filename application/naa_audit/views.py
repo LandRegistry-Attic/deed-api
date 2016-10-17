@@ -8,11 +8,6 @@ naa_bp = Blueprint('naa', __name__,
                         template_folder='templates',
                         static_folder='static')
 
-
-@naa_bp.route('/hello', methods=['GET'])
-def hello():
-    return "oh hey there friend"
-
 @naa_bp.route('/accept/<borrower_id>', methods=['POST'])
 def accept_naa(borrower_id):
     naa = NAAAudit()
