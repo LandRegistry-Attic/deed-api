@@ -411,7 +411,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         self.assertEqual(get_created_deed.status_code, 200)
 
-        modify_deed = requests.post(config.DEED_API_BASE_HOST + response_json["path"],
+        modify_deed = requests.put(config.DEED_API_BASE_HOST + response_json["path"],
                                    data=json.dumps(new_deed),
                                    headers=self.webseal_headers)
 

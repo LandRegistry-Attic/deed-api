@@ -10,6 +10,8 @@ import os
 import logging
 from logger import logging_config
 
+import requests
+
 logging_config.setup_logging()
 LOGGER = logging.getLogger(__name__)
 
@@ -62,6 +64,85 @@ def check_status():
         "commit": str(os.getenv("COMMIT", "LOCAL"))
     })
 
+
+"""
+Test that deed-api can connect to all other services and also ensure
+that it can connect to its own postgres database.
+"""
+@app.route("/health/service-check")
+def service_check_routes():
+
+    database_error = ''
+    status_code = ''
+    database_response_message = ''
+    service_list =  ''
+
+    # Creates a mock deed and retrieve it, then run a try / except with it
+    # in order to catch an exception if it is occuring.
+    try:
+
+        # Attempt to retrieve the value of the alembic version
+        # from the relevant deed_api table
+        result = db.engine.execute("SELECT version_num FROM alembic_version;")
+
+        rowResults = []
+
+        for row in result:
+            rowResults.append(row[0])
+
+        # If the above statement passes, we can assume that a connection
+        # to the database has been established.
+        # If an exception occurs whilst retrieving the result, then the service
+        # will not reach this point.
+        service_list = {
+            "services" :
+            [
+                get_service_check_json(200, "deed-api", "postgres deeds (db)",
+                                "Successfully connected"),
+                get_service_check_json(200, "borrower front end", "deed-api",
+                                "Successfully connected")
+            ]
+        }
+
+    except Exception as e:
+        # If we have found an exception, then we can presume the connection to the database did not work
+        app.logger.error('Database Exception: %s', (e,), exc_info=True)
+
+        service_list = {
+            "services" :
+            [
+                get_service_check_json(500, "deed-api" , "postgres deeds (db)",
+                                "A database exception has occured"),
+                get_service_check_json(200, "borrower-frontend" , "deed-api",
+                                "Successfully connected")
+            ]
+        }
+
+    return json.dumps(service_list)
+
+"""
+Convert given parameters into a json object that will be returned and used within
+the health/service-check endpoint in order to identify the connection status
+for two given services (from/to)
+
+@parameter status_code : The html status code
+@parameter service_from : The service that has called the health/service-check endpoint
+@paramter service_to : This service
+@paramter service_message : The return message (error / success )
+
+@return A json dump that will (more than likely) be used to construct a json object
+        that will be returned to the borrower-frontend.
+"""
+def get_service_check_json(status_code, service_from, service_to, service_message):
+
+    service_json = {
+        "status_code": status_code,
+        "service_from": service_from,
+        "service_to": service_to,
+        "service_message": service_message
+    }
+
+    return service_json
 
 @app.errorhandler(EsecException)
 def esecurity_error(e):
