@@ -2,6 +2,7 @@ from application.naa_audit.model import NAAAudit
 from flask import Blueprint
 from flask.ext.api import status
 import datetime
+import json
 
 
 naa_bp = Blueprint('naa', __name__, template_folder='templates', static_folder='static')
@@ -15,4 +16,12 @@ def accept_naa(borrower_id):
 
     naa.save()
 
-    return '', status.HTTP_200_OK
+    return json.dumps({"id": naa.id}), status.HTTP_200_OK
+
+
+@naa_bp.route('/accept/<id>', methods=['GET'])
+def get_naa(id):
+    naa = NAAAudit()
+    res = naa.get_by_id(id)
+
+    return json.dumps({"id": res.id, "borrower_id": res.borrower_id, "date_accepted": str(res.date_accepted)}), status.HTTP_200_OK
