@@ -5,10 +5,13 @@ from flask.ext.sqlalchemy import SQLAlchemy
 
 from application.service_clients.esec import make_esec_client
 from application.service_clients.esec.implementation import EsecException
+from application import config
 
 import os
 import logging
 from logger import logging_config
+
+import requests
 
 logging_config.setup_logging()
 LOGGER = logging.getLogger(__name__)
@@ -67,6 +70,7 @@ def check_status():
 def service_check_routes():
 
     service_list = ''
+
     # Test the deeds database; try and connect to it and retrieve the version value
     try:
         # Attempt to retrieve the value of the alembic version
@@ -86,9 +90,7 @@ def service_check_routes():
             "services":
             [
                 get_service_check_json(200, "deed-api", "postgres deeds (db)",
-                                       "Successfully connected"),
-                get_service_check_json(200, "borrower front end", "deed-api",
-                                       "Successfully connected")
+                                       "Connected successfully", rowResults[0])
             ]
         }
 
@@ -100,25 +102,84 @@ def service_check_routes():
             "services":
             [
                 get_service_check_json(500, "deed-api", "postgres deeds (db)",
-                                       "A database exception has occured"),
-                get_service_check_json(200, "borrower-frontend", "deed-api",
-                                       "Successfully connected")
+                                       "A database exception has occured")
             ]
         }
 
-    # Attempt to connect to the esec client
+    # Attempt to connect to the esec client and append the result to the service list
+    esec_service_json = get_service_check_response(config.ESEC_CLIENT_BASE_HOST, "deed-api", "esec-client")
+    service_list['services'].append(esec_service_json)
+
+    # Attempt to connect to the title adapter (stub(local) or api(live))
+    # and add the two results to the service list
+    try:
+        title_service_json = get_service_check_response(config.TITLE_ADAPTOR_BASE_HOST, "deed-api", "title adapter stub/api")
+        if len(title_service_json) == 2:
+            # For 200 success: two services
+            service_list['services'].append(title_service_json[0])
+            service_list['services'].append(title_service_json[1])
+        else:
+            # If there is an error response
+            service_list['services'].append(title_service_json)
+    except IndexError as e:
+        serviceIndexError = get_service_check_json(500, "deed-api", "title adapter stub/api",
+                                                   "The response has triggered an index exception")
+        service_list['services'].append(serviceIndexError)
+        app.logger.error('Index Error: %s', (e,), exc_info=True)
 
     return json.dumps(service_list)
 
 
-def get_service_check_json(status_code, service_from, service_to, service_message):
+def get_service_check_response(env_uri, service_from, service_to):
 
-    service_json = {
-        "status_code": status_code,
-        "service_from": service_from,
-        "service_to": service_to,
-        "service_message": service_message
-    }
+    # Attempt to connect to a specific service
+    service_response = ""
+    status_code = 500
+    service_json = ""
+
+    try:
+        # Retrieve the string response from external services; the titial adapter api/stub/ and esec
+        # responses from these services are in strings to avoid java/python JSONObject differences
+        service_response = requests.get(env_uri + '/health/service-check')
+
+        # Change the string into a json format
+        status_code = service_response.status_code
+        service_json = json.loads(service_response.text)
+
+    except (requests.exceptions.RequestException, ValueError, TypeError) as e:
+        # A RequestException resolves the error that occurs when a connection cant be established
+        # and the ValueError/TypeError exception may occur if the json string / object is malformed
+        status_code = 500
+        app.logger.error('A Request or ValueError exception has occurred in get_service_check_response: %s', (e,), exc_info=True)
+
+    if status_code != 200:
+        # We either have a differing status code, add an error for this service
+        # This would imply that we were not able to connect to the esec-client
+        service_json = get_service_check_json(status_code, service_from, service_to,
+                                              "Error: Could not connect")
+
+    return service_json
+
+
+def get_service_check_json(status_code, service_from, service_to, service_message, service_alembic_version=""):
+
+    service_json = {"service_message": "default response"}
+
+    if service_alembic_version == "":
+        service_json = {
+            "status_code": status_code,
+            "service_from": service_from,
+            "service_to": service_to,
+            "service_message": service_message
+        }
+    else:
+        service_json = {
+            "status_code": status_code,
+            "service_from": service_from,
+            "service_to": service_to,
+            "service_message": service_message,
+            "service_alembic_version": service_alembic_version
+        }
 
     return service_json
 
