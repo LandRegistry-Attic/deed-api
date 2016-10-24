@@ -13,7 +13,7 @@ class TestAppRoutes(unittest.TestCase):
 
     def test_health_service_check(self):
         test_health_check = requests.get(config.DEED_API_BASE_HOST + '/health/service-check')
-        test_health_json = json.loads(test_health_check.text)
+        test_health_list = json.loads(test_health_check.text)
 
         self.assertEqual(test_health_check.status_code, 200)
 
@@ -22,7 +22,27 @@ class TestAppRoutes(unittest.TestCase):
         # Assert that there is a minimum of 3 service responses
         # This supposes that there may be a case where esec and title adapter stub/api
         # will be unavailable and will return a 500
-        if(len(test_health_json["services"]) >= 3):
+        if(len(test_health_list["services"]) >= 3):
             expectedAmount = True
 
         self.assertEqual(expectedAmount, True)
+
+        # Assert that there is only one "services" tag; which is essentially a tag
+        # that has an array of services as a value
+        self.assertEqual(len(test_health_list), 1)
+
+        # Test that certain tags/values are present
+        self.assertIn("deed-api", str(test_health_list['services']))
+        self.assertIn("title adapter", str(test_health_list['services']))
+        self.assertIn("esec-client", str(test_health_list['services']))
+
+        self.assertIn("service_from", str(test_health_list['services']))
+        self.assertIn("service_to", str(test_health_list['services']))
+        self.assertIn("status_code", str(test_health_list['services']))
+        self.assertIn("service_message", str(test_health_list['services']))
+
+        # Test that the return json is not empty
+        self.assertIsNotNone(test_health_list)
+
+        # Test that the returned json is converted to a dictionary correctly
+        self.assertIsInstance(test_health_list, dict)
