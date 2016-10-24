@@ -5,7 +5,8 @@ from flask.ext.sqlalchemy import SQLAlchemy
 
 from application.service_clients.esec import make_esec_client
 from application.service_clients.esec.implementation import EsecException
-from application import config
+from application.service_clients.register_adapter import make_register_adapter_client
+from application.service_clients.title_adaptor import make_title_adaptor_client
 
 import os
 import logging
@@ -107,13 +108,14 @@ def service_check_routes():
         }
 
     # Attempt to connect to the esec client and append the result to the service list
-    esec_service_dict = get_service_check_response(config.ESEC_CLIENT_BASE_HOST, "deed-api", "esec-client")
+    esec_service_dict = get_service_check_response("deed-api", "esec-client", "esec")
     service_list['services'].append(esec_service_dict)
 
     try:
         # Attempt to connect to the title adapter (stub(local) or api(live))
         # and add the two results to the service list
-        title_service_dict = get_service_check_response(config.TITLE_ADAPTOR_BASE_HOST, "deed-api", "title adapter stub/api")
+        title_service_dict = get_service_check_response("deed-api",
+                                                        "title adapter stub/api", "title")
         if len(title_service_dict) == 2:
             # For 200 success: two services
             service_list['services'].append(title_service_dict[0])
@@ -124,7 +126,8 @@ def service_check_routes():
 
         # Attempt to connect to the register adapter (stub(local) or api(live))
         # and add the two results to the service list
-        register_service_dict = get_service_check_response(config.DM_REGISTER_ADAPTER, "deed-api", "register-adapter (stub if local)")
+        register_service_dict = get_service_check_response("deed-api",
+                                                           "register-adapter (stub if local)", "register")
         if len(register_service_dict) == 2:
             # For 200 success: two services
             service_list['services'].append(register_service_dict[0])
@@ -142,7 +145,7 @@ def service_check_routes():
     return json.dumps(service_list)
 
 
-def get_service_check_response(env_uri, service_from, service_to):
+def get_service_check_response(service_from, service_to, interface_name):
 
     # Attempt to connect to a specific service
     service_response = ""
@@ -150,16 +153,23 @@ def get_service_check_response(env_uri, service_from, service_to):
     service_dict = ""
 
     try:
-        # Retrieve the string response from external services; the titial adapter api/stub/ and esec
-        # responses from these services are in strings to avoid java/python JSONObject/dict differences
-        service_response = requests.get(env_uri + '/health/service-check')
+        # Retrieve the json response from external services
+        if interface_name == "esec":
+            esec_interface = make_esec_client()
+            service_response = esec_interface.check_service_health()
+        elif interface_name == "title":
+            title_interface = make_title_adaptor_client()
+            service_response = title_interface.check_service_health()
+        elif interface_name == "register":
+            register_interface = make_register_adapter_client()
+            service_response = register_interface.check_service_health()
 
-        # Change the string into a dict format
+        # Change the json into a dict format
         status_code = service_response.status_code
         service_dict = json.loads(service_response.text)
 
     # If a 500 error is reported, it will be far easier to determine the cause by
-    # throwing an exception, rather than by getting an "unexpected error" output
+    # throwing an exception, rather than by getting an "unexpected error"
     except (requests.exceptions.RequestException, ValueError, TypeError) as e:
         # A RequestException resolves the error that occurs when a connection cant be established
         # and the ValueError/TypeError exception may occur if the dict string / object is malformed
