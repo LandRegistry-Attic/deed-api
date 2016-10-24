@@ -110,9 +110,9 @@ def service_check_routes():
     esec_service_dict = get_service_check_response(config.ESEC_CLIENT_BASE_HOST, "deed-api", "esec-client")
     service_list['services'].append(esec_service_dict)
 
-    # Attempt to connect to the title adapter (stub(local) or api(live))
-    # and add the two results to the service list
     try:
+        # Attempt to connect to the title adapter (stub(local) or api(live))
+        # and add the two results to the service list
         title_service_dict = get_service_check_response(config.TITLE_ADAPTOR_BASE_HOST, "deed-api", "title adapter stub/api")
         if len(title_service_dict) == 2:
             # For 200 success: two services
@@ -121,6 +121,18 @@ def service_check_routes():
         else:
             # If there is an error response
             service_list['services'].append(title_service_dict)
+
+        # Attempt to connect to the register adapter (stub(local) or api(live))
+        # and add the two results to the service list
+        register_service_dict = get_service_check_response(config.DM_REGISTER_ADAPTER, "deed-api", "register-adapter (stub if local)")
+        if len(register_service_dict) == 2:
+            # For 200 success: two services
+            service_list['services'].append(register_service_dict[0])
+            service_list['services'].append(register_service_dict[1])
+        else:
+            # If there is an error response
+            service_list['services'].append(register_service_dict)
+
     except IndexError as e:
         serviceIndexError = get_service_check_dict(500, "deed-api", "title adapter stub/api",
                                                    "The response has triggered an index exception")
