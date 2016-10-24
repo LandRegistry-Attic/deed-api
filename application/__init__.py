@@ -12,8 +12,6 @@ import os
 import logging
 from logger import logging_config
 
-import requests
-
 logging_config.setup_logging()
 LOGGER = logging.getLogger(__name__)
 
@@ -103,7 +101,7 @@ def service_check_routes():
             "services":
             [
                 get_service_check_dict(500, "deed-api", "postgres deeds (db)",
-                                       "A database exception has occured")
+                                       "A database exception has occurred")
             ]
         }
 
@@ -140,7 +138,7 @@ def service_check_routes():
         serviceIndexError = get_service_check_dict(500, "deed-api", "title adapter stub/api",
                                                    "The response has triggered an index exception")
         service_list['services'].append(serviceIndexError)
-        app.logger.error('Index Error: %s', (e,), exc_info=True)
+        app.logger.error('Index Error at the service-check route: %s', (e,), exc_info=True)
 
     return json.dumps(service_list)
 
@@ -174,7 +172,7 @@ def get_service_check_response(service_from, service_to, interface_name):
         # A RequestException resolves the error that occurs when a connection cant be established
         # and the ValueError/TypeError exception may occur if the dict string / object is malformed
         status_code = 500
-        app.logger.error('A Request or ValueError exception has occurred in get_service_check_response: %s', (e,), exc_info=True)
+        app.logger.error('An exception has occurred in the service-check route: %s', (e,), exc_info=True)
 
     if status_code != 200:
         # We either have a differing status code, add an error for this service
