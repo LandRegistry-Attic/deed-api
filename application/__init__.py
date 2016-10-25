@@ -89,7 +89,7 @@ def service_check_routes():
             "services":
             [
                 get_service_check_dict(200, "deed-api", "postgres deeds (db)",
-                                       "Connected successfully", rowResults[0])
+                                       "Successfully connected", rowResults[0])
             ]
         }
 
