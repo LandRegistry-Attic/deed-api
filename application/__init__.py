@@ -101,18 +101,18 @@ def service_check_routes():
                                                                "A database exception has occurred"))
 
     # Attempt to connect to the esec client and append the result to the service list
-    esec_service_dict = get_service_check_response("deed-api", "esec-client", "esec")
+    esec_service_dict = get_service_check_response("deed-api", "esec-client", "esec-service")
     service_list["services"].append(esec_service_dict)
 
     # Attempt to connect to the title adapter (stub(local) or api(live))
     # and add the two results to the service list
     service_list = get_multiple_dict_values("deed-api", "title adapter stub/api",
-                                            "title", service_list)
+                                            "title-services", service_list)
 
     # Attempt to connect to the register adapter (stub(local) or api(live))
     # and add the two results to the service list
     service_list = get_multiple_dict_values("deed-api", "register-adapter (stub if local)",
-                                            "register", service_list)
+                                            "register-services", service_list)
 
     return json.dumps(service_list)
 
@@ -125,13 +125,13 @@ def get_service_check_response(service_from, service_to, interface_name):
 
     try:
         # Retrieve the json response from external services
-        if interface_name == "esec":
+        if interface_name == "esec-service":
             esec_interface = make_esec_client()
             service_response = esec_interface.check_service_health()
-        elif interface_name == "title":
+        elif interface_name == "title-services":
             title_interface = make_title_adaptor_client()
             service_response = title_interface.check_service_health()
-        elif interface_name == "register":
+        elif interface_name == "register-services":
             register_interface = make_register_adapter_client()
             service_response = register_interface.check_service_health()
 
@@ -173,20 +173,21 @@ def get_multiple_dict_values(service_from, service_to, interface_name, service_l
     try:
         # Append the return values to the service_list and return it
         service_response_dict = get_service_check_response(service_from, service_to, interface_name)
+        service_response_refined = service_response_dict[interface_name]
 
-        if len(service_response_dict) == 2:
+        if len(service_response_refined) == 2:
             # For 200 success: two services
-            service_list["services"].append(service_response_dict[0])
-            service_list["services"].append(service_response_dict[1])
+            service_list["services"].append(service_response_refined[0])
+            service_list["services"].append(service_response_refined[1])
         else:
             # If there is an error response
-            service_list["services"].append(service_response_dict)
+            service_list["services"].append(service_response_refined)
 
-    except IndexError as e:
-        serviceIndexError = get_service_check_dict(500, "deed-api", "title adapter stub/api",
-                                                   "The response has triggered an index exception")
+    except Exception as e:
+        serviceIndexError = get_service_check_dict(500, service_from, service_to,
+                                                   "Error: could not connect")
         service_list["services"].append(serviceIndexError)
-        app.logger.error("Index Error at the service-check route: %s", (e,), exc_info=True)
+        app.logger.error("An exception has occurred at the service-check route: %s", (e,), exc_info=True)
 
     return service_list
 
