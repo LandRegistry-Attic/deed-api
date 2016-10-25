@@ -79,12 +79,10 @@ def service_check_routes():
     try:
         # Attempt to retrieve the value of the alembic version
         # from the relevant deed_api table
-        result = db.engine.execute("SELECT version_num FROM alembic_version;")
+        result = db.engine.execute("SELECT version_num FROM alembic_version;").first()
 
         rowResults = []
-
-        for row in result:
-            rowResults.append(row[0])
+        rowResults.append(result[0]) if result is not None else "No version information found"
 
         # If the above statement passes, we can assume that a connection
         # to the database has been established.
