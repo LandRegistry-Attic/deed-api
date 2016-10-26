@@ -172,14 +172,7 @@ def get_multiple_dict_values(service_from, service_to, interface_name, service_l
         # Append the return values to the service_list and return it
         service_response_dict = get_service_check_response(service_from, service_to, interface_name)
         service_response_refined = service_response_dict[interface_name]
-
-        if len(service_response_refined) == 2:
-            # For 200 success: two services
-            service_list["services"].append(service_response_refined[0])
-            service_list["services"].append(service_response_refined[1])
-        else:
-            # If there is an error response
-            service_list["services"].append(service_response_refined)
+        [service_list["services"].append(response_value) for response_value in service_response_refined]
 
     except Exception as e:
         serviceIndexError = get_service_check_dict(500, service_from, service_to,
