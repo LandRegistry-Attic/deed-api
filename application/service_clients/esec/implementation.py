@@ -96,3 +96,9 @@ def sign_document_with_authority(deed_xml):
         return _post_request(request_url, deed_xml)
     except (requests.exceptions.ConnectionError, ExternalServiceError):
         raise EsecException
+
+
+def check_health():
+    service_response = requests.get(config.ESEC_CLIENT_BASE_HOST + "/health/service-check")
+
+    return service_response

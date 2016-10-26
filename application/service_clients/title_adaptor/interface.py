@@ -5,3 +5,6 @@ class TitleAdaptorInterface(object):  # pragma: no cover
 
     def perform_check(self, title):
         return self.implementation.perform_check(title)
+
+    def check_service_health(self):
+        return self.implementation.check_health()
