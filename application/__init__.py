@@ -160,7 +160,8 @@ def get_service_check_dict(status_code, service_from, service_to, service_messag
         "service_message": service_message
     }
 
-    if service_alembic_version: service_dict["service_alembic_version"] = service_alembic_version
+    if service_alembic_version:
+        service_dict["service_alembic_version"] = service_alembic_version
 
     return service_dict
 
