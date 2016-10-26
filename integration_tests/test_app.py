@@ -28,11 +28,6 @@ class TestAppRoutes(unittest.TestCase):
         self.assertEqual(len(test_health_list), 1)
 
         # Test that certain tags/values are present
-        self.assertIn("deed-api", str(test_health_list["services"]))
-        self.assertIn("title-adapter", str(test_health_list["services"]))
-        self.assertIn("register-adapter", str(test_health_list["services"]))
-        self.assertIn("esec-client", str(test_health_list["services"]))
-
         self.assertIn("service_from", str(test_health_list["services"]))
         self.assertIn("service_to", str(test_health_list["services"]))
         self.assertIn("status_code", str(test_health_list["services"]))
