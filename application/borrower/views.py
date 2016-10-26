@@ -21,7 +21,8 @@ def validate_borrower():
 
             if input_dob == db_dob:
                 stripped_number = strip_number_to_four_digits(borrower.phonenumber)
-                return json.dumps({"deed_token": borrower.deed_token, "phone_number": stripped_number}),\
+                borrower_id = borrower.id
+                return json.dumps({"deed_token": borrower.deed_token, "phone_number": stripped_number, "borrower_id": borrower_id}),\
                     status.HTTP_200_OK
 
     return "Matching deed not found", status.HTTP_404_NOT_FOUND

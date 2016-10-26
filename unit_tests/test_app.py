@@ -269,6 +269,7 @@ class TestRoutes(TestRoutesBase):
     @mock.patch('application.borrower.model.Borrower.get_by_token')
     def test_validate_borrower(self, mock_borrower):
         class ReturnedBorrower:
+            id = 000000
             deed_token = "aaaaaa"
             dob = "23/01/1986"
             phonenumber = "07502154999"
@@ -283,6 +284,7 @@ class TestRoutes(TestRoutesBase):
     @mock.patch('application.borrower.model.Borrower.get_by_token')
     def test_validate_borrower_no_leading_zero(self, mock_borrower):
         class ReturnedBorrower:
+            id = 0000000
             deed_token = "aaaaaa"
             dob = "01/01/1986"
             phonenumber = "07502154999"
