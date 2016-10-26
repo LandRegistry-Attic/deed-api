@@ -423,3 +423,14 @@ class TestDeedRoutes(unittest.TestCase):
         self.assertEqual(get_modified_deed.status_code, 200)
         modified_deed = get_modified_deed.json()
         self.assertEqual(modified_deed["deed"]["property_address"], "6 The Drive, This Town, This County, PL4 4TH")
+
+    def test_accept_naa(self):
+        res = requests.post(config.DEED_API_BASE_HOST + '/naa/accept/1',
+                            headers=self.webseal_headers)
+
+        response_json = res.json()
+
+        get = requests.get(config.DEED_API_BASE_HOST + '/naa/accept/' + str(response_json["id"]),
+                           headers=self.webseal_headers)
+        return_value = get.json()
+        self.assertEqual(return_value["borrower_id"], 1)

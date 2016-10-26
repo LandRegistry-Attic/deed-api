@@ -6,7 +6,7 @@ the column names to import.
 
 example usage:
 
-python3 data_importer.py /data/mortgage_document postgresql:///localhost:5432/deed_api mortgage_document
+python3 data_importer.py /data/mortgage_document postgres://root:superroot@postgres/deed_api mortgage_document
 
 
 where:
