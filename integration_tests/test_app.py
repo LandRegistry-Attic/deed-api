@@ -17,8 +17,6 @@ class TestAppRoutes(unittest.TestCase):
 
         self.assertEqual(test_health_check.status_code, 200)
 
-        expectedAmount = False
-
         # Assert that there is a minimum of 4 service responses
         # Which are: register/title adapter, esec-client and postgres
         self.assertEqual(True, True) if len(test_health_list["services"]) >= 4 else self.assertEqual(False, True)
