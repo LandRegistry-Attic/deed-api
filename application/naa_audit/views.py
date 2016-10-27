@@ -14,9 +14,10 @@ def accept_naa(borrower_id):
     naa.borrower_id = int(borrower_id)
     naa.date_accepted = datetime.datetime.now()
 
-    naa.save()
+    result = naa.save()
 
-    return json.dumps({"id": naa.id}), status.HTTP_200_OK
+    return json.dumps({"id": naa.id}), result
+
 
 
 @naa_bp.route('/accept/<id>', methods=['GET'])
