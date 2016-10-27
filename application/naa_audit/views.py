@@ -1,9 +1,8 @@
 from application.naa_audit.model import NAAAudit
-from flask import Blueprint
+from flask import Blueprint, jsonify
 from flask.ext.api import status
 import datetime
 import json
-
 
 naa_bp = Blueprint('naa', __name__, template_folder='templates', static_folder='static')
 
@@ -14,9 +13,13 @@ def accept_naa(borrower_id):
     naa.borrower_id = int(borrower_id)
     naa.date_accepted = datetime.datetime.now()
 
-    naa.save()
+    try:
+        naa.save()
+        result = status.HTTP_200_OK
+    except:
+        result = status.HTTP_500_INTERNAL_ERROR
 
-    return json.dumps({"id": naa.id}), status.HTTP_200_OK
+    return jsonify({"id": naa.id}), result
 
 
 @naa_bp.route('/accept/<id>', methods=['GET'])
