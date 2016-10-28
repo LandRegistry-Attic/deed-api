@@ -49,7 +49,9 @@ def verify_pattern(element, key, obj, idx):
 
 
 def verify_against_schema(element, key, obj):
-    error_count, error_message = validate_helper(element["payload"])
+    error_message = validate_helper(element["payload"])
+
+    error_count = len(error_message)
     print(
         "%s: checking for %s - errors expected: %s, errors received: %s"
         % (colored('PASS', 'green') if error_count == element["expected"]

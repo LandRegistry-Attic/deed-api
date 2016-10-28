@@ -104,7 +104,7 @@ def deed_adapter(deed_reference):
     """
     deed = Deed().get_deed(deed_reference)
     if deed is None:
-        raise FileNotFoundError("Deed reference '{0}' not found".format(deed_reference,))
+        raise FileNotFoundError("There is no deed associated with deed id '{0}'.".format(deed_reference,))
     deed.deed['token'] = deed.token
     deed.deed['status'] = deed.status
     return deed

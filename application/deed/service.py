@@ -1,6 +1,7 @@
 import logging
 from application.deed.utils import valid_dob, is_unique_list
 from application.borrower.server import BorrowerService
+from application.borrower.model import Borrower as BorrowerModel
 from underscore import _
 from application.mortgage_document.model import MortgageDocument
 from functools import partial
@@ -70,10 +71,17 @@ def update_borrower(borrower, idx, borrowers, deed_token):
     if 'middle_name' in borrower:
         borrower_json["middle_name"] = borrower["middle_name"]
 
-    created_borrower = borrower_service.saveBorrower(borrower, deed_token)
+    if 'id' not in borrower:
+        created_borrower = borrower_service.saveBorrower(borrower, deed_token)
 
-    borrower_json["id"] = created_borrower.id
-    borrower_json["token"] = created_borrower.token
+        borrower_json["id"] = created_borrower.id
+        borrower_json["token"] = created_borrower.token
+    else:
+        borrower_updater = BorrowerModel()
+        updated_borrower = borrower_updater.update_borrower_by_id(borrower)
+
+        borrower_json["id"] = int(borrower["id"])
+        borrower_json["token"] = updated_borrower.token
 
     return borrower_json
 
@@ -105,17 +113,11 @@ def build_json_deed_document(deed_json):
     return json_doc
 
 
-def update_deed(deed, deed_json, akuma_flag):
+def update_deed(deed, deed_json):
     deed.identity_checked = deed_json["identity_checked"]
     json_doc = build_json_deed_document(deed_json)
 
     borrowers = deed_json["borrowers"]
-
-    if not valid_borrowers(borrowers):
-        msg = "borrower data failed validation"
-        LOGGER.error(msg)
-        return False, msg
-
     update_borrower_for_token = partial(update_borrower, deed_token=deed.token)
 
     borrower_json = _(borrowers).chain()\
@@ -128,14 +130,17 @@ def update_deed(deed, deed_json, akuma_flag):
         LOGGER.error(msg)
         return False, msg
 
-    deed.deed = json_doc
+    assign_deed(deed, json_doc)
 
     deed.save()
+
+    delete_orphaned_borrowers(deed)
 
     return True, "OK"
 
 
 def update_deed_signature_timestamp(deed, borrower_token):
+
     modify_deed = copy.deepcopy(deed.deed)
     for borrower in modify_deed['borrowers']:
         if borrower['token'] == borrower_token:
@@ -183,3 +188,19 @@ def make_deed_effective_date(deed, signed_time):
     deed.status = "NOT-LR-SIGNED"
     deed.deed = modify_deed
     deed.save()
+
+
+def assign_deed(deed, json_doc):
+    deed.deed = json_doc
+
+
+def delete_orphaned_borrowers(deed):
+    borrower_list = []
+
+    for borrower in deed.deed["borrowers"]:
+        borrower_list.append(borrower["id"])
+
+        borrower_model_delete = BorrowerModel()
+
+    borrower_model_delete.delete_borrowers_not_on_deed(borrower_list, deed.token)
+    return True

@@ -1,8 +1,13 @@
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, not_
 from application import db
 import uuid
 
-charset = list("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+charset = list("0123456789ABCDEFGHJKLMNPQRSTUVXY")
+
+
+class DatabaseException(Exception):
+    pass
 
 
 class Borrower(db.Model):
@@ -48,6 +53,59 @@ class Borrower(db.Model):
     def get_by_verify_pid(verify_pid):
         return Borrower.query.join(VerifyMatch).filter(VerifyMatch.verify_pid == verify_pid).first()
 
+    def _get_borrower_internal(self, borrower_id):
+        return Borrower.query.filter_by(id=borrower_id).first()
+
+    def update_borrower_by_id(self, borrower):
+        borrower_id = borrower["id"]
+
+        existing_borrower = self._get_borrower_internal(borrower_id)
+
+        if existing_borrower:
+
+            existing_borrower.forename = borrower["forename"]
+            existing_borrower.surname = borrower["surname"]
+            existing_borrower.dob = borrower["dob"]
+            existing_borrower.phonenumber = borrower["phone_number"]
+            existing_borrower.address = borrower["address"]
+            existing_borrower.gender = borrower["gender"]
+
+            if 'middle_name' in borrower:
+                existing_borrower.middlename = borrower["middle_name"]
+
+            db.session.commit()
+
+            return existing_borrower
+        else:
+            return "Error No Borrower"
+
+    def delete_borrowers_not_on_deed(self, ids, deed_reference):
+        borrowers = self._get_borrowers_not_on_deed(ids, deed_reference)
+
+        for borrower in borrowers:
+            self._delete_borrower(borrower)
+
+        return True
+
+    def _get_borrowers_not_on_deed(self, ids, deed_reference):
+
+        try:
+            borrowers = Borrower.query.filter(not_(Borrower.id.in_(ids)), Borrower.deed_token == deed_reference).all()
+
+            return borrowers
+        except Exception as e:
+            raise DatabaseException(e)
+
+    def _delete_borrower(self, borrower):
+        try:
+            db.session.delete(borrower)
+            db.session.commit()
+
+            return True
+
+        except Exception as e:
+            raise DatabaseException(e)
+
 
 class VerifyMatch(db.Model):
     __tablename__ = 'verify_match'
@@ -57,13 +115,14 @@ class VerifyMatch(db.Model):
 
 
 def bin_to_char(bin_str):
-    pos = min(int(bin_str[:6], 2), len(charset)-1)
-    return charset[pos]
+    # Converts 5 character binary string to a 2 digit integer. Then takes minimum between the 2 digit number and the lenght of the charset - 1.
+    pos = min(int(bin_str[:5], 2), len(charset)-1)
+    return charset[pos]  # Return character from charset based on position established above
 
 
 def generate_hex():
     val = str(bin(uuid.uuid4().int))
-    bin_str = val[2:]
+    bin_str = val[2:]  # Remove 0b from beginning of string
     result = ""
 
     while len(bin_str) > 15:

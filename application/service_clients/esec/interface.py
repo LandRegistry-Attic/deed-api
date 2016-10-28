@@ -13,3 +13,6 @@ class EsecClientInterface(object):  # pragma: no cover
 
     def sign_document_with_authority(self, deed_xml):
         return self.implementation.sign_document_with_authority(deed_xml)
+
+    def check_service_health(self):
+        return self.implementation.check_health()
