@@ -1,10 +1,13 @@
 from flask import Blueprint
-from flask import request, abort, jsonify, Response
+from application.deed.model import Deed
 
 dashboard_bp = Blueprint('dashboard', __name__,
-                    template_folder='templates',
-                    static_folder='static')
+                         template_folder='templates',
+                         static_folder='static')
 
-@dashboard_bp.route('/hello', methods=['GET'])
-def get_all_deeds():
-    return "hello world"
+
+@dashboard_bp.route('/<status>', methods=['GET'])
+def get_deeds_by_status(status):
+    deed = Deed()
+    result = deed.get_deeds_by_status(status)
+    return str(result)
