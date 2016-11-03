@@ -151,8 +151,6 @@ def update_deed_signature_timestamp(deed, borrower_token):
     try:
         set_signed_status(deed)
         deed.save()
-        deed.deed['token'] = deed.token
-        return deed.deed
 
     except Exception as e:
         LOGGER.error("Database Exception - %s" % e)
