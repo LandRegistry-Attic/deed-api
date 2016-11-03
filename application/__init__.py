@@ -32,12 +32,14 @@ from .deed.views import deed_bp  # noqa
 from .borrower.views import borrower_bp  # noqa
 from .casework.views import casework_bp  # noqa
 from .naa_audit.views import naa_bp  # noqa
+from .dashboard.views import dashboard_bp #noqa
 
 app.config.from_pyfile("config.py")
 app.register_blueprint(deed_bp, url_prefix='/deed')
 app.register_blueprint(borrower_bp, url_prefix='/borrower')
 app.register_blueprint(casework_bp, url_prefix='/casework')
 app.register_blueprint(naa_bp, url_prefix='/naa')
+app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
 app.url_map.strict_slashes = False
 
 
