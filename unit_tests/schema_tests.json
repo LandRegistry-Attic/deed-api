@@ -759,7 +759,7 @@
       "payload": {
         "md_ref": "e-MD12345",
         "property_address": "5 The Drive, This Town, This County, PL4 4TH",
-        "reference": "",
+        "reference": "test reference",
         "title_number": "DN12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -773,7 +773,7 @@
           }
         ]
       },
-      "description": "Checking reference passes if its 50 characters",
+      "description": "Check normal reference passes",
       "expected": 0
     }
   ]

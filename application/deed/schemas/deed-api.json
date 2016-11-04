@@ -298,15 +298,6 @@
                 }
             }
         },
-        "Reference": {
-            "type": "object",
-            "properties": {
-                "value": {
-                    "type": "string",
-                    "maxLength" : 50
-                }
-            }
-        },
         "AdditionalProvisions": {
             "type": "array",
             "minItems": 0,
@@ -386,7 +377,8 @@
                             "description": "The address of property that the deed relates. This should be supplied in a comma separated format e.g. 30 wakefield rd, plymouth, PL6 3WA"
                         },
                         "reference": {
-                            "$ref": "#/definitions/Reference"
+                            "type": "string",
+                            "maxLength" : 50
                         },
                         "deed_status": {
                             "type": "string",
@@ -431,7 +423,8 @@
                     "description": "The address of property that the deed relates. This should be supplied in a comma separated format e.g. 30 wakefield rd, plymouth, PL6 3WA"
                 },
                 "reference": {
-                    "$ref": "#/definitions/Reference"
+                    "type": "string",
+                    "maxLength" : 50
                 }
             }
         },
