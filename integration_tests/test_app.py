@@ -43,6 +43,9 @@ class TestAppRoutes(unittest.TestCase):
         self.assertIsInstance(test_health_list, dict)
 
     def test_get_deed_by_status_draft(self):
+        get_existing_deeds = requests.get(config.DEED_API_BASE_HOST + '/dashboard/DRAFT',
+                                          headers=self.webseal_headers)
+
         create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
                                     data=json.dumps(valid_deed),
                                     headers=self.webseal_headers)
@@ -52,9 +55,12 @@ class TestAppRoutes(unittest.TestCase):
                                  headers=self.webseal_headers)
         self.assertEqual(get_deeds.status_code, 200)
 
-        self.assertGreater(int(get_deeds.text), 0)
+        self.assertGreater(int(get_deeds.text), int(get_existing_deeds))
 
     def test_get_all_deeds(self):
+        get_existing_deeds = requests.get(config.DEED_API_BASE_HOST + '/dashboard/%',
+                                          headers=self.webseal_headers)
+
         create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
                                     data=json.dumps(valid_deed),
                                     headers=self.webseal_headers)
@@ -64,9 +70,12 @@ class TestAppRoutes(unittest.TestCase):
                                      headers=self.webseal_headers)
         self.assertEqual(get_all_deeds.status_code, 200)
 
-        self.assertGreater(int(get_all_deeds.text), 0)
+        self.assertGreater(int(get_all_deeds.text), int(get_existing_deeds))
 
     def test_get_signed_deeds(self):
+        get_existing_deeds = requests.get(config.DEED_API_BASE_HOST + '/dashboard/ALL-SIGNED',
+                                          headers=self.webseal_headers)
+
         create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
                                     data=json.dumps(valid_deed),
                                     headers=self.webseal_headers)
@@ -105,9 +114,12 @@ class TestAppRoutes(unittest.TestCase):
         test_result = requests.get(config.DEED_API_BASE_HOST + '/dashboard/ALL-SIGNED',
                                    headers=self.webseal_headers)
 
-        self.assertGreater(int(test_result.text), 0)
+        self.assertGreater(int(test_result.text), int(get_existing_deeds))
 
     def test_get_partially_signed_deeds(self):
+        get_existing_deeds = requests.get(config.DEED_API_BASE_HOST + '/dashboard/PARTIALLY_SIGNED',
+                                          headers=self.webseal_headers)
+
         create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
                                     data=json.dumps(valid_deed_two_borrowers),
                                     headers=self.webseal_headers)
@@ -146,4 +158,4 @@ class TestAppRoutes(unittest.TestCase):
         test_result = requests.get(config.DEED_API_BASE_HOST + '/dashboard/PARTIALLY_SIGNED',
                                    headers=self.webseal_headers)
 
-        self.assertGreater(int(test_result.text), 0)
+        self.assertGreater(int(test_result.text), int(get_existing_deeds))
