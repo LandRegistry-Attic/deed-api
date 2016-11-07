@@ -100,6 +100,10 @@ def update_md_clauses(json_doc, md_ref, organisation_name):
 
 def build_json_deed_document(deed_json):
 
+    reference = ""
+    if "reference" in deed_json:
+        reference = deed_json["reference"]
+
     json_doc = {
         "title_number": deed_json['title_number'],
         "md_ref": deed_json['md_ref'],
@@ -107,7 +111,8 @@ def build_json_deed_document(deed_json):
         "charge_clause": [],
         "additional_provisions": [],
         "property_address": deed_json['property_address'],
-        "effective_clause": ""
+        "effective_clause": "",
+        "reference": reference
     }
 
     return json_doc
