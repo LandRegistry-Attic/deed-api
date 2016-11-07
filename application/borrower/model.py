@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, not_
+from sqlalchemy import ForeignKey, not_, func
 from application import db
 import uuid
 
@@ -48,7 +48,7 @@ class Borrower(db.Model):
         return Borrower.query.filter_by(id=id_).first()
 
     def get_by_token(token_):
-        return Borrower.query.filter_by(token=token_).first()
+        return Borrower.query.filter(func.upper(Borrower.token) == token_).first()
 
     def get_by_verify_pid(verify_pid):
         return Borrower.query.join(VerifyMatch).filter(VerifyMatch.verify_pid == verify_pid).first()
