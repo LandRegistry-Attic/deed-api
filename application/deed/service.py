@@ -86,7 +86,7 @@ def update_borrower(borrower, idx, borrowers, deed_token):
     return borrower_json
 
 
-def update_md_clauses(json_doc, md_ref, organisation_name):
+def update_md_clauses(json_doc, md_ref, reference, organisation_name):
     mortgage_document = MortgageDocument.query.filter_by(md_ref=str(md_ref)).first()
     if mortgage_document is not None:
         md_json = json.loads(mortgage_document.data)
@@ -95,14 +95,16 @@ def update_md_clauses(json_doc, md_ref, organisation_name):
         json_doc["lender"] = md_json["lender"]
         json_doc["effective_clause"] = make_effective_text(organisation_name)
 
+        if "lender_reference_name" in md_json:
+            json_doc["reference_details"] = {
+                "lender_reference_name" : md_json["lender_reference_name"],
+                "lender_reference_value": reference
+            }
+
     return mortgage_document is not None
 
 
 def build_json_deed_document(deed_json):
-
-    reference = ""
-    if "reference" in deed_json:
-        reference = deed_json["reference"]
 
     json_doc = {
         "title_number": deed_json['title_number'],
@@ -111,8 +113,7 @@ def build_json_deed_document(deed_json):
         "charge_clause": [],
         "additional_provisions": [],
         "property_address": deed_json['property_address'],
-        "effective_clause": "",
-        "reference": reference
+        "effective_clause": ""
     }
 
     return json_doc
@@ -130,7 +131,7 @@ def update_deed(deed, deed_json):
 
     json_doc['borrowers'] = borrower_json
 
-    if not update_md_clauses(json_doc, deed_json["md_ref"], deed.organisation_name):
+    if not update_md_clauses(json_doc, deed_json["md_ref"], deed_json["reference"], deed.organisation_name):
         msg = "mortgage document associated with supplied md_ref is not found"
         LOGGER.error(msg)
         return False, msg
