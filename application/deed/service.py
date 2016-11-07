@@ -97,7 +97,7 @@ def update_md_clauses(json_doc, md_ref, reference, organisation_name):
 
         if "lender_reference_name" in md_json:
             json_doc["reference_details"] = {
-                "lender_reference_name" : md_json["lender_reference_name"],
+                "lender_reference_name": md_json["lender_reference_name"],
                 "lender_reference_value": reference
             }
 
@@ -131,7 +131,11 @@ def update_deed(deed, deed_json):
 
     json_doc['borrowers'] = borrower_json
 
-    if not update_md_clauses(json_doc, deed_json["md_ref"], deed_json["reference"], deed.organisation_name):
+    reference = ""
+    if "reference" in deed_json:
+        reference = deed_json["reference"]
+
+    if not update_md_clauses(json_doc, deed_json["md_ref"], reference, deed.organisation_name):
         msg = "mortgage document associated with supplied md_ref is not found"
         LOGGER.error(msg)
         return False, msg
