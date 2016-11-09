@@ -228,6 +228,9 @@ def convert_json_to_xml(deed_json):
 
     deed_data_xml.set_effectiveClause(deed_json["effective_clause"])
 
+    if 'reference' in deed_json:
+        deed_data_xml.set_reference(deed_json["reference"])
+
     operative_deed_xml.set_deedData(deed_data_xml)
     deed_app_xml.set_effectiveDate("tbc")
     auth_sig = api.authSignatureType()

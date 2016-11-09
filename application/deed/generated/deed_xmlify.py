@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Fri Mar  4 13:56:11 2016 by generateDS.py version 2.18a.
+# Generated Wed Nov  9 10:13:27 2016 by generateDS.py version 2.23a.
 #
 # Command line options:
 #   ('-f', '')
 #   ('-o', '../application/deed/generated/deed_xmlify.py')
 #
 # Command line arguments:
-#   ../application/deed/schemas/deed-schema-v0-2.xsd
+#   ../application/deed/schemas/deed-schema-v0-3.xsd
 #
 # Command line:
-#   generateDS.py -f -o "../application/deed/generated/deed_xmlify.py" ../application/deed/schemas/deed-schema-v0-2.xsd
+#   /usr/local/bin/generateDS.py -f -o "../application/deed/generated/deed_xmlify.py" ../application/deed/schemas/deed-schema-v0-3.xsd
 #
 # Current working directory (os.getcwd()):
 #   xmlify
@@ -23,20 +23,28 @@ import re as re_
 import base64
 import datetime as datetime_
 import warnings as warnings_
-from lxml import etree as etree_
 try:
-    basestring
-except NameError:
-    basestring = str
+    from lxml import etree as etree_
+except ImportError:
+    from xml.etree import ElementTree as etree_
+
 
 Validate_simpletypes_ = True
+if sys.version_info.major == 2:
+    BaseStrType_ = basestring
+else:
+    BaseStrType_ = str
 
 
 def parsexml_(infile, parser=None, **kwargs):
     if parser is None:
         # Use the lxml ElementTree compatible parser so that, e.g.,
         #   we ignore comments.
-        parser = etree_.ETCompatXMLParser()
+        try:
+            parser = etree_.ETCompatXMLParser()
+        except AttributeError:
+            # fallback to xml.etree
+            parser = etree_.XMLParser()
     doc = etree_.parse(infile, parser=parser, **kwargs)
     return doc
 
@@ -64,7 +72,7 @@ except ImportError as exp:
             def dst(self, dt):
                 return None
         def gds_format_string(self, input_data, input_name=''):
-            return input_data.decode("utf-8")
+            return input_data
         def gds_validate_string(self, input_data, node=None, input_name=''):
             if not input_data:
                 return ''
@@ -223,7 +231,8 @@ except ImportError as exp:
                                 _svalue += '+'
                             hours = total_seconds // 3600
                             minutes = (total_seconds - (hours * 3600)) // 60
-                            _svalue += '{0:02d}:{1:02d}'.format(hours, minutes)
+                            _svalue += '{0:02d}:{1:02d}'.format(
+                                hours, minutes)
             except AttributeError:
                 pass
             return _svalue
@@ -348,6 +357,20 @@ except ImportError as exp:
         @classmethod
         def gds_reverse_node_mapping(cls, mapping):
             return dict(((v, k) for k, v in mapping.iteritems()))
+        @staticmethod
+        def gds_encode(instring):
+            if sys.version_info.major == 2:
+                return instring.encode(ExternalEncoding)
+            else:
+                return instring
+
+    def getSubclassFromModule_(module, class_):
+        '''Get the subclass of a class from a specific module.'''
+        name = class_.__name__ + 'Sub'
+        if hasattr(module, name):
+            return getattr(module, name)
+        else:
+            return None
 
 
 #
@@ -375,6 +398,10 @@ String_cleanup_pat_ = re_.compile(r"[\n\r\s]+")
 Namespace_extract_pat_ = re_.compile(r'{(.*)}(.*)')
 CDATA_pattern_ = re_.compile(r"<!\[CDATA\[.*?\]\]>", re_.DOTALL)
 
+# Change this to redirect the generated superclass module to use a
+# specific subclass module.
+CurrentSubclassModule_ = None
+
 #
 # Support/utility functions.
 #
@@ -390,8 +417,7 @@ def quote_xml(inStr):
     "Escape markup chars, but do not modify CDATA sections."
     if not inStr:
         return ''
-    s1 = (isinstance(inStr, basestring) and inStr or
-          '%s' % inStr)
+    s1 = (isinstance(inStr, BaseStrType_) and inStr or '%s' % inStr)
     s2 = ''
     pos = 0
     matchobjects = CDATA_pattern_.finditer(s1)
@@ -413,8 +439,7 @@ def quote_xml_aux(inStr):
 
 
 def quote_attrib(inStr):
-    s1 = (isinstance(inStr, basestring) and inStr or
-          '%s' % inStr)
+    s1 = (isinstance(inStr, BaseStrType_) and inStr or '%s' % inStr)
     s1 = s1.replace('&', '&amp;')
     s1 = s1.replace('<', '&lt;')
     s1 = s1.replace('>', '&gt;')
@@ -628,6 +653,11 @@ class dmApplicationType(GeneratedsSuper):
         self.effectiveDate = effectiveDate
         self.authSignature = authSignature
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, dmApplicationType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if dmApplicationType.subclass:
             return dmApplicationType.subclass(*args_, **kwargs_)
         else:
@@ -677,7 +707,7 @@ class dmApplicationType(GeneratedsSuper):
             self.operativeDeed.export(outfile, level, namespace_, name_='operativeDeed', pretty_print=pretty_print)
         if self.effectiveDate is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%seffectiveDate>%s</%seffectiveDate>%s' % (namespace_, self.gds_format_string(quote_xml(self.effectiveDate).encode(ExternalEncoding), input_name='effectiveDate'), namespace_, eol_))
+            outfile.write('<%seffectiveDate>%s</%seffectiveDate>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.effectiveDate), input_name='effectiveDate')), namespace_, eol_))
         if self.authSignature is not None:
             self.authSignature.export(outfile, level, namespace_, name_='authSignature', pretty_print=pretty_print)
     def build(self, node):
@@ -714,6 +744,11 @@ class deedApplicationType(GeneratedsSuper):
         self.original_tagname_ = None
         self.operativeDeed = operativeDeed
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, deedApplicationType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if deedApplicationType.subclass:
             return deedApplicationType.subclass(*args_, **kwargs_)
         else:
@@ -781,6 +816,11 @@ class operativeDeedType(GeneratedsSuper):
         self.deedData = deedData
         self.signatureSlots = signatureSlots
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, operativeDeedType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if operativeDeedType.subclass:
             return operativeDeedType.subclass(*args_, **kwargs_)
         else:
@@ -860,6 +900,11 @@ class borrowersType(GeneratedsSuper):
         else:
             self.borrower = borrower
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, borrowersType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if borrowersType.subclass:
             return borrowersType.subclass(*args_, **kwargs_)
         else:
@@ -930,6 +975,11 @@ class borrowerType(GeneratedsSuper):
         self.name = name
         self.address = address
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, borrowerType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if borrowerType.subclass:
             return borrowerType.subclass(*args_, **kwargs_)
         else:
@@ -976,7 +1026,7 @@ class borrowerType(GeneratedsSuper):
             self.name.export(outfile, level, namespace_, name_='name', pretty_print=pretty_print)
         if self.address is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%saddress>%s</%saddress>%s' % (namespace_, self.gds_format_string(quote_xml(self.address).encode(ExternalEncoding), input_name='address'), namespace_, eol_))
+            outfile.write('<%saddress>%s</%saddress>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.address), input_name='address')), namespace_, eol_))
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -1002,25 +1052,30 @@ class borrowerType(GeneratedsSuper):
 class signatureType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, signature=None):
+    def __init__(self, Signature=None):
         self.original_tagname_ = None
-        self.signature = signature
+        self.Signature = Signature
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, signatureType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if signatureType.subclass:
             return signatureType.subclass(*args_, **kwargs_)
         else:
             return signatureType(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_signature(self): return self.signature
-    def set_signature(self, signature): self.signature = signature
+    def get_Signature(self): return self.Signature
+    def set_Signature(self, Signature): self.Signature = Signature
     def hasContent_(self):
         if (
-            self.signature is not None
+            self.Signature is not None
         ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='signatureType', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespace_='', name_='signatureType', namespacedef_=' xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" ', pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
@@ -1045,9 +1100,8 @@ class signatureType(GeneratedsSuper):
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.signature is not None:
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%ssignature>%s</%ssignature>%s' % (namespace_, self.gds_format_string(quote_xml(self.signature).encode(ExternalEncoding), input_name='signature'), namespace_, eol_))
+        if self.Signature is not None:
+            self.Signature.export(outfile, level, namespace_='dsig:', name_='Signature', pretty_print=pretty_print)
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -1058,64 +1112,12 @@ class signatureType(GeneratedsSuper):
     def buildAttributes(self, node, attrs, already_processed):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
-        if nodeName_ == 'signature':
-            signature_ = child_.text
-            signature_ = self.gds_validate_string(signature_, node, 'signature')
-            self.signature = signature_
+        if nodeName_ == 'Signature':
+            obj_ = SignatureType.factory()
+            obj_.build(child_)
+            self.Signature = obj_
+            obj_.original_tagname_ = 'Signature'
 # end class signatureType
-
-
-class signature(GeneratedsSuper):
-    subclass = None
-    superclass = None
-    def __init__(self):
-        self.original_tagname_ = None
-    def factory(*args_, **kwargs_):
-        if signature.subclass:
-            return signature.subclass(*args_, **kwargs_)
-        else:
-            return signature(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def hasContent_(self):
-        if (
-
-        ):
-            return True
-        else:
-            return False
-    def export(self, outfile, level, namespace_='', name_='signature', namespacedef_='', pretty_print=True):
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.original_tagname_ is not None:
-            name_ = self.original_tagname_
-        showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='signature')
-        if self.hasContent_():
-            outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_='', name_='signature', pretty_print=pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
-        else:
-            outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='signature'):
-        pass
-    def exportChildren(self, outfile, level, namespace_='', name_='signature', fromsubclass_=False, pretty_print=True):
-        pass
-    def build(self, node):
-        already_processed = set()
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
-        pass
-# end class signature
 
 
 class authSignatureType(GeneratedsSuper):
@@ -1125,6 +1127,11 @@ class authSignatureType(GeneratedsSuper):
         self.original_tagname_ = None
         self.signature = signature
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, authSignatureType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if authSignatureType.subclass:
             return authSignatureType.subclass(*args_, **kwargs_)
         else:
@@ -1192,6 +1199,11 @@ class signatureSlotType(GeneratedsSuper):
         self.signature = signature
         self.signatory = signatory
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, signatureSlotType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if signatureSlotType.subclass:
             return signatureSlotType.subclass(*args_, **kwargs_)
         else:
@@ -1264,7 +1276,7 @@ class signatureSlotType(GeneratedsSuper):
 class deedDataType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, Id=None, titleNumber=None, propertyDescription=None, borrowers=None, mdRef=None, chargeClause=None, additionalProvisions=None, lender=None, effectiveClause=None):
+    def __init__(self, Id=None, titleNumber=None, propertyDescription=None, borrowers=None, mdRef=None, chargeClause=None, additionalProvisions=None, lender=None, effectiveClause=None, reference=None):
         self.original_tagname_ = None
         self.Id = _cast(None, Id)
         self.titleNumber = titleNumber
@@ -1275,7 +1287,13 @@ class deedDataType(GeneratedsSuper):
         self.additionalProvisions = additionalProvisions
         self.lender = lender
         self.effectiveClause = effectiveClause
+        self.reference = reference
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, deedDataType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if deedDataType.subclass:
             return deedDataType.subclass(*args_, **kwargs_)
         else:
@@ -1297,6 +1315,8 @@ class deedDataType(GeneratedsSuper):
     def set_lender(self, lender): self.lender = lender
     def get_effectiveClause(self): return self.effectiveClause
     def set_effectiveClause(self, effectiveClause): self.effectiveClause = effectiveClause
+    def get_reference(self): return self.reference
+    def set_reference(self, reference): self.reference = reference
     def get_Id(self): return self.Id
     def set_Id(self, Id): self.Id = Id
     def hasContent_(self):
@@ -1308,7 +1328,8 @@ class deedDataType(GeneratedsSuper):
             self.chargeClause is not None or
             self.additionalProvisions is not None or
             self.lender is not None or
-            self.effectiveClause is not None
+            self.effectiveClause is not None or
+            self.reference is not None
         ):
             return True
         else:
@@ -1334,7 +1355,7 @@ class deedDataType(GeneratedsSuper):
     def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='deedDataType'):
         if self.Id is not None and 'Id' not in already_processed:
             already_processed.add('Id')
-            outfile.write(' Id=%s' % (self.gds_format_string(quote_attrib(self.Id).encode(ExternalEncoding), input_name='Id'), ))
+            outfile.write(' Id=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.Id), input_name='Id')), ))
     def exportChildren(self, outfile, level, namespace_='', name_='deedDataType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
@@ -1342,15 +1363,15 @@ class deedDataType(GeneratedsSuper):
             eol_ = ''
         if self.titleNumber is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%stitleNumber>%s</%stitleNumber>%s' % (namespace_, self.gds_format_string(quote_xml(self.titleNumber).encode(ExternalEncoding), input_name='titleNumber'), namespace_, eol_))
+            outfile.write('<%stitleNumber>%s</%stitleNumber>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.titleNumber), input_name='titleNumber')), namespace_, eol_))
         if self.propertyDescription is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%spropertyDescription>%s</%spropertyDescription>%s' % (namespace_, self.gds_format_string(quote_xml(self.propertyDescription).encode(ExternalEncoding), input_name='propertyDescription'), namespace_, eol_))
+            outfile.write('<%spropertyDescription>%s</%spropertyDescription>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.propertyDescription), input_name='propertyDescription')), namespace_, eol_))
         if self.borrowers is not None:
             self.borrowers.export(outfile, level, namespace_, name_='borrowers', pretty_print=pretty_print)
         if self.mdRef is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%smdRef>%s</%smdRef>%s' % (namespace_, self.gds_format_string(quote_xml(self.mdRef).encode(ExternalEncoding), input_name='mdRef'), namespace_, eol_))
+            outfile.write('<%smdRef>%s</%smdRef>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.mdRef), input_name='mdRef')), namespace_, eol_))
         if self.chargeClause is not None:
             self.chargeClause.export(outfile, level, namespace_, name_='chargeClause', pretty_print=pretty_print)
         if self.additionalProvisions is not None:
@@ -1359,7 +1380,10 @@ class deedDataType(GeneratedsSuper):
             self.lender.export(outfile, level, namespace_, name_='lender', pretty_print=pretty_print)
         if self.effectiveClause is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%seffectiveClause>%s</%seffectiveClause>%s' % (namespace_, self.gds_format_string(quote_xml(self.effectiveClause).encode(ExternalEncoding), input_name='effectiveClause'), namespace_, eol_))
+            outfile.write('<%seffectiveClause>%s</%seffectiveClause>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.effectiveClause), input_name='effectiveClause')), namespace_, eol_))
+        if self.reference is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sreference>%s</%sreference>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.reference), input_name='reference')), namespace_, eol_))
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -1409,6 +1433,10 @@ class deedDataType(GeneratedsSuper):
             effectiveClause_ = child_.text
             effectiveClause_ = self.gds_validate_string(effectiveClause_, node, 'effectiveClause')
             self.effectiveClause = effectiveClause_
+        elif nodeName_ == 'reference':
+            reference_ = child_.text
+            reference_ = self.gds_validate_string(reference_, node, 'reference')
+            self.reference = reference_
 # end class deedDataType
 
 
@@ -1422,6 +1450,11 @@ class signatureSlotsType(GeneratedsSuper):
         else:
             self.borrower_signature = borrower_signature
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, signatureSlotsType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if signatureSlotsType.subclass:
             return signatureSlotsType.subclass(*args_, **kwargs_)
         else:
@@ -1492,6 +1525,11 @@ class nameType(GeneratedsSuper):
         self.privateIndividual = privateIndividual
         self.company = company
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, nameType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if nameType.subclass:
             return nameType.subclass(*args_, **kwargs_)
         else:
@@ -1570,6 +1608,11 @@ class privateIndividualType(GeneratedsSuper):
         self.middlename = middlename
         self.surname = surname
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, privateIndividualType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if privateIndividualType.subclass:
             return privateIndividualType.subclass(*args_, **kwargs_)
         else:
@@ -1617,13 +1660,13 @@ class privateIndividualType(GeneratedsSuper):
             eol_ = ''
         if self.forename is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sforename>%s</%sforename>%s' % (namespace_, self.gds_format_string(quote_xml(self.forename).encode(ExternalEncoding), input_name='forename'), namespace_, eol_))
+            outfile.write('<%sforename>%s</%sforename>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.forename), input_name='forename')), namespace_, eol_))
         if self.middlename is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%smiddlename>%s</%smiddlename>%s' % (namespace_, self.gds_format_string(quote_xml(self.middlename).encode(ExternalEncoding), input_name='middlename'), namespace_, eol_))
+            outfile.write('<%smiddlename>%s</%smiddlename>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.middlename), input_name='middlename')), namespace_, eol_))
         if self.surname is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%ssurname>%s</%ssurname>%s' % (namespace_, self.gds_format_string(quote_xml(self.surname).encode(ExternalEncoding), input_name='surname'), namespace_, eol_))
+            outfile.write('<%ssurname>%s</%ssurname>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.surname), input_name='surname')), namespace_, eol_))
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -1656,6 +1699,11 @@ class companyType(GeneratedsSuper):
         self.original_tagname_ = None
         self.name = name
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, companyType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if companyType.subclass:
             return companyType.subclass(*args_, **kwargs_)
         else:
@@ -1697,7 +1745,7 @@ class companyType(GeneratedsSuper):
             eol_ = ''
         if self.name is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sname>%s</%sname>%s' % (namespace_, self.gds_format_string(quote_xml(self.name).encode(ExternalEncoding), input_name='name'), namespace_, eol_))
+            outfile.write('<%sname>%s</%sname>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.name), input_name='name')), namespace_, eol_))
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -1724,6 +1772,11 @@ class lenderType(GeneratedsSuper):
         self.address = address
         self.companyRegistrationDetails = companyRegistrationDetails
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, lenderType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if lenderType.subclass:
             return lenderType.subclass(*args_, **kwargs_)
         else:
@@ -1773,10 +1826,10 @@ class lenderType(GeneratedsSuper):
             self.organisationName.export(outfile, level, namespace_, name_='organisationName', pretty_print=pretty_print)
         if self.address is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%saddress>%s</%saddress>%s' % (namespace_, self.gds_format_string(quote_xml(self.address).encode(ExternalEncoding), input_name='address'), namespace_, eol_))
+            outfile.write('<%saddress>%s</%saddress>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.address), input_name='address')), namespace_, eol_))
         if self.companyRegistrationDetails is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%scompanyRegistrationDetails>%s</%scompanyRegistrationDetails>%s' % (namespace_, self.gds_format_string(quote_xml(self.companyRegistrationDetails).encode(ExternalEncoding), input_name='companyRegistrationDetails'), namespace_, eol_))
+            outfile.write('<%scompanyRegistrationDetails>%s</%scompanyRegistrationDetails>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.companyRegistrationDetails), input_name='companyRegistrationDetails')), namespace_, eol_))
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -1811,6 +1864,11 @@ class chargeClauseType(GeneratedsSuper):
         self.creCode = creCode
         self.entryText = entryText
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, chargeClauseType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if chargeClauseType.subclass:
             return chargeClauseType.subclass(*args_, **kwargs_)
         else:
@@ -1855,10 +1913,10 @@ class chargeClauseType(GeneratedsSuper):
             eol_ = ''
         if self.creCode is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%screCode>%s</%screCode>%s' % (namespace_, self.gds_format_string(quote_xml(self.creCode).encode(ExternalEncoding), input_name='creCode'), namespace_, eol_))
+            outfile.write('<%screCode>%s</%screCode>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.creCode), input_name='creCode')), namespace_, eol_))
         if self.entryText is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sentryText>%s</%sentryText>%s' % (namespace_, self.gds_format_string(quote_xml(self.entryText).encode(ExternalEncoding), input_name='entryText'), namespace_, eol_))
+            outfile.write('<%sentryText>%s</%sentryText>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.entryText), input_name='entryText')), namespace_, eol_))
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -1890,6 +1948,11 @@ class additionalProvisionsType(GeneratedsSuper):
         else:
             self.provision = provision
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, additionalProvisionsType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if additionalProvisionsType.subclass:
             return additionalProvisionsType.subclass(*args_, **kwargs_)
         else:
@@ -1961,6 +2024,11 @@ class provisionType(GeneratedsSuper):
         self.entryText = entryText
         self.sequenceNumber = sequenceNumber
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, provisionType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if provisionType.subclass:
             return provisionType.subclass(*args_, **kwargs_)
         else:
@@ -2008,10 +2076,10 @@ class provisionType(GeneratedsSuper):
             eol_ = ''
         if self.code is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%scode>%s</%scode>%s' % (namespace_, self.gds_format_string(quote_xml(self.code).encode(ExternalEncoding), input_name='code'), namespace_, eol_))
+            outfile.write('<%scode>%s</%scode>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.code), input_name='code')), namespace_, eol_))
         if self.entryText is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sentryText>%s</%sentryText>%s' % (namespace_, self.gds_format_string(quote_xml(self.entryText).encode(ExternalEncoding), input_name='entryText'), namespace_, eol_))
+            outfile.write('<%sentryText>%s</%sentryText>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.entryText), input_name='entryText')), namespace_, eol_))
         if self.sequenceNumber is not None:
             showIndent(outfile, level, pretty_print)
             outfile.write('<%ssequenceNumber>%s</%ssequenceNumber>%s' % (namespace_, self.gds_format_integer(self.sequenceNumber, input_name='sequenceNumber'), namespace_, eol_))
@@ -2058,6 +2126,11 @@ class SignatureType(GeneratedsSuper):
         else:
             self.Object = Object
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, SignatureType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if SignatureType.subclass:
             return SignatureType.subclass(*args_, **kwargs_)
         else:
@@ -2165,6 +2238,11 @@ class SignatureValueType(GeneratedsSuper):
         self.Id = _cast(None, Id)
         self.valueOf_ = valueOf_
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, SignatureValueType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if SignatureValueType.subclass:
             return SignatureValueType.subclass(*args_, **kwargs_)
         else:
@@ -2194,7 +2272,7 @@ class SignatureValueType(GeneratedsSuper):
         self.exportAttributes(outfile, level, already_processed, namespace_, name_='SignatureValueType')
         if self.hasContent_():
             outfile.write('>')
-            outfile.write((quote_xml(self.valueOf_) if type(self.valueOf_) is str else str(self.valueOf_)).encode(ExternalEncoding))
+            outfile.write((quote_xml(self.valueOf_) if type(self.valueOf_) is str else self.gds_encode(str(self.valueOf_))))
             self.exportChildren(outfile, level + 1, namespace_='', name_='SignatureValueType', pretty_print=pretty_print)
             outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
         else:
@@ -2236,6 +2314,11 @@ class SignedInfoType(GeneratedsSuper):
         else:
             self.Reference = Reference
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, SignedInfoType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if SignedInfoType.subclass:
             return SignedInfoType.subclass(*args_, **kwargs_)
         else:
@@ -2346,6 +2429,11 @@ class CanonicalizationMethodType(GeneratedsSuper):
             self.content_ = content_
         self.valueOf_ = valueOf_
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, CanonicalizationMethodType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if CanonicalizationMethodType.subclass:
             return CanonicalizationMethodType.subclass(*args_, **kwargs_)
         else:
@@ -2451,6 +2539,11 @@ class SignatureMethodType(GeneratedsSuper):
             self.content_ = content_
         self.valueOf_ = valueOf_
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, SignatureMethodType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if SignatureMethodType.subclass:
             return SignatureMethodType.subclass(*args_, **kwargs_)
         else:
@@ -2552,15 +2645,20 @@ class SignatureMethodType(GeneratedsSuper):
 class ReferenceType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, Type=None, URI=None, Id=None, Transforms=None, DigestMethod=None, DigestValue=None):
+    def __init__(self, Id=None, URI=None, Type=None, Transforms=None, DigestMethod=None, DigestValue=None):
         self.original_tagname_ = None
-        self.Type = _cast(None, Type)
-        self.URI = _cast(None, URI)
         self.Id = _cast(None, Id)
+        self.URI = _cast(None, URI)
+        self.Type = _cast(None, Type)
         self.Transforms = Transforms
         self.DigestMethod = DigestMethod
         self.DigestValue = DigestValue
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, ReferenceType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if ReferenceType.subclass:
             return ReferenceType.subclass(*args_, **kwargs_)
         else:
@@ -2572,12 +2670,12 @@ class ReferenceType(GeneratedsSuper):
     def set_DigestMethod(self, DigestMethod): self.DigestMethod = DigestMethod
     def get_DigestValue(self): return self.DigestValue
     def set_DigestValue(self, DigestValue): self.DigestValue = DigestValue
-    def get_Type(self): return self.Type
-    def set_Type(self, Type): self.Type = Type
-    def get_URI(self): return self.URI
-    def set_URI(self, URI): self.URI = URI
     def get_Id(self): return self.Id
     def set_Id(self, Id): self.Id = Id
+    def get_URI(self): return self.URI
+    def set_URI(self, URI): self.URI = URI
+    def get_Type(self): return self.Type
+    def set_Type(self, Type): self.Type = Type
     def hasContent_(self):
         if (
             self.Transforms is not None or
@@ -2606,15 +2704,15 @@ class ReferenceType(GeneratedsSuper):
         else:
             outfile.write('/>%s' % (eol_, ))
     def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='ReferenceType'):
-        if self.Type is not None and 'Type' not in already_processed:
-            already_processed.add('Type')
-            outfile.write(' Type=%s' % (quote_attrib(self.Type), ))
-        if self.URI is not None and 'URI' not in already_processed:
-            already_processed.add('URI')
-            outfile.write(' URI=%s' % (quote_attrib(self.URI), ))
         if self.Id is not None and 'Id' not in already_processed:
             already_processed.add('Id')
             outfile.write(' Id=%s' % (quote_attrib(self.Id), ))
+        if self.URI is not None and 'URI' not in already_processed:
+            already_processed.add('URI')
+            outfile.write(' URI=%s' % (quote_attrib(self.URI), ))
+        if self.Type is not None and 'Type' not in already_processed:
+            already_processed.add('Type')
+            outfile.write(' Type=%s' % (quote_attrib(self.Type), ))
     def exportChildren(self, outfile, level, namespace_='', name_='ReferenceType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
@@ -2635,18 +2733,18 @@ class ReferenceType(GeneratedsSuper):
             self.buildChildren(child, node, nodeName_)
         return self
     def buildAttributes(self, node, attrs, already_processed):
-        value = find_attr_value_('Type', node)
-        if value is not None and 'Type' not in already_processed:
-            already_processed.add('Type')
-            self.Type = value
-        value = find_attr_value_('URI', node)
-        if value is not None and 'URI' not in already_processed:
-            already_processed.add('URI')
-            self.URI = value
         value = find_attr_value_('Id', node)
         if value is not None and 'Id' not in already_processed:
             already_processed.add('Id')
             self.Id = value
+        value = find_attr_value_('URI', node)
+        if value is not None and 'URI' not in already_processed:
+            already_processed.add('URI')
+            self.URI = value
+        value = find_attr_value_('Type', node)
+        if value is not None and 'Type' not in already_processed:
+            already_processed.add('Type')
+            self.Type = value
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
         if nodeName_ == 'Transforms':
             obj_ = TransformsType.factory()
@@ -2682,6 +2780,11 @@ class TransformsType(GeneratedsSuper):
         else:
             self.Transform = Transform
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, TransformsType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if TransformsType.subclass:
             return TransformsType.subclass(*args_, **kwargs_)
         else:
@@ -2766,6 +2869,11 @@ class TransformType(GeneratedsSuper):
             self.content_ = content_
         self.valueOf_ = valueOf_
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, TransformType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if TransformType.subclass:
             return TransformType.subclass(*args_, **kwargs_)
         else:
@@ -2878,6 +2986,11 @@ class DigestMethodType(GeneratedsSuper):
             self.content_ = content_
         self.valueOf_ = valueOf_
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, DigestMethodType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if DigestMethodType.subclass:
             return DigestMethodType.subclass(*args_, **kwargs_)
         else:
@@ -3006,6 +3119,11 @@ class KeyInfoType(GeneratedsSuper):
             self.content_ = content_
         self.valueOf_ = valueOf_
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, KeyInfoType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if KeyInfoType.subclass:
             return KeyInfoType.subclass(*args_, **kwargs_)
         else:
@@ -3207,6 +3325,11 @@ class KeyValueType(GeneratedsSuper):
             self.content_ = content_
         self.valueOf_ = valueOf_
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, KeyValueType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if KeyValueType.subclass:
             return KeyValueType.subclass(*args_, **kwargs_)
         else:
@@ -3315,6 +3438,11 @@ class RetrievalMethodType(GeneratedsSuper):
         self.Type = _cast(None, Type)
         self.Transforms = Transforms
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, RetrievalMethodType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if RetrievalMethodType.subclass:
             return RetrievalMethodType.subclass(*args_, **kwargs_)
         else:
@@ -3417,6 +3545,11 @@ class X509DataType(GeneratedsSuper):
             self.X509CRL = X509CRL
         self.anytypeobjs_ = anytypeobjs_
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, X509DataType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if X509DataType.subclass:
             return X509DataType.subclass(*args_, **kwargs_)
         else:
@@ -3490,16 +3623,16 @@ class X509DataType(GeneratedsSuper):
             X509IssuerSerial_.export(outfile, level, namespace_, name_='X509IssuerSerial', pretty_print=pretty_print)
         for X509SKI_ in self.X509SKI:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sX509SKI>%s</%sX509SKI>%s' % (namespace_, self.gds_format_string(quote_xml(X509SKI_).encode(ExternalEncoding), input_name='X509SKI'), namespace_, eol_))
+            outfile.write('<%sX509SKI>%s</%sX509SKI>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(X509SKI_), input_name='X509SKI')), namespace_, eol_))
         for X509SubjectName_ in self.X509SubjectName:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sX509SubjectName>%s</%sX509SubjectName>%s' % (namespace_, self.gds_format_string(quote_xml(X509SubjectName_).encode(ExternalEncoding), input_name='X509SubjectName'), namespace_, eol_))
+            outfile.write('<%sX509SubjectName>%s</%sX509SubjectName>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(X509SubjectName_), input_name='X509SubjectName')), namespace_, eol_))
         for X509Certificate_ in self.X509Certificate:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sX509Certificate>%s</%sX509Certificate>%s' % (namespace_, self.gds_format_string(quote_xml(X509Certificate_).encode(ExternalEncoding), input_name='X509Certificate'), namespace_, eol_))
+            outfile.write('<%sX509Certificate>%s</%sX509Certificate>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(X509Certificate_), input_name='X509Certificate')), namespace_, eol_))
         for X509CRL_ in self.X509CRL:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sX509CRL>%s</%sX509CRL>%s' % (namespace_, self.gds_format_string(quote_xml(X509CRL_).encode(ExternalEncoding), input_name='X509CRL'), namespace_, eol_))
+            outfile.write('<%sX509CRL>%s</%sX509CRL>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(X509CRL_), input_name='X509CRL')), namespace_, eol_))
         if self.anytypeobjs_ is not None:
             self.anytypeobjs_.export(outfile, level, namespace_, pretty_print=pretty_print)
     def build(self, node):
@@ -3548,6 +3681,11 @@ class X509IssuerSerialType(GeneratedsSuper):
         self.X509IssuerName = X509IssuerName
         self.X509SerialNumber = X509SerialNumber
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, X509IssuerSerialType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if X509IssuerSerialType.subclass:
             return X509IssuerSerialType.subclass(*args_, **kwargs_)
         else:
@@ -3592,10 +3730,10 @@ class X509IssuerSerialType(GeneratedsSuper):
             eol_ = ''
         if self.X509IssuerName is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sX509IssuerName>%s</%sX509IssuerName>%s' % (namespace_, self.gds_format_string(quote_xml(self.X509IssuerName).encode(ExternalEncoding), input_name='X509IssuerName'), namespace_, eol_))
+            outfile.write('<%sX509IssuerName>%s</%sX509IssuerName>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.X509IssuerName), input_name='X509IssuerName')), namespace_, eol_))
         if self.X509SerialNumber is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sX509SerialNumber>%s</%sX509SerialNumber>%s' % (namespace_, self.gds_format_string(quote_xml(self.X509SerialNumber).encode(ExternalEncoding), input_name='X509SerialNumber'), namespace_, eol_))
+            outfile.write('<%sX509SerialNumber>%s</%sX509SerialNumber>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.X509SerialNumber), input_name='X509SerialNumber')), namespace_, eol_))
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -3634,6 +3772,11 @@ class PGPDataType(GeneratedsSuper):
         else:
             self.anytypeobjs_ = anytypeobjs_
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PGPDataType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if PGPDataType.subclass:
             return PGPDataType.subclass(*args_, **kwargs_)
         else:
@@ -3691,13 +3834,13 @@ class PGPDataType(GeneratedsSuper):
             eol_ = ''
         if self.PGPKeyID is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sPGPKeyID>%s</%sPGPKeyID>%s' % (namespace_, self.gds_format_string(quote_xml(self.PGPKeyID).encode(ExternalEncoding), input_name='PGPKeyID'), namespace_, eol_))
+            outfile.write('<%sPGPKeyID>%s</%sPGPKeyID>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.PGPKeyID), input_name='PGPKeyID')), namespace_, eol_))
         if self.PGPKeyPacket is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sPGPKeyPacket>%s</%sPGPKeyPacket>%s' % (namespace_, self.gds_format_string(quote_xml(self.PGPKeyPacket).encode(ExternalEncoding), input_name='PGPKeyPacket'), namespace_, eol_))
+            outfile.write('<%sPGPKeyPacket>%s</%sPGPKeyPacket>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.PGPKeyPacket), input_name='PGPKeyPacket')), namespace_, eol_))
         if self.PGPKeyPacket is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sPGPKeyPacket>%s</%sPGPKeyPacket>%s' % (namespace_, self.gds_format_string(quote_xml(self.PGPKeyPacket).encode(ExternalEncoding), input_name='PGPKeyPacket'), namespace_, eol_))
+            outfile.write('<%sPGPKeyPacket>%s</%sPGPKeyPacket>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.PGPKeyPacket), input_name='PGPKeyPacket')), namespace_, eol_))
         for obj_ in self.anytypeobjs_:
             obj_.export(outfile, level, namespace_, pretty_print=pretty_print)
     def build(self, node):
@@ -3740,6 +3883,11 @@ class SPKIDataType(GeneratedsSuper):
             self.SPKISexp = SPKISexp
         self.anytypeobjs_ = anytypeobjs_
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, SPKIDataType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if SPKIDataType.subclass:
             return SPKIDataType.subclass(*args_, **kwargs_)
         else:
@@ -3787,7 +3935,7 @@ class SPKIDataType(GeneratedsSuper):
             eol_ = ''
         for SPKISexp_ in self.SPKISexp:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sSPKISexp>%s</%sSPKISexp>%s' % (namespace_, self.gds_format_string(quote_xml(SPKISexp_).encode(ExternalEncoding), input_name='SPKISexp'), namespace_, eol_))
+            outfile.write('<%sSPKISexp>%s</%sSPKISexp>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(SPKISexp_), input_name='SPKISexp')), namespace_, eol_))
         if self.anytypeobjs_ is not None:
             self.anytypeobjs_.export(outfile, level, namespace_, pretty_print=pretty_print)
     def build(self, node):
@@ -3814,11 +3962,11 @@ class SPKIDataType(GeneratedsSuper):
 class ObjectType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, MimeType=None, Encoding=None, Id=None, anytypeobjs_=None, valueOf_=None, mixedclass_=None, content_=None):
+    def __init__(self, Id=None, MimeType=None, Encoding=None, anytypeobjs_=None, valueOf_=None, mixedclass_=None, content_=None):
         self.original_tagname_ = None
+        self.Id = _cast(None, Id)
         self.MimeType = _cast(None, MimeType)
         self.Encoding = _cast(None, Encoding)
-        self.Id = _cast(None, Id)
         self.anytypeobjs_ = anytypeobjs_
         self.valueOf_ = valueOf_
         if mixedclass_ is None:
@@ -3831,6 +3979,11 @@ class ObjectType(GeneratedsSuper):
             self.content_ = content_
         self.valueOf_ = valueOf_
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, ObjectType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if ObjectType.subclass:
             return ObjectType.subclass(*args_, **kwargs_)
         else:
@@ -3838,12 +3991,12 @@ class ObjectType(GeneratedsSuper):
     factory = staticmethod(factory)
     def get_anytypeobjs_(self): return self.anytypeobjs_
     def set_anytypeobjs_(self, anytypeobjs_): self.anytypeobjs_ = anytypeobjs_
+    def get_Id(self): return self.Id
+    def set_Id(self, Id): self.Id = Id
     def get_MimeType(self): return self.MimeType
     def set_MimeType(self, MimeType): self.MimeType = MimeType
     def get_Encoding(self): return self.Encoding
     def set_Encoding(self, Encoding): self.Encoding = Encoding
-    def get_Id(self): return self.Id
-    def set_Id(self, Id): self.Id = Id
     def get_valueOf_(self): return self.valueOf_
     def set_valueOf_(self, valueOf_): self.valueOf_ = valueOf_
     def hasContent_(self):
@@ -3873,15 +4026,15 @@ class ObjectType(GeneratedsSuper):
         else:
             outfile.write('/>%s' % (eol_, ))
     def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='ObjectType'):
+        if self.Id is not None and 'Id' not in already_processed:
+            already_processed.add('Id')
+            outfile.write(' Id=%s' % (quote_attrib(self.Id), ))
         if self.MimeType is not None and 'MimeType' not in already_processed:
             already_processed.add('MimeType')
             outfile.write(' MimeType=%s' % (quote_attrib(self.MimeType), ))
         if self.Encoding is not None and 'Encoding' not in already_processed:
             already_processed.add('Encoding')
             outfile.write(' Encoding=%s' % (quote_attrib(self.Encoding), ))
-        if self.Id is not None and 'Id' not in already_processed:
-            already_processed.add('Id')
-            outfile.write(' Id=%s' % (quote_attrib(self.Id), ))
     def exportChildren(self, outfile, level, namespace_='', name_='ObjectType', fromsubclass_=False, pretty_print=True):
         if not fromsubclass_:
             for item_ in self.content_:
@@ -3899,6 +4052,10 @@ class ObjectType(GeneratedsSuper):
             self.buildChildren(child, node, nodeName_)
         return self
     def buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('Id', node)
+        if value is not None and 'Id' not in already_processed:
+            already_processed.add('Id')
+            self.Id = value
         value = find_attr_value_('MimeType', node)
         if value is not None and 'MimeType' not in already_processed:
             already_processed.add('MimeType')
@@ -3907,10 +4064,6 @@ class ObjectType(GeneratedsSuper):
         if value is not None and 'Encoding' not in already_processed:
             already_processed.add('Encoding')
             self.Encoding = value
-        value = find_attr_value_('Id', node)
-        if value is not None and 'Id' not in already_processed:
-            already_processed.add('Id')
-            self.Id = value
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
         if nodeName_ == '':
             obj_ = __ANY__.factory()
@@ -3940,6 +4093,11 @@ class ManifestType(GeneratedsSuper):
         else:
             self.Reference = Reference
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, ManifestType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if ManifestType.subclass:
             return ManifestType.subclass(*args_, **kwargs_)
         else:
@@ -4020,6 +4178,11 @@ class SignaturePropertiesType(GeneratedsSuper):
         else:
             self.SignatureProperty = SignatureProperty
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, SignaturePropertiesType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if SignaturePropertiesType.subclass:
             return SignaturePropertiesType.subclass(*args_, **kwargs_)
         else:
@@ -4092,10 +4255,10 @@ class SignaturePropertiesType(GeneratedsSuper):
 class SignaturePropertyType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, Id=None, Target=None, anytypeobjs_=None, valueOf_=None, mixedclass_=None, content_=None):
+    def __init__(self, Target=None, Id=None, anytypeobjs_=None, valueOf_=None, mixedclass_=None, content_=None):
         self.original_tagname_ = None
-        self.Id = _cast(None, Id)
         self.Target = _cast(None, Target)
+        self.Id = _cast(None, Id)
         self.anytypeobjs_ = anytypeobjs_
         self.valueOf_ = valueOf_
         if mixedclass_ is None:
@@ -4108,6 +4271,11 @@ class SignaturePropertyType(GeneratedsSuper):
             self.content_ = content_
         self.valueOf_ = valueOf_
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, SignaturePropertyType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if SignaturePropertyType.subclass:
             return SignaturePropertyType.subclass(*args_, **kwargs_)
         else:
@@ -4115,10 +4283,10 @@ class SignaturePropertyType(GeneratedsSuper):
     factory = staticmethod(factory)
     def get_anytypeobjs_(self): return self.anytypeobjs_
     def set_anytypeobjs_(self, anytypeobjs_): self.anytypeobjs_ = anytypeobjs_
-    def get_Id(self): return self.Id
-    def set_Id(self, Id): self.Id = Id
     def get_Target(self): return self.Target
     def set_Target(self, Target): self.Target = Target
+    def get_Id(self): return self.Id
+    def set_Id(self, Id): self.Id = Id
     def get_valueOf_(self): return self.valueOf_
     def set_valueOf_(self, valueOf_): self.valueOf_ = valueOf_
     def hasContent_(self):
@@ -4148,12 +4316,12 @@ class SignaturePropertyType(GeneratedsSuper):
         else:
             outfile.write('/>%s' % (eol_, ))
     def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='SignaturePropertyType'):
-        if self.Id is not None and 'Id' not in already_processed:
-            already_processed.add('Id')
-            outfile.write(' Id=%s' % (quote_attrib(self.Id), ))
         if self.Target is not None and 'Target' not in already_processed:
             already_processed.add('Target')
             outfile.write(' Target=%s' % (quote_attrib(self.Target), ))
+        if self.Id is not None and 'Id' not in already_processed:
+            already_processed.add('Id')
+            outfile.write(' Id=%s' % (quote_attrib(self.Id), ))
     def exportChildren(self, outfile, level, namespace_='', name_='SignaturePropertyType', fromsubclass_=False, pretty_print=True):
         if not fromsubclass_:
             for item_ in self.content_:
@@ -4171,14 +4339,14 @@ class SignaturePropertyType(GeneratedsSuper):
             self.buildChildren(child, node, nodeName_)
         return self
     def buildAttributes(self, node, attrs, already_processed):
-        value = find_attr_value_('Id', node)
-        if value is not None and 'Id' not in already_processed:
-            already_processed.add('Id')
-            self.Id = value
         value = find_attr_value_('Target', node)
         if value is not None and 'Target' not in already_processed:
             already_processed.add('Target')
             self.Target = value
+        value = find_attr_value_('Id', node)
+        if value is not None and 'Id' not in already_processed:
+            already_processed.add('Id')
+            self.Id = value
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
         if nodeName_ == '':
             obj_ = __ANY__.factory()
@@ -4217,6 +4385,11 @@ class DSAKeyValueType(GeneratedsSuper):
         self.PgenCounter = PgenCounter
         self.validate_CryptoBinary(self.PgenCounter)
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, DSAKeyValueType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if DSAKeyValueType.subclass:
             return DSAKeyValueType.subclass(*args_, **kwargs_)
         else:
@@ -4413,6 +4586,11 @@ class RSAKeyValueType(GeneratedsSuper):
         self.Exponent = Exponent
         self.validate_CryptoBinary(self.Exponent)
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, RSAKeyValueType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if RSAKeyValueType.subclass:
             return RSAKeyValueType.subclass(*args_, **kwargs_)
         else:
@@ -4505,46 +4683,46 @@ class RSAKeyValueType(GeneratedsSuper):
 
 
 GDSClassesMapping = {
-    'Manifest': ManifestType,
     'CanonicalizationMethod': CanonicalizationMethodType,
-    'provision': provisionType,
-    'borrower_signature': signatureSlotType,
-    'SignedInfo': SignedInfoType,
-    'deedData': deedDataType,
-    'X509IssuerSerial': X509IssuerSerialType,
-    'SignatureValue': SignatureValueType,
-    'signatory': nameType,
-    'SPKIData': SPKIDataType,
     'DSAKeyValue': DSAKeyValueType,
-    'Signature': SignatureType,
-    'lender': lenderType,
+    'DigestMethod': DigestMethodType,
     'KeyInfo': KeyInfoType,
-    'SignatureProperties': SignaturePropertiesType,
-    'Reference': ReferenceType,
-    'organisationName': nameType,
-    'privateIndividual': privateIndividualType,
-    'Transforms': TransformsType,
-    'RSAKeyValue': RSAKeyValueType,
-    'Object': ObjectType,
-    'operativeDeed': operativeDeedType,
-    'signatureSlots': signatureSlotsType,
-    'borrower': borrowerType,
-    'signature': signatureType,
     'KeyValue': KeyValueType,
-    'SignatureProperty': SignaturePropertyType,
+    'Manifest': ManifestType,
+    'Object': ObjectType,
     'PGPData': PGPDataType,
+    'RSAKeyValue': RSAKeyValueType,
+    'Reference': ReferenceType,
     'RetrievalMethod': RetrievalMethodType,
+    'SPKIData': SPKIDataType,
+    'Signature': SignatureType,
+    'SignatureMethod': SignatureMethodType,
+    'SignatureProperties': SignaturePropertiesType,
+    'SignatureProperty': SignaturePropertyType,
+    'SignatureValue': SignatureValueType,
+    'SignedInfo': SignedInfoType,
+    'Transform': TransformType,
+    'Transforms': TransformsType,
+    'X509Data': X509DataType,
+    'X509IssuerSerial': X509IssuerSerialType,
     'additionalProvisions': additionalProvisionsType,
     'authSignature': authSignatureType,
+    'borrower': borrowerType,
+    'borrower_signature': signatureSlotType,
     'borrowers': borrowersType,
-    'dm-application': dmApplicationType,
-    'X509Data': X509DataType,
-    'SignatureMethod': SignatureMethodType,
-    'company': companyType,
-    'DigestMethod': DigestMethodType,
     'chargeClause': chargeClauseType,
-    'Transform': TransformType,
+    'company': companyType,
+    'deedData': deedDataType,
+    'dm-application': dmApplicationType,
+    'lender': lenderType,
     'name': nameType,
+    'operativeDeed': operativeDeedType,
+    'organisationName': nameType,
+    'privateIndividual': privateIndividualType,
+    'provision': provisionType,
+    'signatory': nameType,
+    'signature': signatureType,
+    'signatureSlots': signatureSlotsType,
 }
 
 
@@ -4703,7 +4881,6 @@ __all__ = [
     "operativeDeedType",
     "privateIndividualType",
     "provisionType",
-    "signature",
     "signatureSlotType",
     "signatureSlotsType",
     "signatureType"

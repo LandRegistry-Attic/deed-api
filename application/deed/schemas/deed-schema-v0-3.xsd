@@ -102,7 +102,7 @@
                 maxOccurs="1" minOccurs="1">
             </xs:element>
             <xs:element name="reference" type="xs:string"
-                maxOccurs="1" minOccurs="1">
+                maxOccurs="1" minOccurs="0">
             </xs:element>
         </xs:sequence>
         <xs:attribute name="Id" type="xs:ID" use="required"/>
