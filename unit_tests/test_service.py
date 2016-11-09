@@ -1,8 +1,9 @@
 import unittest
 import mock
 from application import app
-from unit_tests.helper import MortgageDocMock, MortgageDocMockWithReference
-from application.deed.service import update_md_clauses
+from unit_tests.helper import MortgageDocMock, MortgageDocMockWithReference, DeedHelper, DeedModelMock
+from application.deed.service import update_md_clauses, update_deed
+from application.deed.model import Deed
 import json
 
 
@@ -65,3 +66,31 @@ class TestService(unittest.TestCase):
                          }
 
         self.assertEquals(mock_dict, expected_dict)
+
+    @mock.patch('application.deed.service.assign_deed')
+    @mock.patch('application.deed.service.delete_orphaned_borrowers')
+    @mock.patch('application.borrower.model.Borrower')
+    @mock.patch('application.deed.model.Deed.save')
+    @mock.patch('application.deed.service.update_md_clauses', autospec=True)
+    @mock.patch('application.deed.service.update_borrower')
+    @mock.patch('application.deed.service.build_json_deed_document')
+    def test_update_deed_with_reference(self, mock_json_doc, mock_updated_borrower, mock_update_md, mock_save_deed,
+                                        mock_borrower, mock_delete_orphans, mock_assign):
+
+        new_deed = Deed()
+
+        mock_json_doc.return_value = DeedHelper._valid_initial_deed
+        mock_updated_borrower.return_value = DeedHelper._valid_single_borrower_update_response
+
+        res, msg = update_deed(new_deed, DeedHelper._json_doc_with_reference)
+
+        mock_assign.assert_called_with(new_deed, DeedHelper._update_deed_mock_response)
+
+        mock_update_md.assert_called_with(DeedHelper._valid_initial_deed,
+                                          DeedHelper._json_doc_with_reference['md_ref'],
+                                          DeedHelper._json_doc_with_reference['reference'],
+                                          None)
+
+        self.assertTrue(res)
+
+
