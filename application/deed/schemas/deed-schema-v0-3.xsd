@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+        xmlns:dsig="http://www.w3.org/2000/09/xmldsig#"
+        version="0.1" id="LR-DM" attributeFormDefault="unqualified"
+        elementFormDefault="qualified"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:import namespace="http://www.w3.org/2000/09/xmldsig#"
+               schemaLocation="Signature.xsd"/>
+
+    <xs:element name="dm-application" type="dmApplicationType"/>
+
+    <xs:complexType name="dmApplicationType">
+        <xs:sequence>
+        	<xs:element name="operativeDeed" type="operativeDeedType"
+        		maxOccurs="1" minOccurs="1">
+        	</xs:element>
+        	<xs:element name="effectiveDate" type="xs:string"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="authSignature" type="authSignatureType"
+        		maxOccurs="1" minOccurs="1">
+        	</xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="deedApplicationType">
+        <xs:sequence>
+            <xs:element name="operativeDeed" type="operativeDeedType" maxOccurs="1" minOccurs="1"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="operativeDeedType">
+        <xs:sequence>
+            <xs:element name="deedData" type="deedDataType" maxOccurs="1" minOccurs="1"></xs:element>
+            <xs:element name="signatureSlots" type="signatureSlotsType"
+                        maxOccurs="1" minOccurs="1">
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="borrowersType">
+        <xs:sequence>
+            <xs:element name="borrower" type="borrowerType" maxOccurs="unbounded" minOccurs="1"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="borrowerType">
+        <xs:sequence>
+            <xs:element name="name" type="nameType" maxOccurs="1" minOccurs="1"></xs:element>
+            <xs:element name="address" type="xs:string" maxOccurs="1" minOccurs="1">
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="signatureType">
+        <xs:sequence>
+            <xs:element ref="dsig:Signature" minOccurs="0"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="authSignatureType">
+        <xs:sequence>
+            <xs:element name="signature" type="signatureType" minOccurs="0"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="signatureSlotType">
+        <xs:sequence>
+            <xs:element name="signature" type="signatureType" minOccurs="0"></xs:element>
+
+            <xs:element name="signatory" type="nameType" maxOccurs="1"
+                        minOccurs="1">
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="deedDataType">
+        <xs:sequence>
+        	<xs:element name="titleNumber" type="xs:string"
+        		maxOccurs="1" minOccurs="1">
+        	</xs:element>
+        	<xs:element name="propertyDescription" type="xs:string"
+        		maxOccurs="1" minOccurs="1">
+        	</xs:element>
+        	<xs:element name="borrowers" type="borrowersType"
+        		maxOccurs="1" minOccurs="1">
+        	</xs:element>
+        	<xs:element name="mdRef" type="xs:string" maxOccurs="1"
+        		minOccurs="1">
+        	</xs:element>
+        	<xs:element name="chargeClause" type="chargeClauseType" 
+        		minOccurs="1" maxOccurs="1">
+        	</xs:element>
+        	<xs:element name="additionalProvisions" type="additionalProvisionsType" 
+        		minOccurs="1" maxOccurs="1">
+        	</xs:element>
+        	<xs:element name="lender" type="lenderType"
+                maxOccurs="1" minOccurs="1">
+            </xs:element>
+        	<xs:element name="effectiveClause" type="xs:string"
+                maxOccurs="1" minOccurs="1">
+            </xs:element>
+            <xs:element name="reference" type="xs:string"
+                maxOccurs="1" minOccurs="1">
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="Id" type="xs:ID" use="required"/>
+    </xs:complexType>
+
+
+    <xs:complexType name="signatureSlotsType">
+        <xs:sequence>
+            <xs:element name="borrower_signature" type="signatureSlotType" maxOccurs="unbounded"
+                        minOccurs="0"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+
+	<xs:complexType name="nameType">
+    	<xs:choice>
+    		<xs:element name="privateIndividual" type="privateIndividualType"></xs:element>
+    		<xs:element name="company" type="companyType"></xs:element>
+    	</xs:choice>
+    </xs:complexType>
+	    	
+    <xs:complexType name="privateIndividualType">
+    	<xs:sequence>
+    		<xs:element name="forename" type="xs:string" maxOccurs="1"
+    			minOccurs="1">
+    		</xs:element>
+    		<xs:element name="middlename" type="xs:string" maxOccurs="1"
+    			minOccurs="0">
+    		</xs:element>
+    		<xs:element name="surname" type="xs:string" maxOccurs="1"
+    			minOccurs="1">
+    		</xs:element>
+    	</xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="companyType">
+    	<xs:sequence>
+    		<xs:element name="name" type="xs:string" maxOccurs="1"
+    			minOccurs="1">
+    		</xs:element>
+    	</xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="lenderType">
+       <xs:sequence>
+           <xs:element name="organisationName" type="nameType" maxOccurs="1" minOccurs="1">
+           </xs:element>
+           <xs:element name="address" type="xs:string" maxOccurs="1" minOccurs="1">
+           </xs:element>
+           <xs:element name="companyRegistrationDetails" type="xs:string" maxOccurs="1" minOccurs="1">
+           </xs:element>
+       </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="chargeClauseType">
+    	<xs:sequence>
+    		<xs:element name="creCode" type="xs:string" maxOccurs="1"
+    			minOccurs="1">
+    		</xs:element>
+    		<xs:element name="entryText" type="xs:string" maxOccurs="1"
+    			minOccurs="1">
+    		</xs:element>
+    	</xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="additionalProvisionsType">
+        <xs:sequence>
+            <xs:element name="provision" type="provisionType" maxOccurs="unbounded" minOccurs="1"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="provisionType">
+    	<xs:sequence>
+    		<xs:element name="code" type="xs:string" maxOccurs="1"
+    			minOccurs="1">
+    		</xs:element>
+    		<xs:element name="entryText" type="xs:string" maxOccurs="1"
+    			minOccurs="1">
+    		</xs:element>
+    		    <xs:element name="sequenceNumber" type="xs:integer" 
+    			minOccurs="1" maxOccurs="1">
+    		</xs:element>
+    	</xs:sequence>
+    </xs:complexType>
+
+</xs:schema>
