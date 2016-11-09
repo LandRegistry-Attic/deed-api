@@ -16,7 +16,7 @@ from application import config
 LOGGER = logging.getLogger(__name__)
 
 
-XML_SCHEMA_FILE = "deed-schema-v0-2.xsd"
+XML_SCHEMA_FILE = "deed-schema-v0-3.xsd"
 
 SCHEMA_LOCATION = config.ESEC_SCHEMA_LOCATION
 
