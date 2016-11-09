@@ -92,7 +92,7 @@ class Deed(db.Model):
 
     def get_borrower_position(self, borrower_token):
         for idx, borrower in enumerate(self.deed['borrowers'], start=1):
-            if borrower_token == borrower['token']:
+            if borrower_token == str(borrower['token']).upper():
                 return idx
         return -1
 
