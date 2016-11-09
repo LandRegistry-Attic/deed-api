@@ -7,7 +7,7 @@ import PyPDF2
 import requests
 from application import config
 from application.deed.model import Deed
-from integration_tests.deed.deed_data import valid_deed, new_deed
+from integration_tests.deed.deed_data import valid_deed, new_deed, valid_deed_with_reference
 from integration_tests.helper import setUpApp, setUp_MortgageDocuments
 from lxml import etree
 
@@ -43,9 +43,9 @@ class TestDeedRoutes(unittest.TestCase):
         setUpApp(self)
         setUp_MortgageDocuments(self)
 
-    def test_deed_create_and_get(self):
+    def deed_create_and_get(self, deed):
         create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
-                                    data=json.dumps(valid_deed),
+                                    data=json.dumps(deed),
                                     headers=self.webseal_headers)
         self.assertEqual(create_deed.status_code, 201)
 
@@ -67,6 +67,16 @@ class TestDeedRoutes(unittest.TestCase):
         self.assertIn("additional_provisions", str(created_deed['deed']))
         self.assertIn("lender", str(created_deed['deed']))
         self.assertIn("property_address", str(created_deed['deed']))
+        if 'reference' in deed:
+            self.assertIn("reference", str(created_deed['deed']))
+            self.assertEqual(deed['reference'],
+                             str(created_deed['deed']['reference_details']['lender_reference_value']))
+
+    def test_deed_create_and_get(self):
+        self.deed_create_and_get(valid_deed)
+
+    def test_deed_create_and_get_with_optional_reference(self):
+        self.deed_create_and_get(valid_deed_with_reference)
 
     def test_bad_get(self):
         fake_token_deed = requests.get(config.DEED_API_BASE_HOST + "/deed/fake",

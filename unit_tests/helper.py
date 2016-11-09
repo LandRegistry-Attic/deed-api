@@ -9,7 +9,7 @@ class DeedModelMock(Deed):
     token = "ABC1234"
     deed = DEED
     status = "DRAFT"
-    deed_xml = "<dm-application xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"http://localhost:9080/schemas/deed-schema-v0-2.xsd\">\
+    deed_xml = "<dm-application xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"http://localhost:9080/schemas/deed-schema-v0-3.xsd\">\
                 <operativeDeed><deedData Id=\"deedData\"><titleNumber>GR515835</titleNumber><propertyDescription>5 The Drive, This Town, This County, PL4 4TH</propertyDescription>\
                 <borrowers><borrower><name><privateIndividual><forename>Paul</forename><middlename>James</middlename><surname>Smythe</surname>\
                 </privateIndividual></name><address>borrower address</address></borrower><borrower><name><privateIndividual><forename>Jane</forename><surname>Smythe</surname>\
@@ -24,7 +24,7 @@ class DeedModelMock(Deed):
                  </provision></additionalProvisions><lender><organisationName><company><name>Bank of England Plc</name></company></organisationName>\
                  <address>12 Trinity Place, Regents Street, London NW10 6TQ</address><companyRegistrationDetails>Company registration number: 2347676</companyRegistrationDetails>\
                  </lender><effectiveClause>This charge takes effect when the registrar receives notification from Land Registry Devices that the charge is to take effect.</effectiveClause>\
-                 </deedData><signatureSlots><borrower_signature><signature/><signatory><privateIndividual><forename>Paul</forename><middlename>James</middlename><surname>Smythe</surname>\
+                 <reference>A test reference</reference></deedData><signatureSlots><borrower_signature><signature/><signatory><privateIndividual><forename>Paul</forename><middlename>James</middlename><surname>Smythe</surname>\
                  </privateIndividual></signatory></borrower_signature><borrower_signature><signature/><signatory><privateIndividual><forename>Jane</forename><surname>Smythe</surname>\
                  </privateIndividual></signatory></borrower_signature></signatureSlots></operativeDeed><effectiveDate></effectiveDate><authSignature/></dm-application>"
 
