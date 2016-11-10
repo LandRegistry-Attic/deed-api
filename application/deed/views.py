@@ -272,7 +272,7 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
                     deed.save()
 
                     LOGGER.info("updating JSON with Signature")
-                    deed.deed = update_deed_signature_timestamp(deed, borrower_token)
+                    update_deed_signature_timestamp(deed, borrower_token)
 
                 else:
                     LOGGER.error("Failed to sign Mortgage document")
