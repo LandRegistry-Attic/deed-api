@@ -393,7 +393,7 @@ class TestDeedRoutes(unittest.TestCase):
 
     def test_deed_pdf(self):
         create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
-                                    data=json.dumps(valid_deed),
+                                    data=json.dumps(valid_deed_with_reference),
                                     headers=self.webseal_headers)
         response_json = create_deed.json()
         get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
@@ -402,7 +402,8 @@ class TestDeedRoutes(unittest.TestCase):
         txt = obj.getPage(0).extractText()
         self.assertTrue('Digital Mortgage Deed' in txt)
         txt = obj.getPage(1).extractText()
-        self.assertTrue('e-MD12344' in txt)
+        self.assertTrue(valid_deed_with_reference['md_ref'] in txt)
+        self.assertTrue(valid_deed_with_reference['reference'] in txt)
         # Can look at this file if you want.
         f = open('integration_test_deed.pdf', 'wb')
         f.write(get_created_deed.content)
