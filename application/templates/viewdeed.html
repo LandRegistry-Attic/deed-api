@@ -30,10 +30,12 @@
 
     <dl class="definition-inline">
         <dd>{{ deed_data.deed.lender.registration }}</dd>
-    </dl>
-
-    <h3 class="heading-medium">Borrower</h3>
-
+      </dl>
+         {% if borrower_count ==1 %}
+      <h3 class="heading-medium">Borrower</h3>
+      {% else %}
+      <h3 class="heading-medium">Borrowers</h3>
+      {% endif %}
     <ul>
         {% for borrower in deed_data.deed.borrowers %}
         <li class="bold-text">
@@ -65,7 +67,11 @@
         {% else %}
         <p class="awaiting-information">[Effective date will be shown here]</p>
         {% endif %}
-        <h3 class="heading-medium">Borrower's digital signature(s)</h3>
+       {% if borrower_count ==1 %}
+       <h3 class="heading-medium">Borrower's digital signature</h3>
+       {% else %}
+       <h3 class="heading-medium">Borrower's digital signatures</h3>
+       {% endif %}
         {% for borrower in deed_data.deed.borrowers %}
         {% if borrower.signature %}
         <p id="signature{{ loop.index }}">Signed by

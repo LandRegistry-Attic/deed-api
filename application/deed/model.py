@@ -59,6 +59,9 @@ class Deed(db.Model):
 
         return deeds_with_status
 
+    def get_deeds_by_status(self, status):
+        return Deed.query.filter(Deed.status.like(status), Deed.organisation_name != 'Land Registry Devices', Deed.organisation_name.isnot(None)).count()
+
     def _get_deed_internal(self, deed_reference, organisation_id):
         if organisation_id != '*':
             LOGGER.debug("Internal request to view deed reference %s" % deed_reference)
@@ -89,7 +92,7 @@ class Deed(db.Model):
 
     def get_borrower_position(self, borrower_token):
         for idx, borrower in enumerate(self.deed['borrowers'], start=1):
-            if borrower_token == borrower['token']:
+            if borrower_token == str(borrower['token']).upper():
                 return idx
         return -1
 

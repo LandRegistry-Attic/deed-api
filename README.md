@@ -60,6 +60,22 @@ Run the unit tests
 ```
 source unit_test.sh
 ```
+If you get the following errors:
+```
+Command "python setup.py egg_info" failed with error code 1 in /private/var/folders/7c/lgmjhvmj5f3f0dvgk01ygzz80000gq/T/pip-build-c5k5vmpa/psycopg2/
+```
+then install (on a Mac)
+```
+brew install postgresql
+```
+
+```
+OSError: dlopen() failed to load a library: cairo / cairo-2
+```
+then install (on a Mac)
+```
+brew install python cairo pango gdk-pixbuf libxml2 libxslt libffi
+```
 
 ## Acceptance tests
 
