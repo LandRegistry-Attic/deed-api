@@ -91,6 +91,10 @@
             {% if deed_data.deed.society_ref %}
             <p>{{ deed_data.deed.society_ref }}</p>
             {% endif %}
+            {% if deed_data.deed.reference_details %}
+            <p>{{ deed_data.deed.reference_details.lender_reference_name }}: {{
+                deed_data.deed.reference_details.lender_reference_value }}</p>
+            {% endif %}
             <p>{{ deed_data.deed.md_ref }}</p>
         </div>
 

@@ -16,7 +16,7 @@ from application import config
 LOGGER = logging.getLogger(__name__)
 
 
-XML_SCHEMA_FILE = "deed-schema-v0-2.xsd"
+XML_SCHEMA_FILE = "deed-schema-v0-3.xsd"
 
 SCHEMA_LOCATION = config.ESEC_SCHEMA_LOCATION
 
@@ -227,6 +227,9 @@ def convert_json_to_xml(deed_json):
     deed_data_xml.set_lender(convert_json_to_lender(deed_json["lender"]))
 
     deed_data_xml.set_effectiveClause(deed_json["effective_clause"])
+
+    if 'reference' in deed_json:
+        deed_data_xml.set_reference(deed_json["reference"])
 
     operative_deed_xml.set_deedData(deed_data_xml)
     deed_app_xml.set_effectiveDate("tbc")
