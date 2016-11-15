@@ -95,7 +95,7 @@
             },
             "put": {
                 "summary": "Modify Deed",
-                "description": "The Modify Deed endpoint modifies a deed based on the unique deed reference provided in the path.\nThe response will give the relative path to access the deed via the \"Get\" endpoint if an update is successful. Any modifications which arent aren't successful will show the relevant error messages.\n",
+                "description": "The Modify Deed endpoint modifies a deed based on the unique deed reference provided in the path.\nThe response will give the relative path to access the deed via the \"Get\" endpoint if an update is successful. Any modifications which aren't successful will show the relevant error messages. \n The provided payload for the modification will replace the existing deed. \n",
                 "consumes": [
                     "application/json"
                 ],
@@ -117,7 +117,7 @@
                         "schema": {
                             "$ref": "#/definitions/Deed_Application"
                         }
-                    }
+                    }q
                 ],
                 "tags": [
                     "Deed"
