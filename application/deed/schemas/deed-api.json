@@ -117,7 +117,7 @@
                         "schema": {
                             "$ref": "#/definitions/Deed_Application"
                         }
-                    }q
+                    }
                 ],
                 "tags": [
                     "Deed"
