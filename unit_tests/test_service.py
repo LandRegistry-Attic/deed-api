@@ -14,7 +14,7 @@ class TestService(unittest.TestCase):
         self.app = app.test_client()
 
     @mock.patch('application.deed.service.MortgageDocument.query', autospec=True)
-    def test_update_md_clauses_no_result(self, mock_query):
+    def test_update_md_clauses_no_deed_result(self, mock_query):
 
         mock_query_response = mock_query.filter_by.return_value
         mock_query_response.first.return_value = None
@@ -22,14 +22,14 @@ class TestService(unittest.TestCase):
         self.assertEqual(update_md_clauses(None, "e-MDTest", "RefTest", "Fake Org"), False)
 
     @mock.patch('application.deed.service.MortgageDocument.query', autospec=True)
-    def test_update_md_clauses_no_reference(self, mock_query):
+    def test_update_md_clauses_no_lender_reference_name(self, mock_query):
 
         mock_query_response = mock_query.filter_by.return_value
         mock_query_response.first.return_value = MortgageDocMock()
 
         mock_dict = {}
 
-        self.assertEqual(update_md_clauses(mock_dict, "e-MDTest", "Fake Bank", "Fake Org"), True)
+        self.assertEqual(update_md_clauses(mock_dict, "e-MDTest", "Fake reference", "Fake Org"), True)
 
         md_dict = json.loads(MortgageDocMock.data)
 
@@ -43,7 +43,7 @@ class TestService(unittest.TestCase):
         self.assertEquals(mock_dict, expected_dict)
 
     @mock.patch('application.deed.service.MortgageDocument.query', autospec=True)
-    def test_update_md_clauses_with_reference(self, mock_query):
+    def test_update_md_clauses_with_lender_reference_name(self, mock_query):
 
         mock_query_response = mock_query.filter_by.return_value
         mock_query_response.first.return_value = MortgageDocMockWithReference()
@@ -64,6 +64,27 @@ class TestService(unittest.TestCase):
                              {'lender_reference_name': md_dict['lender_reference_name'],
                               'lender_reference_value': 'Fake Bank'}
                          }
+
+        self.assertEquals(mock_dict, expected_dict)
+
+    @mock.patch('application.deed.service.MortgageDocument.query', autospec=True)
+    def test_update_md_clauses_with_lender_reference_name_but_no_reference(self, mock_query):
+
+        mock_query_response = mock_query.filter_by.return_value
+        mock_query_response.first.return_value = MortgageDocMockWithReference()
+
+        mock_dict = {}
+
+        self.assertEqual(update_md_clauses(mock_dict, "e-MDTest", "", "Fake Org"), True)
+
+        md_dict = json.loads(MortgageDocMockWithReference.data)
+
+        expected_dict = {'charge_clause': md_dict['charge_clause'],
+                         'additional_provisions': md_dict['additional_provisions'],
+                         'lender': md_dict['lender'],
+                         'effective_clause': 'This charge takes effect when the registrar' +
+                                             ' receives notification from Fake Org that the charge' +
+                                             ' is to take effect.'}
 
         self.assertEquals(mock_dict, expected_dict)
 

@@ -95,7 +95,7 @@ def update_md_clauses(json_doc, md_ref, reference, organisation_name):
         json_doc["lender"] = md_json["lender"]
         json_doc["effective_clause"] = make_effective_text(organisation_name)
 
-        if "lender_reference_name" in md_json:
+        if "lender_reference_name" in md_json and reference.strip():
             json_doc["reference_details"] = {
                 "lender_reference_name": md_json["lender_reference_name"],
                 "lender_reference_value": reference
