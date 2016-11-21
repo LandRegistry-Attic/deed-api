@@ -23,7 +23,10 @@ def create_deed_html(deed_dict):
     deed_data = {'deed': deed_dict}
     template = 'viewdeed.html'
     LOGGER.info('Creating deed html page for %s', deed_dict['title_number'])
-    return render_template(template, deed_data=deed_data, signed=True)
+    borrower_count=0
+    for borrower in deed_data['deed']['borrowers']:
+        borrower_count += 1
+    return render_template(template, deed_data=deed_data, signed=True, borrower_count=borrower_count)
 
 
 # flake8: noqa

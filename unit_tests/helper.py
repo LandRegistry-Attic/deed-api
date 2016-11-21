@@ -9,7 +9,7 @@ class DeedModelMock(Deed):
     token = "ABC1234"
     deed = DEED
     status = "DRAFT"
-    deed_xml = "<dm-application xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"http://localhost:9080/schemas/deed-schema-v0-2.xsd\">\
+    deed_xml = "<dm-application xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"http://localhost:9080/schemas/deed-schema-v0-3.xsd\">\
                 <operativeDeed><deedData Id=\"deedData\"><titleNumber>GR515835</titleNumber><propertyDescription>5 The Drive, This Town, This County, PL4 4TH</propertyDescription>\
                 <borrowers><borrower><name><privateIndividual><forename>Paul</forename><middlename>James</middlename><surname>Smythe</surname>\
                 </privateIndividual></name><address>borrower address</address></borrower><borrower><name><privateIndividual><forename>Jane</forename><surname>Smythe</surname>\
@@ -24,7 +24,7 @@ class DeedModelMock(Deed):
                  </provision></additionalProvisions><lender><organisationName><company><name>Bank of England Plc</name></company></organisationName>\
                  <address>12 Trinity Place, Regents Street, London NW10 6TQ</address><companyRegistrationDetails>Company registration number: 2347676</companyRegistrationDetails>\
                  </lender><effectiveClause>This charge takes effect when the registrar receives notification from Land Registry Devices that the charge is to take effect.</effectiveClause>\
-                 </deedData><signatureSlots><borrower_signature><signature/><signatory><privateIndividual><forename>Paul</forename><middlename>James</middlename><surname>Smythe</surname>\
+                 <reference>A test reference</reference></deedData><signatureSlots><borrower_signature><signature/><signatory><privateIndividual><forename>Paul</forename><middlename>James</middlename><surname>Smythe</surname>\
                  </privateIndividual></signatory></borrower_signature><borrower_signature><signature/><signatory><privateIndividual><forename>Jane</forename><surname>Smythe</surname>\
                  </privateIndividual></signatory></borrower_signature></signatureSlots></operativeDeed><effectiveDate></effectiveDate><authSignature/></dm-application>"
 
@@ -39,11 +39,50 @@ class MortgageDocMock:
            'additional provision2"}]}'
 
 
+class MortgageDocMockWithReference:
+    md_ref = "e-MD1291A"
+    data = '{"description":"test setup charge clause","lender":{ "name":"a new lender",' \
+           '"address":"no 1 reputable street"}, "lender_reference_name":"Random Company",' \
+           '"charge_clause": { "cre_code": "CRE001",' \
+           '"description":"This is an example charge clause"}, "additional_provisions": ' \
+           '[ { "additional_provision_code":"addp001", "description":"this is additional ' \
+           'provision1"}, { "additional_provision_code":"addp002", "description":"this is ' \
+           'additional provision2"}]}'
+
+
 class DeedHelper:
     _json_doc = {
         "title_number": "GR515835",
         "md_ref": "e-MD12344",
         "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "borrowers": [
+            {
+                "forename": "lisa",
+                "middle_name": "ann",
+                "surname": "bloggette",
+                "gender": "Male",
+                "address": "test address with postcode, PL14 3JR",
+                "dob": "23/01/1986",
+                "phone_number": "07502154062"
+            },
+            {
+                "forename": "frank",
+                "middle_name": "ann",
+                "surname": "bloggette",
+                "gender": "Female",
+                "address": "Test Address With Postcode, PL14 3JR",
+                "dob": "23/01/1986",
+                "phone_number": "07502154061"
+            }
+        ],
+        "identity_checked": "Y"
+    }
+
+    _json_doc_with_reference = {
+        "title_number": "GR515835",
+        "md_ref": "e-MD12344",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "reference": "Test reference",
         "borrowers": [
             {
                 "forename": "lisa",

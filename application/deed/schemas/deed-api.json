@@ -3,7 +3,7 @@
     "info": {
         "title": "Deed API",
         "description": "Land Registry Deed API",
-        "version": "1.3.8"
+        "version": "2.3.1"
     },
     "host": "api.landregistry.gov.uk",
     "schemes": [
@@ -95,7 +95,7 @@
             },
             "put": {
                 "summary": "Modify Deed",
-                "description": "The Modify Deed endpoint modifies a deed based on the unique deed reference provided in the path.\nThe response will give the relative path to access the deed via the \"Get\" endpoint if an update is successful. Any modifications which arent aren't successful will show the relevant error messages.\n",
+                "description": "The Modify Deed endpoint modifies a deed based on the unique deed reference provided in the path.\nThe response will give the relative path to access the deed via the \"Get\" endpoint if an update is successful. Any modifications which aren't successful will show the relevant error messages. \n The provided payload for the modification will replace the existing deed. \n",
                 "consumes": [
                     "application/json"
                 ],
@@ -376,6 +376,11 @@
                             "type": "string",
                             "description": "The address of property that the deed relates. This should be supplied in a comma separated format e.g. 30 wakefield rd, plymouth, PL6 3WA"
                         },
+                        "reference": {
+                            "type": "string",
+                            "maxLength" : 50,
+                            "pattern": "^(?!\\s*$).+"
+                        },
                         "deed_status": {
                             "type": "string",
                             "description": "Current state of the deed"
@@ -417,6 +422,11 @@
                     "pattern": "^(?!\\s*$).+",
                     "type": "string",
                     "description": "The address of property that the deed relates. This should be supplied in a comma separated format e.g. 30 wakefield rd, plymouth, PL6 3WA"
+                },
+                "reference": {
+                    "type": "string",
+                    "maxLength" : 50,
+                    "pattern": "^(?!\\s*$).+"
                 }
             }
         },

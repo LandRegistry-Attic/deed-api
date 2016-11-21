@@ -16,7 +16,7 @@ from application.casework.service import get_document
 from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, StatusMock
 from application.akuma.service import Akuma
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
-from application.deed.service import make_effective_text, make_deed_effective_date, update_deed
+from application.deed.service import make_effective_text, make_deed_effective_date
 from application.deed.views import make_effective, retrieve_signed_deed
 from application.deed.service import apply_registrar_signature, check_effective_status, add_effective_date_to_xml
 from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
@@ -663,43 +663,6 @@ class TestValidators(TestRoutesBase):
 
 
 class TestCreateDeed(TestRoutesBase):
-
-    @mock.patch('application.deed.service.assign_deed')
-    @mock.patch('application.deed.service.delete_orphaned_borrowers')
-    @mock.patch('application.borrower.model.Borrower')
-    @mock.patch('application.deed.model.Deed.save')
-    @mock.patch('application.deed.service.update_md_clauses', autospec=True)
-    @mock.patch('application.deed.service.update_borrower')
-    @mock.patch('application.deed.service.build_json_deed_document')
-    def test_update_deed(self, mock_json_doc, mock_updated_borrower, mock_update_md, mock_save_deed, mock_borrower, mock_delete_orphans, mock_assign):
-        new_deed = DeedModelMock()
-
-        mock_json_doc.return_value = DeedHelper._valid_initial_deed
-        mock_updated_borrower.return_value = DeedHelper._valid_single_borrower_update_response
-
-        res, msg = update_deed(new_deed, DeedHelper._json_doc)
-
-        mock_assign.assert_called_with(new_deed, DeedHelper._update_deed_mock_response)
-
-        self.assertTrue(res)
-
-    @mock.patch('application.borrower.model.Borrower')
-    @mock.patch('application.deed.model.Deed.save')
-    @mock.patch('application.deed.service.update_md_clauses')
-    @mock.patch('application.deed.service.update_borrower')
-    @mock.patch('application.deed.service.build_json_deed_document')
-    def test_update_deed_invalid(self, mock_json_doc, mock_updated_borrower, mock_update_md, mock_save_deed, mock_borrower):
-        new_deed = DeedModelMock()
-
-        mock_json_doc.return_value = DeedHelper._valid_initial_deed
-        mock_updated_borrower.return_value = DeedHelper._valid_single_borrower_update_response
-
-        mock_update_md.return_value = None
-
-        res, msg = update_deed(new_deed, DeedHelper._json_doc)
-
-        self.assertFalse(res)
-
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
     @mock.patch('application.deed.views.Validation.validate_phonenumbers')
     @mock.patch('application.deed.views.Validation.validate_dob')

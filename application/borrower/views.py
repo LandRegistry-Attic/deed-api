@@ -37,7 +37,8 @@ def get_borrower_details_by_verify_pid(verify_pid):
             {
                 "borrower_token": result.token,
                 "deed_token": result.deed_token,
-                "phone_number": result.phonenumber
+                "phone_number": result.phonenumber,
+                "borrower_id": result.id
             }
         ), status.HTTP_200_OK
 

@@ -712,6 +712,90 @@
       },
       "description": "property address is blank - not allowed",
       "expected": 1
+    },
+    {
+      "payload": {
+        "md_ref": "e-MD12345",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "reference":21,
+        "title_number": "DN12345",
+        "identity_checked": "Y",
+        "borrowers": [
+          {
+            "forename": "Amanda",
+            "surname": "Smythe",
+            "gender": "Female",
+            "address": "1 The High Street Highley CR0 9YH",
+            "dob": "21/09/1976",
+            "phone_number": "07507154077"
+          }
+        ]
+      },
+      "description": "Checking reference fails if its not a string",
+      "expected": 1
+    },
+    {
+      "payload": {
+        "md_ref": "e-MD12345",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "reference": "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz",
+        "title_number": "DN12345",
+        "identity_checked": "Y",
+        "borrowers": [
+          {
+            "forename": "Amanda",
+            "surname": "Smythe",
+            "gender": "Female",
+            "address": "1 The High Street Highley CR0 9YH",
+            "dob": "21/09/1976",
+            "phone_number": "07507154077"
+          }
+        ]
+      },
+      "description": "Checking reference fails if its too long",
+      "expected": 1
+    },
+    {
+      "payload": {
+        "md_ref": "e-MD12345",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "reference": "test reference",
+        "title_number": "DN12345",
+        "identity_checked": "Y",
+        "borrowers": [
+          {
+            "forename": "Amanda",
+            "surname": "Smythe",
+            "gender": "Female",
+            "address": "1 The High Street Highley CR0 9YH",
+            "dob": "21/09/1976",
+            "phone_number": "07507154077"
+          }
+        ]
+      },
+      "description": "Check normal reference passes",
+      "expected": 0
+    },
+    {
+      "payload": {
+        "md_ref": "e-MD12345",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "reference": "  ",
+        "title_number": "DN12345",
+        "identity_checked": "Y",
+        "borrowers": [
+          {
+            "forename": "Amanda",
+            "surname": "Smythe",
+            "gender": "Female",
+            "address": "1 The High Street Highley CR0 9YH",
+            "dob": "21/09/1976",
+            "phone_number": "07507154077"
+          }
+        ]
+      },
+      "description": "Checking reference fails if its blank",
+      "expected": 1
     }
   ]
 }
