@@ -136,7 +136,7 @@ def deed_pdf_adapter(deed_reference):
     deed_dict = deed_adapter(deed_reference).deed
     if 'effective_date' in deed_dict:
         temp = datetime.strptime(deed_dict['effective_date'], "%Y-%m-%d %H:%M:%S")
-        deed_dict["effective_date"] = temp.strftime("%d/%m/%Y %H:%M:%S")
+        deed_dict["effective_date"] = temp.strftime("%d/%m/%Y")
     property_address = (deed_dict["property_address"])
     deed_dict["property_address"] = format_address_string(property_address)
     return deed_dict
