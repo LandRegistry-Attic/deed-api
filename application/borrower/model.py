@@ -112,6 +112,7 @@ class VerifyMatch(db.Model):
 
     verify_pid = db.Column(db.String, primary_key=True)
     borrower_id = db.Column(db.Integer, ForeignKey("borrower.id"), primary_key=True)
+    confidence_level = db.Column(db.String)
 
 
 def bin_to_char(bin_str):
