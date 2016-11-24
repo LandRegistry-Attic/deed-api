@@ -424,6 +424,7 @@ class TestRoutes(TestRoutesBase):
             deed_token = "aaaaaa"
             dob = "01/01/1986"
             forename = "Jack"
+            middlename = "John"
             surname = "Jones"
 
         mock_borrower.return_value = ReturnedBorrower()
@@ -481,6 +482,7 @@ class TestRoutes(TestRoutesBase):
             deed_token = "aaaaaa"
             dob = "01/01/1986"
             forename = "Jack"
+            middlename = "John"
             surname = "Jones"
             esec_user_name = "DM123"
 
