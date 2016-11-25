@@ -15,12 +15,12 @@ class EsecException(Exception):
     pass
 
 
-def issue_sms(first_name, last_name, organisation_id, phone_number):  # pragma: no cover
+def issue_sms(forenames, last_name, organisation_id, phone_number):  # pragma: no cover
     LOGGER.info("Calling dm-esec-client to initiate signing")
     request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/issue_sms'
 
     parameters = {
-        'first-name': first_name,
+        'forenames': forenames,
         'last-name': last_name,
         'organisation-id': organisation_id,
         'phone-number': phone_number
