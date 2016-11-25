@@ -436,6 +436,7 @@ class TestRoutes(TestRoutesBase):
                                  data=payload,
                                  headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        mock_issue.assert_called_with('Jack John', 'Jones', None, None)
 
     @mock.patch('application.borrower.model.Borrower.get_by_token')
     @mock.patch('application.service_clients.esec.interface.EsecClientInterface.reissue_sms')
