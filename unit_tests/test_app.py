@@ -439,6 +439,7 @@ class TestRoutes(TestRoutesBase):
             deed_token = "aaaaaa"
             dob = "01/01/1986"
             forename = "Jack"
+            middlename = "John"
             surname = "Jones"
 
         mock_borrower.return_value = ReturnedBorrower()
@@ -450,6 +451,7 @@ class TestRoutes(TestRoutesBase):
                                  data=payload,
                                  headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        mock_issue.assert_called_with('Jack John', 'Jones', None, None)
 
     @mock.patch('application.borrower.model.Borrower.get_by_token')
     @mock.patch('application.service_clients.esec.interface.EsecClientInterface.reissue_sms')
@@ -496,6 +498,7 @@ class TestRoutes(TestRoutesBase):
             deed_token = "aaaaaa"
             dob = "01/01/1986"
             forename = "Jack"
+            middlename = "John"
             surname = "Jones"
             esec_user_name = "DM123"
 

@@ -305,7 +305,10 @@ def issue_sms(deed_reference, borrower_token):
 
             if not borrower.esec_user_name:
                 LOGGER.info("creating esec user for borrower[token:%s]", borrower.token)
-                user_id, status_code = esec_client.issue_sms(borrower.forename, borrower.surname,
+
+                forenames = ' '.join(filter(bool, (borrower.forename, borrower.middlename)))
+
+                user_id, status_code = esec_client.issue_sms(forenames, borrower.surname,
                                                              deed.organisation_id, borrower.phonenumber)
                 if status_code == 200:
                     LOGGER.info("Created new esec user: %s for borrower[token:%s]", str(user_id.decode()),
