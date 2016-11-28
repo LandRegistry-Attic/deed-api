@@ -30,15 +30,16 @@ def validate_borrower():
 
 @borrower_bp.route('/verify/pid/<verify_pid>', methods=['GET'])
 def get_borrower_details_by_verify_pid(verify_pid):
-    result = Borrower.get_by_verify_pid(verify_pid)
+    borrower = Borrower.get_by_verify_pid(verify_pid)
 
-    if result is not None:
+    if borrower is not None:
+        stripped_number = strip_number_to_four_digits(borrower.phonenumber)
         return json.dumps(
             {
-                "borrower_token": result.token,
-                "deed_token": result.deed_token,
-                "phone_number": result.phonenumber,
-                "borrower_id": result.id
+                "borrower_token": borrower.token,
+                "deed_token": borrower.deed_token,
+                "phone_number": stripped_number,
+                "borrower_id": borrower.id
             }
         ), status.HTTP_200_OK
 
