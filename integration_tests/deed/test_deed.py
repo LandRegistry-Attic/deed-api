@@ -445,3 +445,20 @@ class TestDeedRoutes(unittest.TestCase):
                            headers=self.webseal_headers)
         return_value = get.json()
         self.assertEqual(return_value["borrower_id"], 1)
+
+    def test_conveyancer_name(self):
+        create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
+                                    data=json.dumps(valid_deed),
+                                    headers=self.webseal_headers)
+        self.assertEqual(create_deed.status_code, 201)
+        response_json = create_deed.json()
+        self.assertIn("/deed/", str(response_json))
+
+        get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                        headers=self.webseal_headers)
+        self.assertEqual(get_created_deed.status_code, 200)
+
+        get_conveyancer_name = requests.get(config.DEED_API_BASE_HOST + response_json["path"] + '/conveyancer-name',
+                                            headers=self.webseal_headers)
+        self.assertEqual(get_conveyancer_name.status_code, 200)
+        self.assertEqual(get_conveyancer_name.json()['result'], 'Land Registry Devices')
