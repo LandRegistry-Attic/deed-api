@@ -296,6 +296,20 @@ class TestRoutes(TestRoutesBase):
                                  headers={"Content-Type": "application/json"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    # Test get borrower by PID (vaidate)
+    @mock.patch('application.borrower.model.Borrower.get_by_verify_pid')
+    def test_validate_borrower_by_pid(self, mock_borrower):
+        class ReturnedBorrower:
+            id = 0000000
+            token = "aaaaaa"
+            deed_token = "aaaaaa"
+            dob = "23/01/1986"
+            phonenumber = "07502154999"
+
+        mock_borrower.return_value = ReturnedBorrower()
+        response = self.app.get(self.BORROWER_ENDPOINT + "verify/pid/1234")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     @mock.patch('application.borrower.model.Borrower.get_by_token')
     def test_validate_borrower_not_found(self, mock_borrower):
         mock_borrower.return_value = None

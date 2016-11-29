@@ -280,4 +280,5 @@ def get_borrower_position(deed, borrower_token):
                 return idx
         return -1
 
+
 _title_validator = _create_title_validator()

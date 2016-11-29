@@ -26,5 +26,6 @@ class TestPropertyAddress(unittest.TestCase):
         address = re.match(self.pattern, '')
         self.assertFalse(address)
 
+
 if __name__ == "__main__":
     unittest.main()
