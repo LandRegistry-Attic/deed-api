@@ -8,7 +8,7 @@ virtualenv $env_dir
 
 #install requirements
 pip3 install --upgrade pip==7.1.2
-pip3 install -r requirements.txt
+pip3 install -r requirements.txt --upgrade
 
 mkdir ../logs
 
