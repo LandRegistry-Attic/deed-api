@@ -7,6 +7,7 @@ virtualenv $env_dir
 . $env_dir/bin/activate
 
 #install requirements
+pip3 install --upgrade pip==7.1.2
 pip install -r requirements.txt
 
 mkdir ../logs
