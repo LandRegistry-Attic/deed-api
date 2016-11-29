@@ -77,6 +77,7 @@ def run_schema_checks():
 
     return pattern_results and payload_results
 
+
 if __name__ == "__main__":
     res = 0 if run_schema_checks() else 1
     sys.exit(res)

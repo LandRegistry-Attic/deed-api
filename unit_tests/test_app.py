@@ -307,7 +307,6 @@ class TestRoutes(TestRoutesBase):
             phonenumber = "07502154999"
 
         mock_borrower.return_value = ReturnedBorrower()
-        payload = json.dumps(DeedHelper._validate_borrower)
         response = self.app.get(self.BORROWER_ENDPOINT + "verify/pid/1234")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
