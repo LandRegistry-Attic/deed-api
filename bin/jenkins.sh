@@ -7,8 +7,7 @@ virtualenv $env_dir
 . $env_dir/bin/activate
 
 #install requirements
-pip uninstall lxml
-pip3 install -r requirements.txt --no-binary lxml
+pip3 --upgrade install -r requirements.txt --no-binary lxml
 
 mkdir ../logs
 
