@@ -114,6 +114,7 @@ class VerifyMatch(db.Model):
     borrower_id = db.Column(db.Integer, ForeignKey("borrower.id"), primary_key=True)
     confidence_level = db.Column(db.Integer, nullable=False)
 
+
 def bin_to_char(bin_str):
     # Converts 5 character binary string to a 2 digit integer. Then takes minimum between the 2 digit number and the lenght of the charset - 1.
     pos = min(int(bin_str[:5], 2), len(charset)-1)
