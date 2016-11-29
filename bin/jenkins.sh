@@ -8,7 +8,7 @@ virtualenv $env_dir
 
 #install requirements
 pip3 uninstall -y lxml
-pip3 nstall -r requirements.txt --no-binary lxml
+pip3 install -r requirements.txt --no-binary lxml
 
 mkdir ../logs
 
