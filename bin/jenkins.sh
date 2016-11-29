@@ -7,9 +7,7 @@ virtualenv $env_dir
 . $env_dir/bin/activate
 
 #install requirements
-pip3 install --upgrade pip==7.1.2
-pyenv rehash && hash -r
-pip3 install -r requirements.txt --upgrade
+pip3 install -r requirements.txt --no-binary lxml
 
 mkdir ../logs
 
