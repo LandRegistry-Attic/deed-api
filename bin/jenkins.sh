@@ -8,6 +8,7 @@ virtualenv $env_dir
 
 #install requirements
 pip3 install --upgrade pip==7.1.2
+pyenv rehash && hash -r
 pip3 install -r requirements.txt --upgrade
 
 mkdir ../logs
