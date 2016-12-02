@@ -69,12 +69,9 @@ def get_existing_deed_and_update(deed_reference):
         return jsonify({"message": "This deed is not in the correct state to be modified."}), \
             status.HTTP_400_BAD_REQUEST
 
-    for borrower_id in ids:
-        borrower_check = Borrower.get_by_id(borrower_id)
-
-        if borrower_check is None or borrower_check.deed_token != deed_reference:
-            return jsonify({"message": "Borrowers provided do not match the selected deed"}), \
-                status.HTTP_400_BAD_REQUEST
+    id_validate, msg = validator.validate_id(deed_update_json, deed_reference)
+    if not id_validate:
+        return jsonify({"message": msg}), status.HTTP_400_BAD_REQUEST
 
     validate_title_number = validator.validate_title_number(deed_update_json)
     if validate_title_number != "title OK":
@@ -187,6 +184,10 @@ def create():
                                    "being suitable for digital applications. "
                                    "You will need to complete this transaction using a paper deed."}), \
             status.HTTP_403_FORBIDDEN
+
+    id_validate, msg = validator.validate_id(deed_json, deed.token)
+    if not id_validate:
+        error_list.append(msg)
 
     dob_validate, msg = validator.validate_dob(deed_json)
     if not dob_validate:

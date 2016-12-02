@@ -6,7 +6,7 @@ from application.deed.validate_borrowers import check_borrower_names, BorrowerNa
 from application.title_adaptor.service import TitleAdaptor
 from underscore import _
 from application.mortgage_document.model import MortgageDocument
-from application.borrower.model import DatabaseException
+from application.borrower.model import DatabaseException, Borrower
 
 LOGGER = logging.getLogger(__name__)
 
@@ -35,6 +35,26 @@ class Validation():
         if error_message:
             LOGGER.error("Schema validation 400_BAD_REQUEST")
         return error_message
+
+    def validate_id(self, deed_json, deed_token):
+
+        for borrower in deed_json["borrowers"]:
+            if "id" in borrower:
+
+                try:
+                    borrower_check = Borrower.get_by_id(borrower["id"])
+
+                    if borrower_check is None or borrower_check.deed_token != deed_token:
+
+                        msg = "The id supplied for one or more borrowers does not exist, or " \
+                              "conflicts with those stored for another deed"
+                        return False, msg
+                except:
+                    raise DatabaseException
+
+        # If no existing borrowers have been found that match the id's provided, or
+        # no id's are provided at all, return that no errors have been found
+        return True, ""
 
     def validate_title_number(self, deed_json):
         return_val = TitleAdaptor.do_check(deed_json['title_number'])
