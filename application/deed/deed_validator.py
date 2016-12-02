@@ -52,8 +52,7 @@ class Validation():
                 except:
                     raise DatabaseException
 
-        # If no existing borrowers have been found that match the id's provided, or
-        # no id's are provided at all, return that no errors have been found
+        # If no errors have been found
         return True, ""
 
     def validate_title_number(self, deed_json):
