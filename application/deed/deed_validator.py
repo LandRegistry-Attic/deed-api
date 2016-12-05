@@ -36,25 +36,6 @@ class Validation():
             LOGGER.error("Schema validation 400_BAD_REQUEST")
         return error_message
 
-    def validate_id(self, deed_json, deed_token):
-
-        for borrower in deed_json["borrowers"]:
-            if "id" in borrower:
-
-                try:
-                    borrower_check = Borrower.get_by_id(borrower["id"])
-
-                    if borrower_check is None or borrower_check.deed_token != deed_token:
-
-                        msg = "The id supplied for one or more borrowers does not exist, or " \
-                              "conflicts with those stored for another deed"
-                        return False, msg
-                except:
-                    raise DatabaseException
-
-        # If no errors have been found
-        return True, ""
-
     def validate_title_number(self, deed_json):
         return_val = TitleAdaptor.do_check(deed_json['title_number'])
         if return_val != "title OK":

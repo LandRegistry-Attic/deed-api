@@ -7,6 +7,7 @@ from datetime import datetime
 
 import requests  # NOQA
 import PyPDF2
+import ast
 from flask.ext.api import status
 from lxml import etree
 
@@ -194,7 +195,7 @@ class TestRoutes(TestRoutesBase):
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
-    def test_create_with_invalid(self, mock_Borrower, mock_Deed, mock_proprietor_names, mock_organisation_cred):
+    def test_create_with_invalid_phone_numbers(self, mock_Borrower, mock_Deed, mock_proprietor_names, mock_organisation_cred):
         mock_organisation_cred.return_value = {'organisation_id': "Foo",
                                                'organisation_name': "Bar",
                                                'organisation_locale': "FooBar"}
@@ -205,6 +206,33 @@ class TestRoutes(TestRoutesBase):
                                  headers={"Content-Type": "application/json"})
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @mock.patch('application.service_clients.title_adaptor.interface.TitleAdaptorInterface.perform_check')
+    @mock.patch('application.deed.deed_validator.Validation.validate_organisation_credentials')
+    @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
+    @mock.patch('application.borrower.model.Borrower.save')
+    @mock.patch('application.deed.model.Deed.save')
+    def test_create_with_borrower_ids(self, mock_Borrower, mock_Deed, mock_proprietor_names, mock_organisation_cred,
+                                      mock_validator):
+
+        # A test to ensure that if a deed is being created (not updated) and the borrowers
+        # have id's included in the payload, that the response is a HTTP_400_BAD_REQUEST
+        mock_organisation_cred.return_value = {'organisation_id': "Foo",
+                                               'organisation_name': "Bar",
+                                               'organisation_locale': "FooBar"}
+
+        mock_proprietor_names.return_value = ['lisa ann bloggette', 'frank ann bloggette']
+        mock_validator.return_value.text = "title OK"
+
+        payload = json.dumps(DeedHelper._valid_borrowers_with_ids)
+        response = self.app.post(self.DEED_ENDPOINT, data=payload,
+                                 headers=self.webseal_headers)
+
+        response = response.data.decode("utf-8")
+        response = ast.literal_eval(response)
+        response_msg = response["message"]
+
+        self.assertEqual(response_msg, "A borrower id cannot be provided for this type of request.")
 
     @mock.patch('application.deed.deed_validator.Validation.validate_organisation_credentials')
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
