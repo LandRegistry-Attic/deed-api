@@ -188,10 +188,9 @@ def create():
                                    "You will need to complete this transaction using a paper deed."}), \
             status.HTTP_403_FORBIDDEN
 
-    for borrower in deed_json["borrowers"]:
-        if "id" in borrower:
-            return jsonify({"message": "A borrower id cannot be provided for this type of request."}), \
-                status.HTTP_400_BAD_REQUEST
+    id_validate, msg = validator.validate_borrower_ids(deed_json)
+    if not id_validate:
+        error_list.append(msg)
 
     dob_validate, msg = validator.validate_dob(deed_json)
     if not dob_validate:
