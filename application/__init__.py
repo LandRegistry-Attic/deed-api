@@ -7,6 +7,7 @@ from application.service_clients.esec import make_esec_client
 from application.service_clients.esec.implementation import EsecException
 from application.service_clients.register_adapter import make_register_adapter_client
 from application.service_clients.title_adaptor import make_title_adaptor_client
+from application.service_clients.organisation_adapter import make_organisation_adapter_client
 
 import os
 import logging
@@ -85,15 +86,15 @@ def service_check_routes():
         # from the relevant deed_api table
         result = db.engine.execute("SELECT version_num FROM alembic_version;").first()
 
-        rowResults = []
-        rowResults.append(result[0]) if result is not None else "No version information found"
+        row_results = []
+        row_results.append(result[0]) if result is not None else "No version information found"
 
         # If the above statement passes, we can assume that a connection
         # to the database has been established.
         # If an exception occurs whilst retrieving the result, then the service
         # will not reach this point.
         service_list["services"].append(get_service_check_dict(200, "deed-api", "postgres deeds (db)",
-                                                               "Successfully connected", rowResults[0]))
+                                                               "Successfully connected", row_results[0]))
 
     except Exception as e:
         # If we have found an exception, then we can presume the connection to the database did not work
@@ -116,6 +117,11 @@ def service_check_routes():
     service_list = get_multiple_dict_values("deed-api", "register-adapter (stub if local)",
                                             "register-services", service_list)
 
+    # Attempt to connect to the organisation api and append the result to the service list
+    organisation_service_dict = get_service_check_response("deed-api", "organisation-api",
+                                                           "organisation-services")
+    service_list["services"].append(organisation_service_dict)
+
     return json.dumps(service_list)
 
 
@@ -136,6 +142,9 @@ def get_service_check_response(service_from, service_to, interface_name):
         elif interface_name == "register-services":
             register_interface = make_register_adapter_client()
             service_response = register_interface.check_service_health()
+        elif interface_name == "organisation-services":
+            organisation_interface = make_organisation_adapter_client()
+            service_response = organisation_interface.check_service_health()
 
         # Change the json into a dict format
         service_dict = json.loads(service_response.text)
@@ -179,9 +188,9 @@ def get_multiple_dict_values(service_from, service_to, interface_name, service_l
         [service_list["services"].append(response_value) for response_value in service_response_refined]
 
     except Exception as e:
-        serviceIndexError = get_service_check_dict(500, service_from, service_to,
+        service_index_error = get_service_check_dict(500, service_from, service_to,
                                                    "Error: could not connect")
-        service_list["services"].append(serviceIndexError)
+        service_list["services"].append(service_index_error)
         app.logger.error("An exception has occurred at the service-check route: %s", (e,), exc_info=True)
 
     return service_list
