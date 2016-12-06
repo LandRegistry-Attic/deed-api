@@ -16,5 +16,4 @@ def perform_check(title):  # pragma: no cover
 
 def check_health():
     service_response = requests.get(config.TITLE_ADAPTOR_BASE_HOST + '/health/service-check')
-
     return service_response
