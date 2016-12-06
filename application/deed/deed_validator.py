@@ -6,7 +6,7 @@ from application.deed.validate_borrowers import check_borrower_names, BorrowerNa
 from application.title_adaptor.service import TitleAdaptor
 from underscore import _
 from application.mortgage_document.model import MortgageDocument
-from application.borrower.model import DatabaseException, Borrower
+from application.borrower.model import DatabaseException
 
 LOGGER = logging.getLogger(__name__)
 

@@ -7,7 +7,6 @@ from datetime import datetime
 
 import requests  # NOQA
 import PyPDF2
-import ast
 from flask.ext.api import status
 from lxml import etree
 
