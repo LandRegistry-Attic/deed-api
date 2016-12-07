@@ -236,7 +236,7 @@ class DeedHelper:
                 "gender": "Male",
                 "address": "test address with postcode, PL14 3JR",
                 "dob": "23/01/1986",
-                "id": "1",
+                "id": 1,
                 "phone_number": "07502154062"
             },
             {
@@ -246,7 +246,7 @@ class DeedHelper:
                 "gender": "Male",
                 "address": "Test Address With Postcode, PL14 3JR",
                 "dob": "23/01/1986",
-                "id": "2",
+                "id": 2,
                 "phone_number": "07502154061"
             }
         ],

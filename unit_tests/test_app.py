@@ -207,7 +207,7 @@ class TestRoutes(TestRoutesBase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     @mock.patch('application.service_clients.title_adaptor.interface.TitleAdaptorInterface.perform_check')
-    @mock.patch('application.deed.deed_validator.Validation.validate_organisation_credentials')
+    @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
