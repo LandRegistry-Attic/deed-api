@@ -20,6 +20,7 @@ from application.deed.service import make_effective_text, make_deed_effective_da
 from application.deed.views import make_effective, retrieve_signed_deed
 from application.deed.service import apply_registrar_signature, check_effective_status, add_effective_date_to_xml
 from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
+from application.service_clients.organisation.implementation import get_organisation_name
 from application.borrower.model import Borrower, DatabaseException
 from unit_tests.schema_tests import run_schema_checks
 from application.deed.deed_validator import Validation

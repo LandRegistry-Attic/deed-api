@@ -16,9 +16,7 @@ def get_organisation_name(organisation_id, organisation_name):
                                    'organisation-name/', organisation_id])
 
     # Collect the organisation name and return it
-    json_response = json.loads(requests.get(request_url).text)
-    new_organisation_name = json_response["organisation_name"]
-    LOGGER.debug("Response get_organisation_name: '%s'", new_organisation_name)
+    new_organisation_name = _get_request(request_url)
 
     if new_organisation_name == "not found":
         # Use the organisation name with brackets
@@ -26,6 +24,13 @@ def get_organisation_name(organisation_id, organisation_name):
     else:
         # If an organisation is found, return it
         return new_organisation_name
+
+
+def _get_request(request_url):
+    json_response = json.loads(requests.get(request_url).text)
+    new_organisation_name = json_response["organisation_name"]
+    LOGGER.debug("Response get_organisation_name: '%s'", new_organisation_name)
+    return new_organisation_name
 
 
 def check_health():
