@@ -429,7 +429,7 @@ def send_error_list(error_list):
 def get_organisation_name(deed_reference):
 
     organisation_interface = make_organisation_adapter_client()
-    organisation_name = organisation_interface.get_organisation_name(
-                            deed_adapter(deed_reference).organisation_id)
+    organisation_name = organisation_interface.get_organisation_name(deed_adapter(deed_reference).organisation_id,
+                                                                     deed_adapter(deed_reference).organisation_name)
 
     return jsonify({'result': organisation_name}), status.HTTP_200_OK
