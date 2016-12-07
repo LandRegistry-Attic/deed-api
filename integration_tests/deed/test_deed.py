@@ -7,7 +7,7 @@ import PyPDF2
 import requests
 from application import config
 from application.deed.model import Deed
-from integration_tests.deed.deed_data import valid_deed, test_organisation, new_deed, valid_deed_with_reference
+from integration_tests.deed.deed_data import valid_deed, new_deed, valid_deed_with_reference
 from integration_tests.helper import setUpApp, setUp_MortgageDocuments
 from lxml import etree
 
@@ -486,5 +486,3 @@ class TestDeedRoutes(unittest.TestCase):
                                                    json.loads(post_organisation_name.text)['path'])
 
         self.assertEqual(delete_organisation_name.status_code, 200)
-
-

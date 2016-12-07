@@ -189,7 +189,7 @@ def get_multiple_dict_values(service_from, service_to, interface_name, service_l
 
     except Exception as e:
         service_index_error = get_service_check_dict(500, service_from, service_to,
-                                                   "Error: could not connect")
+                                                     "Error: could not connect")
         service_list["services"].append(service_index_error)
         app.logger.error("An exception has occurred at the service-check route: %s", (e,), exc_info=True)
 
