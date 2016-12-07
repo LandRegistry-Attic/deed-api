@@ -20,7 +20,7 @@ from application.deed.service import make_effective_text, make_deed_effective_da
 from application.deed.views import make_effective, retrieve_signed_deed
 from application.deed.service import apply_registrar_signature, check_effective_status, add_effective_date_to_xml
 from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
-from application.service_clients.organisation.implementation import get_organisation_name
+from application.service_clients.organisation_adapter.implementation import get_organisation_name
 from application.borrower.model import Borrower, DatabaseException
 from unit_tests.schema_tests import run_schema_checks
 from application.deed.deed_validator import Validation
@@ -870,3 +870,19 @@ class TestUpdateDeed(TestRoutesBase):
         delete_borrowers = Borrower()
 
         self.assertRaises(DatabaseException, delete_borrowers.delete_borrowers_not_on_deed, [1, 2], "AAAAA")
+
+    @mock.patch('application.service_clients.organisation_adapter.implementation._get_request')
+    def test_get_organisation_name(self, mock_organisation_name):
+
+        #  A test to check that the logic contained within the get_organisation_name method
+        #  returns a "not found" if the call to get the name matches no organisation, or
+        #  the name, if it does match.
+        mock_organisation_name.return_value = "not found"
+        organisation_name = get_organisation_name("1000.1.2", "Test Organisation")
+
+        self.assertEqual(organisation_name, "Test Organisation")
+
+        mock_organisation_name.return_value = "Land Registry Devices"
+        organisation_name = get_organisation_name("1000.1.2", "Land Registry [22022] Devices")
+
+        self.assertEqual(organisation_name, "Land Registry Devices")
