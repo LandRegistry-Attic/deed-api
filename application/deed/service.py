@@ -13,7 +13,7 @@ import datetime
 import copy
 from application import esec_client
 from lxml import etree
-
+from application.service_clients.organisation_adapter import make_organisation_adapter_client
 
 LOGGER = logging.getLogger(__name__)
 
@@ -135,7 +135,11 @@ def update_deed(deed, deed_json):
     if "reference" in deed_json:
         reference = deed_json["reference"]
 
-    if not update_md_clauses(json_doc, deed_json["md_ref"], reference, deed.organisation_name):
+    organisation_interface = make_organisation_adapter_client()
+    organisation_name = organisation_interface.get_organisation_name(deed.organisation_id,
+                                                                     deed.organisation_name)
+
+    if not update_md_clauses(json_doc, deed_json["md_ref"], reference, organisation_name):
         msg = "mortgage document associated with supplied md_ref is not found"
         LOGGER.error(msg)
         return False, msg
