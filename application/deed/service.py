@@ -139,8 +139,6 @@ def update_deed(deed, deed_json):
     organisation_name = organisation_interface.get_organisation_name(deed.organisation_id,
                                                                      deed.organisation_name)
 
-    import pdb; pdb.set_trace()
-
     if not update_md_clauses(json_doc, deed_json["md_ref"], reference, organisation_name):
         msg = "mortgage document associated with supplied md_ref is not found"
         LOGGER.error(msg)
