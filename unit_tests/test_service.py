@@ -19,7 +19,7 @@ class TestService(unittest.TestCase):
         mock_query_response = mock_query.filter_by.return_value
         mock_query_response.first.return_value = None
 
-        self.assertEqual(update_md_clauses(None, "e-MDTest", "RefTest", "Fake Org"), False)
+        self.assertEqual(update_md_clauses(None, "e-MDTest", "RefTest", "100.1.2", "Fake Org"), False)
 
     @mock.patch('application.deed.service.MortgageDocument.query', autospec=True)
     def test_update_md_clauses_no_lender_reference_name(self, mock_query):
@@ -29,7 +29,7 @@ class TestService(unittest.TestCase):
 
         mock_dict = {}
 
-        self.assertEqual(update_md_clauses(mock_dict, "e-MDTest", "Fake reference", "Fake Org"), True)
+        self.assertEqual(update_md_clauses(mock_dict, "e-MDTest", "Fake reference", "100.1.2", "Fake Org"), True)
 
         md_dict = json.loads(MortgageDocMock.data)
 
@@ -50,7 +50,7 @@ class TestService(unittest.TestCase):
 
         mock_dict = {}
 
-        self.assertEqual(update_md_clauses(mock_dict, "e-MDTest", "Fake Bank", "Fake Org"), True)
+        self.assertEqual(update_md_clauses(mock_dict, "e-MDTest", "Fake Bank", "100.1.2", "Fake Org"), True)
 
         md_dict = json.loads(MortgageDocMockWithReference.data)
 
@@ -75,7 +75,7 @@ class TestService(unittest.TestCase):
 
         mock_dict = {}
 
-        self.assertEqual(update_md_clauses(mock_dict, "e-MDTest", "", "Fake Org"), True)
+        self.assertEqual(update_md_clauses(mock_dict, "e-MDTest", "", "100.1.2", "Fake Org"), True)
 
         md_dict = json.loads(MortgageDocMockWithReference.data)
 
@@ -110,6 +110,7 @@ class TestService(unittest.TestCase):
         mock_update_md.assert_called_with(DeedHelper._valid_initial_deed,
                                           DeedHelper._json_doc_with_reference['md_ref'],
                                           DeedHelper._json_doc_with_reference['reference'],
+                                          None,
                                           None)
 
         self.assertTrue(res)
