@@ -209,7 +209,7 @@ class TestRoutes(TestRoutesBase):
     def test_create_fails_with_borrower_ids(self):
 
         # A test to ensure that if a deed is being created (not updated) and the borrowers
-        # have id's included in the payload, that the response is a HTTP_400_BAD_REQUEST
+        # have id's included in the payload, that the system prevents it from being created
         payload = DeedHelper._valid_borrowers_with_ids
 
         validator = Validation()
@@ -221,7 +221,7 @@ class TestRoutes(TestRoutesBase):
     def test_create_succeeds_with_borrower_ids(self):
 
         # A test to ensure that if a deed is being created (not updated) and the borrowers
-        # have id's included in the payload, that the response is a HTTP_400_BAD_REQUEST
+        # ids are not included in the payload, that no error is reported
         payload = DeedHelper._json_doc
 
         validator = Validation()
