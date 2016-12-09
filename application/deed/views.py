@@ -189,6 +189,10 @@ def create():
                                    "You will need to complete this transaction using a paper deed."}), \
             status.HTTP_403_FORBIDDEN
 
+    id_validate, msg = validator.validate_borrower_ids(deed_json)
+    if not id_validate:
+        error_list.append(msg)
+
     dob_validate, msg = validator.validate_dob(deed_json)
     if not dob_validate:
         error_list.append(msg)

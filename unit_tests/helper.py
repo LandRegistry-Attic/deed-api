@@ -223,6 +223,36 @@ class DeedHelper:
             }
         ]
     }
+
+    _valid_borrowers_with_ids = {
+        "title_number": "DN100",
+        "md_ref": "e-MD12344",
+        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "borrowers": [
+            {
+                "forename": "lisa",
+                "middle_name": "ann",
+                "surname": "bloggette",
+                "gender": "Male",
+                "address": "test address with postcode, PL14 3JR",
+                "dob": "23/01/1986",
+                "id": 1,
+                "phone_number": "07502154062"
+            },
+            {
+                "forename": "frank",
+                "middle_name": "ann",
+                "surname": "bloggette",
+                "gender": "Male",
+                "address": "Test Address With Postcode, PL14 3JR",
+                "dob": "23/01/1986",
+                "id": 2,
+                "phone_number": "07502154061"
+            }
+        ],
+        "identity_checked": "Y"
+    }
+
     _valid_single_borrower_update = {
                 "id": 25,
                 "forename": "lisa",

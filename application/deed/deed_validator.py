@@ -36,6 +36,15 @@ class Validation():
             LOGGER.error("Schema validation 400_BAD_REQUEST")
         return error_message
 
+    def validate_borrower_ids(self, deed_json):
+
+        for borrower in deed_json["borrowers"]:
+            if "id" in borrower:
+                msg = "A borrower id cannot be provided for this type of request."
+                return False, msg
+
+        return True, ""
+
     def validate_title_number(self, deed_json):
         return_val = TitleAdaptor.do_check(deed_json['title_number'])
         if return_val != "title OK":
