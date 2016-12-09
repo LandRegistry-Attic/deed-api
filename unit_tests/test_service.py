@@ -99,12 +99,11 @@ class TestService(unittest.TestCase):
                                         mock_borrower, mock_delete_orphans, mock_assign):
 
         new_deed = Deed()
+        new_deed.organisation_id = "1"
+        new_deed.organisation_name = "Greg"
 
         mock_json_doc.return_value = DeedHelper._valid_initial_deed
         mock_updated_borrower.return_value = DeedHelper._valid_single_borrower_update_response
-
-        new_deed.organisation_id = "1"
-        new_deed.organisation_name = "Greg"
 
         res, msg = update_deed(new_deed, DeedHelper._json_doc_with_reference)
 
