@@ -135,11 +135,7 @@ def update_deed(deed, deed_json):
     if "reference" in deed_json:
         reference = deed_json["reference"]
 
-    organisation_interface = make_organisation_adapter_client()
-    organisation_name = organisation_interface.get_organisation_name(deed.organisation_id,
-                                                                     deed.organisation_name)
-
-    if not update_md_clauses(json_doc, deed_json["md_ref"], reference, organisation_name):
+    if not update_md_clauses(json_doc, deed_json["md_ref"], reference, get_organisation_name(deed)):
         msg = "mortgage document associated with supplied md_ref is not found"
         LOGGER.error(msg)
         return False, msg
@@ -152,6 +148,11 @@ def update_deed(deed, deed_json):
 
     return True, "OK"
 
+
+def get_organisation_name(deed):
+    organisation_interface = make_organisation_adapter_client()
+    return organisation_interface.get_organisation_name(deed.organisation_id,
+                                                                 deed.organisation_name)
 
 def update_deed_signature_timestamp(deed, borrower_token):
 
