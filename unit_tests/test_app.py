@@ -194,7 +194,7 @@ class TestRoutes(TestRoutesBase):
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
-    def test_create_with_invalid(self, mock_Borrower, mock_Deed, mock_proprietor_names, mock_organisation_cred):
+    def test_create_with_invalid_phone_numbers(self, mock_Borrower, mock_Deed, mock_proprietor_names, mock_organisation_cred):
         mock_organisation_cred.return_value = {'organisation_id': "Foo",
                                                'organisation_name': "Bar",
                                                'organisation_locale': "FooBar"}
@@ -205,6 +205,30 @@ class TestRoutes(TestRoutesBase):
                                  headers={"Content-Type": "application/json"})
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_fails_with_borrower_ids(self):
+
+        # A test to ensure that if a deed is being created (not updated) and the borrowers
+        # have id's included in the payload, that the system prevents it from being created
+        payload = DeedHelper._valid_borrowers_with_ids
+
+        validator = Validation()
+        validate_borrowers, msg = validator.validate_borrower_ids(payload)
+
+        self.assertEqual(validate_borrowers, False)
+        self.assertEqual(msg, "A borrower id cannot be provided for this type of request.")
+
+    def test_create_succeeds_with_borrower_ids(self):
+
+        # A test to ensure that if a deed is being created (not updated) and the borrowers
+        # ids are not included in the payload, that no error is reported
+        payload = DeedHelper._json_doc
+
+        validator = Validation()
+        validate_borrowers, msg = validator.validate_borrower_ids(payload)
+
+        self.assertEqual(validate_borrowers, True)
+        self.assertEqual(msg, "")
 
     @mock.patch('application.deed.deed_validator.Validation.validate_organisation_credentials')
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
