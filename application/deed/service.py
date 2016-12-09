@@ -86,19 +86,14 @@ def update_borrower(borrower, idx, borrowers, deed_token):
     return borrower_json
 
 
-def update_md_clauses(json_doc, md_ref, reference, organisation_id, organisation_name):
+def update_md_clauses(json_doc, md_ref, reference, organisation_name):
     mortgage_document = MortgageDocument.query.filter_by(md_ref=str(md_ref)).first()
     if mortgage_document is not None:
         md_json = json.loads(mortgage_document.data)
         json_doc["charge_clause"] = md_json["charge_clause"]
         json_doc["additional_provisions"] = md_json["additional_provisions"]
         json_doc["lender"] = md_json["lender"]
-
-        organisation_interface = make_organisation_adapter_client()
-        friendly_organisation_name = organisation_interface.get_organisation_name(organisation_id,
-                                                                                  organisation_name)
-
-        json_doc["effective_clause"] = make_effective_text(friendly_organisation_name)
+        json_doc["effective_clause"] = make_effective_text(organisation_name)
 
         if "lender_reference_name" in md_json and reference.strip():
             json_doc["reference_details"] = {
@@ -140,11 +135,13 @@ def update_deed(deed, deed_json):
     if "reference" in deed_json:
         reference = deed_json["reference"]
 
-    # organisation_interface = make_organisation_adapter_client()
-    # organisation_name = organisation_interface.get_organisation_name(deed.organisation_id,
-    #                                                                 deed.organisation_name)
+    organisation_interface = make_organisation_adapter_client()
+    organisation_name = organisation_interface.get_organisation_name(deed.organisation_id,
+                                                                     deed.organisation_name)
 
-    if not update_md_clauses(json_doc, deed_json["md_ref"], reference, deed.organisation_id, deed.organisation_name):
+    import pdb; pdb.set_trace()
+
+    if not update_md_clauses(json_doc, deed_json["md_ref"], reference, organisation_name):
         msg = "mortgage document associated with supplied md_ref is not found"
         LOGGER.error(msg)
         return False, msg

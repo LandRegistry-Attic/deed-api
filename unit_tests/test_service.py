@@ -19,7 +19,7 @@ class TestService(unittest.TestCase):
         mock_query_response = mock_query.filter_by.return_value
         mock_query_response.first.return_value = None
 
-        self.assertEqual(update_md_clauses(None, "e-MDTest", "RefTest", "100.1.2", "Fake Org"), False)
+        self.assertEqual(update_md_clauses(None, "e-MDTest", "RefTest", "Fake Org"), False)
 
     @mock.patch('application.deed.service.MortgageDocument.query', autospec=True)
     def test_update_md_clauses_no_lender_reference_name(self, mock_query):
@@ -29,7 +29,7 @@ class TestService(unittest.TestCase):
 
         mock_dict = {}
 
-        self.assertEqual(update_md_clauses(mock_dict, "e-MDTest", "Fake reference", "100.1.2", "Fake Org"), True)
+        self.assertEqual(update_md_clauses(mock_dict, "e-MDTest", "Fake reference", "Fake Org"), True)
 
         md_dict = json.loads(MortgageDocMock.data)
 
@@ -50,7 +50,7 @@ class TestService(unittest.TestCase):
 
         mock_dict = {}
 
-        self.assertEqual(update_md_clauses(mock_dict, "e-MDTest", "Fake Bank", "100.1.2", "Fake Org"), True)
+        self.assertEqual(update_md_clauses(mock_dict, "e-MDTest", "Fake Bank", "Fake Org"), True)
 
         md_dict = json.loads(MortgageDocMockWithReference.data)
 
@@ -75,7 +75,7 @@ class TestService(unittest.TestCase):
 
         mock_dict = {}
 
-        self.assertEqual(update_md_clauses(mock_dict, "e-MDTest", "", "100.1.2", "Fake Org"), True)
+        self.assertEqual(update_md_clauses(mock_dict, "e-MDTest", "", "Fake Org"), True)
 
         md_dict = json.loads(MortgageDocMockWithReference.data)
 
@@ -103,15 +103,17 @@ class TestService(unittest.TestCase):
         mock_json_doc.return_value = DeedHelper._valid_initial_deed
         mock_updated_borrower.return_value = DeedHelper._valid_single_borrower_update_response
 
+        new_deed.organisation_id = "1"
+        new_deed.organisation_name = "Greg"
+
         res, msg = update_deed(new_deed, DeedHelper._json_doc_with_reference)
 
         mock_assign.assert_called_with(new_deed, DeedHelper._update_deed_mock_response)
 
         mock_update_md.assert_called_with(DeedHelper._valid_initial_deed,
-                                          DeedHelper._json_doc_with_reference['md_ref'],
-                                          DeedHelper._json_doc_with_reference['reference'],
-                                          None,
-                                          None)
+                                          DeedHelper._json_doc_with_reference["md_ref"],
+                                          DeedHelper._json_doc_with_reference["reference"],
+                                          "Greg")
 
         self.assertTrue(res)
 
@@ -124,6 +126,8 @@ class TestService(unittest.TestCase):
     @mock.patch('application.deed.service.build_json_deed_document')
     def test_update_deed(self, mock_json_doc, mock_updated_borrower, mock_update_md, mock_save_deed, mock_borrower, mock_delete_orphans, mock_assign):
         new_deed = DeedModelMock()
+        new_deed.organisation_id = "1"
+        new_deed.organisation_name = "Greg"
 
         mock_json_doc.return_value = DeedHelper._valid_initial_deed
         mock_updated_borrower.return_value = DeedHelper._valid_single_borrower_update_response
@@ -141,6 +145,8 @@ class TestService(unittest.TestCase):
     @mock.patch('application.deed.service.build_json_deed_document')
     def test_update_deed_invalid(self, mock_json_doc, mock_updated_borrower, mock_update_md, mock_save_deed, mock_borrower):
         new_deed = DeedModelMock()
+        new_deed.organisation_id = "1"
+        new_deed.organisation_name = "Greg"
 
         mock_json_doc.return_value = DeedHelper._valid_initial_deed
         mock_updated_borrower.return_value = DeedHelper._valid_single_borrower_update_response
