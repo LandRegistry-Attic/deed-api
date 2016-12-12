@@ -45,5 +45,5 @@ class TestDeed(unittest.TestCase):
         result = deed_pdf_adapter('1234')
         self.assertEqual(deed.token, result['token'])
         self.assertEqual(deed.status, result['status'])
-        self.assertEqual('05/07/2016', result['effective_date'])
+        self.assertEqual('05/07/2016 12:00:05', result['effective_date'])
         self.assertEqual(['5 The Drive', 'This Town', 'This County', 'PL4 4TH'], result['property_address'])

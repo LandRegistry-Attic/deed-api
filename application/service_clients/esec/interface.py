@@ -2,8 +2,8 @@ class EsecClientInterface(object):  # pragma: no cover
     def __init__(self, implementation):
         self.implementation = implementation
 
-    def issue_sms(self, first_name, last_name, organisation_id, phone_number):
-        return self.implementation.issue_sms(first_name, last_name, organisation_id, phone_number)
+    def issue_sms(self, forenames, last_name, organisation_id, phone_number):
+        return self.implementation.issue_sms(forenames, last_name, organisation_id, phone_number)
 
     def reissue_sms(self, esec_user_name):
         return self.implementation.reissue_sms(esec_user_name)

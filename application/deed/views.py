@@ -9,7 +9,7 @@ from application import esec_client
 from application.akuma.service import Akuma
 from application.borrower.model import Borrower
 from application.deed.deed_render import create_deed_pdf
-from application.deed.model import Deed, deed_json_adapter, deed_pdf_adapter
+from application.deed.model import Deed, deed_json_adapter, deed_pdf_adapter, deed_adapter
 from application.deed.service import update_deed, update_deed_signature_timestamp, apply_registrar_signature, \
     make_deed_effective_date
 from application.deed.utils import convert_json_to_xml
@@ -305,7 +305,10 @@ def issue_sms(deed_reference, borrower_token):
 
             if not borrower.esec_user_name:
                 LOGGER.info("creating esec user for borrower[token:%s]", borrower.token)
-                user_id, status_code = esec_client.issue_sms(borrower.forename, borrower.surname,
+
+                forenames = ' '.join(filter(bool, (borrower.forename, borrower.middlename)))
+
+                user_id, status_code = esec_client.issue_sms(forenames, borrower.surname,
                                                              deed.organisation_id, borrower.phonenumber)
                 if status_code == 200:
                     LOGGER.info("Created new esec user: %s for borrower[token:%s]", str(user_id.decode()),
@@ -419,3 +422,8 @@ def send_error_list(error_list):
         error_message.append("Problem %s: %s" % (count, str(error)))
 
     return jsonify({"errors": error_message}), status.HTTP_400_BAD_REQUEST
+
+
+@deed_bp.route('/<deed_reference>/conveyancer-name', methods=['GET'])
+def conveyancer_name(deed_reference):
+    return jsonify({'result': deed_adapter(deed_reference).organisation_name}), status.HTTP_200_OK
