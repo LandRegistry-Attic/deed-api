@@ -21,5 +21,4 @@ def get_proprietor_names(title_number):
 
 def check_health():
     service_response = requests.get(config.DM_REGISTER_ADAPTER + '/health/service-check')
-
     return service_response

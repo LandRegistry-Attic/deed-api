@@ -90,16 +90,18 @@ class TestService(unittest.TestCase):
 
     @mock.patch('application.deed.service.assign_deed')
     @mock.patch('application.deed.service.delete_orphaned_borrowers')
-    @mock.patch('application.borrower.model.Borrower')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.deed.service.update_md_clauses', autospec=True)
     @mock.patch('application.deed.service.update_borrower')
     @mock.patch('application.deed.service.build_json_deed_document')
-    def test_update_deed_with_reference(self, mock_json_doc, mock_updated_borrower, mock_update_md, mock_save_deed,
-                                        mock_borrower, mock_delete_orphans, mock_assign):
-
+    @mock.patch('application.deed.service.get_organisation_name')
+    def test_update_deed_with_reference(self, mock_org_name, mock_json_doc, mock_updated_borrower, mock_update_md,
+                                        mock_save_deed,
+                                        mock_delete_orphans, mock_assign):
         new_deed = Deed()
-
+        mock_org_name.return_value = 'A conveyancer'
+        new_deed.organisation_id = "1"
+        new_deed.organisation_name = mock_org_name
         mock_json_doc.return_value = DeedHelper._valid_initial_deed
         mock_updated_borrower.return_value = DeedHelper._valid_single_borrower_update_response
 
@@ -108,21 +110,24 @@ class TestService(unittest.TestCase):
         mock_assign.assert_called_with(new_deed, DeedHelper._update_deed_mock_response)
 
         mock_update_md.assert_called_with(DeedHelper._valid_initial_deed,
-                                          DeedHelper._json_doc_with_reference['md_ref'],
-                                          DeedHelper._json_doc_with_reference['reference'],
-                                          None)
+                                          DeedHelper._json_doc_with_reference["md_ref"],
+                                          DeedHelper._json_doc_with_reference["reference"],
+                                          'A conveyancer')
 
         self.assertTrue(res)
 
     @mock.patch('application.deed.service.assign_deed')
     @mock.patch('application.deed.service.delete_orphaned_borrowers')
-    @mock.patch('application.borrower.model.Borrower')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.deed.service.update_md_clauses', autospec=True)
     @mock.patch('application.deed.service.update_borrower')
     @mock.patch('application.deed.service.build_json_deed_document')
-    def test_update_deed(self, mock_json_doc, mock_updated_borrower, mock_update_md, mock_save_deed, mock_borrower, mock_delete_orphans, mock_assign):
-        new_deed = DeedModelMock()
+    @mock.patch('application.deed.service.get_organisation_name')
+    def test_update_deed(self, mock_org_name, mock_json_doc, mock_updated_borrower, mock_update_md, mock_save_deed, mock_delete_orphans, mock_assign):
+        new_deed = Deed()
+        mock_org_name.return_value = 'A conveyancer'
+        new_deed.organisation_id = "1"
+        new_deed.organisation_name = mock_org_name
 
         mock_json_doc.return_value = DeedHelper._valid_initial_deed
         mock_updated_borrower.return_value = DeedHelper._valid_single_borrower_update_response
@@ -133,13 +138,16 @@ class TestService(unittest.TestCase):
 
         self.assertTrue(res)
 
-    @mock.patch('application.borrower.model.Borrower')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.deed.service.update_md_clauses')
     @mock.patch('application.deed.service.update_borrower')
     @mock.patch('application.deed.service.build_json_deed_document')
-    def test_update_deed_invalid(self, mock_json_doc, mock_updated_borrower, mock_update_md, mock_save_deed, mock_borrower):
-        new_deed = DeedModelMock()
+    @mock.patch('application.deed.service.get_organisation_name')
+    def test_update_deed_invalid(self, mock_org_name, mock_json_doc, mock_updated_borrower, mock_update_md, mock_save_deed):
+        new_deed = Deed()
+        mock_org_name.return_value = 'A conveyancer'
+        new_deed.organisation_id = "1"
+        new_deed.organisation_name = mock_org_name
 
         mock_json_doc.return_value = DeedHelper._valid_initial_deed
         mock_updated_borrower.return_value = DeedHelper._valid_single_borrower_update_response

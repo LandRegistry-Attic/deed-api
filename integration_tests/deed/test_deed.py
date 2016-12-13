@@ -39,6 +39,12 @@ class TestDeedRoutes(unittest.TestCase):
         "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Devices,O=1359.2.1,C=gb"
     }
 
+    webseal_test_organisation_name = {
+        "Content-Type": "application/json",
+        "Accept": "application/pdf",
+        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Test%20Organisation,O=1000.1.2,C=gb"
+    }
+
     def setUp(self):
         setUpApp(self)
         setUp_MortgageDocuments(self)
@@ -446,19 +452,37 @@ class TestDeedRoutes(unittest.TestCase):
         return_value = get.json()
         self.assertEqual(return_value["borrower_id"], 1)
 
-    def test_conveyancer_name(self):
+    def test_organisation_name(self):
+
+        # Post a new test organisation, which will match the one provided in the test headers
+        post_organisation_name = requests.post(config.ORGANISATION_API_BASE_HOST + '/organisation-name',
+                                               data=json.dumps({"organisation_name": "Test Organisation",
+                                                                "organisation_id": "1000.1.2"}),
+                                               headers=self.webseal_test_organisation_name)
+
+        self.assertEqual(post_organisation_name.status_code, 201)
+
+        # Create a new test deed and attempt to retrieve the organisation name from it
+        # which should match the posted organisation above
         create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
                                     data=json.dumps(valid_deed),
-                                    headers=self.webseal_headers)
+                                    headers=self.webseal_test_organisation_name)
         self.assertEqual(create_deed.status_code, 201)
         response_json = create_deed.json()
         self.assertIn("/deed/", str(response_json))
 
         get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
-                                        headers=self.webseal_headers)
+                                        headers=self.webseal_test_organisation_name)
+
         self.assertEqual(get_created_deed.status_code, 200)
 
-        get_conveyancer_name = requests.get(config.DEED_API_BASE_HOST + response_json["path"] + '/conveyancer-name',
-                                            headers=self.webseal_headers)
-        self.assertEqual(get_conveyancer_name.status_code, 200)
-        self.assertEqual(get_conveyancer_name.json()['result'], 'Land Registry Devices')
+        get_organisation_name = requests.get(config.DEED_API_BASE_HOST + response_json["path"] + '/organisation-name',
+                                             headers=self.webseal_test_organisation_name)
+        self.assertEqual(get_organisation_name.status_code, 200)
+        self.assertEqual(get_organisation_name.json()['result'], 'Test Organisation')
+
+        # Finally, teardown/delete the test organisation name
+        delete_organisation_name = requests.delete(config.ORGANISATION_API_BASE_HOST +
+                                                   json.loads(post_organisation_name.text)['path'])
+
+        self.assertEqual(delete_organisation_name.status_code, 200)
