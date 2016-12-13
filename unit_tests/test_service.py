@@ -1,7 +1,7 @@
 import unittest
 import mock
 from application import app
-from unit_tests.helper import MortgageDocMock, MortgageDocMockWithReference, DeedHelper, DeedModelMock
+from unit_tests.helper import MortgageDocMock, MortgageDocMockWithReference, DeedHelper
 from application.deed.service import update_md_clauses, update_deed
 from application.deed.model import Deed
 import json
