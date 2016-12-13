@@ -156,7 +156,8 @@ class TestRoutes(TestRoutesBase):
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_create_webseal_external(self, mock_query, mock_Deed, mock_Borrower, mock_akuma, mock_title, mock_proprietor_names, mock_borrower):
+    @mock.patch('application.deed.service.get_organisation_name')
+    def test_create_webseal_external(self, mock_organisation_name, mock_query, mock_Deed, mock_Borrower, mock_akuma, mock_title, mock_proprietor_names, mock_borrower):
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
         mock_akuma.return_value = {
