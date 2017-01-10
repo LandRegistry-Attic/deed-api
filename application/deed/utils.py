@@ -113,7 +113,7 @@ def get_obj_by_path(schema, path):
 
 
 def load_json_file(file_path):
-    with open(file_path, 'rt') as file:
+    with open(file_path, 'rt', encoding='utf-8') as file:
         json_data = json.load(file)
 
     return json_data
