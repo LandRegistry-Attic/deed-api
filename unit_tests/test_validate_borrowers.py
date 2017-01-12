@@ -1,11 +1,11 @@
 # flake8: noqa
 
-import mock
 import unittest
 
-from application.deed.validate_borrowers import check_borrower_names, _unpack_borrowers, _complement_names, \
-      _set_no_duplicates, BorrowerNamesException
+import mock
 
+from application.deed.validate_borrowers import check_borrower_names, _unpack_borrowers, _unmatched_names, \
+      _set_no_duplicates, BorrowerNamesException
 
 PAYLOAD = {
    "title_number": "GR515835",
@@ -51,27 +51,27 @@ class TestValidateBorrowers(unittest.TestCase):
 
 
 class TestValidateNames(unittest.TestCase):
-
     def test_names_register_names_proprietor_names(self):
-        ret_val = _complement_names(['PeTeR', 'PaUl', 'MaRy'],
-                                    ['pAuL', 'mArY', 'pEtEr'])
+        ret_val = _unmatched_names(['PeTeR', 'PaUl', 'MaRy'],
+                                   ['pAuL', 'mArY', 'pEtEr'])
         self.assertFalse(ret_val)
 
     def test_more_names_on_register(self):
-        ret_val = _complement_names(['Peter', 'Paul', 'Mary'],
-                                    ['Peter'])
-        self.assertEqual(set(['paul.0', 'mary.0']), ret_val)
+        ret_val = _unmatched_names(['Peter', 'Paul', 'Mary'],
+                                   ['Peter'])
+        self.assertEqual({'paul.0', 'mary.0'}, ret_val)
 
-    def test_register_subset_of_deed(self):
-        ret_val = _complement_names(['Peter'],
-                                    ['Peter', 'Paul', 'Mary'])
-        self.assertFalse(ret_val)
+    def test_more_names_on_deed(self):
+        ret_val = _unmatched_names(['Peter', 'Paul', 'Mary'],
+                                   ['Peter', 'Mary', 'Paul', 'Bob'])
+
+        self.assertEqual({'bob.0'}, ret_val)
 
     def test_dupes_on_register_subset_of_deed(self):
-        ret_val = _complement_names(['Peter', 'Peter'],
-                                    ['Peter', 'Paul', 'Mary'])
-        self.assertEqual({'peter.1'}, ret_val)
+        ret_val = _unmatched_names(['Peter', 'Peter', 'Peter'],
+                                   ['Peter', 'Paul', 'Mary'])
+        self.assertEqual({'peter.1', 'peter.2', 'paul.0', 'mary.0'}, ret_val)
 
     def test_uniquify(self):
         names = _set_no_duplicates(['foo', 'foo', 'bar', 'foo'])
-        self.assertEqual(set(['foo.0', 'foo.1', 'bar.0', 'foo.2']), names)
+        self.assertEqual({'foo.0', 'foo.1', 'bar.0', 'foo.2'}, names)
