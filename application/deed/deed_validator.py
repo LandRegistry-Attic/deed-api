@@ -1,12 +1,13 @@
 import logging
 
+from underscore import _
+
 from application.akuma.service import Akuma
+from application.borrower.model import DatabaseException
 from application.deed.utils import process_organisation_credentials, validate_helper, valid_dob, is_unique_list
 from application.deed.validate_borrowers import check_borrower_names, BorrowerNamesException
-from application.title_adaptor.service import TitleAdaptor
-from underscore import _
 from application.mortgage_document.model import MortgageDocument
-from application.borrower.model import DatabaseException
+from application.title_adaptor.service import TitleAdaptor
 
 LOGGER = logging.getLogger(__name__)
 
@@ -57,7 +58,8 @@ class Validation():
             return True, ""
 
         except BorrowerNamesException:
-            msg = "The names supplied do not match those held on the register."
+            msg = "Only a person who is entered in the register as proprietor or joint proprietor " \
+                  "of the registered estate can be named as a borrower."
             return False, msg
 
     def call_akuma(self, deed_json, deed_token, organisation_name, organisation_locale, deed_type):
