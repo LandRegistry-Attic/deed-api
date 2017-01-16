@@ -5,7 +5,8 @@ from underscore import _
 from application.akuma.service import Akuma
 from application.borrower.model import DatabaseException
 from application.deed.utils import process_organisation_credentials, validate_helper, valid_dob, is_unique_list
-from application.deed.validate_borrowers import check_borrower_names, BorrowerNamesException
+from application.deed.validate_borrowers import all_borrower_names_present, BorrowerNamesMissingException
+from application.deed.validate_borrowers import compare_borrower_names, BorrowerNamesDifferException
 from application.mortgage_document.model import MortgageDocument
 from application.title_adaptor.service import TitleAdaptor
 
@@ -54,12 +55,16 @@ class Validation():
 
     def validate_borrower_names(self, deed_json):
         try:
-            check_borrower_names(deed_json)
+            all_borrower_names_present(deed_json)
+            compare_borrower_names(deed_json)
             return True, ""
-
-        except BorrowerNamesException:
+        except BorrowerNamesDifferException:
             msg = "Only a person who is entered in the register as proprietor or joint proprietor " \
                   "of the registered estate can be named as a borrower."
+            return False, msg
+        except BorrowerNamesMissingException:
+            msg = "Please add all borrowers names. All those entered in the register as proprietor " \
+                  "or joint proprietor of the registered estate must be named as a borrower."
             return False, msg
 
     def call_akuma(self, deed_json, deed_token, organisation_name, organisation_locale, deed_type):

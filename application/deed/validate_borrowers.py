@@ -62,11 +62,15 @@ def _unmatched_names(proprietor_names, deed_names):
     return register_set.symmetric_difference(deed_set)
 
 
-class BorrowerNamesException(Exception):
+class BorrowerNamesDifferException(Exception):
     pass
 
 
-def check_borrower_names(payload):
+class BorrowerNamesMissingException(Exception):
+    pass
+
+
+def compare_borrower_names(payload):
     """
     Check that the names on the payload are valid.
     """
@@ -77,5 +81,18 @@ def check_borrower_names(payload):
     if unmatched_names:
         LOGGER.info(
             "%s Names on Register and deed do not match for title number '%s'" % (len(unmatched_names), title_number))
-        raise BorrowerNamesException
+        raise BorrowerNamesDifferException
 
+
+def all_borrower_names_present(payload):
+    """
+    Check that the enough Borrower names exist in the payload.
+    """
+    deed_names = _unpack_borrowers(payload)
+    title_number = payload.get('title_number')
+    proprietor_names = RegisterAdapter.get_proprietor_names(title_number)
+    missing_borrower_name_count = len(proprietor_names) - len(deed_names)
+    if missing_borrower_name_count > 0:
+        LOGGER.info(
+            "%s Borrower names missing for title number '%s'" % (missing_borrower_name_count, title_number))
+        raise BorrowerNamesMissingException
