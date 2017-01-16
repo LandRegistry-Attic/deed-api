@@ -21,7 +21,7 @@ class TestDeedValidator(unittest.TestCase):
         Test that the function fails correctly if borrower and proprietor names don't match.
         """
         expected_fail_msg = "Only a person who is entered in the register as proprietor or joint proprietor " \
-              "of the registered estate can be named as a borrower."
+                            "of the registered estate can be named as a borrower."
 
         mock_name_check.side_effect = self.create_a_borrower_differ_exception
         result, actual_msg = Validation().validate_borrower_names({})
