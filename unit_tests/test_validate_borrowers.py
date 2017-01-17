@@ -61,7 +61,6 @@ class TestValidateBorrowers(unittest.TestCase):
         self.assertRaises(BorrowerNamesMissingException, all_borrower_names_present, PAYLOAD)
 
 
-
 class TestValidateNames(unittest.TestCase):
     def test_names_register_names_proprietor_names(self):
         ret_val = _unmatched_names(['PeTeR', 'PaUl', 'MaRy'],
@@ -87,6 +86,3 @@ class TestValidateNames(unittest.TestCase):
     def test_uniquify(self):
         names = _set_no_duplicates(['foo', 'foo', 'bar', 'Foo', 'Bar'])
         self.assertEqual({'foo.0', 'foo.1', 'bar.0', 'foo.2', 'bar.1'}, names)
-
-    def test_all_borrower_names_present(self):
-        pass
