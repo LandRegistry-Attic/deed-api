@@ -454,7 +454,6 @@ class TestDeedRoutes(unittest.TestCase):
         self.assertEqual(return_value["borrower_id"], 1)
 
     def test_organisation_name(self):
-        print(config.ORGANISATION_API_BASE_HOST)
         # Post a new test organisation, which will match the one provided in the test headers
         post_organisation_name = requests.post(config.ORGANISATION_API_BASE_HOST + '/organisation-name',
                                                data=json.dumps({"organisation_name": "Test Organisation",
