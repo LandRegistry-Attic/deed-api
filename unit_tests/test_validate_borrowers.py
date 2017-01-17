@@ -4,8 +4,9 @@ import unittest
 
 import mock
 
-from application.deed.validate_borrowers import compare_borrower_names, _unpack_borrowers, _unmatched_names, \
-      _set_no_duplicates, BorrowerNamesDifferException
+from application.deed.validate_borrowers import compare_borrower_names, all_borrower_names_present,\
+    _unpack_borrowers, _unmatched_names, _set_no_duplicates, BorrowerNamesDifferException, \
+    BorrowerNamesMissingException
 
 PAYLOAD = {
    "title_number": "GR515835",
@@ -40,14 +41,25 @@ class TestValidateBorrowers(unittest.TestCase):
         self.assertEqual(ret_val, ["Simon Tsang", "Eddie David Davies"])
 
     @mock.patch('application.register_adapter.service.RegisterAdapter.get_proprietor_names')
-    def test_validate_borrower_good(self, mock_register_adapter):
+    def test_compare_borrower_good(self, mock_register_adapter):
         mock_register_adapter.return_value = ["Simon Tsang", "Eddie David Davies"]
         compare_borrower_names(PAYLOAD)
 
     @mock.patch('application.register_adapter.service.RegisterAdapter.get_proprietor_names')
-    def test_validate_borrower_bad(self, mock_register_adapter):
+    def test_compare_borrower_bad(self, mock_register_adapter):
         mock_register_adapter.return_value = ["Alice", "Bob"]
         self.assertRaises(BorrowerNamesDifferException, compare_borrower_names, PAYLOAD)
+
+    @mock.patch('application.register_adapter.service.RegisterAdapter.get_proprietor_names')
+    def test_borrowers_present_good(self, mock_register_adapter):
+        mock_register_adapter.return_value = ["Simon Tsang", "Eddie David Davies"]
+        all_borrower_names_present(PAYLOAD)
+
+    @mock.patch('application.register_adapter.service.RegisterAdapter.get_proprietor_names')
+    def test_borrowers_present_bad(self, mock_register_adapter):
+        mock_register_adapter.return_value = ["Simon Tsang", "Eddie David Davies", "Another Name"]
+        self.assertRaises(BorrowerNamesMissingException, all_borrower_names_present, PAYLOAD)
+
 
 
 class TestValidateNames(unittest.TestCase):
