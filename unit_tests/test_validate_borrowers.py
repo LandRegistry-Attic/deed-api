@@ -73,5 +73,8 @@ class TestValidateNames(unittest.TestCase):
         self.assertEqual({'peter.1', 'peter.2', 'paul.0', 'mary.0'}, ret_val)
 
     def test_uniquify(self):
-        names = _set_no_duplicates(['foo', 'foo', 'bar', 'foo'])
-        self.assertEqual({'foo.0', 'foo.1', 'bar.0', 'foo.2'}, names)
+        names = _set_no_duplicates(['foo', 'foo', 'bar', 'Foo', 'Bar'])
+        self.assertEqual({'foo.0', 'foo.1', 'bar.0', 'foo.2', 'bar.1'}, names)
+
+    def test_all_borrower_names_present(self):
+        pass

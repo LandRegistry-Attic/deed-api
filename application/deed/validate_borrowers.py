@@ -40,10 +40,11 @@ def _set_no_duplicates(names):
     :type names: list
     :rtype: set
     """
+    lowercase_names = [x.lower() for x in names]
     return set(itertools.chain(*[["{0}.{1}".format(j, i)
-                               for i, j in enumerate(y*[x.lower()])]
-                               for x, y in
-                                 collections.Counter(names).items()]))
+                                  for i, j in enumerate(y * [x])]
+                                 for x, y in
+                                 collections.Counter(lowercase_names).items()]))
 
 
 def _unmatched_names(proprietor_names, deed_names):
