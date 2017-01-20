@@ -5,11 +5,12 @@ import unittest
 
 import PyPDF2
 import requests
+from lxml import etree
+
 from application import config
 from application.deed.model import Deed
 from integration_tests.deed.deed_data import valid_deed, new_deed, valid_deed_with_reference
 from integration_tests.helper import setUpApp, setUp_MortgageDocuments
-from lxml import etree
 
 
 class TestDeedRoutes(unittest.TestCase):
@@ -453,7 +454,6 @@ class TestDeedRoutes(unittest.TestCase):
         self.assertEqual(return_value["borrower_id"], 1)
 
     def test_organisation_name(self):
-
         # Post a new test organisation, which will match the one provided in the test headers
         post_organisation_name = requests.post(config.ORGANISATION_API_BASE_HOST + '/organisation-name',
                                                data=json.dumps({"organisation_name": "Test Organisation",

@@ -3,22 +3,18 @@ Checks the validity of the borrowers.
 
 According to the following business rules:
 
-- Conveyancer must be alerted if more names are on the register than on the mortgage deed.
-- All names on the register must be on the mortgage deed.
-- There can be more names on the mortgage deed than on the register.
-- Conveyancer does not need to be alerted that there are more names on mortgage deed than register.
+- All registered proprietors must be named as borrowers on the mortgage deed.
+- Conveyancer must be alerted if the registered proprietors and mortgage deed borrower names do not match.
 - Names do not need to be in the same order that they are on the register.
 - Names must not be case sensitive.
 """
 
-
 import collections
-import itertools
 import logging
 
+import itertools
 
 from application.register_adapter.service import RegisterAdapter
-
 
 LOGGER = logging.getLogger(__name__)
 
@@ -44,15 +40,16 @@ def _set_no_duplicates(names):
     :type names: list
     :rtype: set
     """
+    lowercase_names = [x.lower() for x in names]
     return set(itertools.chain(*[["{0}.{1}".format(j, i)
-                               for i, j in enumerate(y*[x.lower()])]
-                               for x, y in
-                                 collections.Counter(names).items()]))
+                                  for i, j in enumerate(y * [x])]
+                                 for x, y in
+                                 collections.Counter(lowercase_names).items()]))
 
 
-def _complement_names(proprietor_names, deed_names):
+def _unmatched_names(proprietor_names, deed_names):
     """
-    The Relative Complement of names on the Deed.
+    Testing equality of names from two sources.
 
     :param proprietor_names: The names on the Register.
     :type proprietor_names: list
@@ -63,22 +60,40 @@ def _complement_names(proprietor_names, deed_names):
     """
     register_set = _set_no_duplicates(proprietor_names)
     deed_set = _set_no_duplicates(deed_names)
-    return set([name for name in register_set if name not in deed_set])
+    return register_set.symmetric_difference(deed_set)
 
 
-class BorrowerNamesException(Exception):
+class BorrowerNamesDifferException(Exception):
     pass
 
 
-def check_borrower_names(payload):
+class BorrowerNamesMissingException(Exception):
+    pass
+
+
+def compare_borrower_names(payload):
     """
     Check that the names on the payload are valid.
     """
     deed_names = _unpack_borrowers(payload)
     title_number = payload.get('title_number')
     proprietor_names = RegisterAdapter.get_proprietor_names(title_number)
-    complement = _complement_names(proprietor_names, deed_names)
-    if complement:
-        names = ','.join(complement)
-        LOGGER.info("Names on Register but not on Deed '%s'", names)
-        raise BorrowerNamesException
+    unmatched_names = _unmatched_names(proprietor_names, deed_names)
+    if unmatched_names:
+        LOGGER.info(
+            "%s Names on Register and deed do not match for title number '%s'" % (len(unmatched_names), title_number))
+        raise BorrowerNamesDifferException
+
+
+def all_borrower_names_present(payload):
+    """
+    Check that the enough Borrower names exist in the payload.
+    """
+    deed_names = _unpack_borrowers(payload)
+    title_number = payload.get('title_number')
+    proprietor_names = RegisterAdapter.get_proprietor_names(title_number)
+    missing_borrower_name_count = len(proprietor_names) - len(deed_names)
+    if missing_borrower_name_count > 0:
+        LOGGER.info(
+            "%s Borrower names missing for title number '%s'" % (missing_borrower_name_count, title_number))
+        raise BorrowerNamesMissingException
