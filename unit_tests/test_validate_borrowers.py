@@ -7,28 +7,28 @@ from application.deed.validate_borrowers import compare_borrower_names, all_borr
     BorrowerNamesMissingException
 
 PAYLOAD = {
-   "title_number": "GR515835",
-   "md_ref": "e-MD12344",
-   "borrowers": [
-     {
-          "forename": "Simon",
-          "surname": "Tsang",
-          "gender": "Male",
-          "address": "2 The Street, Plymouth, PL1 2PP",
-          "dob": "01/10/1976",
-          "phone_number": "07900804888"
-      }, {
-           "forename": "Eddie",
-           "middle_name": "David",
-           "surname": "Davies",
-           "gender": "Female",
-           "address": "2 The Street, Plymouth, PL1 2PP",
-           "dob": "01/12/1982",
-           "phone_number": "07747742010"
-       }
-   ],
-   "identity_checked": "Y",
-   "property_address": "5 The Drive, This Town, This County, PL4 4TH"
+    "title_number": "GR515835",
+    "md_ref": "e-MD12344",
+    "borrowers": [
+        {
+            "forename": "Simon",
+            "surname": "Tsang",
+            "gender": "Male",
+            "address": "2 The Street, Plymouth, PL1 2PP",
+            "dob": "01/10/1976",
+            "phone_number": "07900804888"
+        }, {
+            "forename": "Eddie",
+            "middle_name": "David",
+            "surname": "Davies",
+            "gender": "Female",
+            "address": "2 The Street, Plymouth, PL1 2PP",
+            "dob": "01/12/1982",
+            "phone_number": "07747742010"
+        }
+    ],
+    "identity_checked": "Y",
+    "property_address": "5 The Drive, This Town, This County, PL4 4TH"
 }
 
 
