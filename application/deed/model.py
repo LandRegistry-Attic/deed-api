@@ -80,9 +80,9 @@ class Deed(db.Model):
     @staticmethod
     def get_signed_deeds():
         conveyancer_credentials = process_organisation_credentials()
-        organisation_id = conveyancer_credentials["O"][1]
+        organisation_name = conveyancer_credentials["O"][0]
 
-        result = Deed.query.filter_by(organisation_id=organisation_id, status=DeedStatus.all_signed.value).all()
+        result = Deed.query.filter_by(organisation_name=organisation_name, status=DeedStatus.all_signed.value).all()
 
         all_signed_deeds = list(
             map(lambda deed: deed.token, result)
