@@ -386,17 +386,22 @@ def make_effective(deed_reference):
 
             return '', status.HTTP_200_OK
 
+
         elif deed_status == "EFFECTIVE" or deed_status == "NOT-LR-SIGNED":
+            errors = []
             LOGGER.error("Deed with reference - %s is in %s status and can not be registrar signed" %
                          (str(deed_reference), str(deed_status)))
-            return jsonify({"message": "This deed has already been made effective."}), \
-                status.HTTP_400_BAD_REQUEST
+            errors.append("This deed has already been made effective.")
+            compiled_list = send_error_list(errors)
+            return compiled_list
 
         else:
+            errors = []
             LOGGER.error("Deed with reference - %s is not fully signed and can not be registrar signed" %
                          str(deed_reference))
-            return jsonify({"message": "This deed cannot be made effective as not all borrowers "
-                                       "have signed the deed."}), status.HTTP_400_BAD_REQUEST
+            errors.append("This deed cannot be made effective as not all borrowers have signed the deed")
+            compiled_list = send_error_list(errors)
+            return compiled_list
 
 
 @deed_bp.route('/<deed_reference>/request-auth-code', methods=['POST'])
