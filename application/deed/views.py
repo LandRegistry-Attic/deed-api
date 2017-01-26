@@ -78,7 +78,7 @@ def get_existing_deed_and_update(deed_reference):
         borrower_check = Borrower.get_by_id(borrower_id)
 
         if borrower_check is None or borrower_check.deed_token != deed_reference:
-            error_list.append("Borrowers provided do not match the selected deed")
+            error_list.append("Borrowers provided do not match the selected deed.")
             return_error_list=send_error_list(error_list)
             return return_error_list
 
