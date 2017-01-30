@@ -1,15 +1,14 @@
+import PyPDF2
 import copy
 import io
 import json
-import unittest
-
-import PyPDF2
 import requests
+import unittest
+from application.deed.model import Deed
+from integration_tests.deed.deed_data import valid_deed, new_deed, valid_deed_with_reference
 from lxml import etree
 
 from application import config
-from application.deed.model import Deed
-from integration_tests.deed.deed_data import valid_deed, new_deed, valid_deed_with_reference
 from integration_tests.helper import setUpApp, setUp_MortgageDocuments
 
 
@@ -454,35 +453,38 @@ class TestDeedRoutes(unittest.TestCase):
         self.assertEqual(return_value["borrower_id"], 1)
 
     def test_organisation_name(self):
-        # Post a new test organisation, which will match the one provided in the test headers
-        post_organisation_name = requests.post(config.ORGANISATION_API_BASE_HOST + '/organisation-name',
-                                               data=json.dumps({"organisation_name": "Test Organisation",
-                                                                "organisation_id": "1000.1.2"}),
-                                               headers=self.webseal_test_organisation_name)
+        try:
+            # Post a new test organisation, which will match the one provided in the test headers
+            post_organisation_name = requests.post(config.ORGANISATION_API_BASE_HOST + '/organisation-name',
+                                                   data=json.dumps({"organisation_name": "Test Organisation",
+                                                                    "organisation_id": "1000.1.2"}),
+                                                   headers=self.webseal_test_organisation_name)
 
-        self.assertEqual(post_organisation_name.status_code, 201)
+            self.assertEqual(post_organisation_name.status_code, 201)
 
-        # Create a new test deed and attempt to retrieve the organisation name from it
-        # which should match the posted organisation above
-        create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
-                                    data=json.dumps(valid_deed),
-                                    headers=self.webseal_test_organisation_name)
-        self.assertEqual(create_deed.status_code, 201)
-        response_json = create_deed.json()
-        self.assertIn("/deed/", str(response_json))
-
-        get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+            # Create a new test deed and attempt to retrieve the organisation name from it
+            # which should match the posted organisation above
+            create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
+                                        data=json.dumps(valid_deed),
                                         headers=self.webseal_test_organisation_name)
+            self.assertEqual(create_deed.status_code, 201)
+            response_json = create_deed.json()
+            self.assertIn("/deed/", str(response_json))
 
-        self.assertEqual(get_created_deed.status_code, 200)
+            get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                            headers=self.webseal_test_organisation_name)
 
-        get_organisation_name = requests.get(config.DEED_API_BASE_HOST + response_json["path"] + '/organisation-name',
-                                             headers=self.webseal_test_organisation_name)
-        self.assertEqual(get_organisation_name.status_code, 200)
-        self.assertEqual(get_organisation_name.json()['result'], 'Test Organisation')
+            self.assertEqual(get_created_deed.status_code, 200)
 
-        # Finally, teardown/delete the test organisation name
-        delete_organisation_name = requests.delete(config.ORGANISATION_API_BASE_HOST +
-                                                   json.loads(post_organisation_name.text)['path'])
+            get_organisation_name = requests.get(
+                config.DEED_API_BASE_HOST + response_json["path"] + '/organisation-name',
+                headers=self.webseal_test_organisation_name)
+            self.assertEqual(get_organisation_name.status_code, 200)
+            self.assertEqual(get_organisation_name.json()['result'], 'Test Organisation')
 
-        self.assertEqual(delete_organisation_name.status_code, 200)
+        finally:
+            # Finally, teardown/delete the test organisation name
+            delete_organisation_name = requests.delete(
+                config.ORGANISATION_API_BASE_HOST + '/organisation-name/1000.1.2')
+
+            self.assertEqual(delete_organisation_name.status_code, 200)
