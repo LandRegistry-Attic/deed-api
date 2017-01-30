@@ -65,13 +65,13 @@ def get_existing_deed_and_update(deed_reference):
     if result_deed is None:
         error_list.append("There is no deed associated with - %s deed id." % str(deed_reference))
         LOGGER.error("Deed with reference - %s not found" % str(deed_reference))
-        return_error_list=send_error_list(error_list)
+        return_error_list = send_error_list(error_list)
         return return_error_list
 
     # Deed Status checksss
     if str(result_deed.status) != "DRAFT":
         error_list.append("This deed is not in the correct state to be modified.")
-        return_error_list=send_error_list(error_list)
+        return_error_list = send_error_list(error_list)
         return return_error_list
 
     for borrower_id in ids:
@@ -79,13 +79,13 @@ def get_existing_deed_and_update(deed_reference):
 
         if borrower_check is None or borrower_check.deed_token != deed_reference:
             error_list.append("Borrowers provided do not match the selected deed.")
-            return_error_list=send_error_list(error_list)
+            return_error_list = send_error_list(error_list)
             return return_error_list
 
     validate_title_number = validator.validate_title_number(deed_update_json)
     if validate_title_number != "title OK":
         error_list.append(validate_title_number)
-        return_error_list=send_error_list(error_list)
+        return_error_list = send_error_list(error_list)
         return return_error_list
 
     # From here - errors are grouped
@@ -180,7 +180,6 @@ def create():
         compiled_list = send_error_list(errors)
 
         return compiled_list
-
 
     # From here - errors are grouped
     error_list = []
@@ -385,7 +384,6 @@ def make_effective(deed_reference):
             apply_registrar_signature(result, signed_time)
 
             return '', status.HTTP_200_OK
-
 
         elif deed_status == "EFFECTIVE" or deed_status == "NOT-LR-SIGNED":
             errors = []

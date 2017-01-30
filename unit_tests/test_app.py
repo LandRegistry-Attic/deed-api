@@ -1,29 +1,28 @@
-import unittest
+import PyPDF2
+import io
 import json
 import mock
-import io
-from unittest.mock import patch
-from datetime import datetime
-
 import requests  # NOQA
-import PyPDF2
+import unittest
+from application.akuma.service import Akuma
+from application.casework.service import get_document
+from application.deed.deed_validator import Validation
+from application.deed.model import Deed
+from application.deed.service import apply_registrar_signature, check_effective_status, add_effective_date_to_xml
+from application.deed.service import make_effective_text, make_deed_effective_date
+from application.deed.utils import convert_json_to_xml, validate_generated_xml
+from application.deed.views import make_effective, retrieve_signed_deed
+from datetime import datetime
 from flask.ext.api import status
 from lxml import etree
+from unittest.mock import patch
 
 from application import app
-from application.deed.model import Deed
-from application.casework.service import get_document
-from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, StatusMock
-from application.akuma.service import Akuma
-from application.deed.utils import convert_json_to_xml, validate_generated_xml
-from application.deed.service import make_effective_text, make_deed_effective_date
-from application.deed.views import make_effective, retrieve_signed_deed
-from application.deed.service import apply_registrar_signature, check_effective_status, add_effective_date_to_xml
+from application.borrower.model import Borrower, DatabaseException
 from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
 from application.service_clients.organisation_adapter.implementation import get_organisation_name
-from application.borrower.model import Borrower, DatabaseException
+from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, StatusMock
 from unit_tests.schema_tests import run_schema_checks
-from application.deed.deed_validator import Validation
 
 
 class TestRoutesBase(unittest.TestCase):
@@ -582,22 +581,22 @@ class TestRoutes(TestRoutesBase):
         deed_model.status = "EFFECTIVE"
         mock_get_deed.return_value = deed_model
         response_status_code = make_effective(123)[1]
-        mock_jsonify.assert_called_with({"message": "This deed has already been made effective."})
+        mock_jsonify.assert_called_with({'errors': ['Problem 1: This deed has already been made effective.']})
         self.assertEqual(response_status_code, 400)
 
         # test where not registrar signed
         deed_model.status = "NOT-LR-SIGNED"
         mock_get_deed.return_value = deed_model
         response_status_code = make_effective(123)[1]
-        mock_jsonify.assert_called_with({"message": "This deed has already been made effective."})
+        mock_jsonify.assert_called_with({'errors': ['Problem 1: This deed has already been made effective.']})
         self.assertEqual(response_status_code, 400)
 
         # test anything else
         deed_model.status = "Foo"
         mock_get_deed.return_value = deed_model
         response_status_code = make_effective(123)[1]
-        mock_jsonify.assert_called_with({"message": "This deed cannot be made effective as not all borrowers have "
-                                                    "signed the deed."})
+        mock_jsonify.assert_called_with(
+            {'errors': ['Problem 1: This deed cannot be made effective as not all borrowers have signed the deed']})
         self.assertEqual(response_status_code, 400)
 
     @mock.patch('json.dumps')
