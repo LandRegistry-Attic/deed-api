@@ -59,27 +59,34 @@ def get_existing_deed_and_update(deed_reference):
         compiled_list = send_error_list(schema_errors)
         return compiled_list
 
+    error_list = []
+
     result_deed = deed.get_deed(deed_reference)
     if result_deed is None:
+        error_list.append("There is no deed associated with - %s deed id." % str(deed_reference))
         LOGGER.error("Deed with reference - %s not found" % str(deed_reference))
-        return jsonify({"message": "There is no deed associated with this deed id."}), \
-            status.HTTP_400_BAD_REQUEST
+        return_error_list = send_error_list(error_list)
+        return return_error_list
 
-    # Deed Status check
+    # Deed Status checksss
     if str(result_deed.status) != "DRAFT":
-        return jsonify({"message": "This deed is not in the correct state to be modified."}), \
-            status.HTTP_400_BAD_REQUEST
+        error_list.append("This deed is not in the correct state to be modified.")
+        return_error_list = send_error_list(error_list)
+        return return_error_list
 
     for borrower_id in ids:
         borrower_check = Borrower.get_by_id(borrower_id)
 
         if borrower_check is None or borrower_check.deed_token != deed_reference:
-            return jsonify({"message": "Borrowers provided do not match the selected deed"}), \
-                status.HTTP_400_BAD_REQUEST
+            error_list.append("Borrowers provided do not match the selected deed.")
+            return_error_list = send_error_list(error_list)
+            return return_error_list
 
     validate_title_number = validator.validate_title_number(deed_update_json)
     if validate_title_number != "title OK":
-        return jsonify({"message": validate_title_number}), status.HTTP_400_BAD_REQUEST
+        error_list.append(validate_title_number)
+        return_error_list = send_error_list(error_list)
+        return return_error_list
 
     # From here - errors are grouped
     error_list = []
@@ -168,7 +175,11 @@ def create():
 
     validate_title_number = validator.validate_title_number(deed_json)
     if validate_title_number != "title OK":
-        return jsonify({"message": validate_title_number}), status.HTTP_400_BAD_REQUEST
+        errors = []
+        errors.append(validate_title_number)
+        compiled_list = send_error_list(errors)
+
+        return compiled_list
 
     # From here - errors are grouped
     error_list = []
@@ -375,16 +386,20 @@ def make_effective(deed_reference):
             return '', status.HTTP_200_OK
 
         elif deed_status == "EFFECTIVE" or deed_status == "NOT-LR-SIGNED":
+            errors = []
             LOGGER.error("Deed with reference - %s is in %s status and can not be registrar signed" %
                          (str(deed_reference), str(deed_status)))
-            return jsonify({"message": "This deed has already been made effective."}), \
-                status.HTTP_400_BAD_REQUEST
+            errors.append("This deed has already been made effective.")
+            compiled_list = send_error_list(errors)
+            return compiled_list
 
         else:
+            errors = []
             LOGGER.error("Deed with reference - %s is not fully signed and can not be registrar signed" %
                          str(deed_reference))
-            return jsonify({"message": "This deed cannot be made effective as not all borrowers "
-                                       "have signed the deed."}), status.HTTP_400_BAD_REQUEST
+            errors.append("This deed cannot be made effective as not all borrowers have signed the deed.")
+            compiled_list = send_error_list(errors)
+            return compiled_list
 
 
 @deed_bp.route('/<deed_reference>/request-auth-code', methods=['POST'])
