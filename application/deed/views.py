@@ -397,7 +397,7 @@ def make_effective(deed_reference):
             errors = []
             LOGGER.error("Deed with reference - %s is not fully signed and can not be registrar signed" %
                          str(deed_reference))
-            errors.append("This deed cannot be made effective as not all borrowers have signed the deed")
+            errors.append("This deed cannot be made effective as not all borrowers have signed the deed.")
             compiled_list = send_error_list(errors)
             return compiled_list
 
