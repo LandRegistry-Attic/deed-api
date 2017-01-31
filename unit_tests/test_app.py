@@ -596,7 +596,7 @@ class TestRoutes(TestRoutesBase):
         mock_get_deed.return_value = deed_model
         response_status_code = make_effective(123)[1]
         mock_jsonify.assert_called_with(
-            {'errors': ['Problem 1: This deed cannot be made effective as not all borrowers have signed the deed']})
+            {'errors': ['Problem 1: This deed cannot be made effective as not all borrowers have signed the deed.']})
         self.assertEqual(response_status_code, 400)
 
     @mock.patch('json.dumps')
