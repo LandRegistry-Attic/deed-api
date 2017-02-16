@@ -364,7 +364,7 @@ def make_effective(deed_reference):
 
             apply_registrar_signature(result, signed_time)
 
-            return jsonify({"path": '/deed/' + str(deed.token)}), status.HTTP_200_OK
+            return jsonify({"path": '/deed/' + str(result.token)}), status.HTTP_200_OK
 
         elif deed_status == "EFFECTIVE" or deed_status == "NOT-LR-SIGNED":
             LOGGER.error("Deed with reference - %s is in %s status and can not be registrar signed" %
