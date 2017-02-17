@@ -514,18 +514,18 @@ class TestRoutes(TestRoutesBase):
 
     @mock.patch('application.deed.model.Deed.get_deed')
     @mock.patch('application.deed.views.Akuma.do_check')
-    @mock.patch('application.deed.views.jsonify')
     @mock.patch('application.deed.views.datetime')
     @mock.patch('application.deed.views.apply_registrar_signature')
-    def test_make_deed_effective_200(self, mock_sign, mock_datetime, mock_jsonify,
-                                     mock_akuma, mock_get_deed):
+    def test_make_deed_effective(self, mock_sign, mock_datetime, mock_akuma, mock_get_deed):
         deed_model = mock.create_autospec(Deed)
         deed_model.deed = {}
         deed_model.status = "ALL-SIGNED"
         mock_datetime.now.return_value = datetime(1900, 1, 1)
         mock_get_deed.return_value = deed_model
-        response_status_code = make_effective(123)[1]
-        self.assertEqual(response_status_code, 200)
+        response = self.app.post(self.DEED_ENDPOINT + '123' + '/make-effective',
+                                 headers=self.webseal_headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("path" in response.data.decode())
 
     @mock.patch('application.deed.model.Deed.get_deed')
     @mock.patch('application.deed.views.Akuma.do_check')
