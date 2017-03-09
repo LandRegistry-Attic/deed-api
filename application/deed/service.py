@@ -1,18 +1,19 @@
-import logging
-from application.deed.utils import valid_dob, is_unique_list
-from application.borrower.server import BorrowerService
-from application.borrower.model import Borrower as BorrowerModel
-from underscore import _
-from application.mortgage_document.model import MortgageDocument
-from functools import partial
-from flask.ext.api import status
-from flask import abort
-from application.deed.deed_status import DeedStatus
-import json
-import datetime
 import copy
-from application import esec_client
+import datetime
+import json
+import logging
+from application.deed.deed_status import DeedStatus
+from application.deed.utils import valid_dob, is_unique_list
+from flask import abort
+from flask.ext.api import status
+from functools import partial
 from lxml import etree
+from underscore import _
+
+from application import esec_client
+from application.borrower.model import Borrower as BorrowerModel
+from application.borrower.server import BorrowerService
+from application.mortgage_document.model import MortgageDocument
 from application.service_clients.organisation_adapter import make_organisation_adapter_client
 
 LOGGER = logging.getLogger(__name__)
@@ -86,7 +87,8 @@ def update_borrower(borrower, idx, borrowers, deed_token):
     return borrower_json
 
 
-def update_md_clauses(json_doc, md_ref, reference, organisation_name):
+def update_md_clauses(json_doc, md_ref, reference, date_of_mortgage_offer, miscellaneous_information,
+                      organisation_name):
     mortgage_document = MortgageDocument.query.filter_by(md_ref=str(md_ref)).first()
     if mortgage_document is not None:
         md_json = json.loads(mortgage_document.data)
@@ -99,6 +101,18 @@ def update_md_clauses(json_doc, md_ref, reference, organisation_name):
             json_doc["reference_details"] = {
                 "lender_reference_name": md_json["lender_reference_name"],
                 "lender_reference_value": reference
+            }
+
+        if "date_of_mortgage_offer_heading" in md_json and date_of_mortgage_offer.strip():
+            json_doc["date_of_mortgage_offer_details"] = {
+                "date_of_mortgage_offer_heading": md_json["date_of_mortgage_offer_heading"],
+                "date_of_mortgage_offer_value": date_of_mortgage_offer
+            }
+
+        if "miscellaneous_information_heading" in md_json and miscellaneous_information.strip():
+            json_doc["miscellaneous_information_details"] = {
+                "miscellaneous_information_heading": md_json["miscellaneous_information_heading"],
+                "miscellaneous_information_value": miscellaneous_information
             }
 
     return mortgage_document is not None
@@ -135,7 +149,16 @@ def update_deed(deed, deed_json):
     if "reference" in deed_json:
         reference = deed_json["reference"]
 
-    if not update_md_clauses(json_doc, deed_json["md_ref"], reference, get_organisation_name(deed)):
+    date_of_mortgage_offer = ""
+    if "date_of_mortgage_offer" in deed_json:
+        date_of_mortgage_offer = deed_json["date_of_mortgage_offer"]
+
+    miscellaneous_information = ""
+    if "miscellaneous_information" in deed_json:
+        miscellaneous_information = deed_json["miscellaneous_information"]
+
+    if not update_md_clauses(json_doc, deed_json["md_ref"], reference, date_of_mortgage_offer,
+                             miscellaneous_information, get_organisation_name(deed)):
         msg = "mortgage document associated with supplied md_ref is not found"
         LOGGER.error(msg)
         return False, msg

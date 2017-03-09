@@ -136,7 +136,7 @@ Example payload with Enact-style lender-reference, date of mortgage offer, misce
 		"phone_number": "07502154069"
 	}],
 	"identity_checked": "Y",
-	"reference": 123,
+	"reference": "123",
 	"date_of_mortgage_offer": "a date string",
 	"miscellaneous_information": "A Conveyancer"
 }
