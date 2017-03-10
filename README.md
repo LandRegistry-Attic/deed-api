@@ -125,7 +125,7 @@ Example payload with Enact-style lender-reference, date of mortgage offer, misce
 
 {
 	"title_number": "CYM123457",
-	"md_ref": "e-MD12344",
+	"md_ref": "e-MD1291A",
 	"property_address": "5 The Drive, This Town, This County, PL4 4TH",
 	"borrowers": [{
 		"forename": "Ann",

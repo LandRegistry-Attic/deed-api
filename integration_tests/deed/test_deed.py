@@ -84,6 +84,12 @@ class TestDeedRoutes(unittest.TestCase):
     def test_deed_create_and_get_with_optional_reference(self):
         self.deed_create_and_get(valid_deed_with_reference)
 
+    def test_deed_create_and_get_with_optional_date_of_mortgage_offer(self):
+        self.deed_create_and_get('will fail')
+
+    def test_deed_create_and_get_with_optional_miscellaneous_info(self):
+        self.deed_create_and_get('will fail')
+
     def test_bad_get(self):
         fake_token_deed = requests.get(config.DEED_API_BASE_HOST + "/deed/fake",
                                        headers=self.webseal_headers)
