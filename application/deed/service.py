@@ -102,7 +102,6 @@ def update_md_clauses(json_doc, md_ref, reference, date_of_mortgage_offer, misce
                 "lender_reference_name": md_json["lender_reference_name"],
                 "lender_reference_value": reference
             }
-
         if "date_of_mortgage_offer_heading" in md_json and date_of_mortgage_offer.strip():
             json_doc["date_of_mortgage_offer_details"] = {
                 "date_of_mortgage_offer_heading": md_json["date_of_mortgage_offer_heading"],

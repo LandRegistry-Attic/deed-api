@@ -49,6 +49,26 @@ class MortgageDocMockWithReference:
            'provision1"}, { "additional_provision_code":"addp002", "description":"this is ' \
            'additional provision2"}]}'
 
+class MortgageDocMockWithDateOfMortgageOffer:
+    md_ref = "e-MD1291A"
+    data = '{"description":"test setup charge clause","lender":{ "name":"a new lender",' \
+           '"address":"no 1 reputable street"}, "date_of_mortgage_offer_heading":"a date",' \
+           '"charge_clause": { "cre_code": "CRE001",' \
+           '"description":"This is an example charge clause"}, "additional_provisions": ' \
+           '[ { "additional_provision_code":"addp001", "description":"this is additional ' \
+           'provision1"}, { "additional_provision_code":"addp002", "description":"this is ' \
+           'additional provision2"}]}'
+
+class MortgageDocMockWithMiscInfo:
+    md_ref = "e-MD1291A"
+    data = '{"description":"test setup charge clause","lender":{ "name":"a new lender",' \
+           '"address":"no 1 reputable street"}, "miscellaneous_information_heading":"misc info: ",' \
+           '"charge_clause": { "cre_code": "CRE001",' \
+           '"description":"This is an example charge clause"}, "additional_provisions": ' \
+           '[ { "additional_provision_code":"addp001", "description":"this is additional ' \
+           'provision1"}, { "additional_provision_code":"addp002", "description":"this is ' \
+           'additional provision2"}]}'
+
 
 class DeedHelper:
     _json_doc = {
