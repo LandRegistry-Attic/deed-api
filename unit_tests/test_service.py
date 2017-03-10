@@ -25,6 +25,8 @@ class TestService(unittest.TestCase):
 
     @mock.patch('application.deed.service.MortgageDocument.query', autospec=True)
     def test_update_md_clauses_no_lender_reference_name(self, mock_query):
+        # The mortgage doc has no reference specified - but the function receives one.
+        # As a result, NO reference should appear in the outputted deed.
 
         mock_query_response = mock_query.filter_by.return_value
         mock_query_response.first.return_value = MortgageDocMock()
@@ -46,6 +48,8 @@ class TestService(unittest.TestCase):
 
     @mock.patch('application.deed.service.MortgageDocument.query', autospec=True)
     def test_update_md_clauses_with_lender_reference_name(self, mock_query):
+        # The mortgage doc has a reference specified - and the function receives a reference.
+        # As a result, the reference should appear in the outputted deed.
 
         mock_query_response = mock_query.filter_by.return_value
         mock_query_response.first.return_value = MortgageDocMockWithReference()
@@ -71,6 +75,8 @@ class TestService(unittest.TestCase):
 
     @mock.patch('application.deed.service.MortgageDocument.query', autospec=True)
     def test_update_md_clauses_with_lender_reference_name_but_no_reference(self, mock_query):
+        # The mortgage doc has a reference specified - but the function receives NO reference.
+        # As a result, NO reference should appear in the outputted deed.
 
         mock_query_response = mock_query.filter_by.return_value
         mock_query_response.first.return_value = MortgageDocMockWithReference()
