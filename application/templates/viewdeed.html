@@ -45,6 +45,11 @@
         {% endfor %}
     </ul>
 
+    {% if deed_data.deed.date_of_mortgage_offer_details %}
+        <h3 class="heading-medium">{{ deed_data.deed.date_of_mortgage_offer_details.date_of_mortgage_offer_heading }}</h3>
+        <p> {{ deed_data.deed.date_of_mortgage_offer_details.date_of_mortgage_offer_value }} </p>
+    {% endif %}
+
     <h3 class="heading-medium">Charging clause</h3>
 
     <p>{{ deed_data.deed.charge_clause.description }}</p>

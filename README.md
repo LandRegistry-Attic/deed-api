@@ -121,6 +121,27 @@ Example payload:
 }
 ```
 
+Example payload with Enact-style lender-reference, date of mortgage offer, miscellaneous information
+
+{
+	"title_number": "CYM123457",
+	"md_ref": "e-MD1291A",
+	"property_address": "5 The Drive, This Town, This County, PL4 4TH",
+	"borrowers": [{
+		"forename": "Ann",
+		"surname": "Smith",
+		"gender": "Male",
+		"address": "test address with postcode, PL14 3JR",
+		"dob": "23/01/1987",
+		"phone_number": "07502154069"
+	}],
+	"identity_checked": "Y",
+	"reference": "123",
+	"date_of_mortgage_offer": "a date string",
+	"miscellaneous_information": "A Conveyancer"
+}
+
+
 # Useful curl commands
 
 Add deed

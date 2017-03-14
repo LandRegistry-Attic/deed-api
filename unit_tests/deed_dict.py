@@ -38,5 +38,7 @@ DEED = {
         "registration": "Company registration number: 123456"
     },
     "effective_clause": "Effective clause goes here",
-    "identity_checked": "Y"
+    "identity_checked": "Y",
+    "date_of_mortgage_offer": "a date",
+    "miscellaneous_information": "misc info"
 }

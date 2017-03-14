@@ -25,16 +25,14 @@
                 "produces": [
                     "application/json"
                 ],
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/Deed_Application"
-                        }
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/Deed_Application"
                     }
-                ],
+                }],
                 "responses": {
                     "201": {
                         "description": "A URL to the GET endpoint for the deed returned on successful creation.\n",
@@ -59,22 +57,19 @@
                     "application/json",
                     "application/pdf"
                 ],
-                "parameters": [
-                    {
-                        "name": "deed_reference",
-                        "in": "path",
-                        "description": "Unique reference of the deed.",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "name": "Accept",
-                        "in": "header",
-                        "description": "Pass application/json for the deed as JSON or application/pdf to get a pdf",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
+                "parameters": [{
+                    "name": "deed_reference",
+                    "in": "path",
+                    "description": "Unique reference of the deed.",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "Accept",
+                    "in": "header",
+                    "description": "Pass application/json for the deed as JSON or application/pdf to get a pdf",
+                    "required": true,
+                    "type": "string"
+                }],
                 "tags": [
                     "Deed"
                 ],
@@ -102,23 +97,20 @@
                 "produces": [
                     "application/json"
                 ],
-                "parameters": [
-                    {
-                        "name": "deed_reference",
-                        "in": "path",
-                        "description": "Unique reference of the deed.",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/Deed_Application"
-                        }
+                "parameters": [{
+                    "name": "deed_reference",
+                    "in": "path",
+                    "description": "Unique reference of the deed.",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "in": "body",
+                    "name": "body",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/Deed_Application"
                     }
-                ],
+                }],
                 "tags": [
                     "Deed"
                 ],
@@ -171,15 +163,13 @@
                 "produces": [
                     "application/json"
                 ],
-                "parameters": [
-                    {
-                        "name": "deed_reference",
-                        "in": "path",
-                        "description": "Unique reference of the deed.",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
+                "parameters": [{
+                    "name": "deed_reference",
+                    "in": "path",
+                    "description": "Unique reference of the deed.",
+                    "required": true,
+                    "type": "string"
+                }],
                 "tags": [
                     "Make Effective"
                 ],
@@ -378,8 +368,21 @@
                         },
                         "reference": {
                             "type": "string",
-                            "maxLength" : 50,
-                            "pattern": "^(?!\\s*$).+"
+                            "maxLength": 50,
+                            "pattern": "^(?!\\s*$).+",
+                            "description": "A conveyancer reference.  Can be displayed on the deed if the mortgage document template permits."
+                        },
+                        "date_of_mortgage_offer": {
+                            "type": "string",
+                            "maxLength": 50,
+                            "pattern": "^(?!\\s*$).+",
+                            "description": "Date that the mortgage offer was made.  Can be displayed on the deed if the mortgage document template permits."
+                        },
+                        "miscellaneous_information": {
+                            "type": "string",
+                            "maxLength": 250,
+                            "pattern": "^(?!\\s*$).+",
+                            "description": "Values unsuited to other keys. Can be displayed on the deed if the mortgage document template permits."
                         },
                         "deed_status": {
                             "type": "string",
@@ -425,8 +428,21 @@
                 },
                 "reference": {
                     "type": "string",
-                    "maxLength" : 50,
-                    "pattern": "^(?!\\s*$).+"
+                    "maxLength": 50,
+                    "pattern": "^(?!\\s*$).+",
+                    "description": "A conveyancer reference.  Can be displayed on the deed if the mortgage document template permits."
+                },
+                "date_of_mortgage_offer": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "pattern": "^(?!\\s*$).+",
+                    "description": "Date that the mortgage offer was made.  Can be displayed on the deed if the mortgage document template permits."
+                },
+                "miscellaneous_information": {
+                    "type": "string",
+                    "maxLength": 250,
+                    "pattern": "^(?!\\s*$).+",
+                    "description": "Values unsuited to other keys. Can be displayed on the deed if the mortgage document template permits."
                 }
             }
         },
