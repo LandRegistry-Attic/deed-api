@@ -5,7 +5,8 @@ import json
 import requests
 import unittest
 from application.deed.model import Deed
-from integration_tests.deed.deed_data import valid_deed, new_deed, valid_deed_with_reference, valid_deed_with_date_of_mortgage_offer, valid_deed_with_miscellaneous_info
+from integration_tests.deed.deed_data import valid_deed, new_deed, valid_deed_with_reference, \
+    valid_deed_with_date_of_mortgage_offer, valid_deed_with_miscellaneous_info
 from lxml import etree
 
 from application import config

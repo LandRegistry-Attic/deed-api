@@ -1,6 +1,7 @@
 from application.deed.model import Deed
 from application.borrower.model import Borrower
 from .deed_dict import DEED
+from .complete_deed_dict import complete_deed_dict
 
 # flake8: noqa
 
@@ -49,6 +50,7 @@ class MortgageDocMockWithReference:
            'provision1"}, { "additional_provision_code":"addp002", "description":"this is ' \
            'additional provision2"}]}'
 
+
 class MortgageDocMockWithDateOfMortgageOffer:
     md_ref = "e-MD1291A"
     data = '{"description":"test setup charge clause","lender":{ "name":"a new lender",' \
@@ -58,6 +60,8 @@ class MortgageDocMockWithDateOfMortgageOffer:
            '[ { "additional_provision_code":"addp001", "description":"this is additional ' \
            'provision1"}, { "additional_provision_code":"addp002", "description":"this is ' \
            'additional provision2"}]}'
+    deed = complete_deed_dict
+
 
 class MortgageDocMockWithMiscInfo:
     md_ref = "e-MD1291A"
@@ -68,6 +72,7 @@ class MortgageDocMockWithMiscInfo:
            '[ { "additional_provision_code":"addp001", "description":"this is additional ' \
            'provision1"}, { "additional_provision_code":"addp002", "description":"this is ' \
            'additional provision2"}]}'
+    deed = complete_deed_dict
 
 
 class DeedHelper:
