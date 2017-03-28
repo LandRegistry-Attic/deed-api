@@ -1,8 +1,11 @@
-from application.borrower.model import Borrower
-from flask import Blueprint, request
+from application.borrower.model import Borrower, VerifyMatch
+from flask import Blueprint, request, abort
 from flask.ext.api import status
 import json
+import logging
 from datetime import datetime
+
+LOGGER = logging.getLogger(__name__)
 
 borrower_bp = Blueprint('borrower', __name__,
                         template_folder='templates',
@@ -44,6 +47,21 @@ def get_borrower_details_by_verify_pid(verify_pid):
         ), status.HTTP_200_OK
 
     return "Matching borrower not found", status.HTTP_404_NOT_FOUND
+
+
+@borrower_bp.route('/verify-match/delete/<verify_pid>', methods=['DELETE'])
+def delete_verify_match(verify_pid):
+    match = None
+    verify_match_model = VerifyMatch()
+    try:
+        match = verify_match_model.delete(verify_pid)
+    except Exception as inst:
+        LOGGER.error(str(type(inst)) + ":" + str(inst))
+
+    if match is None:
+        abort(status.HTTP_404_NOT_FOUND)
+    else:
+        return status.HTTP_200_OK
 
 
 def strip_number_to_four_digits(phone_number):
