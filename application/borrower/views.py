@@ -59,9 +59,9 @@ def delete_verify_match(verify_pid):
         LOGGER.error(str(type(inst)) + ":" + str(inst))
 
     if match is None:
-        abort(status.HTTP_404_NOT_FOUND)
-    else:
-        return status.HTTP_200_OK
+        LOGGER.error("no match found on verify-matcher: continue as normal")
+
+    return status.HTTP_200_OK
 
 
 def strip_number_to_four_digits(phone_number):
