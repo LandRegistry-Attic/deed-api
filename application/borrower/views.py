@@ -1,5 +1,5 @@
 from application.borrower.model import Borrower, VerifyMatch
-from flask import Blueprint, request, abort
+from flask import Blueprint, request
 from flask.ext.api import status
 import json
 import logging
