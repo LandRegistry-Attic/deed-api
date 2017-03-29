@@ -54,7 +54,7 @@ def delete_verify_match(verify_pid):
     match = None
     verify_match_model = VerifyMatch()
     try:
-        match = verify_match_model.remove_verify_ma(verify_pid)
+        match = verify_match_model.remove_verify_match(verify_pid)
     except Exception as inst:
         LOGGER.error(str(type(inst)) + ":" + str(inst))
 
