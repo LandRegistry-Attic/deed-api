@@ -113,6 +113,20 @@ class VerifyMatch(db.Model):
     verify_pid = db.Column(db.String, primary_key=True)
     borrower_id = db.Column(db.Integer, ForeignKey("borrower.id"), primary_key=True)
 
+    def remove_verify_match(self, pid_):
+        match = VerifyMatch.query.filter_by(verify_pid=pid_).first()
+
+        try:
+            if match is None:
+                return False
+
+            db.session.delete(match)
+            db.session.commit()
+            return True
+
+        except Exception as e:
+            raise DatabaseException(e)
+
 
 def bin_to_char(bin_str):
     # Converts 5 character binary string to a 2 digit integer. Then takes minimum between the 2 digit number and the lenght of the charset - 1.
