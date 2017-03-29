@@ -51,11 +51,15 @@ def get_borrower_details_by_verify_pid(verify_pid):
 
 @borrower_bp.route('/verify-match/delete/<verify_pid>', methods=['DELETE'])
 def delete_verify_match(verify_pid):
+    LOGGER.info("Removing Verify Match entry - PID = " + verify_pid)
     match = None
     verify_match_model = VerifyMatch()
+
     try:
+        LOGGER.info("In Try")
         match = verify_match_model.remove_verify_match(verify_pid)
     except Exception as inst:
+        LOGGER.info("DB exception when removing verify-match")
         LOGGER.error(str(type(inst)) + ":" + str(inst))
 
     if match is None:
