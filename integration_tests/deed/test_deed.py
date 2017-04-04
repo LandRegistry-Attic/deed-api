@@ -1,6 +1,7 @@
 import PyPDF2
 import copy
 import io
+import os
 import json
 import requests
 import unittest
@@ -16,7 +17,7 @@ from integration_tests.helper import setUpApp, setUp_MortgageDocuments
 class TestDeedRoutes(unittest.TestCase):
     webseal_headers = {
         "Content-Type": "application/json",
-        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Devices,O=1359.2.1,C=gb"
+        os.getenv("WEBSEAL_HEADER_KEY"): os.getenv('WEBSEAL_HEADER_VALUE')
     }
 
     webseal_headers_2 = {
@@ -37,7 +38,7 @@ class TestDeedRoutes(unittest.TestCase):
     webseal_headers_for_pdf = {
         "Content-Type": "application/json",
         "Accept": "application/pdf",
-        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Devices,O=1359.2.1,C=gb"
+        os.getenv("WEBSEAL_HEADER_KEY"): os.getenv('WEBSEAL_HEADER_VALUE')
     }
 
     webseal_test_organisation_name = {

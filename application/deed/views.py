@@ -68,7 +68,7 @@ def get_existing_deed_and_update(deed_reference):
         return_error_list = send_error_list(error_list)
         return return_error_list
 
-    # Deed Status checksss
+    # Deed Status checks
     if str(result_deed.status) != "DRAFT":
         error_list.append("This deed is not in the correct state to be modified.")
         return_error_list = send_error_list(error_list)

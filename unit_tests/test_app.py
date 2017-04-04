@@ -1,5 +1,6 @@
 import PyPDF2
 import io
+import os
 import json
 import mock
 import requests  # NOQA
@@ -36,7 +37,7 @@ class TestRoutesBase(unittest.TestCase):
     }
     webseal_headers = {
         "Content-Type": "application/json",
-        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Devices,O=1359.2.1,C=gb"
+        os.getenv("WEBSEAL_HEADER_KEY"): os.getenv('WEBSEAL_HEADER_VALUE')
     }
     dodgy_webseal_headers1 = {
         "Content-Type": "application/json",
