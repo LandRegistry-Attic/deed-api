@@ -41,7 +41,7 @@ class TestRoutesBase(unittest.TestCase):
     }
     dodgy_webseal_headers1 = {
         "Content-Type": "application/json",
-        "Iv-User-L": "incorrect data"
+        os.getenv('WEBSEAL_HEADER_KEY'): "incorrect data"
     }
 
     def setUp(self):

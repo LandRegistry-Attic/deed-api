@@ -1,6 +1,7 @@
 import logging
 import copy
 import uuid
+import os
 from datetime import datetime
 from builtins import FileNotFoundError
 
@@ -60,6 +61,7 @@ class Deed(db.Model):
         return deeds_with_status
 
     def get_deeds_by_status(self, status):
+        LOGGER.info('Getting status %s' % os.getenv('DEED_ORGANISATION_NAME'))
         return Deed.query.filter(Deed.status.like(status), Deed.organisation_name != 'Land Registry Devices', Deed.organisation_name.isnot(None)).count()
 
     def _get_deed_internal(self, deed_reference, organisation_id):
