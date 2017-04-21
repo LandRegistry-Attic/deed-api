@@ -110,7 +110,7 @@ Example payload with Enact-style lender-reference, date of mortgage offer, misce
 		"surname": "Smith",
 		"gender": "Male",
 		"address": "test address with postcode, PL0 0JR",
-		"dob": "22/02/1900",
+		"dob": "02/02/1922",
 		"phone_number": "07777777777"
 	}],
 	"identity_checked": "Y",
@@ -122,5 +122,5 @@ Example payload with Enact-style lender-reference, date of mortgage offer, misce
 Validate borrower
 
 ```
-curl -X POST -d '{"borrower_token":"AHDHDI", "dob":"01/02/1900"}' -H "Content-Type:application/json" localhost:9020/borrower/validate
+curl -X POST -d '{"borrower_token":"AHDHDI", "dob":"02/02/1922"}' -H "Content-Type:application/json" localhost:9020/borrower/validate
 ```

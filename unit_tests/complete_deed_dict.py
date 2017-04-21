@@ -18,7 +18,7 @@ complete_deed_dict = {
         },
         {
             "additional_provision_code": "addp004",
-            "description": "The borrower as a member of the Coventry Building Society will during the existence \
+            "description": "The borrower as a member of the Test Building Society will during the existence \
                 of this mortgage deed be bound by the Rules of the Society in force from time to time including rules \
                 adopted and amendments made after the date of this mortgage deed, except insofar as the Rules are \
                 expressly modified by the Mortgage Conditions and this mortgage deed."
@@ -35,19 +35,19 @@ complete_deed_dict = {
     ],
     "borrowers": [
         {
-            "forename": "Julia",
+            "forename": "Julius",
             "id": 196,
-            "middle_name": "Hannah",
+            "middle_name": "Hill",
             "signature": "13 March 2017 12:44PM",
-            "surname": "Northin",
+            "surname": "North",
             "token": "T8A4LBL8"
         },
         {
-            "forename": "Mr David",
+            "forename": "Mr Dillan",
             "id": 197,
-            "middle_name": "Alan",
+            "middle_name": "Ale",
             "signature": "13 March 2017 12:45PM",
-            "surname": "Jewers",
+            "surname": "Jives",
             "token": "LF44UML2"
         }
     ],
@@ -60,11 +60,11 @@ complete_deed_dict = {
         "date_of_mortgage_offer_heading": "Date of Mortgage Offer",
         "date_of_mortgage_offer_value": "a date string"
     },
-    "effective_clause": "This charge takes effect when the registrar receives notification from Land Registry \
-        Devices that the charge is to take effect.",
+    "effective_clause": "This charge takes effect when the registrar receives notification from Test Organisation \
+        that the charge is to take effect.",
     "lender": {
-        "address": "Economic House PO Box 9, High Street Coventry CV1 5QN",
-        "name": "COVENTRY BUILDING SOCIETY",
+        "address": "Economic House PO Box 0, Test Street Coventry CV0 0QN",
+        "name": "TEST BUILDING SOCIETY",
         "registration": ""
     },
     "md_ref": "e-MD1291A",
@@ -72,9 +72,9 @@ complete_deed_dict = {
         "miscellaneous_information_heading": "Your conveyancer contact is",
         "miscellaneous_information_value": "bob test"
     },
-    "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+    "property_address": "0 The Drive, This Town, This County, PL0 0TH",
     "reference_details": {
-        "lender_reference_name": "Coventry reference",
+        "lender_reference_name": "Test reference",
         "lender_reference_value": "123"
     },
     "status": "ALL-SIGNED",

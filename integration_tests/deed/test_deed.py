@@ -238,7 +238,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         response = requests.post(config.DEED_API_BASE_HOST + '/borrower/validate',
                                  data=json.dumps({"borrower_token": borrower["deed"]["borrowers"][0]["token"],
-                                                  "dob": "23/01/1986"}),
+                                                  "dob": "02/02/1922"}),
                                  headers=self.webseal_headers)
 
         self.assertEqual(response.status_code, 200)
@@ -246,7 +246,7 @@ class TestDeedRoutes(unittest.TestCase):
     def test_validate_borrower_not_found(self):
         response = requests.post(config.DEED_API_BASE_HOST + '/borrower/validate',
                                  data=json.dumps({"borrower_token": "unknown",
-                                                  "dob": "23/01/1986"}),
+                                                  "dob": "02/02/1922"}),
                                  headers=self.webseal_headers)
         self.assertEqual(response.status_code, 404)
 
@@ -312,7 +312,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         deed_model = Deed()
 
-        result = deed_model._get_deed_internal(response_json["path"].replace("/deed/", ""), "*")
+        result = deed_model._get_deed_internal(response_json["path"].replace("/deed/", ""), os.getenv('DEED_ORGANISATION_ID'))
 
         self.assertIsNotNone(result.deed_xml)
 
@@ -447,7 +447,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         self.assertEqual(get_modified_deed.status_code, 200)
         modified_deed = get_modified_deed.json()
-        self.assertEqual(modified_deed["deed"]["property_address"], "6 The Drive, This Town, This County, PL4 4TH")
+        self.assertEqual(modified_deed["deed"]["property_address"], "0 The Drive, This Town, This County, PL0 0TH")
 
     def test_accept_naa(self):
         res = requests.post(config.DEED_API_BASE_HOST + '/naa/accept/1',
