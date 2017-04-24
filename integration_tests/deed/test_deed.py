@@ -22,17 +22,17 @@ class TestDeedRoutes(unittest.TestCase):
 
     webseal_headers_2 = {
         "Content-Type": "application/json",
-        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Test,O=1360,C=gb"
+        os.getenv("WEBSEAL_HEADER_KEY"): os.getenv("WEBSEAL_HEADER_INT_TEST_2")
     }
 
     webseal_test_headers3 = {
         "Content-Type": "application/json",
-        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20TestD,O=1362.5.1,C=gb"
+        os.getenv("WEBSEAL_HEADER_KEY"): os.getenv("WEBSEAL_HEADER_INT_TEST_3")
     }
 
     webseal_headers_internal = {
         "Content-Type": "application/json",
-        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Test2,O=*,C=gb"
+        os.getenv("WEBSEAL_HEADER_KEY"): os.getenv("WEBSEAL_HEADER_INT_INTERNAL")
     }
 
     webseal_headers_for_pdf = {
@@ -44,7 +44,7 @@ class TestDeedRoutes(unittest.TestCase):
     webseal_test_organisation_name = {
         "Content-Type": "application/json",
         "Accept": "application/pdf",
-        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Test%20Organisation,O=1000.1.2,C=gb"
+        os.getenv("WEBSEAL_HEADER_KEY"): os.getenv("WEBSEAL_HEADER_INT_ORGANISATION")
     }
 
     def setUp(self):
