@@ -312,7 +312,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         deed_model = Deed()
 
-        result = deed_model._get_deed_internal(response_json["path"].replace("/deed/", ""), os.getenv('DEED_ORGANISATION_ID'))
+        result = deed_model._get_deed_internal(response_json["path"].replace("/deed/", ""), os.getenv('LR_ORGANISATION_ID'))
 
         self.assertIsNotNone(result.deed_xml)
 

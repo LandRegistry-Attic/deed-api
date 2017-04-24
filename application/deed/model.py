@@ -61,10 +61,11 @@ class Deed(db.Model):
         return deeds_with_status
 
     def get_deeds_by_status(self, status):
-        return Deed.query.filter(Deed.status.like(status), Deed.organisation_name != os.getenv('DEED_ORGANISATION_NAME'), Deed.organisation_name.isnot(None)).count()
+        return Deed.query.filter(Deed.status.like(status), Deed.organisation_name != os.getenv('LR_ORGANISATION_NAME'),
+                                 Deed.organisation_name.isnot(None)).count()
 
     def _get_deed_internal(self, deed_reference, organisation_id):
-        if organisation_id != os.getenv('DEED_ORGANISATION_ID'):
+        if organisation_id != os.getenv('LR_ORGANISATION_ID'):
             LOGGER.debug("Internal request to view deed reference %s" % deed_reference)
             result = Deed.query.filter_by(token=str(deed_reference), organisation_id=organisation_id).first()
         else:

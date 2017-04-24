@@ -256,7 +256,7 @@ def convert_json_to_xml(deed_json):
 
 
 def is_internal():
-    return True if os.getenv('WEBSEAL_HEADER_INTERNAL_ORG') in request.headers else False
+    return True if os.getenv('LR_HEADER_INTERNAL_ORG') in request.headers else False
 
 
 def process_organisation_credentials():
