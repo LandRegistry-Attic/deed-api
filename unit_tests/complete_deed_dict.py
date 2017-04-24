@@ -30,7 +30,7 @@ complete_deed_dict = {
                 proprietor of the registered estate or by the proprietor of any registered charge, not being a charge \
                 registered before the entry of this restriction, is to be registered without a written consent signed \
                 by the proprietor for the time being of the charge dated [the date of this charge] in favour of \
-                Coventry Building Society referred to in the Charges Register&quot;."
+                Test Building Society referred to in the Charges Register&quot;."
         }
     ],
     "borrowers": [
@@ -63,7 +63,7 @@ complete_deed_dict = {
     "effective_clause": "This charge takes effect when the registrar receives notification from Test Organisation \
         that the charge is to take effect.",
     "lender": {
-        "address": "Economic House PO Box 0, Test Street Coventry CV0 0QN",
+        "address": "Test House PO Box 0, Test Street CV0 0QN",
         "name": "TEST BUILDING SOCIETY",
         "registration": ""
     },
