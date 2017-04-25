@@ -8,26 +8,34 @@ from the database and putting a new JSON deed onto a database that returns an en
 The API also holds the functionality to capture personal information provided and save it in a
 separate table to be used at a later date for matching.
 
+Please note that sensitive environment variables are inherited from the environment-store service and you
+would need to bring it into your devenv config for these to be set.
+
 ### Contents
 
 - [Usage](#usage)
 - [Getting Started](#getting-started)
 - [Migration](#migration)
 - [Unit tests](#unit-tests)
-- [Acceptance tests](#acceptance-tests)
+- [Integration tests](#integration-tests)
 - [Current Schema](#current-schema)
 
 ## Usage
 ```
-get     /health                          # test endpoint for the application
-get     /deed/<id_>                      # get a deed with an id in the URL
-post    /deed/                           # Create a deed by posting a json object reflecting the schema
-delete  /borrowers/delete/<borrower_id>  # delete a borrower from the borrower table
-
+get     /health                                 # Test endpoint for the application
+get     /health/service-check                   # Check the health of all services connected to deed-api
+get     /deed/<deed_reference>                  # Get a deed with an id in the URL
+get     /dashboard/<status>                     # Gets the total amount of deeds for each status
+get     /deed/retrieve-signed                   # Get all deeds that have been signed
+post    /deed/                                  # Create a deed by posting a json object reflecting the schema
+post    /deed/<deed_reference>/make-effective   # Makes a deed effective.
+post    /deed/<deed_reference>/verify-auth-code # Verify the auth code provided by a borrower, for their prospective deed.
+put     /deed/<deed_reference>                  # Update a deed. A new id is generated unless the id field is present in the payload
+delete  /borrowers/delete/<borrower_id>         # delete a borrower from the borrower table
 ```
-> [schema](#current-schema) for post
 
 ## Getting Started
+
 1. Clone the repo
 2. In the directory enter the command
 ```
@@ -77,101 +85,42 @@ then install (on a Mac)
 brew install python cairo pango gdk-pixbuf libxml2 libxslt libffi
 ```
 
-## Acceptance tests
+## Integration tests
 
-See, the following link for information on how to run the acceptance tests:-
-
-[Acceptance Tests](https://192.168.249.38/digital-mortgage/acceptance-tests)
+```
+source integration_tests.sh
+```
 
 ## Current Schema
 
-The Deed requires a title number and at least 1 borrower
+The Deed requires a title number, md ref and at least 1 borrower
 
 ### Deed
-The schema can be found below
-```
-https://192.168.249.38/digital-mortgage/deed-api/blob/develop/application/deed/schema.json
-```
-Example payload:
-```
-{
-    "title_number": "DT100",
-    "md_ref": "e-MD12344",
-    "borrowers": [
-      {
-           "forename": "Paul",
-           "middle_name": "James",
-           "surname": "Smythe",
-           "gender": "Male",
-           "address": "2 The Street, Plymouth, PL1 2PP",
-           "dob": "01/10/1976",
-           "phone_number": "07502159062"
-       },
-       {
-            "forename": "Jane",
-            "surname": "Smythe",
-            "gender": "Female",
-            "address": "2 The Street, Plymouth, PL1 2PP",
-            "dob": "01/12/1982",
-            "phone_number": "07502154999"
-        }
-    ],
-    "identity_checked": "Y",
-    "property_address": "5 The Drive, This Town, This County, PL4 4TH"
-}
-```
+The schema can be found in the application/deed/schemas folder under the filename of deed-api
 
-Example payload with Enact-style lender-reference, date of mortgage offer, miscellaneous information
+Example payload with Enact-style lender-reference, date of mortgage offer, miscellaneous information:
 
+```
 {
 	"title_number": "CYM123457",
 	"md_ref": "e-MD1291A",
-	"property_address": "5 The Drive, This Town, This County, PL4 4TH",
+	"property_address": "0 The Drive, This Town, This County, PL0 0TH",
 	"borrowers": [{
 		"forename": "Ann",
 		"surname": "Smith",
 		"gender": "Male",
-		"address": "test address with postcode, PL14 3JR",
-		"dob": "23/01/1987",
-		"phone_number": "07502154069"
+		"address": "test address with postcode, PL0 0JR",
+		"dob": "02/02/1922",
+		"phone_number": "07777777777"
 	}],
 	"identity_checked": "Y",
-	"reference": "123",
 	"date_of_mortgage_offer": "a date string",
 	"miscellaneous_information": "A Conveyancer"
 }
-
-
-# Useful curl commands
-
-Add deed
-
-```
-curl -i -X POST localhost:9020/deed/ \
--H "Content-Type:application/json"  \
--H "Iv-User-L:CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Devices,O=1359.2.1,C=gb"  \
--d @- << EOF
-{
-    "title_number": "GR999999",
-    "md_ref": "e-MD12344",
-    "borrowers": [
-      {
-           "forename": "Barry",
-           "surname": "Jones",
-           "gender": "Male",
-           "address": "2 The Street, Plymouth, PL1 2PP",
-           "dob": "01/10/1976",
-           "phone_number": "07502159062"
-       }
-    ],
-    "identity_checked": "Y",
-    "property_address": "5 The Drive, This Town, This County, PL4 4TH"
-}
-EOF
 ```
 
 Validate borrower
 
 ```
-curl -X POST -d '{"borrower_token":"AHDHDI", "dob":"13/05/79"}' -H "Content-Type:application/json" localhost:9020/borrower/validate
+curl -X POST -d '{"borrower_token":"AHDHDI", "dob":"02/02/1922"}' -H "Content-Type:application/json" localhost:9020/borrower/validate
 ```

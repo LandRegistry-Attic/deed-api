@@ -46,7 +46,7 @@
           "description": "names can have spaces in"
         },
         {
-          "payload": "names_can_be_reaaly_reaaly_very__very_extremely_long",
+          "payload": "names_can_be_very_very_very_very_very_very_very_long",
           "expected": true,
           "description": "names can be long"
         }
@@ -111,32 +111,32 @@
           "description": "must not be blank"
         },
         {
-          "payload": "07234243401",
+          "payload": "07777777777",
           "expected": true,
           "description": "valid phone numbers start with 07"
         },
         {
-          "payload": "082342323401",
+          "payload": "087777777777",
           "expected": false,
           "description": "does not start with 07 (but right length)"
         },
         {
-          "payload": "072342334",
+          "payload": "077777777",
           "expected": false,
           "description": "starts with 07 but too short"
         },
         {
-          "payload": "082342323143",
+          "payload": "077777777777777",
           "expected": false,
           "description": "starts with 07 but too long"
         },
         {
-          "payload": "0723 4243401",
+          "payload": "0777 7777777",
           "expected": false,
           "description": "starts with 07 but has a space"
         },
         {
-          "payload": "0723 424340",
+          "payload": "0777 777777",
           "expected": false,
           "description": "starts with 07 has a space and is a digit short"
         }
@@ -151,12 +151,12 @@
           "description": "must not be blank"
         },
         {
-          "payload": "PL21 0AQ",
+          "payload": "PL0 0AQ",
           "expected": true,
           "description": "valid post code"
         },
         {
-          "payload": "PL21 0CC",
+          "payload": "PL0 0CC",
           "expected": false,
           "description": "invalid end characters"
         },
@@ -166,17 +166,17 @@
           "description": "invalid start of code"
         },
         {
-          "payload": "PL21 0KK",
+          "payload": "PL0 0KK",
           "expected": false,
           "description": "invalid end characters"
         },
         {
-          "payload": "PL210AQ",
+          "payload": "PL00AQ",
           "expected": false,
           "description": "must have a space"
         },
         {
-          "payload": "PL21 ABC",
+          "payload": "PL0 ABC",
           "expected": false,
           "description": "Second part must start with a number"
         }
@@ -314,7 +314,7 @@
 	  {
 	      "description": "Special Chars",
 	      "expected": true,
-	      "payload": "Chalon-Sur-Saône, Westward Ho!, Devon"
+	      "payload": "Chalon-Sur-Saône, Westward to the Hoe!, Devon"
 	  }
       ]
   },
@@ -322,7 +322,7 @@
     {
       "payload": {
         "title_number": "DT567568",
-        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "md_ref": "e-MD12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -331,27 +331,27 @@
             "middle_name": "Elizabeth",
             "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           },
           {
             "forename": "Paul",
             "middle_name": "Frank",
             "surname": "Smythe",
             "gender": "Not Specified",
-            "address": "1 The High Street Highley PL6 7TG",
-            "dob": "21/08/2015",
-            "phone_number": "07507154057"
+            "address": "0 The Test Street PL0 0TG",
+            "dob": "02/02/1922",
+            "phone_number": "07777777778"
           },
           {
             "forename": "Paul",
             "middle_name": "Frank",
             "surname": "Smythe",
             "gender": "Male",
-            "address": "1 The High Street Highley PL6 7TG",
-            "dob": "21/08/2015",
-            "phone_number": "07507154078"
+            "address": "1 The High Street PL0 0TG",
+            "dob": "21/08/1922",
+            "phone_number": "07777777779"
           }
         ]
       },
@@ -361,7 +361,7 @@
     {
       "payload": {
         "title_number": "DT567568",
-        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "md_ref": "e-MD12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -370,27 +370,27 @@
             "middle_name": "Elizabeth",
             "surname": "Smy the",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           },
           {
             "forename": "Paul",
             "middle_name": "Frank",
             "surname": "Smythe",
             "gender": "Not Specified",
-            "address": "1 The High Street Highley PL6 7TG",
-            "dob": "21/08/2015",
-            "phone_number": "07507154057"
+            "address": "0 The Test Street PL0 0TG",
+            "dob": "02/02/1922",
+            "phone_number": "07777777778"
           },
           {
             "forename": "Paul",
             "middle_name": "Frank",
             "surname": "Smythe",
             "gender": "Male",
-            "address": "1 The High Street Highley PL6 7TG",
-            "dob": "21/08/2015",
-            "phone_number": "07507154078"
+            "address": "0 The Test Street PL0 0TG",
+            "dob": "02/02/1922",
+            "phone_number": "07777777779"
           }
         ]
       },
@@ -400,7 +400,7 @@
     {
       "payload": {
         "title_number": "DT567568",
-        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "md_ref": "e-MD12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -409,27 +409,27 @@
             "middle_name": "Elizabeth",
             "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           },
           {
             "forename": "Paul",
             "middle_name": "Frank",
             "surname": "Smy the",
             "gender": "Not Specified",
-            "address": "1 The High Street Highley PL6 7TG",
-            "dob": "21/08/2015",
-            "phone_number": "07507154057"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777778"
           },
           {
             "forename": "Paul",
             "middle_name": "Frank",
             "surname": "Smyt he",
             "gender": "Male",
-            "address": "1 The High Street Highley PL6 7TG",
-            "dob": "21/08/2015",
-            "phone_number": "07507154078"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777779"
           }
         ]
       },
@@ -439,7 +439,7 @@
     {
       "payload": {
         "title_number": "DT567568",
-        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "md_ref": "e-MD12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -448,26 +448,26 @@
             "middle_name": "Elizabeth",
             "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           },
           {
             "forename": "Paul",
             "middle_name": "Frank",
             "surname": "Smythe",
             "gender": "Not Specified",
-            "address": "1 The High Street Highley PL6 7TG",
-            "dob": "21/08/2015",
-            "phone_number": "07507154057"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777778"
           },
           {
             "forename": "Paul",
             "surname": "Smythe",
             "gender": "Male",
-            "address": "1 The High Street Highley PL6 7TG",
-            "dob": "21/08/2015",
-            "phone_number": "07507154078"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777779"
           }
         ]
       },
@@ -477,34 +477,33 @@
     {
       "payload": {
         "title_number": "DT567568",
-        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "md_ref": "e-MD12345",
         "identity_checked": "Y",
         "borrowers": [
           {
             "forename": "Amanda",
             "middle_name": "Elizabeth",
-            "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           },
           {
             "forename": "Paul",
             "middle_name": "Frank",
+            "surname": "Smythe",
             "gender": "Not Specified",
-            "address": "1 The High Street Highley PL6 7TG",
-            "dob": "21/08/2015",
-            "phone_number": "07507154057"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777778"
           },
           {
             "forename": "Paul",
-            "middle_name": "Frank",
             "gender": "Male",
-            "address": "1 The High Street Highley PL6 7TG",
-            "dob": "21/08/2015",
-            "phone_number": "07507154078"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777779"
           }
         ]
       },
@@ -514,7 +513,7 @@
     {
       "payload": {
         "title_number": "DT567568",
-        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "md_ref": "e-MD12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -523,26 +522,25 @@
             "middle_name": "Elizabeth",
             "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           },
           {
             "forename": "Paul",
             "middle_name": "Frank",
             "gender": "Not Specified",
-            "address": "1 The High Street Highley PL6 7TG",
-            "dob": "21/08/2015",
-            "phone_number": "07507154057"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777778"
           },
           {
             "forename": "Paul",
-            "middle_name": "Frank",
-            "gender": "Male",
             "surname": "",
-            "address": "1 The High Street Highley PL6 7TG",
-            "dob": "21/08/2015",
-            "phone_number": "07507154078"
+            "gender": "Male",
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777779"
           }
         ]
       },
@@ -553,34 +551,33 @@
       "payload": {
         "md_ref": "e-MD12345",
         "identity_checked": "Y",
-        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "borrowers": [
           {
             "forename": "Amanda",
             "middle_name": "Elizabeth",
             "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           },
           {
             "forename": "Paul",
             "middle_name": "Frank",
             "surname": "Smythe",
             "gender": "Not Specified",
-            "address": "1 The High Street Highley PL6 7TG",
-            "dob": "21/08/2015",
-            "phone_number": "07507154057"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777778"
           },
           {
             "forename": "Paul",
-            "middle_name": "Frank",
             "surname": "Smythe",
             "gender": "Male",
-            "address": "1 The High Street Highley PL6 7TG",
-            "dob": "21/08/2015",
-            "phone_number": "07507154078"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777779"
           }
         ]
       },
@@ -590,7 +587,7 @@
     {
       "payload": {
         "md_ref": "e-MD12345",
-        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "title_number": "DN12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -599,9 +596,9 @@
             "middle_name": "Elizabeth",
             "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           }
         ]
       },
@@ -612,16 +609,16 @@
       "payload": {
         "title_number": "DN12345",
         "identity_checked": "Y",
-        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "borrowers": [
           {
             "forename": "Amanda",
             "middle_name": "Elizabeth",
             "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           }
         ]
       },
@@ -633,17 +630,17 @@
         "md_ref": "e-MD12345",
         "title_number": "DN12345",
         "identity_checked": "Y",
-        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "borrowers": [
           {
             "forename": "Amanda",
             "middle_name": "Elizabeth",
             "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077",
-            "extra": "some extra data"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777",
+            "extra": "something extra"
           }
         ]
       },
@@ -655,7 +652,7 @@
         "md_ref": "e-MD12345",
         "title_number": "DN12345",
         "identity_checked": "Y",
-        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "extra2": "some extra property data",
         "borrowers": [
           {
@@ -663,9 +660,9 @@
             "middle_name": "Elizabeth",
             "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           }
         ]
       },
@@ -675,7 +672,7 @@
     {
       "payload": {
         "md_ref": "e-MD12345",
-        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "title_number": "DN12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -684,9 +681,9 @@
             "middle_name": "",
             "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           }
         ]
       },
@@ -704,9 +701,9 @@
             "forename": "Amanda",
             "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           }
         ]
       },
@@ -716,7 +713,7 @@
     {
       "payload": {
         "md_ref": "e-MD12345",
-        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "reference":21,
         "title_number": "DN12345",
         "identity_checked": "Y",
@@ -725,9 +722,9 @@
             "forename": "Amanda",
             "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           }
         ]
       },
@@ -737,7 +734,7 @@
     {
       "payload": {
         "md_ref": "e-MD12345",
-        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "reference": "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz",
         "title_number": "DN12345",
         "identity_checked": "Y",
@@ -746,9 +743,9 @@
             "forename": "Amanda",
             "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           }
         ]
       },
@@ -758,7 +755,7 @@
     {
       "payload": {
         "md_ref": "e-MD12345",
-        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "reference": "test reference",
         "title_number": "DN12345",
         "identity_checked": "Y",
@@ -767,9 +764,9 @@
             "forename": "Amanda",
             "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           }
         ]
       },
@@ -779,7 +776,7 @@
     {
       "payload": {
         "md_ref": "e-MD12345",
-        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "reference": "  ",
         "title_number": "DN12345",
         "identity_checked": "Y",
@@ -788,9 +785,9 @@
             "forename": "Amanda",
             "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           }
         ]
       },
@@ -800,7 +797,7 @@
     {
       "payload": {
         "md_ref": "e-MD1291A",
-        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "date_of_mortgage_offer": 123,
         "miscellaneous_information": false,
         "title_number": "DN12345",
@@ -810,9 +807,9 @@
             "forename": "Amanda",
             "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           }
         ]
       },
@@ -822,7 +819,7 @@
     {
       "payload": {
         "md_ref": "e-MD1291A",
-        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "date_of_mortgage_offer": "Making sure that if this sentence is over 50 characters long, that it fails",
         "miscellaneous_information": "Making sure that if this sentence is over 250 characters long, that it fails. Making sure that if this sentence is over 250 characters long, that it fails. Making sure that if this sentence is over 250 characters long, that it fails. Making sure that if this sentence is over 250 characters long, that it fails. ",
         "title_number": "DN12345",
@@ -832,9 +829,9 @@
             "forename": "Amanda",
             "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           }
         ]
       },
@@ -844,7 +841,7 @@
     {
       "payload": {
         "md_ref": "e-MD1291A",
-        "property_address": "5 The Drive, This Town, This County, PL4 4TH",
+        "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "date_of_mortgage_offer": "a date string",
         "miscellaneous_information": "A Conveyancer",
         "title_number": "DN12345",
@@ -854,9 +851,9 @@
             "forename": "Amanda",
             "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           }
         ]
       },
@@ -876,9 +873,9 @@
             "forename": "Amanda",
             "surname": "Smythe",
             "gender": "Female",
-            "address": "1 The High Street Highley CR0 9YH",
-            "dob": "21/09/1976",
-            "phone_number": "07507154077"
+            "address": "0 The Test Street CR0 0YH",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
           }
         ]
       },

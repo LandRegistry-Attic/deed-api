@@ -1,6 +1,7 @@
 import PyPDF2
 import copy
 import io
+import os
 import json
 import requests
 import unittest
@@ -16,34 +17,34 @@ from integration_tests.helper import setUpApp, setUp_MortgageDocuments
 class TestDeedRoutes(unittest.TestCase):
     webseal_headers = {
         "Content-Type": "application/json",
-        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Devices,O=1359.2.1,C=gb"
+        os.getenv("WEBSEAL_HEADER_KEY"): os.getenv('WEBSEAL_HEADER_VALUE')
     }
 
     webseal_headers_2 = {
         "Content-Type": "application/json",
-        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Test,O=1360,C=gb"
+        os.getenv("WEBSEAL_HEADER_KEY"): os.getenv("WEBSEAL_HEADER_INT_TEST_2")
     }
 
     webseal_test_headers3 = {
         "Content-Type": "application/json",
-        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20TestD,O=1362.5.1,C=gb"
+        os.getenv("WEBSEAL_HEADER_KEY"): os.getenv("WEBSEAL_HEADER_INT_TEST_3")
     }
 
     webseal_headers_internal = {
         "Content-Type": "application/json",
-        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Test2,O=*,C=gb"
+        os.getenv("WEBSEAL_HEADER_KEY"): os.getenv("WEBSEAL_HEADER_INT_INTERNAL")
     }
 
     webseal_headers_for_pdf = {
         "Content-Type": "application/json",
         "Accept": "application/pdf",
-        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Devices,O=1359.2.1,C=gb"
+        os.getenv("WEBSEAL_HEADER_KEY"): os.getenv('WEBSEAL_HEADER_VALUE')
     }
 
     webseal_test_organisation_name = {
         "Content-Type": "application/json",
         "Accept": "application/pdf",
-        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Test%20Organisation,O=1000.1.2,C=gb"
+        os.getenv("WEBSEAL_HEADER_KEY"): os.getenv("WEBSEAL_HEADER_INT_ORGANISATION")
     }
 
     def setUp(self):
@@ -237,7 +238,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         response = requests.post(config.DEED_API_BASE_HOST + '/borrower/validate',
                                  data=json.dumps({"borrower_token": borrower["deed"]["borrowers"][0]["token"],
-                                                  "dob": "23/01/1986"}),
+                                                  "dob": "02/02/1922"}),
                                  headers=self.webseal_headers)
 
         self.assertEqual(response.status_code, 200)
@@ -245,7 +246,7 @@ class TestDeedRoutes(unittest.TestCase):
     def test_validate_borrower_not_found(self):
         response = requests.post(config.DEED_API_BASE_HOST + '/borrower/validate',
                                  data=json.dumps({"borrower_token": "unknown",
-                                                  "dob": "23/01/1986"}),
+                                                  "dob": "02/02/1922"}),
                                  headers=self.webseal_headers)
         self.assertEqual(response.status_code, 404)
 
@@ -311,7 +312,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         deed_model = Deed()
 
-        result = deed_model._get_deed_internal(response_json["path"].replace("/deed/", ""), "*")
+        result = deed_model._get_deed_internal(response_json["path"].replace("/deed/", ""), os.getenv('LR_ORGANISATION_ID'))
 
         self.assertIsNotNone(result.deed_xml)
 
@@ -446,7 +447,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         self.assertEqual(get_modified_deed.status_code, 200)
         modified_deed = get_modified_deed.json()
-        self.assertEqual(modified_deed["deed"]["property_address"], "6 The Drive, This Town, This County, PL4 4TH")
+        self.assertEqual(modified_deed["deed"]["property_address"], "0 The Drive, This Town, This County, PL0 0TH")
 
     def test_accept_naa(self):
         res = requests.post(config.DEED_API_BASE_HOST + '/naa/accept/1',

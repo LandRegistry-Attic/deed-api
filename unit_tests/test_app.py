@@ -1,5 +1,6 @@
 import PyPDF2
 import io
+import os
 import json
 import mock
 import requests  # NOQA
@@ -36,11 +37,11 @@ class TestRoutesBase(unittest.TestCase):
     }
     webseal_headers = {
         "Content-Type": "application/json",
-        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=Land%20Registry%20Devices,O=1359.2.1,C=gb"
+        os.getenv("WEBSEAL_HEADER_KEY"): os.getenv('WEBSEAL_HEADER_VALUE')
     }
     dodgy_webseal_headers1 = {
         "Content-Type": "application/json",
-        "Iv-User-L": "incorrect data"
+        os.getenv('WEBSEAL_HEADER_KEY'): "incorrect data"
     }
 
     def setUp(self):
@@ -84,7 +85,7 @@ class TestRoutes(TestRoutesBase):
 
     def test_effective_date_in_xml(self):
         mock_deed = DeedModelMock()
-        effective_date = '1900-01-01 00:00:00'
+        effective_date = '1922-02-02 00:00:00'
 
         result = add_effective_date_to_xml(mock_deed.deed_xml, effective_date)
 
@@ -297,8 +298,8 @@ class TestRoutes(TestRoutesBase):
         class ReturnedBorrower:
             id = 000000
             deed_token = "aaaaaa"
-            dob = "23/01/1986"
-            phonenumber = "07502154999"
+            dob = "02/02/1922"
+            phonenumber = "07777777777"
 
         mock_borrower.return_value = ReturnedBorrower()
         payload = json.dumps(DeedHelper._validate_borrower)
@@ -312,8 +313,8 @@ class TestRoutes(TestRoutesBase):
         class ReturnedBorrower:
             id = 0000000
             deed_token = "aaaaaa"
-            dob = "01/01/1986"
-            phonenumber = "07502154999"
+            dob = "02/02/1922"
+            phonenumber = "07777777777"
 
         mock_borrower.return_value = ReturnedBorrower()
         payload = json.dumps(DeedHelper._validate_borrower_dob)
@@ -329,8 +330,8 @@ class TestRoutes(TestRoutesBase):
             id = 0000000
             token = "aaaaaa"
             deed_token = "aaaaaa"
-            dob = "23/01/1986"
-            phonenumber = "07502154999"
+            dob = "02/02/1922"
+            phonenumber = "07777777777"
 
         mock_borrower.return_value = ReturnedBorrower()
         response = self.app.get(self.BORROWER_ENDPOINT + "verify/pid/1234")
@@ -426,7 +427,7 @@ class TestRoutes(TestRoutesBase):
             "id": "2b9115b2-d956-11e5-942f-08002719cd16"
         }
 
-        check_result = Akuma.do_check(DeedHelper._json_doc, "create deed", "Land Registry Devices", "gb",
+        check_result = Akuma.do_check(DeedHelper._json_doc, "create deed", "Test Organisation", "gb",
                                       "bb34300c-ba9b-4d86-b28f-ab793e0d45fa")
 
         self.assertEqual(check_result["result"], "A")
@@ -462,10 +463,10 @@ class TestRoutes(TestRoutesBase):
 
         class ReturnedBorrower(Borrower):
             deed_token = "aaaaaa"
-            dob = "01/01/1986"
+            dob = "02/02/1922"
             forename = "Jack"
             middlename = "John"
-            surname = "Jones"
+            surname = "Duck"
 
         mock_borrower.return_value = ReturnedBorrower()
         mock_borrower_save.return_value = "OK"
@@ -476,7 +477,7 @@ class TestRoutes(TestRoutesBase):
                                  data=payload,
                                  headers=self.webseal_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        mock_issue.assert_called_with('Jack John', 'Jones', None, None)
+        mock_issue.assert_called_with('Jack John', 'Duck', None, None)
 
     @mock.patch('application.borrower.model.Borrower.get_by_token')
     @mock.patch('application.service_clients.esec.interface.EsecClientInterface.reissue_sms')
@@ -488,9 +489,9 @@ class TestRoutes(TestRoutesBase):
 
         class ReturnedBorrower(Borrower):
             deed_token = "aaaaaa"
-            dob = "01/01/1986"
+            dob = "02/02/1922"
             forename = "Jack"
-            surname = "Jones"
+            surname = "Duck"
             esec_user_name = "DM123"
 
         mock_borrower.return_value = ReturnedBorrower()
@@ -521,10 +522,10 @@ class TestRoutes(TestRoutesBase):
 
         class ReturnedBorrower(Borrower):
             deed_token = "aaaaaa"
-            dob = "01/01/1986"
+            dob = "02/02/1922"
             forename = "Jack"
             middlename = "John"
-            surname = "Jones"
+            surname = "Duck"
             esec_user_name = "DM123"
 
         mock_borrower.return_value = ReturnedBorrower()
@@ -907,7 +908,7 @@ class TestUpdateDeed(TestRoutesBase):
 
         self.assertEqual(organisation_name, "Test Organisation")
 
-        mock_organisation_name.return_value = "Land Registry Devices"
-        organisation_name = get_organisation_name("1000.1.2", "Land Registry [22022] Devices")
+        mock_organisation_name.return_value = "Test Organisation"
+        organisation_name = get_organisation_name("1000.1.2", "Test [22022] Organisation")
 
-        self.assertEqual(organisation_name, "Land Registry Devices")
+        self.assertEqual(organisation_name, "Test Organisation")

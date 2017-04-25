@@ -1,6 +1,7 @@
 import logging
 import copy
 import uuid
+import os
 from datetime import datetime
 from builtins import FileNotFoundError
 
@@ -60,10 +61,11 @@ class Deed(db.Model):
         return deeds_with_status
 
     def get_deeds_by_status(self, status):
-        return Deed.query.filter(Deed.status.like(status), Deed.organisation_name != 'Land Registry Devices', Deed.organisation_name.isnot(None)).count()
+        return Deed.query.filter(Deed.status.like(status), Deed.organisation_name != os.getenv('LR_ORGANISATION_NAME'),
+                                 Deed.organisation_name.isnot(None)).count()
 
     def _get_deed_internal(self, deed_reference, organisation_id):
-        if organisation_id != '*':
+        if organisation_id != os.getenv('LR_ORGANISATION_ID'):
             LOGGER.debug("Internal request to view deed reference %s" % deed_reference)
             result = Deed.query.filter_by(token=str(deed_reference), organisation_id=organisation_id).first()
         else:
@@ -73,14 +75,14 @@ class Deed(db.Model):
 
     def get_deed(self, deed_reference):
         conveyancer_credentials = process_organisation_credentials()
-        organisation_id = conveyancer_credentials["O"][1]
+        organisation_id = conveyancer_credentials[os.getenv('DEED_CONVEYANCER_KEY')][1]
 
         return self._get_deed_internal(deed_reference, organisation_id)
 
     @staticmethod
     def get_signed_deeds():
         conveyancer_credentials = process_organisation_credentials()
-        organisation_name = conveyancer_credentials["O"][0]
+        organisation_name = conveyancer_credentials[os.getenv('DEED_CONVEYANCER_KEY')][0]
 
         result = Deed.query.filter_by(organisation_name=organisation_name, status=DeedStatus.all_signed.value).all()
 

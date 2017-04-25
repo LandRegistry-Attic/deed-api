@@ -38,7 +38,7 @@ class TestDeed(unittest.TestCase):
     def test_deed_pdf_adapter(self, mock_get_deed):
         deed = Deed()
         deed.deed = {"effective_date": "2016-07-05 12:00:05",
-                     "property_address": "5 The Drive, This Town, This County, PL4 4TH"}
+                     "property_address": "0 The Drive, This Town, This County, PL0 0TH"}
         deed.token = 'token'
         deed.status = 'status'
         mock_get_deed.return_value = deed
@@ -46,4 +46,4 @@ class TestDeed(unittest.TestCase):
         self.assertEqual(deed.token, result['token'])
         self.assertEqual(deed.status, result['status'])
         self.assertEqual('05/07/2016', result['effective_date'])
-        self.assertEqual(['5 The Drive', 'This Town', 'This County', 'PL4 4TH'], result['property_address'])
+        self.assertEqual(['0 The Drive', 'This Town', 'This County', 'PL0 0TH'], result['property_address'])

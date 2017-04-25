@@ -1,6 +1,7 @@
 import unittest
 import requests
 import json
+import os
 
 from application import config
 from integration_tests.helper import setUpApp
@@ -10,7 +11,7 @@ from integration_tests.deed.deed_data import valid_deed, valid_deed_two_borrower
 class TestAppRoutes(unittest.TestCase):
     webseal_headers = {
         "Content-Type": "application/json",
-        "Iv-User-L": "CN=DigitalMortgage%20DigitalMortgage,OU=devices,O=testusers,O=1359.2.1,C=gb"
+        os.getenv("WEBSEAL_HEADER_KEY"): os.getenv("WEBSEAL_HEADER_INT_TEST_4")
     }
 
     def setUp(self):

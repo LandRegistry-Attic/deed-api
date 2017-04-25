@@ -11,24 +11,24 @@ PAYLOAD = {
     "md_ref": "e-MD12344",
     "borrowers": [
         {
-            "forename": "Simon",
-            "surname": "Tsang",
+            "forename": "Jake",
+            "surname": "Bullet",
             "gender": "Male",
-            "address": "2 The Street, Plymouth, PL1 2PP",
-            "dob": "01/10/1976",
-            "phone_number": "07900804888"
+            "address": "0 The Street, Plymouth, PL0 0PP",
+            "dob": "02/02/1922",
+            "phone_number": "07777777777"
         }, {
-            "forename": "Eddie",
-            "middle_name": "David",
-            "surname": "Davies",
+            "forename": "Jill",
+            "middle_name": "Beatrix",
+            "surname": "Bullet",
             "gender": "Female",
-            "address": "2 The Street, Plymouth, PL1 2PP",
-            "dob": "01/12/1982",
-            "phone_number": "07747742010"
+            "address": "0 The Street, Plymouth, PL0 0PP",
+            "dob": "02/02/1922",
+            "phone_number": "07777777778"
         }
     ],
     "identity_checked": "Y",
-    "property_address": "5 The Drive, This Town, This County, PL4 4TH"
+    "property_address": "0 The Drive, This Town, This County, PL0 0TH"
 }
 
 
@@ -36,11 +36,11 @@ class TestValidateBorrowers(unittest.TestCase):
 
     def test_unpack_borrowers(self):
         ret_val = _unpack_borrowers(PAYLOAD)
-        self.assertEqual(ret_val, ["Simon Tsang", "Eddie David Davies"])
+        self.assertEqual(ret_val, ["Jake Bullet", "Jill Beatrix Bullet"])
 
     @mock.patch('application.register_adapter.service.RegisterAdapter.get_proprietor_names')
     def test_compare_borrower_good(self, mock_register_adapter):
-        mock_register_adapter.return_value = ["Simon Tsang", "Eddie David Davies"]
+        mock_register_adapter.return_value = ["Jake Bullet", "Jill Beatrix Bullet"]
         compare_borrower_names(PAYLOAD)
 
     @mock.patch('application.register_adapter.service.RegisterAdapter.get_proprietor_names')
@@ -50,12 +50,12 @@ class TestValidateBorrowers(unittest.TestCase):
 
     @mock.patch('application.register_adapter.service.RegisterAdapter.get_proprietor_names')
     def test_borrowers_present_good(self, mock_register_adapter):
-        mock_register_adapter.return_value = ["Simon Tsang", "Eddie David Davies"]
+        mock_register_adapter.return_value = ["Jake Bullet", "Jill Beatrix Bullet"]
         all_borrower_names_present(PAYLOAD)
 
     @mock.patch('application.register_adapter.service.RegisterAdapter.get_proprietor_names')
     def test_borrowers_present_bad(self, mock_register_adapter):
-        mock_register_adapter.return_value = ["Simon Tsang", "Eddie David Davies", "Another Name"]
+        mock_register_adapter.return_value = ["Jake Bullet", "Jill Beatrix Bullet", "Another Name"]
         self.assertRaises(BorrowerNamesMissingException, all_borrower_names_present, PAYLOAD)
 
 

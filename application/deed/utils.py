@@ -256,14 +256,14 @@ def convert_json_to_xml(deed_json):
 
 
 def is_internal():
-    return True if "X-Land-Registry" in request.headers else False
+    return True if os.getenv('LR_HEADER_INTERNAL_ORG') in request.headers else False
 
 
 def process_organisation_credentials():
     header_dict = {}
 
     try:
-        header_data = request.headers.get("Iv-User-L")
+        header_data = request.headers.get(os.getenv('WEBSEAL_HEADER_KEY'))
 
         for param in header_data.split(','):
             key, value = param.split('=')

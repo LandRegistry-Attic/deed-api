@@ -19,7 +19,7 @@ class TestPropertyAddress(unittest.TestCase):
 
     def test_special_chars(self):
         address = re.match(self.pattern,
-                           'Chalon-Sur-Saône, Westward Ho!, Devon')
+                           'Chalon-Sur-Saône, Westward towards the Hoe!, Devon')
         self.assertTrue(address)
 
     def test_empty_string(self):
