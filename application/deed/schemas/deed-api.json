@@ -180,6 +180,12 @@
                             "$ref": "#/definitions/Operative_Deed"
                         }
                     },
+                    "400": {
+                        "description": "One or more errors have been detected. A list of which should accompany this response.\n This is most likely to occur if the deed has already been made effective, or if not all borrowers have signed the deed.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
                     "404": {
                         "description": "Deed not found",
                         "schema": {
