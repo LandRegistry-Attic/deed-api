@@ -164,6 +164,8 @@ def update_deed(deed, deed_json):
 
     assign_deed(deed, json_doc)
 
+    deed.payload_json = json_doc
+
     deed.save()
 
     delete_orphaned_borrowers(deed)
