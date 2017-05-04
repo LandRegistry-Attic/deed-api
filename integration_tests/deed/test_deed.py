@@ -13,8 +13,8 @@ from lxml import etree
 from application import config
 from integration_tests.helper import setUpApp, setUp_MortgageDocuments
 
-import sqlalchemy
 import datetime
+
 
 class TestDeedRoutes(unittest.TestCase):
     webseal_headers = {
@@ -498,12 +498,10 @@ class TestDeedRoutes(unittest.TestCase):
                 config.ORGANISATION_API_BASE_HOST + '/organisation-name/1000.1.2')
 
             self.assertEqual(delete_organisation_name.status_code, 200)
-        
+
     def test_additional_columns(self):
 
-        our_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
-                                    data=json.dumps(valid_deed),
-                                    headers=self.webseal_headers)
+        our_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/', data=json.dumps(valid_deed), headers=self.webseal_headers)
 
         response_json = our_deed.json()
 
