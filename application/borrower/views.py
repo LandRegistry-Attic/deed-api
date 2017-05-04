@@ -1,9 +1,10 @@
-from application.borrower.model import Borrower, VerifyMatch
-from flask import Blueprint, request
-from flask.ext.api import status
 import json
 import logging
 from datetime import datetime
+from flask import Blueprint, request, jsonify
+from flask.ext.api import status
+
+from application.borrower.model import Borrower, VerifyMatch
 
 LOGGER = logging.getLogger(__name__)
 
@@ -51,21 +52,17 @@ def get_borrower_details_by_verify_pid(verify_pid):
 
 @borrower_bp.route('/verify-match/delete/<verify_pid>', methods=['DELETE'])
 def delete_verify_match(verify_pid):
-    LOGGER.info("Removing Verify Match entry - PID = " + verify_pid)
-    match = None
     verify_match_model = VerifyMatch()
 
-    try:
-        LOGGER.info("In Try")
-        match = verify_match_model.remove_verify_match(verify_pid)
-    except Exception as inst:
-        LOGGER.info("DB exception when removing verify-match")
-        LOGGER.error(str(type(inst)) + ":" + str(inst))
+    LOGGER.info("trying to remove verify match entry - PID = %s" % verify_pid)
 
-    if match is None:
-        LOGGER.error("no match found on verify-matcher: continue as normal")
-
-    return status.HTTP_200_OK
+    if verify_match_model.remove_verify_match(verify_pid):
+        match_msg = "match found for PID %s: row removed" % verify_pid
+        return jsonify({'result': match_msg}), status.HTTP_200_OK
+    else:
+        no_match_msg = "no match found for PID %s: nothing removed" % verify_pid
+        LOGGER.error(no_match_msg)
+        return jsonify({'result': no_match_msg}), status.HTTP_200_OK
 
 
 def strip_number_to_four_digits(phone_number):
