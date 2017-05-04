@@ -13,6 +13,7 @@ from lxml import etree
 from application import config
 from integration_tests.helper import setUpApp, setUp_MortgageDocuments
 
+import sqlalchemy
 
 class TestDeedRoutes(unittest.TestCase):
     webseal_headers = {
@@ -496,3 +497,28 @@ class TestDeedRoutes(unittest.TestCase):
                 config.ORGANISATION_API_BASE_HOST + '/organisation-name/1000.1.2')
 
             self.assertEqual(delete_organisation_name.status_code, 200)
+        
+    def test_additional_columns(self):
+
+        self.deed_create_and_get(valid_deed)
+
+        engine = sqlalchemy.create_engine('postgres://root:superroot@postgres/deed_api')
+        sql_connection = engine.connect()
+
+        metadata = sqlalchemy.MetaData(sql_connection)
+
+        deed = sqlalchemy.Table('deed', metadata, autoload=True)
+
+        query_string = sqlalchemy.select([deed.c.created_date])
+        result = sql_connection.execute(query_string)
+
+        import datetime
+        for row in result:
+            self.assertIsInstance(row.created_date, datetime.datetime)
+
+        query_string = sqlalchemy.select([deed.c.payload_json])
+        result = sql_connection.execute(query_string)
+        single_row = result.fetchone()
+
+        self.assertEqual(single_row.payload_json, valid_deed)
+

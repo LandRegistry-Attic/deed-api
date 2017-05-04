@@ -164,7 +164,7 @@ def update_deed(deed, deed_json):
 
     assign_deed(deed, json_doc)
 
-    deed.payload_json = json_doc
+    deed.payload_json = deed_json
 
     deed.save()
 
