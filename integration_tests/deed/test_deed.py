@@ -14,6 +14,7 @@ from application import config
 from integration_tests.helper import setUpApp, setUp_MortgageDocuments
 
 import sqlalchemy
+import datetime
 
 class TestDeedRoutes(unittest.TestCase):
     webseal_headers = {
@@ -512,7 +513,6 @@ class TestDeedRoutes(unittest.TestCase):
         query_string = sqlalchemy.select([deed.c.created_date])
         result = sql_connection.execute(query_string)
 
-        import datetime
         for row in result:
             self.assertIsInstance(row.created_date, datetime.datetime)
 
