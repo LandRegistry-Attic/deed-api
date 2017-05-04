@@ -501,24 +501,17 @@ class TestDeedRoutes(unittest.TestCase):
         
     def test_additional_columns(self):
 
-        self.deed_create_and_get(valid_deed)
+        our_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
+                                    data=json.dumps(valid_deed),
+                                    headers=self.webseal_headers)
 
-        engine = sqlalchemy.create_engine('postgres://root:superroot@postgres/deed_api')
-        sql_connection = engine.connect()
+        response_json = our_deed.json()
 
-        metadata = sqlalchemy.MetaData(sql_connection)
+        response_path = response_json['path'].replace('/deed/', '')
 
-        deed = sqlalchemy.Table('deed', metadata, autoload=True)
+        create_deed = Deed()
 
-        query_string = sqlalchemy.select([deed.c.created_date])
-        result = sql_connection.execute(query_string)
+        deed_returned = create_deed._get_deed_internal(response_path, os.getenv('LR_ORGANISATION_ID'))
 
-        for row in result:
-            self.assertIsInstance(row.created_date, datetime.datetime)
-
-        query_string = sqlalchemy.select([deed.c.payload_json])
-        result = sql_connection.execute(query_string)
-        single_row = result.fetchone()
-
-        self.assertEqual(single_row.payload_json, valid_deed)
-
+        self.assertIsInstance(deed_returned.created_date, datetime.datetime)
+        self.assertEqual(deed_returned.payload_json, valid_deed)
