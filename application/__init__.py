@@ -208,13 +208,13 @@ def not_found_exception(e):
     return jsonify({"message": "Deed not found"}), 404
 
 
-@app.errorhandler(Exception)
-def unhandled_exception(e):
-    app.logger.error("Unhandled Exception: %s", (e,), exc_info=True)
-    return jsonify({"message": "Unexpected error."}), 500
-
-
 @app.errorhandler(DatabaseException)
 def database_exception(e):
     app.logger.error("Database Exception: %s", (e,), exc_info=True)
     return jsonify({"message": "Database Error."}), 500
+
+
+@app.errorhandler(Exception)
+def unhandled_exception(e):
+    app.logger.error("Unhandled Exception: %s", (e,), exc_info=True)
+    return jsonify({"message": "Unexpected error."}), 500
