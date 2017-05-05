@@ -23,4 +23,3 @@ class TestVerifyMatchRemoval(unittest.TestCase):
         response = requests.delete(config.DEED_API_BASE_HOST + '/borrower/verify-match/delete/200abc123',
                                    headers=webseal_headers).text
         self.assertEquals(json.loads(response)['result'], 'no match found for PID 200abc123: nothing removed')
-

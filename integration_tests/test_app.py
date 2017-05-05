@@ -1,7 +1,6 @@
 import unittest
 import requests
 import json
-import os
 
 from application import config
 from integration_tests.helper import setUpApp, webseal_headers
