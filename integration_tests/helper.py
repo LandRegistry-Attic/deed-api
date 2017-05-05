@@ -1,11 +1,12 @@
-from functools import wraps
-from application import app
-from application import db
+import os
 from flask.ext.script import Manager
+from functools import wraps
 from migrations.setup_initial_data.data_importer import process_file
 from sqlalchemy import create_engine, MetaData, Table
 
-import os
+from application import app
+from application import db
+from application.borrower.model import Borrower
 
 webseal_headers = {
     "Content-Type": "application/json",
@@ -35,11 +36,35 @@ def setUpDB(self):
         self.db = manager.db
 
 
-def insert_verify_match_row(self):
+def insert_verify_match_row(self, verify_pid, borrower_id):
     with self.app.app_context():
-        db.engine.execute('DELETE FROM verify_match WHERE verify_pid = %s', '200abc123')
+        db.engine.execute('DELETE FROM verify_match WHERE verify_pid = %s', verify_pid)
         db.engine.execute('INSERT INTO verify_match (verify_pid, borrower_id, confidence_level)' +
-                          'VALUES (%s, %s, %s)', '200abc123', '3', 3)
+                          'VALUES (%s, %s, %s)', verify_pid, borrower_id, 3)
+
+
+def insert_borrower_row(self, verify_pid, borrower_id):
+    with self.app.app_context():
+        remove_borrower_row(self, 999)
+        borrower = Borrower()
+        borrower.id = 999
+        borrower.forename = 'some'
+        borrower.middlename = 'nice'
+        borrower.surname = 'guy'
+        borrower.dob = 'a date'
+        borrower.gender = 'a gender'
+        borrower.phonenumber = '07777777777'
+        borrower.address = 'an address'
+        borrower.token = 'a token'
+        borrower.deed_token = 'a deed token'
+        borrower.esec_user_name = 'an esec user name'
+        borrower.save()
+
+
+def remove_borrower_row(self, borrower_id):
+    with self.app.app_context():
+        borrower = Borrower()
+        borrower.delete(999)
 
 
 def setUp_MortgageDocuments(self):
