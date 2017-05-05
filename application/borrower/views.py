@@ -57,12 +57,13 @@ def delete_verify_match(verify_pid):
     LOGGER.info("trying to remove verify match entry - PID = %s" % verify_pid)
 
     if verify_match_model.remove_verify_match(verify_pid):
-        match_msg = "match found for PID %s: row removed" % verify_pid
-        return jsonify({'result': match_msg}), status.HTTP_200_OK
+        match_message = "match found for PID %s: row removed" % verify_pid
+        LOGGER.info(match_message)
     else:
-        no_match_msg = "no match found for PID %s: nothing removed" % verify_pid
-        LOGGER.error(no_match_msg)
-        return jsonify({'result': no_match_msg}), status.HTTP_200_OK
+        match_message = "no match found for PID %s: nothing removed" % verify_pid
+        LOGGER.error(match_message)
+
+    return jsonify({'result': match_message}), status.HTTP_200_OK
 
 
 def strip_number_to_four_digits(phone_number):

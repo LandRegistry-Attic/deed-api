@@ -4,7 +4,13 @@ from application import db
 from flask.ext.script import Manager
 from migrations.setup_initial_data.data_importer import process_file
 from sqlalchemy import create_engine, MetaData, Table
+
 import os
+
+webseal_headers = {
+    "Content-Type": "application/json",
+    os.getenv("WEBSEAL_HEADER_KEY"): os.getenv("WEBSEAL_HEADER_INT_TEST_4")
+}
 
 
 def with_client(test):
@@ -25,6 +31,15 @@ def setUpApp(self):
 def setUpDB(self):
     with self.app.app_context():
         db.create_all()
+        manager = Manager(db)
+        self.db = manager.db
+
+
+def insert_verify_match_row(self):
+    with self.app.app_context():
+        db.engine.execute('DELETE FROM verify_match WHERE verify_pid = %s', '200abc123')
+        db.engine.execute('INSERT INTO verify_match (verify_pid, borrower_id, confidence_level)' +
+                          'VALUES (%s, %s, %s)', '200abc123', '3', 3)
 
 
 def setUp_MortgageDocuments(self):
