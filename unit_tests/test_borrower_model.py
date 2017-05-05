@@ -1,5 +1,5 @@
 import unittest
-from application.borrower.model import Borrower
+from application.borrower.model import Borrower, VerifyMatch
 import mock
 from unit_tests.helper import DeedHelper, borrower_object_helper
 import copy
@@ -47,3 +47,20 @@ class TestBorrowerModel(unittest.TestCase):
         res = borrower.update_borrower_by_id(updated_borrower)
 
         self.assertEqual(res, "Error No Borrower")
+
+
+class TestVerifyModel(unittest.TestCase):
+
+    @mock.patch('application.borrower.model.VerifyMatch.query', autospec=True)
+    def test_remove_verify_match_not_found(self, mock_query):
+        mock_query_response = mock_query.filter_by.return_value
+        mock_query_response.first.return_value = None
+        self.assertEqual(VerifyMatch.remove_verify_match(self, '1'), False)
+
+    @mock.patch('application.borrower.model.VerifyMatch.query', autospec=True)
+    @mock.patch('application.borrower.model.db.session.commit', autospec=True)
+    @mock.patch('application.borrower.model.db.session.delete', autospec=True)
+    def test_remove_verify_match_not_found(self, mock_delete, mock_commit, mock_query):
+        mock_query_response = mock_query.filter_by.return_value
+        mock_query_response.first.return_value = 'a thing'
+        self.assertEqual(VerifyMatch.remove_verify_match(self, '1'), True)

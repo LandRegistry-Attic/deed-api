@@ -1,6 +1,5 @@
 import unittest
 import requests
-import os
 import json
 from application import config
 
