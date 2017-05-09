@@ -111,7 +111,7 @@ class VerifyMatch(db.Model):
     __tablename__ = 'verify_match'
 
     verify_pid = db.Column(db.String, primary_key=True)
-    borrower_id = db.Column(db.Integer, ForeignKey("borrower.id"), primary_key=True)
+    borrower_id = db.Column(db.Integer, primary_key=True)
 
     def remove_verify_match(self, pid_):
         try:
