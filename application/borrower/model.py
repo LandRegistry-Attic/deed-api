@@ -112,6 +112,7 @@ class VerifyMatch(db.Model):
 
     verify_pid = db.Column(db.String, primary_key=True)
     borrower_id = db.Column(db.Integer, primary_key=True)
+    confidence_level = db.Column(db.Integer, nullable=False)
 
     def remove_verify_match(self, pid_):
         try:
