@@ -1,7 +1,7 @@
-from sqlalchemy import ForeignKey, not_, func
-from application import db
 import uuid
+from sqlalchemy import ForeignKey, not_, func
 
+from application import db
 
 charset = list("0123456789ABCDEFGHJKLMNPQRSTUVXY")
 
@@ -114,9 +114,8 @@ class VerifyMatch(db.Model):
     borrower_id = db.Column(db.Integer, ForeignKey("borrower.id"), primary_key=True)
 
     def remove_verify_match(self, pid_):
-        match = VerifyMatch.query.filter_by(verify_pid=pid_).first()
-
         try:
+            match = VerifyMatch.query.filter_by(verify_pid=pid_).first()
             if match is None:
                 return False
 
