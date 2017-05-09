@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import ForeignKey, not_, func
+from sqlalchemy import not_, func
 
 from application import db
 
