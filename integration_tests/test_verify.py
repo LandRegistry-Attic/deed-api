@@ -25,5 +25,5 @@ class TestVerifyMatchRemoval(unittest.TestCase):
                                    headers=webseal_headers).text
         self.assertEquals(json.loads(response)['result'], 'no match found for PID verify_pid: nothing removed')
 
-    def tearDownDB(self):
-        remove_borrower_row(999)
+    def tearDown(self):
+        remove_borrower_row(self, 999)
