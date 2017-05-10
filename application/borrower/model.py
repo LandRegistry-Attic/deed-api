@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import not_, func
+from sqlalchemy import not_, func, ForeignKey
 
 from application import db
 
@@ -111,7 +111,7 @@ class VerifyMatch(db.Model):
     __tablename__ = 'verify_match'
 
     verify_pid = db.Column(db.String, primary_key=True)
-    borrower_id = db.Column(db.Integer, primary_key=True)
+    borrower_id = db.Column(db.Integer, ForeignKey("borrower.id"), primary_key=True)
     confidence_level = db.Column(db.Integer, nullable=False)
 
     def remove_verify_match(self, pid_):
