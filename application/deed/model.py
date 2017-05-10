@@ -4,6 +4,7 @@ import uuid
 import os
 from datetime import datetime
 from builtins import FileNotFoundError
+import pytz
 
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.operators import and_
@@ -30,8 +31,6 @@ class Deed(db.Model):
     checksum = db.Column(db.Integer, nullable=True, default=-1)
     organisation_id = db.Column(db.String, nullable=True)
     organisation_name = db.Column(db.String, nullable=True)
-    payload_json = db.Column(JSON)
-    created_date = db.Column(db.DateTime, default=datetime.utcnow(),  nullable=False)
 
     def save(self):  # pragma: no cover
         db.session.add(self)
@@ -140,8 +139,15 @@ def deed_pdf_adapter(deed_reference):
     deed_dict = deed_adapter(deed_reference).deed
     if 'effective_date' in deed_dict:
         temp = datetime.strptime(deed_dict['effective_date'], "%Y-%m-%d %H:%M:%S")
-        deed_dict["effective_date"] = temp.strftime("%d/%m/%Y")
-        deed_dict["effective_time"] = temp.strftime("%H:%M:%S")
+        check_time = check_time_stamp(temp)
+        deed_dict["effective_date"] = check_time.strftime("%d/%m/%Y")
+        deed_dict["effective_time"] = check_time.strftime("%H:%M:%S")
+
     property_address = (deed_dict["property_address"])
     deed_dict["property_address"] = format_address_string(property_address)
     return deed_dict
+
+
+def check_time_stamp(time):
+    time_zone = pytz.timezone('Europe/London')
+    return (pytz.utc.localize(time, is_dst=None).astimezone(time_zone))
