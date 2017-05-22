@@ -3,6 +3,7 @@ import logging
 from application import config
 from flask.ext.api import status
 from flask import abort
+from application.dependencies.rabbitmq import  Emitter, broker_url
 
 LOGGER = logging.getLogger(__name__)
 
@@ -55,8 +56,9 @@ def reissue_sms(esec_user_name):  # pragma: no cover
 
 
 def auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code):  # pragma: no cover
+
     LOGGER.info("Calling dm-esec-client to verify OTP code and sign the deed")
-    request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/auth_sms'
+    # request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/auth_sms'
     element_id = 'deedData'
     borrower_path = "/dm-application/operativeDeed/signatureSlots"
 
@@ -68,14 +70,25 @@ def auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code):  # pragma: no
         'otp-code': borrower_auth_code
     }
 
-    resp = requests.post(request_url, params=parameters, data=deed_xml)
+    LOGGER.info("before sending the message")
 
-    if resp.status_code == status.HTTP_200_OK or resp.status_code == status.HTTP_401_UNAUTHORIZED:
-        LOGGER.info("Response XML = %s" % resp.content)
-        return resp.content, resp.status_code
-    else:
-        LOGGER.error("Esecurity Client Exception when trying to verify OTP code and sign the deed ")
-        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
+    try:
+        LOGGER.info("in the try")
+        url = broker_url('rabbitmq', 'guest', 'guest', 5672)
+        with Emitter(url, config.EXCHANGE_NAME, 'esec-signing-key') as emitter:
+            emitter.send_message({'params': parameters, 'data': str(deed_xml)})
+            LOGGER.info("sent a message")
+    except Exception as e:
+        LOGGER.info('error returned when trying to place on queue: %s' % e)
+
+    # resp = requests.post(request_url, params=parameters, data=deed_xml)
+
+    # if resp.status_code == status.HTTP_200_OK or resp.status_code == status.HTTP_401_UNAUTHORIZED:
+    #     LOGGER.info("Response XML = %s" % resp.content)
+    #     return resp.content, resp.status_code
+    # else:
+    #     LOGGER.error("Esecurity Client Exception when trying to verify OTP code and sign the deed ")
+    #     abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 def _post_request(url, data):
