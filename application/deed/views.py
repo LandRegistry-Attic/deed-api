@@ -278,21 +278,20 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
             if esec_id:
                 esec_client.auth_sms(modify_xml, borrower_pos, esec_id, borrower_code)
                 LOGGER.info("Added deed to esec-signing queue")
-                # LOGGER.info("signed status code: %s", str(status_code))
-                # LOGGER.info("signed XML: %s" % result_xml)
 
+                # TODO Do we need to reinclude this here?
                 # if status_code == 200:
-                # deed.deed_xml = result_xml
+                #     deed.deed_xml = result_xml
 
-                # LOGGER.info("Saving XML to DB")
-                # deed.save()
+                #     LOGGER.info("Saving XML to DB")
+                #     deed.save()
 
-                LOGGER.info("updating JSON with Signature")
-                update_deed_signature_timestamp(deed, borrower_token)
+                # TODO Move this at some stage
+                # LOGGER.info("updating JSON with Signature")
+                # update_deed_signature_timestamp(deed, borrower_token)
 
-                # else:
-                #     LOGGER.error("Failed to sign Mortgage document")
-                #     return "Failed to sign Mortgage document"
+                return "", 200
+
             else:
                 LOGGER.error("Failed to sign Mortgage document - unable to create user")
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -452,11 +451,3 @@ def get_organisation_name(deed_reference):
                                                                      deed_adapter(deed_reference).organisation_name)
 
     return jsonify({'result': organisation_name}), status.HTTP_200_OK
-
-
-# @deed_bp.route('', methods=['POST'])
-# def push_to_exchange():
-#     # Dummy for sending messages from Deed API
-#     url = broker_url('rabbitmq', 'guest', 'guest', 5672)
-#     with Emitter(url, config.EXCHANGE_NAME, 'esec-signing-key') as emitter:
-#         emitter.send_message({'signed': 'no'})
