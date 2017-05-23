@@ -31,6 +31,8 @@ class Deed(db.Model):
     checksum = db.Column(db.Integer, nullable=True, default=-1)
     organisation_id = db.Column(db.String, nullable=True)
     organisation_name = db.Column(db.String, nullable=True)
+    payload_json = db.Column(JSON)
+    created_date = db.Column(db.DateTime, default=datetime.utcnow(),  nullable=False)
 
     def save(self):  # pragma: no cover
         db.session.add(self)
