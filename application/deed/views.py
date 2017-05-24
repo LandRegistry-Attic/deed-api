@@ -276,7 +276,7 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
             esec_id = borrower.esec_user_name
 
             if esec_id:
-                esec_client.auth_sms(modify_xml, borrower_pos, esec_id, borrower_code)
+                esec_client.auth_sms(modify_xml, borrower_pos, esec_id, borrower_code, borrower_token, deed)
                 LOGGER.info("Added deed to esec-signing queue")
 
                 # TODO Do we need to reinclude this here?
@@ -432,6 +432,17 @@ def verify_auth_code(deed_reference):
     else:
         LOGGER.error("Not able to sign the deed")
         return jsonify({"result": False}), status_code
+
+
+@deed_bp.route('/<deed_reference>/update-json-with-signature', methods=['POST'])
+def update_json_with_signature(deed_reference):
+    LOGGER.info(request.form.getlist('deed_json'))
+    data = request.form.to_dict()
+    LOGGER.info(data['borrower_token'])
+    LOGGER.info("updating JSON with Signature")
+    LOGGER.info(data['deed_json'])
+    update_deed_signature_timestamp(data['deed_json'], data['borrower_token'])
+    return "", status.HTTP_200_OK
 
 
 def send_error_list(error_list):

@@ -3,7 +3,7 @@ import logging
 from application import config
 from flask.ext.api import status
 from flask import abort
-from application.dependencies.rabbitmq import  Emitter, broker_url
+from application.dependencies.rabbitmq import Emitter, broker_url
 
 LOGGER = logging.getLogger(__name__)
 
@@ -55,7 +55,7 @@ def reissue_sms(esec_user_name):  # pragma: no cover
         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code):  # pragma: no cover
+def auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code, borrower_token, deed):  # pragma: no cover
 
     LOGGER.info("Calling dm-esec-client to verify OTP code and sign the deed")
     element_id = 'deedData'
@@ -66,7 +66,11 @@ def auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code):  # pragma: no
         'element-id': element_id,
         'borrowers-path': borrower_path,
         'user-id': user_id,
-        'otp-code': borrower_auth_code
+        'otp-code': borrower_auth_code,
+    }
+
+    extra_parameters = {
+        'borrower-token': borrower_token
     }
 
     LOGGER.info("Preparing to send message to the queue...")
@@ -74,7 +78,7 @@ def auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code):  # pragma: no
     try:
         url = broker_url('rabbitmq', 'guest', 'guest', 5672)
         with Emitter(url, config.EXCHANGE_NAME, 'esec-signing-key') as emitter:
-            emitter.send_message({'params': parameters, 'data': str(deed_xml)})
+            emitter.send_message({'params': parameters, 'extra-parameters': extra_parameters, 'data': str(deed_xml), 'deed-json': deed})
             LOGGER.info("Message sent to the queue...")
             return "", 200
     except Exception as e:
