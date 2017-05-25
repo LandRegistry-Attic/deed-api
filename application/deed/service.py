@@ -184,6 +184,7 @@ def update_deed_signature_timestamp(deed, borrower_token):
     modify_deed = copy.deepcopy(deed.deed)
     for borrower in modify_deed['borrowers']:
         if str(borrower['token']).upper() == borrower_token:
+            #TODO UPDATE WITH CORRECT TIME
             borrower['signature'] = datetime.datetime.now().strftime("%d %B %Y %I:%M%p")
 
     deed.deed = modify_deed
