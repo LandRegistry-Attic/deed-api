@@ -4,6 +4,7 @@ from application import config
 from flask.ext.api import status
 from flask import abort
 from application.dependencies.rabbitmq import Emitter, broker_url
+import datetime
 
 LOGGER = logging.getLogger(__name__)
 
@@ -70,7 +71,8 @@ def auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code, borrower_token
     }
 
     extra_parameters = {
-        'borrower-token': borrower_token
+        'borrower-token': borrower_token,
+        'datetime': datetime.datetime.now().strftime("%d %B %Y %I:%M%p")
     }
 
     LOGGER.info("Preparing to send message to the queue...")

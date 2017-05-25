@@ -179,13 +179,13 @@ def get_organisation_name(deed):
                                                         deed.organisation_name)
 
 
-def update_deed_signature_timestamp(deed, borrower_token):
+def update_deed_signature_timestamp(deed, borrower_token, datetime):
 
     modify_deed = copy.deepcopy(deed.deed)
     for borrower in modify_deed['borrowers']:
         if str(borrower['token']).upper() == borrower_token:
             #TODO UPDATE WITH CORRECT TIME
-            borrower['signature'] = datetime.datetime.now().strftime("%d %B %Y %I:%M%p")
+            borrower['signature'] = datetime
 
     deed.deed = modify_deed
 

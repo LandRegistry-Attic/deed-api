@@ -18,6 +18,7 @@ from application.deed.deed_validator import Validation
 from flask import Blueprint
 from flask import request, abort, jsonify, Response
 from flask.ext.api import status
+from struct import *
 
 LOGGER = logging.getLogger(__name__)
 
@@ -425,18 +426,15 @@ def verify_auth_code(deed_reference):
 
 @deed_bp.route('/<deed_reference>/update-json-with-signature', methods=['POST'])
 def update_json_with_signature(deed_reference):
-    LOGGER.info("back in deed-api")
     data = request.form.to_dict()
-    LOGGER.info("got data")
+
     deed = Deed()._get_deed_internal(deed_reference,"*")
 
-    LOGGER.info("GOT THE DEED")
-    deed.deed_xml = str(data["deed_xml"])
-    LOGGER.info("ASSIGNED THE DEED")
-    LOGGER.info(data["deed_xml"])
+    deed.deed_xml = data["deed_xml"].encode('UTF-8')
+
     deed.save()
-    LOGGER.info("SAVED BOOM")
-    update_deed_signature_timestamp(deed, data['borrower_token'])
+
+    update_deed_signature_timestamp(deed, data['borrower_token'], data['datetime'])
     return "", status.HTTP_200_OK
 
 
