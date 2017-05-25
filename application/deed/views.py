@@ -276,19 +276,8 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
             esec_id = borrower.esec_user_name
 
             if esec_id:
-                esec_client.auth_sms(modify_xml, borrower_pos, esec_id, borrower_code, borrower_token, deed)
+                esec_client.auth_sms(modify_xml, borrower_pos, esec_id, borrower_code, borrower_token)
                 LOGGER.info("Added deed to esec-signing queue")
-
-                # TODO Do we need to reinclude this here?
-                # if status_code == 200:
-                #     deed.deed_xml = result_xml
-
-                #     LOGGER.info("Saving XML to DB")
-                #     deed.save()
-
-                # TODO Move this at some stage
-                # LOGGER.info("updating JSON with Signature")
-                # update_deed_signature_timestamp(deed, borrower_token)
 
                 return "", 200
 
@@ -436,11 +425,18 @@ def verify_auth_code(deed_reference):
 
 @deed_bp.route('/<deed_reference>/update-json-with-signature', methods=['POST'])
 def update_json_with_signature(deed_reference):
+    LOGGER.info("back in deed-api")
     data = request.form.to_dict()
-    deed = Deed()
-    existing_deed = deed._get_deed_internal(deed_reference, "*")
+    LOGGER.info("got data")
+    deed = Deed()._get_deed_internal(deed_reference,"*")
 
-    update_deed_signature_timestamp(existing_deed, data['borrower_token'])
+    LOGGER.info("GOT THE DEED")
+    deed.deed_xml = str(data["deed_xml"])
+    LOGGER.info("ASSIGNED THE DEED")
+    LOGGER.info(data["deed_xml"])
+    deed.save()
+    LOGGER.info("SAVED BOOM")
+    update_deed_signature_timestamp(deed, data['borrower_token'])
     return "", status.HTTP_200_OK
 
 
