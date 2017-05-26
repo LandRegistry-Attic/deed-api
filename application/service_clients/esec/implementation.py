@@ -56,7 +56,7 @@ def reissue_sms(esec_user_name):  # pragma: no cover
         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code, borrower_token):  # pragma: no cover
+def auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code, borrower_token, deed_id):  # pragma: no cover
 
     LOGGER.info("Calling dm-esec-client to verify OTP code and sign the deed")
     element_id = 'deedData'
@@ -72,7 +72,8 @@ def auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code, borrower_token
 
     extra_parameters = {
         'borrower-token': borrower_token,
-        'datetime': datetime.datetime.now().strftime("%d %B %Y %I:%M%p")
+        'datetime': datetime.datetime.now().strftime("%d %B %Y %I:%M%p"),
+        'deed_id': deed_id
     }
 
     LOGGER.info("Preparing to send message to the queue...")

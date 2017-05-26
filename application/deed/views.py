@@ -277,7 +277,7 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
             esec_id = borrower.esec_user_name
 
             if esec_id:
-                esec_client.auth_sms(modify_xml, borrower_pos, esec_id, borrower_code, borrower_token)
+                esec_client.auth_sms(modify_xml, borrower_pos, esec_id, borrower_code, borrower_token, deed.token)
                 LOGGER.info("Added deed to esec-signing queue")
 
                 return "", 200
