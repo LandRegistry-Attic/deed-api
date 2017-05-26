@@ -24,9 +24,8 @@ def validate_borrower():
             db_dob = datetime.strptime(borrower.dob, "%d/%m/%Y")
 
             if input_dob == db_dob:
-                stripped_number = strip_number_to_four_digits(borrower.phonenumber)
                 borrower_id = borrower.id
-                return json.dumps({"deed_token": borrower.deed_token, "phone_number": stripped_number, "borrower_id": borrower_id}),\
+                return json.dumps({"deed_token": borrower.deed_token, "phone_number": borrower.phonenumber, "borrower_id": borrower_id}),\
                     status.HTTP_200_OK
 
     return "Matching deed not found", status.HTTP_404_NOT_FOUND
@@ -37,12 +36,11 @@ def get_borrower_details_by_verify_pid(verify_pid):
     borrower = Borrower.get_by_verify_pid(verify_pid)
 
     if borrower is not None:
-        stripped_number = strip_number_to_four_digits(borrower.phonenumber)
         return json.dumps(
             {
                 "borrower_token": borrower.token,
                 "deed_token": borrower.deed_token,
-                "phone_number": stripped_number,
+                "phone_number": borrower.phonenumber,
                 "borrower_id": borrower.id
             }
         ), status.HTTP_200_OK
@@ -64,8 +62,3 @@ def delete_verify_match(verify_pid):
         LOGGER.error(match_message)
 
     return jsonify({'result': match_message}), status.HTTP_200_OK
-
-
-def strip_number_to_four_digits(phone_number):
-    stripped_number = phone_number[-4:]
-    return stripped_number
