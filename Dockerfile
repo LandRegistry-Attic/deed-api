@@ -1,5 +1,5 @@
 # Set the base image to the base image
-FROM lr_base_python_flask
+FROM lr_base_python_flask:1
 
 # ---- Database stuff start
 
@@ -22,6 +22,9 @@ ENV TITLE_ADAPTOR_URI 'http://title-adapter-stub:8080'
 ENV REGISTER_ADAPTER 'http://register-adapter-stub:8080/'
 ENV DEED_API_ADDRESS 'http://0.0.0.0:8080'
 ENV ORGANISATION_API_ADDRESS 'http://organisation-api:8080/'
+
+# For logging
+ENV FLASK_LOG_LEVEL DEBUG
 
 RUN mkdir /logs
 WORKDIR /src

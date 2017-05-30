@@ -12,3 +12,14 @@ services:
     volumes:
       # Our convention is (for python) to always map the app files to /src within the container
       - /vagrant/apps/deed-api:/src
+    # Redirect all the logs to a logstash server. Logstash is set up to parse RFC5424 format messages.
+    logging:
+      driver: syslog
+      options:
+        syslog-format: "rfc5424"
+        syslog-address: "tcp://localhost:25826"
+        tag: "{{.Name}}"
+    # Docker-compose will ensure logstash is started before the application starts.
+    depends_on:
+      - logstash
+
