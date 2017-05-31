@@ -5,6 +5,7 @@ from flask.ext.api import status
 from flask import abort
 from application.dependencies.rabbitmq import Emitter, broker_url
 import datetime
+import base64
 
 LOGGER = logging.getLogger(__name__)
 
@@ -80,8 +81,9 @@ def auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code, borrower_token
 
     try:
         url = broker_url('rabbitmq', 'guest', 'guest', 5672)
+        LOGGER.info(deed_xml)
         with Emitter(url, config.EXCHANGE_NAME, 'esec-signing-key') as emitter:
-            emitter.send_message({'params': parameters, 'extra-parameters': extra_parameters, 'data': str(deed_xml)})
+            emitter.send_message({'params': parameters, 'extra-parameters': extra_parameters, 'data': base64.b64encode(deed_xml).decode()})
             LOGGER.info("Message sent to the queue...")
             return "", 200
     except Exception as e:
