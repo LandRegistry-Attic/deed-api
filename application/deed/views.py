@@ -428,13 +428,16 @@ def verify_auth_code(deed_reference):
 def update_json_with_signature(deed_reference):
     data = request.form.to_dict()
 
-    deed = Deed()._get_deed_internal(deed_reference,"*")
+    deed = Deed()._get_deed_internal(deed_reference, "*")
 
-    deed.deed_xml = data["deed_xml"].encode('UTF-8')
+    deed.deed_xml = data["deed_xml"].encode("utf-8")
+
+    LOGGER.info(deed.deed_xml)
 
     deed.save()
 
     update_deed_signature_timestamp(deed, data['borrower_token'], data['datetime'])
+
     return "", status.HTTP_200_OK
 
 
