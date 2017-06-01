@@ -69,25 +69,39 @@ def auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code, borrower_token
         'borrowers-path': borrower_path,
         'user-id': user_id,
         'otp-code': borrower_auth_code,
+        'service-id': 1,
     }
 
     extra_parameters = {
         'borrower-token': borrower_token,
         'datetime': datetime.datetime.now().strftime("%d %B %Y %I:%M%p"),
-        'deed_id': deed_id
+        'deed-id': deed_id
     }
 
-    LOGGER.info("Preparing to send message to the queue...")
+    LOGGER.info("Calling esec_client to hit validateSMSOTP...")
 
-    try:
-        url = broker_url('rabbitmq', 'guest', 'guest', 5672)
-        LOGGER.info(deed_xml)
-        with Emitter(url, config.EXCHANGE_NAME, 'esec-signing-key') as emitter:
-            emitter.send_message({'params': parameters, 'extra-parameters': extra_parameters, 'data': base64.b64encode(deed_xml).decode()})
-            LOGGER.info("Message sent to the queue...")
-            return "", 200
-    except Exception as e:
-        LOGGER.info('Error returned when trying to place an item on the queue: %s' % e)
+    request_url = config.ESEC_CLIENT_BASE_HOST + "/esec/auth_sms"
+
+    resp = requests.post(request_url, params=parameters, data=deed_xml)
+
+    if resp.status_code == status.HTTP_200_OK or resp.status_code == status.HTTP_401_UNAUTHORIZED:
+        LOGGER.info("Response XML = %s" % resp.content)
+
+        LOGGER.info("Preparing to send message to the queue...")
+
+        try:
+            url = broker_url('rabbitmq', 'guest', 'guest', 5672)
+            LOGGER.info(deed_xml)
+            with Emitter(url, config.EXCHANGE_NAME, 'esec-signing-key') as emitter:
+                emitter.send_message({'params': parameters, 'extra-parameters': extra_parameters, 'data': base64.b64encode(deed_xml).decode()})
+                LOGGER.info("Message sent to the queue...")
+                return "", 200
+        except Exception as e:
+            LOGGER.info('Error returned when trying to place an item on the queue: %s' % e)
+
+    else:
+        LOGGER.error("ESecurity Client Exception when trying to verify the OTP code")
+        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 def _post_request(url, data):

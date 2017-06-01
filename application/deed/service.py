@@ -1,5 +1,4 @@
 import copy
-import datetime
 import json
 import logging
 from application.deed.deed_status import DeedStatus
@@ -184,7 +183,7 @@ def update_deed_signature_timestamp(deed, borrower_token, datetime):
     modify_deed = copy.deepcopy(deed.deed)
     for borrower in modify_deed['borrowers']:
         if str(borrower['token']).upper() == borrower_token:
-            #TODO UPDATE WITH CORRECT TIME
+            # TODO UPDATE WITH CORRECT TIME
             borrower['signature'] = datetime
 
     deed.deed = modify_deed
