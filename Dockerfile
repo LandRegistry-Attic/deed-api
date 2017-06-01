@@ -1,5 +1,5 @@
 # Set the base image to the base image
-FROM lr_base_python_flask:1
+FROM lr_base_python_flask:2
 
 # ---- Database stuff start
 

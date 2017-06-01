@@ -10,13 +10,11 @@ According to the following business rules:
 """
 
 import collections
-import logging
 
 import itertools
 
 from application.register_adapter.service import RegisterAdapter
-
-LOGGER = logging.getLogger(__name__)
+from flask import current_app
 
 
 def _unpack_borrowers(payload):
@@ -80,7 +78,7 @@ def compare_borrower_names(payload):
     proprietor_names = RegisterAdapter.get_proprietor_names(title_number)
     unmatched_names = _unmatched_names(proprietor_names, deed_names)
     if unmatched_names:
-        LOGGER.info(
+        current_app.logger.info(
             "%s Names on Register and deed do not match for title number '%s'" % (len(unmatched_names), title_number))
         raise BorrowerNamesDifferException
 
@@ -94,6 +92,6 @@ def all_borrower_names_present(payload):
     proprietor_names = RegisterAdapter.get_proprietor_names(title_number)
     missing_borrower_name_count = len(proprietor_names) - len(deed_names)
     if missing_borrower_name_count > 0:
-        LOGGER.info(
+        current_app.logger.info(
             "%s Borrower names missing for title number '%s'" % (missing_borrower_name_count, title_number))
         raise BorrowerNamesMissingException

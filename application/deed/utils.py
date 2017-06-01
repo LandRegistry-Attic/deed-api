@@ -3,17 +3,13 @@ import io
 import json
 import os
 import sys
-import logging
 from jsonschema.validators import validator_for
 from lxml import etree
 from underscore import _
 import application.deed.generated.deed_xmlify as api
-from flask import request
+from flask import request, current_app
 import urllib
 from application import config
-
-
-LOGGER = logging.getLogger(__name__)
 
 
 XML_SCHEMA_FILE = "deed-schema-v0-4.xsd"
@@ -104,7 +100,7 @@ def get_obj_by_path(schema, path):
             res = schema[key]
             return res
         except:
-            LOGGER.error(
+            current_app.logger.error(
                 "ACCESS ERROR:\nlocation in schema: %s\n with key: %s \n%s."
                 % (schema, key, sys.exc_info()[0]))
             raise
@@ -274,7 +270,7 @@ def process_organisation_credentials():
                 header_dict[key] = [value]
     except:
         msg = str(sys.exc_info())
-        LOGGER.error("unable to process organisation credentials %s" % msg)
+        current_app.logger.error("unable to process organisation credentials %s" % msg)
         header_dict = None
 
     return header_dict

@@ -1,15 +1,12 @@
 import requests
-import logging
 from application import config
-
-
-LOGGER = logging.getLogger(__name__)
+from flask import current_app
 
 
 def perform_check(title):  # pragma: no cover
     resp = requests.get(config.TITLE_ADAPTOR_BASE_HOST + "/titlenumber/" + title)
 
-    LOGGER.info("Making title validator call")
+    current_app.logger.info("Making title validator call")
 
     return resp
 

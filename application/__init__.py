@@ -147,7 +147,6 @@ def get_service_check_response(service_from, service_to, interface_name):
 
     # Attempt to connect to a specific service
     service_response = ""
-    service_dict = ""
 
     try:
         # Retrieve the json response from external services
