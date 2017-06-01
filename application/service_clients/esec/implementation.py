@@ -1,7 +1,6 @@
-import requests
 from application import config
 from flask.ext.api import status
-from flask import abort, current_app
+from flask import abort, current_app, g
 
 
 class ExternalServiceError(Exception):
@@ -23,7 +22,7 @@ def issue_sms(forenames, last_name, organisation_id, phone_number):  # pragma: n
         'phone-number': phone_number
     }
 
-    resp = requests.post(request_url, params=parameters)
+    resp = g.requests.post(request_url, params=parameters)
 
     if resp.status_code == status.HTTP_200_OK:
         current_app.logger.info("Response XML = %s" % resp.content)
@@ -41,7 +40,7 @@ def reissue_sms(esec_user_name):  # pragma: no cover
         'esec-username': esec_user_name
     }
 
-    resp = requests.post(request_url, params=parameters)
+    resp = g.requests.post(request_url, params=parameters)
 
     if resp.status_code == status.HTTP_200_OK:
         current_app.logger.info("Response XML = %s" % resp.content)
@@ -65,7 +64,7 @@ def auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code):  # pragma: no
         'otp-code': borrower_auth_code
     }
 
-    resp = requests.post(request_url, params=parameters, data=deed_xml)
+    resp = g.requests.post(request_url, params=parameters, data=deed_xml)
 
     if resp.status_code == status.HTTP_200_OK or resp.status_code == status.HTTP_401_UNAUTHORIZED:
         current_app.logger.info("Response XML = %s" % resp.content)
@@ -77,7 +76,7 @@ def auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code):  # pragma: no
 
 def _post_request(url, data):
     current_app.logger.info("Calling: %s", url)
-    resp = requests.post(url, data=data)
+    resp = g.requests.post(url, data=data)
     if resp.status_code == status.HTTP_200_OK:
         return resp.content
     else:
@@ -91,11 +90,11 @@ def sign_document_with_authority(deed_xml):
     request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/sign_document_with_authority'
     try:
         return _post_request(request_url, deed_xml)
-    except (requests.exceptions.ConnectionError, ExternalServiceError):
+    except (g.requests.exceptions.ConnectionError, ExternalServiceError):
         raise EsecException
 
 
 def check_health():
-    service_response = requests.get(config.ESEC_CLIENT_BASE_HOST + "/health/service-check")
+    service_response = g.requests.get(config.ESEC_CLIENT_BASE_HOST + "/health/service-check")
 
     return service_response

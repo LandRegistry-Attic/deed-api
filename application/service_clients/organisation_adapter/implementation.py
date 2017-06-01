@@ -1,9 +1,8 @@
 from functools import reduce
-import requests
 import json
 from urllib.parse import urljoin
 from application import config
-from flask import current_app
+from flask import current_app, g
 
 
 def get_organisation_name(organisation_id, organisation_name):
@@ -25,12 +24,12 @@ def get_organisation_name(organisation_id, organisation_name):
 
 
 def _get_request(request_url):
-    json_response = json.loads(requests.get(request_url).text)
+    json_response = json.loads(g.requests.get(request_url).text)
     new_organisation_name = json_response["organisation_name"]
     current_app.logger.debug("Response get_organisation_name: '%s'", new_organisation_name)
     return new_organisation_name
 
 
 def check_health():
-    service_response = requests.get(config.ORGANISATION_API_BASE_HOST + '/health/service-check')
+    service_response = g.requests.get(config.ORGANISATION_API_BASE_HOST + '/health/service-check')
     return service_response

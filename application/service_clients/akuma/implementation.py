@@ -1,13 +1,12 @@
-import requests
 from application import config
 from flask.ext.api import status
-from flask import current_app
+from flask import current_app, g
 
 
 def perform_check(payload):  # pragma: no cover
     data = None
 
-    resp = requests.post(config.AKUMA_BASE_HOST + "/", json=payload)
+    resp = g.requests.post(config.AKUMA_BASE_HOST + "/", json=payload)
 
     current_app.logger.info("Making call to Akuma")
 
