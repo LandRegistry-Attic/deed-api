@@ -17,7 +17,6 @@ from datetime import datetime
 from flask.ext.api import status
 from lxml import etree
 from unittest.mock import patch
-from flask import g
 
 from application import app
 from application.borrower.model import Borrower, DatabaseException
@@ -622,7 +621,7 @@ class TestRoutes(TestRoutesBase):
                 response_status_code = make_effective(123)[1]
                 mock_jsonify.assert_called_with(
                     {'errors':
-                         ['Problem 1: This deed cannot be made effective as not all borrowers have signed the deed.']})
+                        ['Problem 1: This deed cannot be made effective as not all borrowers have signed the deed.']})
                 self.assertEqual(response_status_code, 400)
 
     @mock.patch('json.dumps')
@@ -780,8 +779,9 @@ class TestCreateDeed(TestRoutesBase):
     @mock.patch('application.deed.views.update_deed')
     @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
     @mock.patch('application.deed.views.Deed.get_deed')
-    def test_get_existing_deed_and_update_bad_payload(self, mock_deed, mock_org_cred, mock_update, mock_val_payload, mock_val_tn,
-                                                      mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone):
+    def test_get_existing_deed_and_update_bad_payload(self, mock_deed, mock_org_cred, mock_update, mock_val_payload,
+                                                      mock_val_tn, mock_val_bor, mock_akuma, mock_val_dob,
+                                                      mock_val_phone):
         # test validate_payload
         mock_val_payload.return_value = 1, "Foo"
         mock_val_tn.return_value = "OK"

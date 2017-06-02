@@ -3,7 +3,7 @@ import datetime
 import json
 from application.deed.deed_status import DeedStatus
 from application.deed.utils import valid_dob, is_unique_list
-from flask import abort, current_app
+from flask import abort
 from flask.ext.api import status
 from functools import partial
 from lxml import etree

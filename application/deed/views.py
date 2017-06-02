@@ -15,7 +15,7 @@ from application.deed.service import update_deed, update_deed_signature_timestam
 from application.service_clients.organisation_adapter import make_organisation_adapter_client
 from application.deed.utils import convert_json_to_xml
 from application.deed.deed_validator import Validation
-from flask import Blueprint, current_app
+from flask import Blueprint
 from flask import request, abort, jsonify, Response
 from flask.ext.api import status
 
@@ -254,8 +254,8 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
         application.app.logger.error("Database Exception 404 for deed reference - %s" % deed_reference)
         abort(status.HTTP_404_NOT_FOUND)
     else:
-        application.app.logger.info("Signing deed for borrower_token %s against deed reference %s" % (borrower_token,
-                                                                                                  deed_reference))
+        application.app.logger.info("Signing deed for borrower_token %s against deed reference %s" %
+                                    (borrower_token, deed_reference))
 
         signing_deed_akuma = Akuma.do_check(deed.deed, "borrower sign",
                                             deed.organisation_name, "", deed.token)
@@ -316,7 +316,8 @@ def issue_sms(deed_reference, borrower_token):
         application.app.logger.error("Database Exception 404 for deed reference - %s" % deed_reference)
         abort(status.HTTP_404_NOT_FOUND)
     else:
-        application.app.logger.info("Signing deed for borrower_token %s against deed reference %s" % (borrower_token, deed_reference))
+        application.app.logger.info("Signing deed for borrower_token %s against deed reference %s" %
+                                    (borrower_token, deed_reference))
 
         try:
             application.app.logger.info("getting existing XML")
@@ -330,19 +331,21 @@ def issue_sms(deed_reference, borrower_token):
                 user_id, status_code = esec_client.issue_sms(forenames, borrower.surname,
                                                              deed.organisation_id, borrower.phonenumber)
                 if status_code == 200:
-                    application.app.logger.info("Created new esec user: %s for borrower[token:%s]", str(user_id.decode()),
-                                borrower.token)
+                    application.app.logger.info("Created new esec user: %s for borrower[token:%s]",
+                                                str(user_id.decode()), borrower.token)
                     borrower.esec_user_name = user_id.decode()
                     borrower.save()
                 else:
-                    application.app.logger.error("Unable to create new e-sec user for borrower [token:%s]", borrower.token)
+                    application.app.logger.error("Unable to create new e-sec user for borrower [token:%s]",
+                                                 borrower.token)
                     abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             else:
                 result, status_code = esec_client.reissue_sms(borrower.esec_user_name)
 
             if status_code != 200:
-                application.app.logger.error("Unable to reissue new sms code for esec user: %s", borrower.esec_user_name)
+                application.app.logger.error("Unable to reissue new sms code for esec user: %s",
+                                             borrower.esec_user_name)
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         except:
@@ -391,15 +394,15 @@ def make_effective(deed_reference):
         elif deed_status == "EFFECTIVE" or deed_status == "NOT-LR-SIGNED":
             errors = []
             application.app.logger.error("Deed with reference - %s is in %s status and can not be registrar signed" %
-                         (str(deed_reference), str(deed_status)))
+                                         (str(deed_reference), str(deed_status)))
             errors.append("This deed has already been made effective.")
             compiled_list = send_error_list(errors)
             return compiled_list
 
         else:
             errors = []
-            application.app.logger.error("Deed with reference - %s is not fully signed and can not be registrar signed" %
-                         str(deed_reference))
+            application.app.logger.error("Deed with reference - %s is not fully signed and can not be registrar signed"
+                                         % str(deed_reference))
             errors.append("This deed cannot be made effective as not all borrowers have signed the deed.")
             compiled_list = send_error_list(errors)
             return compiled_list
@@ -427,11 +430,13 @@ def verify_auth_code(deed_reference):
     deed, status_code = auth_sms(deed_reference, borrower_token, borrower_code)
 
     if status_code == status.HTTP_200_OK:
-        application.app.logger.info("Borrower with token %s successfully authenticated using valid authentication code: %s",
-                    borrower_token, borrower_code)
+        application.app.logger.info("Borrower with token %s successfully"
+                                    " authenticated using valid authentication code: %s",
+                                    borrower_token, borrower_code)
         return jsonify({"result": True}), status.HTTP_200_OK
     elif status_code == status.HTTP_401_UNAUTHORIZED:
-        application.app.logger.error("Invalid authentication code: %s for borrower token %s ", borrower_code, borrower_token)
+        application.app.logger.error("Invalid authentication code: %s for borrower token %s ",
+                                     borrower_code, borrower_token)
         return jsonify({"result": False}), status_code
     else:
         application.app.logger.error("Not able to sign the deed")

@@ -8,7 +8,7 @@ from jsonschema.validators import validator_for
 from lxml import etree
 from underscore import _
 import application.deed.generated.deed_xmlify as api
-from flask import request, current_app
+from flask import request
 import urllib
 from application import config
 
