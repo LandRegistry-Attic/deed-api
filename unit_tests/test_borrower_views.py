@@ -7,8 +7,8 @@ class TestBorrowerViews(unittest.TestCase):
 
     @mock.patch('application.borrower.views.VerifyMatch.remove_verify_match', autospec=True)
     @mock.patch('application.borrower.views.jsonify')
-    @mock.patch('application.borrower.views.LOGGER.error')
-    @mock.patch('application.borrower.views.LOGGER.info')
+    @mock.patch('application.borrower.views.application.app.logger.error')
+    @mock.patch('application.borrower.views.application.app.logger.info')
     def test_delete_verify_match_false(self, mock_logger_info, mock_logger_error, mock_jsonify, mock_verify_match):
         mock_jsonify.return_value = 'no match found for PID 200abc123: nothing removed'
         mock_verify_match.return_value = False
@@ -18,7 +18,7 @@ class TestBorrowerViews(unittest.TestCase):
 
     @mock.patch('application.borrower.views.VerifyMatch.remove_verify_match', autospec=True)
     @mock.patch('application.borrower.views.jsonify')
-    @mock.patch('application.borrower.views.LOGGER.info')
+    @mock.patch('application.borrower.views.application.app.logger.info')
     def test_delete_verify_match_true(self, mock_logger_info, mock_jsonify, mock_verify_match):
         mock_jsonify.return_value = 'match found for PID 200abc123: row removed'
         mock_verify_match.return_value = True

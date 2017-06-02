@@ -1,8 +1,9 @@
 from application.deed.model import Deed
-from flask import abort, current_app
+from flask import abort
 from flask import Blueprint
 from flask.ext.api import status
 import sys
+import application
 from application.casework.service import get_document
 
 casework_bp = Blueprint('casework', __name__,
@@ -23,5 +24,5 @@ def get_deed(deed_reference):
 
         except:
             msg = str(sys.exc_info())
-            current_app.logger.debug(msg)
+            application.app.logger.debug(msg)
             return msg

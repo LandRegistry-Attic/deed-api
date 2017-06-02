@@ -1,7 +1,8 @@
 import json
 from datetime import datetime
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify
 from flask.ext.api import status
+import application
 
 from application.borrower.model import Borrower, VerifyMatch
 
@@ -51,14 +52,14 @@ def get_borrower_details_by_verify_pid(verify_pid):
 def delete_verify_match(verify_pid):
     verify_match_model = VerifyMatch()
 
-    current_app.logger.info("trying to remove verify match entry - PID = %s" % verify_pid)
+    application.app.logger.info("trying to remove verify match entry - PID = %s" % verify_pid)
 
     if verify_match_model.remove_verify_match(verify_pid):
         match_message = "match found for PID %s: row removed" % verify_pid
-        current_app.logger.info(match_message)
+        application.app.logger.info(match_message)
     else:
         match_message = "no match found for PID %s: nothing removed" % verify_pid
-        current_app.logger.error(match_message)
+        application.app.logger.error(match_message)
 
     return jsonify({'result': match_message}), status.HTTP_200_OK
 

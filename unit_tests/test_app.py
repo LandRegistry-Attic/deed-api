@@ -17,6 +17,7 @@ from datetime import datetime
 from flask.ext.api import status
 from lxml import etree
 from unittest.mock import patch
+from flask import g
 
 from application import app
 from application.borrower.model import Borrower, DatabaseException
@@ -75,13 +76,16 @@ class TestRoutes(TestRoutesBase):
     @patch('application.deed.model.Deed.save')
     @patch('application.service_clients.esec.implementation.sign_document_with_authority')
     def test_sign_document_is_called(self, mock_sign_with_authority, mock_save):
-        mock_deed = DeedModelMock()
-        mock_deed.status = "NOT-LR-SIGNED"
-        effective_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        with app.app_context() as ac:
+            ac.g.trace_id = None
+            with app.test_request_context():
+                mock_deed = DeedModelMock()
+                mock_deed.status = "NOT-LR-SIGNED"
+                effective_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-        apply_registrar_signature(mock_deed, effective_date)
-        self.assertTrue(mock_sign_with_authority.called)
-        self.assertTrue(mock_save.called)
+                apply_registrar_signature(mock_deed, effective_date)
+                self.assertTrue(mock_sign_with_authority.called)
+                self.assertTrue(mock_save.called)
 
     def test_effective_date_in_xml(self):
         mock_deed = DeedModelMock()
@@ -96,19 +100,25 @@ class TestRoutes(TestRoutesBase):
         self.assertEqual(effective_date, test_result)
 
     def test_wrong_effective_status(self):
-        mock_deed = DeedModelMock()
-        self.assertRaises(ValueError, check_effective_status, mock_deed.status)
+        with app.app_context() as ac:
+            ac.g.trace_id = None
+            with app.test_request_context():
+                mock_deed = DeedModelMock()
+                self.assertRaises(ValueError, check_effective_status, mock_deed.status)
 
-    @patch('requests.post')
+    @patch('application.service_clients.esec.implementation.g.requests.post')
     def test_post_request_200(self, mock_post):
         class ResponseStub:
             status_code = 200
             content = 'foo'
 
-        mock_post.return_value = ResponseStub()
-        mock_deed = DeedModelMock()
-        ret_val = _post_request('dummy/url/string', mock_deed.deed_xml)
-        self.assertEqual('foo', ret_val)
+        with app.app_context() as ac:
+            ac.g.trace_id = None
+            with app.test_request_context():
+                mock_post.return_value = ResponseStub()
+                mock_deed = DeedModelMock()
+                ret_val = _post_request('dummy/url/string', mock_deed.deed_xml)
+                self.assertEqual('foo', ret_val)
 
     @patch('requests.post')
     def test_post_request_500(self, mock_post):
@@ -116,17 +126,24 @@ class TestRoutes(TestRoutesBase):
             status_code = 500
             content = 'bar'
 
-        mock_post.return_value = ResponseStub()
-        mock_deed = DeedModelMock()
-        self.assertRaises(ExternalServiceError,
-                          _post_request, 'dummy/url/string', mock_deed.deed_xml)
+        with app.app_context() as ac:
+            ac.g.trace_id = None
+            with app.test_request_context():
+                mock_post.return_value = ResponseStub()
+                mock_deed = DeedModelMock()
+                self.assertRaises(ExternalServiceError,
+                                  _post_request, 'dummy/url/string', mock_deed.deed_xml)
 
     @patch('application.service_clients.esec.implementation._post_request')
     def test_sign_document_with_authority(self, mock_post_request):
-        mock_deed = DeedModelMock()
-        sign_document_with_authority(mock_deed.deed_xml)
-        mock_post_request.assert_called_with('{}/esec/sign_document_with_authority'.format(app.config["ESEC_CLIENT_BASE_HOST"]),
-                                             mock_deed.deed_xml)
+        with app.app_context() as ac:
+            ac.g.trace_id = None
+            with app.test_request_context():
+                mock_deed = DeedModelMock()
+                sign_document_with_authority(mock_deed.deed_xml)
+                mock_post_request.assert_called_with('{}/esec/sign_document_with_authority'
+                                                     .format(app.config["ESEC_CLIENT_BASE_HOST"]),
+                                                     mock_deed.deed_xml)
 
     @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
     @mock.patch('application.service_clients.register_adapter.interface.RegisterAdapterInterface.get_proprietor_names')
@@ -134,7 +151,8 @@ class TestRoutes(TestRoutesBase):
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.deed.model.Deed.save')
     @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
-    def test_create_no_auth_headers(self, mock_query, mock_Deed, mock_Borrower, mock_akuma, mock_proprietor_names, mock_organisation_cred):
+    def test_create_no_auth_headers(self, mock_query, mock_Deed, mock_Borrower, mock_akuma, mock_proprietor_names,
+                                    mock_organisation_cred):
         mock_organisation_cred.return_value = None
 
         mock_instance_response = mock_query.filter_by.return_value
@@ -552,9 +570,12 @@ class TestRoutes(TestRoutesBase):
     @mock.patch('application.deed.model.Deed.get_deed')
     @mock.patch('application.deed.views.abort')
     def test_make_deed_effective_404(self, mock_abort, mock_get_deed):
-        mock_get_deed.return_value = None
-        make_effective(123)
-        mock_abort.assert_called_with(status.HTTP_404_NOT_FOUND)
+        with app.app_context() as ac:
+            ac.g.trace_id = None
+            with app.test_request_context():
+                mock_get_deed.return_value = None
+                make_effective(123)
+                mock_abort.assert_called_with(status.HTTP_404_NOT_FOUND)
 
     @mock.patch('application.deed.model.Deed.get_deed')
     @mock.patch('application.deed.views.Akuma.do_check')
@@ -575,30 +596,34 @@ class TestRoutes(TestRoutesBase):
     @mock.patch('application.deed.views.Akuma.do_check')
     @mock.patch('application.deed.views.jsonify')
     def test_make_deed_effective_400(self, mock_jsonify, mock_akuma, mock_get_deed):
-        deed_model = mock.create_autospec(Deed)
-        deed_model.deed = {}
+        with app.app_context() as ac:
+            ac.g.trace_id = None
+            with app.test_request_context():
+                deed_model = mock.create_autospec(Deed)
+                deed_model.deed = {}
 
-        # test where already effective
-        deed_model.status = "EFFECTIVE"
-        mock_get_deed.return_value = deed_model
-        response_status_code = make_effective(123)[1]
-        mock_jsonify.assert_called_with({'errors': ['Problem 1: This deed has already been made effective.']})
-        self.assertEqual(response_status_code, 400)
+                # test where already effective
+                deed_model.status = "EFFECTIVE"
+                mock_get_deed.return_value = deed_model
+                response_status_code = make_effective(123)[1]
+                mock_jsonify.assert_called_with({'errors': ['Problem 1: This deed has already been made effective.']})
+                self.assertEqual(response_status_code, 400)
 
-        # test where not registrar signed
-        deed_model.status = "NOT-LR-SIGNED"
-        mock_get_deed.return_value = deed_model
-        response_status_code = make_effective(123)[1]
-        mock_jsonify.assert_called_with({'errors': ['Problem 1: This deed has already been made effective.']})
-        self.assertEqual(response_status_code, 400)
+                # test where not registrar signed
+                deed_model.status = "NOT-LR-SIGNED"
+                mock_get_deed.return_value = deed_model
+                response_status_code = make_effective(123)[1]
+                mock_jsonify.assert_called_with({'errors': ['Problem 1: This deed has already been made effective.']})
+                self.assertEqual(response_status_code, 400)
 
-        # test anything else
-        deed_model.status = "Foo"
-        mock_get_deed.return_value = deed_model
-        response_status_code = make_effective(123)[1]
-        mock_jsonify.assert_called_with(
-            {'errors': ['Problem 1: This deed cannot be made effective as not all borrowers have signed the deed.']})
-        self.assertEqual(response_status_code, 400)
+                # test anything else
+                deed_model.status = "Foo"
+                mock_get_deed.return_value = deed_model
+                response_status_code = make_effective(123)[1]
+                mock_jsonify.assert_called_with(
+                    {'errors':
+                         ['Problem 1: This deed cannot be made effective as not all borrowers have signed the deed.']})
+                self.assertEqual(response_status_code, 400)
 
     @mock.patch('json.dumps')
     def test_check_health(self, mock_status):
@@ -671,8 +696,11 @@ class TestRoutesErrorHandlers(TestRoutesBase):
 
     @mock.patch('application.service_clients.esec.implementation._post_request')
     def test_esec_down_gives_200(self, mock_request):
-        mock_request.side_effect = requests.ConnectionError
-        self.assertRaises(EsecException, sign_document_with_authority, "Foo")
+        with app.app_context() as ac:
+            ac.g.trace_id = None
+            with app.test_request_context():
+                mock_request.side_effect = requests.ConnectionError
+                self.assertRaises(EsecException, sign_document_with_authority, "Foo")
 
     @mock.patch('application.deed.model.Deed.get_deed')
     def test_file_not_found_exception(self, mock_get_deed):
@@ -696,14 +724,17 @@ class TestRoutesErrorHandlers(TestRoutesBase):
 
 class TestValidators(TestRoutesBase):
     def test_validation_order(self):
-        obj = Validation()
-        result, msg = obj.validate_dob(DeedHelper._json_doc_future_dob)
+        with app.app_context() as ac:
+            ac.g.trace_id = None
+            with app.test_request_context():
+                obj = Validation()
+                result, msg = obj.validate_dob(DeedHelper._json_doc_future_dob)
 
-        self.assertFalse(result)
+                self.assertFalse(result)
 
-        result, msg = obj.validate_phonenumbers(DeedHelper._borrowers_with_same_phonenumber)
+                result, msg = obj.validate_phonenumbers(DeedHelper._borrowers_with_same_phonenumber)
 
-        self.assertFalse(result)
+                self.assertFalse(result)
 
 
 class TestCreateDeed(TestRoutesBase):
@@ -900,15 +931,18 @@ class TestUpdateDeed(TestRoutesBase):
     @mock.patch('application.service_clients.organisation_adapter.implementation._get_request')
     def test_get_organisation_name(self, mock_organisation_name):
 
-        #  A test to check that the logic contained within the get_organisation_name method
-        #  returns a "not found" if the call to get the name matches no organisation, or
-        #  the name, if it does match.
-        mock_organisation_name.return_value = "not found"
-        organisation_name = get_organisation_name("1000.1.2", "Test Organisation")
+        with app.app_context() as ac:
+            ac.g.trace_id = None
+            with app.test_request_context():
+                #  A test to check that the logic contained within the get_organisation_name method
+                #  returns a "not found" if the call to get the name matches no organisation, or
+                #  the name, if it does match.
+                mock_organisation_name.return_value = "not found"
+                organisation_name = get_organisation_name("1000.1.2", "Test Organisation")
 
-        self.assertEqual(organisation_name, "Test Organisation")
+                self.assertEqual(organisation_name, "Test Organisation")
 
-        mock_organisation_name.return_value = "Test Organisation"
-        organisation_name = get_organisation_name("1000.1.2", "Test [22022] Organisation")
+                mock_organisation_name.return_value = "Test Organisation"
+                organisation_name = get_organisation_name("1000.1.2", "Test [22022] Organisation")
 
-        self.assertEqual(organisation_name, "Test Organisation")
+                self.assertEqual(organisation_name, "Test Organisation")

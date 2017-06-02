@@ -3,6 +3,7 @@ import io
 import json
 import os
 import sys
+import application
 from jsonschema.validators import validator_for
 from lxml import etree
 from underscore import _
@@ -100,7 +101,7 @@ def get_obj_by_path(schema, path):
             res = schema[key]
             return res
         except:
-            current_app.logger.error(
+            application.app.logger.error(
                 "ACCESS ERROR:\nlocation in schema: %s\n with key: %s \n%s."
                 % (schema, key, sys.exc_info()[0]))
             raise
@@ -270,7 +271,7 @@ def process_organisation_credentials():
                 header_dict[key] = [value]
     except:
         msg = str(sys.exc_info())
-        current_app.logger.error("unable to process organisation credentials %s" % msg)
+        application.app.logger.error("unable to process organisation credentials %s" % msg)
         header_dict = None
 
     return header_dict

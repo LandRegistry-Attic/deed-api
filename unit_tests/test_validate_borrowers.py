@@ -1,4 +1,5 @@
 import unittest
+from application import app
 
 import mock
 
@@ -45,8 +46,11 @@ class TestValidateBorrowers(unittest.TestCase):
 
     @mock.patch('application.register_adapter.service.RegisterAdapter.get_proprietor_names')
     def test_compare_borrower_bad(self, mock_register_adapter):
-        mock_register_adapter.return_value = ["Alice", "Bob"]
-        self.assertRaises(BorrowerNamesDifferException, compare_borrower_names, PAYLOAD)
+        with app.app_context() as ac:
+            ac.g.trace_id = None
+            with app.test_request_context():
+                mock_register_adapter.return_value = ["Alice", "Bob"]
+                self.assertRaises(BorrowerNamesDifferException, compare_borrower_names, PAYLOAD)
 
     @mock.patch('application.register_adapter.service.RegisterAdapter.get_proprietor_names')
     def test_borrowers_present_good(self, mock_register_adapter):
@@ -55,8 +59,11 @@ class TestValidateBorrowers(unittest.TestCase):
 
     @mock.patch('application.register_adapter.service.RegisterAdapter.get_proprietor_names')
     def test_borrowers_present_bad(self, mock_register_adapter):
-        mock_register_adapter.return_value = ["Jake Bullet", "Jill Beatrix Bullet", "Another Name"]
-        self.assertRaises(BorrowerNamesMissingException, all_borrower_names_present, PAYLOAD)
+        with app.app_context() as ac:
+            ac.g.trace_id = None
+            with app.test_request_context():
+                mock_register_adapter.return_value = ["Jake Bullet", "Jill Beatrix Bullet", "Another Name"]
+                self.assertRaises(BorrowerNamesMissingException, all_borrower_names_present, PAYLOAD)
 
 
 class TestValidateNames(unittest.TestCase):

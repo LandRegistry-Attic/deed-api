@@ -1,11 +1,12 @@
 from application import config
-from flask import current_app, g
+from flask import g
+import application
 
 
 def perform_check(title):  # pragma: no cover
     resp = g.requests.get(config.TITLE_ADAPTOR_BASE_HOST + "/titlenumber/" + title)
 
-    current_app.logger.info("Making title validator call")
+    application.app.logger.info("Making title validator call")
 
     return resp
 

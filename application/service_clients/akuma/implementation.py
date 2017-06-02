@@ -1,6 +1,7 @@
 from application import config
 from flask.ext.api import status
-from flask import current_app, g
+from flask import g
+import application
 
 
 def perform_check(payload):  # pragma: no cover
@@ -8,7 +9,7 @@ def perform_check(payload):  # pragma: no cover
 
     resp = g.requests.post(config.AKUMA_BASE_HOST + "/", json=payload)
 
-    current_app.logger.info("Making call to Akuma")
+    application.app.logger.info("Making call to Akuma")
 
     if resp.status_code == status.HTTP_200_OK:
         data = resp.json()

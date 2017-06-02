@@ -12,8 +12,7 @@ from application import db
 from application.deed.utils import process_organisation_credentials
 from application.deed.deed_status import DeedStatus
 from application.deed.address_utils import format_address_string
-
-from flask import current_app
+import application
 
 
 class Deed(db.Model):
@@ -67,7 +66,7 @@ class Deed(db.Model):
 
     def _get_deed_internal(self, deed_reference, organisation_id):
         if organisation_id != os.getenv('LR_ORGANISATION_ID'):
-            current_app.logger.debug("Internal request to view deed reference %s" % deed_reference)
+            application.app.logger.debug("Internal request to view deed reference %s" % deed_reference)
             result = Deed.query.filter_by(token=str(deed_reference), organisation_id=organisation_id).first()
         else:
             result = Deed.query.filter_by(token=str(deed_reference)).first()

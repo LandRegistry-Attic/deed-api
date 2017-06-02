@@ -2,10 +2,10 @@
 import csv
 import os
 import argparse
+import application
 from os import listdir
 from os.path import isfile, join
 from sqlalchemy import create_engine, MetaData, Table, exc, bindparam
-from flask import current_app
 
 
 def build_data(cols, row):
@@ -57,7 +57,7 @@ def process_file(csv_file, sql_connection, table):
     total_rows = 0
 
     print("\nProcessing: %s" % csv_file.name)
-    current_app.logger.info("Processing file: %s" % str(csv_file.name))
+    application.app.logger.info("Processing file: %s" % str(csv_file.name))
 
     rows_reader = csv.reader(csv_file, delimiter='|', quotechar="'")
     row_count = 0
@@ -84,15 +84,15 @@ def process_file(csv_file, sql_connection, table):
     print("Insert Count: " + str(insert_count))
     print("Update Count: " + str(update_count))
     print("Error Count: " + str(error_count))
-    current_app.logger.info("Processing file complete, errors: %s" % str(error_count))
+    application.app.logger.info("Processing file complete, errors: %s" % str(error_count))
 
     print("-" * 120)
 
 
 def run_import():
-    current_app.logger.info("Data Importer Init")
+    application.app.logger.info("Data Importer Init")
     settings = process_input_options()
-    current_app.logger.info("Settings from command line: %s" % str(settings))
+    application.app.logger.info("Settings from command line: %s" % str(settings))
 
     target_path = os.path.dirname(os.path.realpath(__file__)) + settings.import_directory
 

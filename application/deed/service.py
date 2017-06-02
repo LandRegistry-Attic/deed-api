@@ -14,6 +14,7 @@ from application.borrower.model import Borrower as BorrowerModel
 from application.borrower.server import BorrowerService
 from application.mortgage_document.model import MortgageDocument
 from application.service_clients.organisation_adapter import make_organisation_adapter_client
+import application
 
 
 def valid_borrowers(borrowers):
@@ -33,7 +34,7 @@ def valid_borrowers(borrowers):
 def check_effective_status(deed_status):
     if DeedStatus.not_lr_signed.value not in deed_status:
         msg = "Deed has a wrong status. Status should be {0}".format(DeedStatus.not_lr_signed.value)
-        current_app.logger.error(msg)
+        application.app.logger.error(msg)
         raise ValueError(msg)
 
 
@@ -49,11 +50,11 @@ def apply_registrar_signature(deed, effective_date):
     deed_xml = deed.deed_xml
     effective_xml = add_effective_date_to_xml(deed_xml, effective_date)
 
-    current_app.logger.info("Applying registrar's signature to deed {}".format(deed.token))
+    application.app.logger.info("Applying registrar's signature to deed {}".format(deed.token))
     deed.deed_xml = esec_client.sign_document_with_authority(effective_xml)
     deed.status = DeedStatus.effective.value
     deed.save()
-    current_app.logger.info("Signed and saved document to DB")
+    application.app.logger.info("Signed and saved document to DB")
 
 
 def update_borrower(borrower, idx, borrowers, deed_token):
@@ -156,7 +157,7 @@ def update_deed(deed, deed_json):
     if not update_md_clauses(json_doc, deed_json["md_ref"], reference, date_of_mortgage_offer,
                              miscellaneous_information, get_organisation_name(deed)):
         msg = "mortgage document associated with supplied md_ref is not found"
-        current_app.logger.error(msg)
+        application.app.logger.error(msg)
         return False, msg
 
     assign_deed(deed, json_doc)
@@ -190,7 +191,7 @@ def update_deed_signature_timestamp(deed, borrower_token):
         deed.save()
 
     except Exception as e:
-        current_app.logger.error("Database Exception - %s" % e)
+        application.app.logger.error("Database Exception - %s" % e)
         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -202,7 +203,7 @@ def make_effective_text(organisation_name):
 
 
 def set_signed_status(deed):
-    current_app.logger.info("updating Deed signed Status")
+    application.app.logger.info("updating Deed signed Status")
     signed_count = 0
 
     for idx, borrower in enumerate(deed.deed["borrowers"], start=0):
