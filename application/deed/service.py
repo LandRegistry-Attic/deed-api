@@ -191,7 +191,7 @@ def update_deed_signature_timestamp(deed, borrower_token):
         deed.save()
 
     except Exception as e:
-        application.app.logger.error("Database Exception - %s" % e)
+        application.app.logger.error("Database Exception in update_deed_signature_timestamp method - %s" % e)
         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
