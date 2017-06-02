@@ -1,11 +1,14 @@
 from application.service_clients import akuma
 from copy import deepcopy
+import application
 
 
 class Akuma:
 
     @staticmethod
     def do_check(json_payload, check_type, org_name, org_locale, deed_token):
+
+        application.app.logger.debug('Constructing Akuma payload')
 
         akuma_payload = deepcopy(json_payload)
 

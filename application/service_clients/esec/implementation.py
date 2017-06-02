@@ -1,6 +1,7 @@
 from application import config
 from flask.ext.api import status
 from flask import abort, g
+import requests
 import application
 
 
@@ -91,7 +92,7 @@ def sign_document_with_authority(deed_xml):
     request_url = config.ESEC_CLIENT_BASE_HOST + '/esec/sign_document_with_authority'
     try:
         return _post_request(request_url, deed_xml)
-    except (g.requests.exceptions.ConnectionError, ExternalServiceError):
+    except (requests.exceptions.ConnectionError, ExternalServiceError):
         raise EsecException
 
 

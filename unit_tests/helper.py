@@ -2,6 +2,7 @@ from application.deed.model import Deed
 from application.borrower.model import Borrower
 from .deed_dict import DEED
 from .complete_deed_dict import complete_deed_dict
+import requests
 
 # flake8: noqa
 
@@ -476,6 +477,15 @@ class AkumaMock:
         "activity": "create deed"
 
     }
+
+
+class FakeResponse(requests.Response):
+
+    def __init__(self, content='', status_code=200):
+        super(FakeResponse, self).__init__()
+        self._content = content
+        self._content_consumed = True
+        self.status_code = status_code
 
 
 def borrower_object_helper(borrower):

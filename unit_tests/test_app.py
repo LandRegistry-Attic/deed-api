@@ -16,13 +16,13 @@ from application.deed.views import make_effective, retrieve_signed_deed
 from datetime import datetime
 from flask.ext.api import status
 from lxml import etree
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 from application import app
 from application.borrower.model import Borrower, DatabaseException
 from application.service_clients.esec.implementation import sign_document_with_authority, _post_request, ExternalServiceError, EsecException
 from application.service_clients.organisation_adapter.implementation import get_organisation_name
-from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, StatusMock
+from unit_tests.helper import DeedHelper, DeedModelMock, MortgageDocMock, StatusMock, FakeResponse
 from unit_tests.schema_tests import run_schema_checks
 
 
@@ -105,33 +105,54 @@ class TestRoutes(TestRoutesBase):
                 mock_deed = DeedModelMock()
                 self.assertRaises(ValueError, check_effective_status, mock_deed.status)
 
-    @patch('application.service_clients.esec.implementation.g.requests.post')
-    def test_post_request_200(self, mock_post):
-        class ResponseStub:
-            status_code = 200
-            content = 'foo'
+    def test_post_request_200(self):
 
         with app.app_context() as ac:
-            ac.g.trace_id = None
-            with app.test_request_context():
-                mock_post.return_value = ResponseStub()
-                mock_deed = DeedModelMock()
-                ret_val = _post_request('dummy/url/string', mock_deed.deed_xml)
-                self.assertEqual('foo', ret_val)
 
-    @patch('requests.post')
-    def test_post_request_500(self, mock_post):
-        class ResponseStub:
-            status_code = 500
-            content = 'bar'
+            def fake_post(url, data):
+                return FakeResponse(content='I have returned with a 200')
+
+            ac.g.trace_id = None
+
+            # Create a MagicMock and assign it to the g.requests function
+            mock_requests = MagicMock()
+            ac.g.requests = mock_requests
+
+            # Create a MagicMock and assign it to the g.requests.post function
+            mock_post = MagicMock()
+            mock_post.side_effect = fake_post
+            ac.g.requests.post = mock_post
+
+            # Call the assertion for the test
+            mock_deed = DeedModelMock()
+            ret_val = _post_request('dummy/url/string', mock_deed.deed_xml)
+
+            self.assertEqual('I have returned with a 200', ret_val)
+
+    def test_post_request_500(self):
 
         with app.app_context() as ac:
+
+            def fake_post(url, data):
+                fake_response = FakeResponse(content='I have returned with a 500')
+                fake_response.status_code = 500
+                return fake_response
+
             ac.g.trace_id = None
-            with app.test_request_context():
-                mock_post.return_value = ResponseStub()
-                mock_deed = DeedModelMock()
-                self.assertRaises(ExternalServiceError,
-                                  _post_request, 'dummy/url/string', mock_deed.deed_xml)
+
+            # Create a MagicMock and assign it to the g.requests function
+            mock_requests = MagicMock()
+            ac.g.requests = mock_requests
+
+            # Create a MagicMock and assign it to the g.requests.post function
+            mock_post = MagicMock()
+            mock_post.side_effect = fake_post
+            ac.g.requests.post = mock_post
+
+            # Call the assertion for the test
+            mock_deed = DeedModelMock()
+            self.assertRaises(ExternalServiceError,
+                              _post_request, 'dummy/url/string', mock_deed.deed_xml)
 
     @patch('application.service_clients.esec.implementation._post_request')
     def test_sign_document_with_authority(self, mock_post_request):
@@ -696,10 +717,15 @@ class TestRoutesErrorHandlers(TestRoutesBase):
     @mock.patch('application.service_clients.esec.implementation._post_request')
     def test_esec_down_gives_200(self, mock_request):
         with app.app_context() as ac:
+            def fake_post(url, data):
+                return FakeResponse(content='Foo')
+
             ac.g.trace_id = None
-            with app.test_request_context():
-                mock_request.side_effect = requests.ConnectionError
-                self.assertRaises(EsecException, sign_document_with_authority, "Foo")
+
+            # Mock out the actual call to the _post_request and return an error
+            mock_request.side_effect = requests.ConnectionError
+
+            self.assertRaises(EsecException, sign_document_with_authority, "Foo")
 
     @mock.patch('application.deed.model.Deed.get_deed')
     def test_file_not_found_exception(self, mock_get_deed):
