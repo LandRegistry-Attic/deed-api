@@ -53,7 +53,7 @@ def delete_verify_match(verify_pid):
     verify_match_model = VerifyMatch()
 
     application.app.logger.info("Removing Verify Match Entry")
-    application.app.logger.debug("Verify match entry - PID = %s" % verify_pid)
+    application.app.logger.debug("Attempting to remove verify match entry with PID = %s" % verify_pid)
 
     if verify_match_model.remove_verify_match(verify_pid):
         match_message = "match found for PID provided."
