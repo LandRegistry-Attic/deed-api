@@ -5,6 +5,7 @@ import os
 import json
 import requests
 import unittest
+import time
 from application.deed.model import Deed
 from integration_tests.deed.deed_data import valid_deed, new_deed, valid_deed_with_reference, \
     valid_deed_with_date_of_mortgage_offer, valid_deed_with_miscellaneous_info
@@ -272,6 +273,11 @@ class TestDeedRoutes(unittest.TestCase):
         self.assertEqual(get_created_deed.status_code, 200)
 
     def test_save_make_effective(self):
+        get_existing_deeds = requests.get(config.DEED_API_BASE_HOST + '/deed/retrieve-signed',
+                                          headers=self.webseal_headers)
+
+        get_existing_deeds = get_existing_deeds.json()
+
         create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
                                     data=json.dumps(valid_deed),
                                     headers=self.webseal_headers)
@@ -306,6 +312,25 @@ class TestDeedRoutes(unittest.TestCase):
                                   headers=self.webseal_headers)
 
         self.assertEqual(sign_deed.status_code, 200)
+
+        get_deed_again = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                      headers=self.webseal_headers)
+
+        second_deed = get_deed_again.json()
+
+        timer = time.time() + 15
+        while time.time() < timer or second_deed["deed"]["status"] != "ALL-SIGNED":
+            get_deed_again = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                          headers=self.webseal_headers)
+
+            second_deed = get_deed_again.json()
+
+        test_result = requests.get(config.DEED_API_BASE_HOST + '/deed/retrieve-signed',
+                                   headers=self.webseal_headers)
+
+        test_result = test_result.json()
+
+        self.assertGreater(len(test_result["deeds"]), len(get_existing_deeds["deeds"]))
 
         make_effective = requests.post(config.DEED_API_BASE_HOST + response_json["path"] + '/make-effective',
                                        headers=self.webseal_headers)
