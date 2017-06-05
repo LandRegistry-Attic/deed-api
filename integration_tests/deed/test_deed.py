@@ -385,11 +385,24 @@ class TestDeedRoutes(unittest.TestCase):
 
         self.assertEqual(sign_deed.status_code, 200)
 
+        get_deed_again = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                      headers=self.webseal_headers)
+
+        second_deed = get_deed_again.json()
+
+        timer = time.time() + 15
+        while time.time() < timer or second_deed["deed"]["status"] != "ALL-SIGNED":
+            get_deed_again = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                          headers=self.webseal_headers)
+
+            second_deed = get_deed_again.json()
+
         test_result = requests.get(config.DEED_API_BASE_HOST + '/deed/retrieve-signed',
                                    headers=self.webseal_headers)
 
         signed_deeds = test_result.json()
         self.assertIn("deeds", str(signed_deeds))
+        self.assertIn(created_deed["deed"]["token"], str(signed_deeds))
 
     def test_get_signed_deeds_not_found(self):
         create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',

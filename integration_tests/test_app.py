@@ -168,6 +168,18 @@ class TestAppRoutes(unittest.TestCase):
 
         self.assertEqual(sign_deed.status_code, 200)
 
+        get_deed_again = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                      headers=webseal_headers)
+
+        second_deed = get_deed_again.json()
+
+        timer = time.time() + 15
+        while time.time() < timer or second_deed["deed"]["status"] != "PARTIALLY-SIGNED":
+            get_deed_again = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                          headers=webseal_headers)
+
+            second_deed = get_deed_again.json()
+
         test_result = requests.get(config.DEED_API_BASE_HOST + '/dashboard/PARTIALLY_SIGNED',
                                    headers=webseal_headers)
 
