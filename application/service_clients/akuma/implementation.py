@@ -1,6 +1,6 @@
 from application import config
 from flask.ext.api import status
-from flask import g, abort
+from flask import g
 import application
 
 
