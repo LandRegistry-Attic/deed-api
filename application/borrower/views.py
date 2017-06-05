@@ -25,6 +25,8 @@ def validate_borrower():
                 borrower_id = borrower.id
                 return json.dumps({"deed_token": borrower.deed_token, "phone_number": borrower.phonenumber, "borrower_id": borrower_id}),\
                     status.HTTP_200_OK
+            else:
+                application.app.logger.error("Matching DOB not found for provided borrower.")
 
     return "Matching deed not found", status.HTTP_404_NOT_FOUND
 
@@ -50,13 +52,14 @@ def get_borrower_details_by_verify_pid(verify_pid):
 def delete_verify_match(verify_pid):
     verify_match_model = VerifyMatch()
 
-    application.app.logger.info("trying to remove verify match entry - PID = %s" % verify_pid)
+    application.app.logger.info("Removing Verify Match Entry")
+    application.app.logger.debug("Verify match entry - PID = %s" % verify_pid)
 
     if verify_match_model.remove_verify_match(verify_pid):
-        match_message = "match found for PID %s: row removed" % verify_pid
-        application.app.logger.info(match_message)
+        match_message = "match found for PID provided."
+        application.app.logger.debug("match found for PID %s: row removed" % verify_pid)
     else:
-        match_message = "no match found for PID %s: nothing removed" % verify_pid
-        application.app.logger.error(match_message)
+        match_message = "no match found for PID provided."
+        application.app.logger.error("no match found for PID %s: nothing removed" % verify_pid)
 
     return jsonify({'result': match_message}), status.HTTP_200_OK
