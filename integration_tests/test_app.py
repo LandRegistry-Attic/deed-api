@@ -1,6 +1,7 @@
 import unittest
 import requests
 import json
+import time
 
 from application import config
 from integration_tests.helper import setUpApp, webseal_headers
@@ -69,8 +70,10 @@ class TestAppRoutes(unittest.TestCase):
         self.assertGreater(int(get_all_deeds.text), int(get_existing_deeds.text))
 
     def test_get_signed_deeds(self):
-        get_existing_deeds = requests.get(config.DEED_API_BASE_HOST + '/dashboard/ALL-SIGNED',
+        get_existing_deeds = requests.get(config.DEED_API_BASE_HOST + '/deed/retrieve-signed',
                                           headers=webseal_headers)
+
+        get_existing_deeds = get_existing_deeds.json()
 
         create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
                                     data=json.dumps(valid_deed),
@@ -107,10 +110,24 @@ class TestAppRoutes(unittest.TestCase):
 
         self.assertEqual(sign_deed.status_code, 200)
 
-        test_result = requests.get(config.DEED_API_BASE_HOST + '/dashboard/ALL-SIGNED',
+        get_deed_again = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                      headers=webseal_headers)
+
+        second_deed = get_deed_again.json()
+
+        timer = time.time() + 15
+        while time.time() < timer or second_deed["deed"]["status"] != "ALL-SIGNED":
+            get_deed_again = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                          headers=webseal_headers)
+
+            second_deed = get_deed_again.json()
+
+        test_result = requests.get(config.DEED_API_BASE_HOST + '/deed/retrieve-signed',
                                    headers=webseal_headers)
 
-        self.assertGreater(int(test_result.text), int(get_existing_deeds.text))
+        test_result = test_result.json()
+
+        self.assertGreater(len(test_result["deeds"]), len(get_existing_deeds["deeds"]))
 
     def test_get_partially_signed_deeds(self):
         get_existing_deeds = requests.get(config.DEED_API_BASE_HOST + '/dashboard/PARTIALLY_SIGNED',
