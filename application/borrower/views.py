@@ -56,10 +56,10 @@ def delete_verify_match(verify_pid):
     application.app.logger.debug("Attempting to remove verify match entry with PID = %s" % verify_pid)
 
     if verify_match_model.remove_verify_match(verify_pid):
-        match_message = "match found for PID provided."
-        application.app.logger.debug("match found for PID %s: row removed" % verify_pid)
+        match_message = "match found for PID provided. Row has been removed."
+        application.app.logger.debug("match found for PID: row removed")
     else:
-        match_message = "no match found for PID provided."
-        application.app.logger.error("no match found for PID %s: nothing removed" % verify_pid)
+        match_message = "no match found for PID provided. Row has not been removed."
+        application.app.logger.error("no match found for PID: nothing removed")
 
     return jsonify({'result': match_message}), status.HTTP_200_OK

@@ -15,5 +15,4 @@ def perform_check(payload):  # pragma: no cover
         data = resp.json()
     else:
         application.app.logger.error('Call to Akuma returned with a %s status code', resp.status_code)
-        abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
     return data

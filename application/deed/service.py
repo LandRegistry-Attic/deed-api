@@ -212,10 +212,10 @@ def set_signed_status(deed):
 
     if signed_count == len(deed.deed['borrowers']):
         deed.status = DeedStatus.all_signed.value
-        application.app.logger.debug('Deed status has been changed to ALL-SIGNED')
+        application.app.logger.info('Deed status has been changed to ALL-SIGNED')
     elif signed_count > 0:
         deed.status = DeedStatus.partial.value
-        application.app.logger.debug('Deed status has been changed to PARTIAL')
+        application.app.logger.info('Deed status has been changed to PARTIAL')
 
 
 def make_deed_effective_date(deed, signed_time):
@@ -224,7 +224,7 @@ def make_deed_effective_date(deed, signed_time):
     modify_deed = copy.deepcopy(deed.deed)
     modify_deed['effective_date'] = signed_time
     deed.status = "NOT-LR-SIGNED"
-    application.app.logger.debug('Deed status has been changed to NOT-LR-SIGNED')
+    application.app.logger.info('Deed status has been changed to NOT-LR-SIGNED')
     deed.deed = modify_deed
     deed.save()
 
