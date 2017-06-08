@@ -61,7 +61,9 @@ def process_file(csv_file, sql_connection, table):
     print("\nProcessing: %s" % csv_file.name)
     LOGGER.info("Processing file: %s" % str(csv_file.name))
 
-    rows_reader = csv.reader(csv_file, delimiter='|', quotechar="'")
+    f = open(csv_file.name, newline='', encoding='utf-8')
+
+    rows_reader = csv.reader(f, delimiter='|', quotechar="'")
     row_count = 0
 
     for row in rows_reader:
