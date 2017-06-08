@@ -24,7 +24,7 @@ ENV DEED_API_ADDRESS 'http://0.0.0.0:8080'
 ENV ORGANISATION_API_ADDRESS 'http://organisation-api:8080/'
 
 # For logging
-ENV FLASK_LOG_LEVEL DEBUG
+ENV LOG_LEVEL DEBUG
 
 RUN mkdir /logs
 WORKDIR /src
