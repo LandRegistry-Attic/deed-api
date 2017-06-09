@@ -1,24 +1,21 @@
 from functools import reduce
-import requests
 import json
-import logging
 from urllib.parse import urljoin
+from flask import g
+import application
 
 
 from application import config
 
 
-LOGGER = logging.getLogger(__name__)
-
-
 def get_proprietor_names(title_number):
-    LOGGER.info("Calling get-proprietor-names...")
+    application.app.logger.info("Calling get-proprietor-names...")
     request_url = reduce(urljoin, [config.DM_REGISTER_ADAPTER, 'get-proprietor-names/', title_number])
-    txt = requests.get(request_url).text
-    LOGGER.debug("Response: '%s'", txt)
+    txt = g.requests.get(request_url).text
+    application.app.logger.debug("Response: '%s'", txt)
     return json.loads(txt).get('proprietor_names')
 
 
 def check_health():
-    service_response = requests.get(config.DM_REGISTER_ADAPTER + '/health/service-check')
+    service_response = g.requests.get(config.DM_REGISTER_ADAPTER + '/health/service-check')
     return service_response

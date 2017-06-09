@@ -1,12 +1,10 @@
-import logging
 from application.deed.model import Deed
 from flask import abort
 from flask import Blueprint
 from flask.ext.api import status
 import sys
+import application
 from application.casework.service import get_document
-
-LOGGER = logging.getLogger(__name__)
 
 casework_bp = Blueprint('casework', __name__,
                         template_folder='templates',
@@ -26,5 +24,5 @@ def get_deed(deed_reference):
 
         except:
             msg = str(sys.exc_info())
-            LOGGER.log(msg)
+            application.app.logger.debug(msg)
             return msg

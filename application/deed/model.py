@@ -1,4 +1,3 @@
-import logging
 import copy
 import uuid
 import os
@@ -13,9 +12,7 @@ from application import db
 from application.deed.utils import process_organisation_credentials
 from application.deed.deed_status import DeedStatus
 from application.deed.address_utils import format_address_string
-
-
-LOGGER = logging.getLogger(__name__)
+import application
 
 
 class Deed(db.Model):
@@ -69,7 +66,7 @@ class Deed(db.Model):
 
     def _get_deed_internal(self, deed_reference, organisation_id):
         if organisation_id != os.getenv('LR_ORGANISATION_ID'):
-            LOGGER.debug("Internal request to view deed reference %s" % deed_reference)
+            application.app.logger.debug("Internal request to view deed reference %s" % deed_reference)
             result = Deed.query.filter_by(token=str(deed_reference), organisation_id=organisation_id).first()
         else:
             result = Deed.query.filter_by(token=str(deed_reference)).first()
@@ -152,4 +149,4 @@ def deed_pdf_adapter(deed_reference):
 
 def check_time_stamp(time):
     time_zone = pytz.timezone('Europe/London')
-    return (pytz.utc.localize(time, is_dst=None).astimezone(time_zone))
+    return pytz.utc.localize(time, is_dst=None).astimezone(time_zone)
