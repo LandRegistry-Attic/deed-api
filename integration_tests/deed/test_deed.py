@@ -121,6 +121,25 @@ class TestDeedRoutes(unittest.TestCase):
         self.assertIn("DRAFT", str(get_deed_data))
         self.assertIn(response_json["path"][-6:], str(get_deed_data))
 
+    def deed_internal_create_and_get(self, deed):
+        create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
+                                    data=json.dumps(deed),
+                                    headers=self.webseal_headers)
+        self.assertEqual(create_deed.status_code, 201)
+
+        response_json = create_deed.json()
+
+        self.assertIn("/deed/", str(response_json))
+
+        get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"] + '/internal')
+        self.assertEqual(get_created_deed.status_code, 200)
+
+        created_deed = get_created_deed.json()
+        self.assertIn("deed", str(created_deed))
+
+    def test_deed_internal_create_and_get(self):
+        self.deed_internal_create_and_get(valid_deed)
+
     def test_invalid_params_on_get_with_mdref_and_titleno(self):
         fake_token_deed = requests.get(config.DEED_API_BASE_HOST + "/deed?invalid_query_parameter=invalid",
                                        headers=self.webseal_headers)

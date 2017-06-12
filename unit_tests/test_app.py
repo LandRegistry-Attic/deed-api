@@ -294,7 +294,7 @@ class TestRoutes(TestRoutesBase):
                                                'organisation_locale': "FooBar"}
 
         payload = json.dumps(DeedHelper._invalid_title)
-        response = self.app.post(self.DEED_ENDPOINT, data=payload,
+        response = self.app.post(self.DEED_INTERNAL_ENDPOINT, data=payload,
                                  headers={"Content-Type": "application/json"})
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
