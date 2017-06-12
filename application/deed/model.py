@@ -79,6 +79,12 @@ class Deed(db.Model):
 
         return self._get_deed_internal(deed_reference, organisation_id)
 
+    def get_deed_system(self, deed_reference):
+        application.app.logger.debug("Internal request to NEW METHOD view deed reference %s" % deed_reference)
+        result = Deed.query.filter_by(token=str(deed_reference)).first()
+
+        return result
+
     @staticmethod
     def get_signed_deeds():
         conveyancer_credentials = process_organisation_credentials()
