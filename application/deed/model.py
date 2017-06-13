@@ -80,7 +80,7 @@ class Deed(db.Model):
         return self._get_deed_internal(deed_reference, organisation_id)
 
     def get_deed_system(self, deed_reference):
-        application.app.logger.debug("Internal request to NEW METHOD view deed reference %s" % deed_reference)
+        application.app.logger.info("Internal request to get_deed_system to view deed reference %s" % deed_reference)
         result = Deed.query.filter_by(token=str(deed_reference)).first()
 
         return result
@@ -105,7 +105,7 @@ class Deed(db.Model):
         return -1
 
 
-def deed_adapter(deed_reference):
+def deed_adapter(deed_reference, use_internal=False):
     """
     An adapter for the deed to enhance and return in the required form.
 
@@ -113,7 +113,10 @@ def deed_adapter(deed_reference):
     :return: The deed with status and token attributes set
     :rtype: deed
     """
-    deed = Deed().get_deed(deed_reference)
+    if use_internal:
+        deed = Deed().get_deed_system(deed_reference)
+    else:
+        deed = Deed().get_deed(deed_reference)
     if deed is None:
         raise FileNotFoundError("There is no deed associated with deed id '{0}'.".format(deed_reference,))
     deed.deed['token'] = deed.token
@@ -133,7 +136,7 @@ def deed_json_adapter(deed_reference):
     return {'deed': deed.deed}
 
 
-def deed_pdf_adapter(deed_reference):
+def deed_pdf_adapter(deed_reference, use_internal=False):
     """
     An adapter for the deed to return as a dictionary for conversion to json.
 
@@ -141,7 +144,10 @@ def deed_pdf_adapter(deed_reference):
     :return: The deed, as a pdf.
     :rtype: pdf
     """
-    deed_dict = deed_adapter(deed_reference).deed
+    if use_internal:
+        deed_dict = deed_adapter(deed_reference, use_internal=True).deed
+    else:
+        deed_dict = deed_adapter(deed_reference).deed
     if 'effective_date' in deed_dict:
         temp = datetime.strptime(deed_dict['effective_date'], "%Y-%m-%d %H:%M:%S")
         check_time = check_time_stamp(temp)
