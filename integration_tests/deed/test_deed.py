@@ -333,7 +333,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         deed_model = Deed()
 
-        result = deed_model._get_deed_internal(response_json["path"].replace("/deed/", ""), os.getenv('LR_ORGANISATION_ID'))
+        result = deed_model.get_deed_system(response_json["path"].replace("/deed/", ""))
 
         self.assertIsNotNone(result.deed_xml)
 
@@ -528,7 +528,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         create_deed = Deed()
 
-        deed_returned = create_deed._get_deed_internal(response_path, os.getenv('LR_ORGANISATION_ID'))
+        deed_returned = create_deed.get_deed_system(response_path)
 
         self.assertIsInstance(deed_returned.created_date, datetime.datetime)
         self.assertEqual(deed_returned.payload_json, valid_deed)
