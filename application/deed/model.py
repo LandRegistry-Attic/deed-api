@@ -64,7 +64,10 @@ class Deed(db.Model):
         return Deed.query.filter(Deed.status.like(status), Deed.organisation_name != os.getenv('LR_ORGANISATION_NAME'),
                                  Deed.organisation_name.isnot(None)).count()
 
-    def _get_deed_internal(self, deed_reference, organisation_id):
+    def get_deed(self, deed_reference):
+        conveyancer_credentials = process_organisation_credentials()
+        organisation_id = conveyancer_credentials[os.getenv('DEED_CONVEYANCER_KEY')][1]
+
         if organisation_id != os.getenv('LR_ORGANISATION_ID'):
             application.app.logger.debug("Internal request to view deed reference %s" % deed_reference)
             result = Deed.query.filter_by(token=str(deed_reference), organisation_id=organisation_id).first()
@@ -72,12 +75,6 @@ class Deed(db.Model):
             result = Deed.query.filter_by(token=str(deed_reference)).first()
 
         return result
-
-    def get_deed(self, deed_reference):
-        conveyancer_credentials = process_organisation_credentials()
-        organisation_id = conveyancer_credentials[os.getenv('DEED_CONVEYANCER_KEY')][1]
-
-        return self._get_deed_internal(deed_reference, organisation_id)
 
     def get_deed_system(self, deed_reference):
         application.app.logger.info("Internal request to get_deed_system to view deed reference %s" % deed_reference)
@@ -105,7 +102,7 @@ class Deed(db.Model):
         return -1
 
 
-def deed_adapter(deed_reference, use_internal=False):
+def deed_adapter(deed_reference, use_system=False):
     """
     An adapter for the deed to enhance and return in the required form.
 
@@ -113,7 +110,7 @@ def deed_adapter(deed_reference, use_internal=False):
     :return: The deed with status and token attributes set
     :rtype: deed
     """
-    if use_internal:
+    if use_system:
         deed = Deed().get_deed_system(deed_reference)
     else:
         deed = Deed().get_deed(deed_reference)
@@ -136,7 +133,7 @@ def deed_json_adapter(deed_reference):
     return {'deed': deed.deed}
 
 
-def deed_pdf_adapter(deed_reference, use_internal=False):
+def deed_pdf_adapter(deed_reference, use_system=False):
     """
     An adapter for the deed to return as a dictionary for conversion to json.
 
@@ -144,8 +141,8 @@ def deed_pdf_adapter(deed_reference, use_internal=False):
     :return: The deed, as a pdf.
     :rtype: pdf
     """
-    if use_internal:
-        deed_dict = deed_adapter(deed_reference, use_internal=True).deed
+    if use_system:
+        deed_dict = deed_adapter(deed_reference, use_system=True).deed
     else:
         deed_dict = deed_adapter(deed_reference).deed
     if 'effective_date' in deed_dict:
