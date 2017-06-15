@@ -141,10 +141,7 @@ def deed_pdf_adapter(deed_reference, use_system=False):
     :return: The deed, as a pdf.
     :rtype: pdf
     """
-    if use_system:
-        deed_dict = deed_adapter(deed_reference, use_system=True).deed
-    else:
-        deed_dict = deed_adapter(deed_reference).deed
+    deed_dict = deed_adapter(deed_reference, use_system=use_system).deed
     if 'effective_date' in deed_dict:
         temp = datetime.strptime(deed_dict['effective_date'], "%Y-%m-%d %H:%M:%S")
         check_time = check_time_stamp(temp)
