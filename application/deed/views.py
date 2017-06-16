@@ -378,7 +378,7 @@ def make_effective(deed_reference):
         deed_status = str(result.status)
 
         if deed_status == "ALL-SIGNED":
-            check_result = Akuma.do_check(result.deed, "make effective", result.organisation_name, result.token)
+            check_result = Akuma.do_check(result.deed, "make effective", result.organisation_id, result.organisation_name, result.token)
             application.app.logger.info("Check ID - Make Effective: " + check_result['id'])
 
             signed_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
