@@ -314,7 +314,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         deed_model = Deed()
 
-        result = deed_model._get_deed_internal(response_json["path"].replace("/deed/", ""), os.getenv('LR_ORGANISATION_ID'))
+        result = deed_model._get_deed_internal(response_json["path"].replace("/deed/", ""), os.getenv('LR_ORGANISATION_NAME'))
 
         self.assertIsNotNone(result.deed_xml)
 
@@ -467,7 +467,6 @@ class TestDeedRoutes(unittest.TestCase):
             # Post a new test organisation, which will match the one provided in the test headers
             post_organisation_name = requests.post(config.ORGANISATION_API_BASE_HOST + '/organisation-name',
                                                    data=json.dumps({"organisation_name": "Test Organisation",
-                                                                    "organisation_id": "1000.1.2"}),
                                                    headers=self.webseal_test_organisation_name)
 
             self.assertEqual(post_organisation_name.status_code, 201)
