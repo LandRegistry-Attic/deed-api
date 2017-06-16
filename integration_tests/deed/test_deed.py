@@ -509,7 +509,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         create_deed = Deed()
 
-        deed_returned = create_deed._get_deed_internal(response_path, os.getenv('LR_ORGANISATION_ID'))
+        deed_returned = create_deed._get_deed_internal(response_path, os.getenv('LR_ORGANISATION_NAME'))
 
         self.assertIsInstance(deed_returned.created_date, datetime.datetime)
         self.assertEqual(deed_returned.payload_json, valid_deed)
