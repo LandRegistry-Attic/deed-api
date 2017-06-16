@@ -23,7 +23,7 @@ class Validation():
         organisation_credentials = process_organisation_credentials()
 
         if organisation_credentials is not None:
-            organisation_credentials = {'organisation_id': organisation_credentials[os.getenv('DEED_CONVEYANCER_KEY')][1],
+            organisation_credentials = {#'organisation_id': organisation_credentials[os.getenv('DEED_CONVEYANCER_KEY')][1],
                                         'organisation_name': organisation_credentials[os.getenv('DEED_CONVEYANCER_KEY')][0],
                                         'organisation_locale': organisation_credentials[os.getenv('DEED_WEBSEAL_LOCALE')][0]}
             return organisation_credentials

@@ -173,7 +173,7 @@ def update_deed(deed, deed_json):
 
 def get_organisation_name(deed):
     organisation_interface = make_organisation_adapter_client()
-    return organisation_interface.get_organisation_name(deed.organisation_id,
+    return organisation_interface.get_organisation_name(#deed.organisation_id,
                                                         deed.organisation_name)
 
 
