@@ -32,6 +32,7 @@ pbr==1.10.0
 psycopg2==2.5.4
 py==1.4.30
 pycparser==2.17
+pycrypto==2.6.1
 PyPDF2==1.26.0
 Pyphen==0.9.4
 PySocks==1.5.7
