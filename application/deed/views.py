@@ -18,7 +18,7 @@ from application.deed.deed_validator import Validation
 from flask import Blueprint
 from flask import request, abort, jsonify, Response
 from flask.ext.api import status
-# from struct import *
+from Crypto.Hash import SHA256
 
 LOGGER = logging.getLogger(__name__)
 
@@ -438,11 +438,18 @@ def update_json_with_signature(deed_reference):
     # Check that the hash returned matches the original hash stored on our deed-hash table
     # TODO Add logic and checks here
 
-    deed.save()
+    hash = SHA256.new()
+    hash.update(str("hello").encode("utf-8"))
 
-    update_deed_signature_timestamp(deed, data['borrower-token'], data['datetime'])
+    if deed.deed_hash != hash.hexdigest():
+        LOGGER.error("Hashed deed on table does not match deed_xml hash")
+        return jsonify({"Error": "Hashed deed on table does not match deed_xml hash"}), status.HTTP_500_INTERNAL_SERVER_ERROR
 
-    return "", status.HTTP_200_OK
+    else:
+        deed.save()
+        update_deed_signature_timestamp(deed, data['borrower-token'], data['datetime'])
+
+        return "", status.HTTP_200_OK
 
 
 def send_error_list(error_list):

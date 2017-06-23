@@ -157,6 +157,5 @@ def deed_pdf_adapter(deed_reference):
 def generate_hash(deed_xml):
     hash = SHA256.new()
     hash.update(deed_xml)
-    LOGGER.info(hash.hexdigest())
 
     return hash.hexdigest()
