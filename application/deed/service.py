@@ -9,10 +9,10 @@ from functools import partial
 from lxml import etree
 from underscore import _
 
-from application import esec_client
 from application.borrower.model import Borrower as BorrowerModel
 from application.borrower.server import BorrowerService
 from application.mortgage_document.model import MortgageDocument
+from application.service_clients.esec import make_esec_client
 from application.service_clients.organisation_adapter import make_organisation_adapter_client
 
 LOGGER = logging.getLogger(__name__)
@@ -52,6 +52,7 @@ def apply_registrar_signature(deed, effective_date):
     effective_xml = add_effective_date_to_xml(deed_xml, effective_date)
 
     LOGGER.info("Applying registrar's signature to deed {}".format(deed.token))
+    esec_client = make_esec_client()
     deed.deed_xml = esec_client.sign_document_with_authority(effective_xml)
     deed.status = DeedStatus.effective.value
     deed.save()

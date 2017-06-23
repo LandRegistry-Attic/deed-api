@@ -7,6 +7,9 @@ from application.dependencies.rabbitmq import Emitter, broker_url
 import datetime
 import base64
 
+from application.deed.model import Deed
+
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -57,7 +60,7 @@ def reissue_sms(esec_user_name):  # pragma: no cover
         abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code, borrower_token, deed_id):  # pragma: no cover
+def auth_sms(deed, borrower_pos, user_id, borrower_auth_code, borrower_token):  # pragma: no cover
 
     LOGGER.info("Calling dm-esec-client to verify OTP code and sign the deed")
     element_id = 'deedData'
@@ -75,25 +78,29 @@ def auth_sms(deed_xml, borrower_pos, user_id, borrower_auth_code, borrower_token
     extra_parameters = {
         'borrower-token': borrower_token,
         'datetime': datetime.datetime.now().strftime("%d %B %Y %I:%M%p"),
-        'deed-id': deed_id
+        'deed-id': deed.token
     }
 
     LOGGER.info("Calling esec_client to hit validateSMSOTP...")
 
     request_url = config.ESEC_CLIENT_BASE_HOST + "/esec/auth_sms"
 
-    resp = requests.post(request_url, params=parameters, data=deed_xml)
+    resp = requests.post(request_url, params=parameters, data=deed.deed_xml)
 
     if resp.status_code == status.HTTP_200_OK or resp.status_code == status.HTTP_401_UNAUTHORIZED:
         LOGGER.info("Response XML = %s" % resp.content)
+
+        LOGGER.info("Hashing deed_xml prior to sending message to queue...")
+        deed.deed_hash = Deed().generate_hash(deed.deed_xml)
+        deed.save()
 
         LOGGER.info("Preparing to send message to the queue...")
 
         try:
             url = broker_url('rabbitmq', 'guest', 'guest', 5672)
-            LOGGER.info(deed_xml)
+            LOGGER.info(deed.deed_xml)
             with Emitter(url, config.EXCHANGE_NAME, 'esec-signing-key') as emitter:
-                emitter.send_message({'params': parameters, 'extra-parameters': extra_parameters, 'data': base64.b64encode(deed_xml).decode()})
+                emitter.send_message({'params': parameters, 'extra-parameters': extra_parameters, 'data': base64.b64encode(deed.deed_xml).decode()})
                 LOGGER.info("Message sent to the queue...")
                 return "", 200
         except Exception as e:

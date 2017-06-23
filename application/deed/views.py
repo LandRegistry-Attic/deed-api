@@ -5,7 +5,7 @@ import logging
 import sys
 from datetime import datetime
 
-from application import esec_client
+from application.service_clients.esec import make_esec_client
 from application.akuma.service import Akuma
 from application.borrower.model import Borrower
 from application.deed.deed_render import create_deed_pdf
@@ -271,13 +271,14 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
 
         try:
             LOGGER.info("getting existing XML")
-            modify_xml = copy.deepcopy(deed.deed_xml)
+            # modify_xml = copy.deepcopy(deed.deed_xml)
             borrower_pos = deed.get_borrower_position(borrower_token)
             borrower = Borrower.get_by_token(borrower_token)
             esec_id = borrower.esec_user_name
 
             if esec_id:
-                esec_client.auth_sms(modify_xml, borrower_pos, esec_id, borrower_code, borrower_token, deed.token)
+                esec_client = make_esec_client()
+                esec_client.auth_sms(deed, borrower_pos, esec_id, borrower_code, borrower_token)
                 LOGGER.info("Added deed to esec-signing queue")
 
                 return "", 200
@@ -297,6 +298,7 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
 def issue_sms(deed_reference, borrower_token):
     deed_instance = Deed()
     deed = deed_instance.get_deed(deed_reference)
+    esec_client = make_esec_client()
 
     if deed is None:
         LOGGER.error("Database Exception 404 for deed reference - %s" % deed_reference)
@@ -432,7 +434,9 @@ def update_json_with_signature(deed_reference):
 
     deed.deed_xml = data["deed-xml"].encode("utf-8")
 
-    LOGGER.info(deed.deed_xml)
+    LOGGER.info("Checking deed_xml after getting it back from the queue")
+    # Check that the hash returned matches the original hash stored on our deed-hash table
+    # TODO Add logic and checks here
 
     deed.save()
 

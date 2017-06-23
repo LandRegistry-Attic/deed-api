@@ -13,6 +13,8 @@ from application.deed.utils import process_organisation_credentials
 from application.deed.deed_status import DeedStatus
 from application.deed.address_utils import format_address_string
 
+from Crypto.Hash import SHA256
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -32,6 +34,7 @@ class Deed(db.Model):
     organisation_name = db.Column(db.String, nullable=True)
     payload_json = db.Column(JSON)
     created_date = db.Column(db.DateTime, default=datetime.utcnow(),  nullable=False)
+    deed_hash = db.Column(db.String, nullable=True)
 
     def save(self):  # pragma: no cover
         db.session.add(self)
@@ -40,6 +43,10 @@ class Deed(db.Model):
     @staticmethod
     def generate_token():
         return str(uuid.uuid4())
+
+    @staticmethod
+    def generate_hash(deed_xml):
+        return generate_hash(deed_xml)
 
     def get_json_doc(self):
         return copy.deepcopy(self.json_doc)
@@ -145,3 +152,11 @@ def deed_pdf_adapter(deed_reference):
     property_address = (deed_dict["property_address"])
     deed_dict["property_address"] = format_address_string(property_address)
     return deed_dict
+
+
+def generate_hash(deed_xml):
+    hash = SHA256.new()
+    hash.update(deed_xml)
+    LOGGER.info(hash.hexdigest())
+
+    return hash.hexdigest()
