@@ -9,6 +9,7 @@ from .complete_deed_dict import complete_deed_dict
 class DeedModelMock(Deed):
     token = "ABC1234"
     deed = DEED
+    deed_hash = "d4c220637b3338e0af749d4e1cd276d950973fa9bbff4011f61a757aa4f4f638"
     status = "DRAFT"
     deed_xml = "<dm-application xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"http://localhost:9080/schemas/deed-schema-v0-3.xsd\">\
                 <operativeDeed><deedData Id=\"deedData\"><titleNumber>GR515835</titleNumber><propertyDescription>0 The Drive, This Town, This County, PL0 0TH</propertyDescription>\

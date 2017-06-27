@@ -912,3 +912,13 @@ class TestUpdateDeed(TestRoutesBase):
         organisation_name = get_organisation_name("1000.1.2", "Test [22022] Organisation")
 
         self.assertEqual(organisation_name, "Test Organisation")
+
+    @mock.patch('application.service_clients.esec.interface.EsecClientInterface.auth_sms')
+    @mock.patch('application.deed.model.Deed.query', autospec=True)
+    def test_deed_hash_exists(self, mock_auth, mock_api):
+        payload = json.dumps(DeedHelper._verify_and_sign)
+
+        response = self.app.post(self.DEED_ENDPOINT + 'AB1234' + '/verify-auth-code',
+                                 data=payload,
+                                 headers=self.webseal_headers)
+        self.assertEqual(response.status_code, 500)

@@ -35,6 +35,7 @@ class Deed(db.Model):
     payload_json = db.Column(JSON)
     created_date = db.Column(db.DateTime, default=datetime.utcnow(),  nullable=False)
     deed_hash = db.Column(db.String, nullable=True)
+    in_progress = db.Column(db.Boolean, nullable=True)
 
     def save(self):  # pragma: no cover
         db.session.add(self)

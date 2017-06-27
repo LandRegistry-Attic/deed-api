@@ -6,6 +6,7 @@ from flask import abort
 from application.dependencies.rabbitmq import Emitter, broker_url
 import datetime
 import base64
+from lxml import etree
 
 from application.deed.model import Deed
 
@@ -90,21 +91,29 @@ def auth_sms(deed, borrower_pos, user_id, borrower_auth_code, borrower_token):  
     if resp.status_code == status.HTTP_200_OK or resp.status_code == status.HTTP_401_UNAUTHORIZED:
         LOGGER.info("Response XML = %s" % resp.content)
 
-        LOGGER.info("Hashing deed_xml prior to sending message to queue...")
-        deed.deed_hash = Deed().generate_hash(deed.deed_xml)
-        deed.save()
+        LOGGER.info("Hashing deed prior to sending message to queue...")
+        # Check if deed_hash exists on table - if it does, break
+        if deed.deed_hash:
+            return "Hashed deed exists on table", 500
+        else:
+            tree = etree.fromstring(deed.deed_xml)
+            deed_data_xml = tree.xpath('.//deedData')[0]
 
-        LOGGER.info("Preparing to send message to the queue...")
+            deed.deed_hash = Deed().generate_hash(etree.tostring(deed_data_xml))
+            extra_parameters.update({'deed-hash': deed.deed_hash})
+            LOGGER.info("Marking deed as in progress immediately prior to sending message to queue...")
+            deed.save()
 
-        try:
-            url = broker_url('rabbitmq', 'guest', 'guest', 5672)
-            LOGGER.info(deed.deed_xml)
-            with Emitter(url, config.EXCHANGE_NAME, 'esec-signing-key') as emitter:
-                emitter.send_message({'params': parameters, 'extra-parameters': extra_parameters, 'data': base64.b64encode(deed.deed_xml).decode()})
-                LOGGER.info("Message sent to the queue...")
-                return "", 200
-        except Exception as e:
-            LOGGER.info('Error returned when trying to place an item on the queue: %s' % e)
+            LOGGER.info("Preparing to send message to the queue...")
+
+            try:
+                url = broker_url('rabbitmq', 'guest', 'guest', 5672)
+                with Emitter(url, config.EXCHANGE_NAME, 'esec-signing-key') as emitter:
+                    emitter.send_message({'params': parameters, 'extra-parameters': extra_parameters, 'data': base64.b64encode(deed.deed_xml).decode()})
+                    LOGGER.info("Message sent to the queue...")
+                    return "", 200
+            except Exception as e:
+                LOGGER.info('Error returned when trying to place an item on the queue: %s' % e)
 
     else:
         LOGGER.error("ESecurity Client Exception when trying to verify the OTP code")
