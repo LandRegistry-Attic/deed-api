@@ -433,6 +433,14 @@ def update_json_with_signature(deed_reference):
 
     deed.deed_xml = data["deed-xml"].encode("utf-8")
 
+    from lxml import etree
+    tree = etree.fromstring(data['deed-xml'])
+    deed_data_xml = tree.xpath('.//signatureSlots')[0]
+    borrower_pos = deed_data_xml.get_borrower_position(data['borrower-token'])
+    LOGGER.info('****************************')
+    LOGGER.info('Borrower pos is %s' % borrower_pos)
+    LOGGER.info('****************************')
+
     deed.deed_hash = None
     deed.save()
     update_deed_signature_timestamp(deed, data['borrower-token'], data['datetime'])
