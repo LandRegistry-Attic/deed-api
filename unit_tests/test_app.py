@@ -964,11 +964,11 @@ class TestUpdateDeed(TestRoutesBase):
                 #  returns a "not found" if the call to get the name matches no organisation, or
                 #  the name, if it does match.
                 mock_organisation_name.return_value = "not found"
-                organisation_name = get_organisation_name("1000.1.2", "Test Organisation")
+                organisation_name = get_organisation_name("Test Organisation")
 
                 self.assertEqual(organisation_name, "Test Organisation")
 
                 mock_organisation_name.return_value = "Test Organisation"
-                organisation_name = get_organisation_name("1000.1.2", "Test [22022] Organisation")
+                organisation_name = get_organisation_name("Test [22022] Organisation")
 
                 self.assertEqual(organisation_name, "Test Organisation")

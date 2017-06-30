@@ -25,6 +25,7 @@ class Akuma:
 
         akuma_client = akuma.make_akuma_client()
 
+        application.app.logger.debug(payload)
         check_result = akuma_client.perform_check(payload)
 
         return check_result

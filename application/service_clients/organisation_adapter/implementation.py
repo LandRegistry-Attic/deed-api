@@ -6,12 +6,12 @@ from flask import g
 import application
 
 
-def get_organisation_name(organisation_id, organisation_name):
+def get_organisation_name(organisation_name):
 
     # Connect to organisation-api and get the name for the id provided
     application.app.logger.info("Calling get-organisation-name...")
     request_url = reduce(urljoin, [config.ORGANISATION_API_BASE_HOST,
-                                   'organisation-name/', organisation_id])
+                                   'organisation-name/', organisation_name])
 
     # Collect the organisation name and return it
     new_organisation_name = _get_request(request_url)

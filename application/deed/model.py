@@ -64,10 +64,10 @@ class Deed(db.Model):
         return Deed.query.filter(Deed.status.like(status), Deed.organisation_name != os.getenv('LR_ORGANISATION_NAME'),
                                  Deed.organisation_name.isnot(None)).count()
 
-    def _get_deed_internal(self, deed_reference, organisation_id):
-        if organisation_id != os.getenv('LR_ORGANISATION_ID'):
+    def _get_deed_internal(self, deed_reference, organisation_name):
+        if organisation_name != os.getenv('LR_ORGANISATION_NAME'):
             application.app.logger.debug("Internal request to view deed reference %s" % deed_reference)
-            result = Deed.query.filter_by(token=str(deed_reference), organisation_id=organisation_id).first()
+            result = Deed.query.filter_by(token=str(deed_reference), organisation_name=organisation_name).first()
         else:
             result = Deed.query.filter_by(token=str(deed_reference)).first()
 
@@ -75,9 +75,9 @@ class Deed(db.Model):
 
     def get_deed(self, deed_reference):
         conveyancer_credentials = process_organisation_credentials()
-        organisation_id = conveyancer_credentials[os.getenv('DEED_CONVEYANCER_KEY')][1]
+        organisation_name = conveyancer_credentials[os.getenv('DEED_CONVEYANCER_KEY')][0]
 
-        return self._get_deed_internal(deed_reference, organisation_id)
+        return self._get_deed_internal(deed_reference, organisation_name)
 
     @staticmethod
     def get_signed_deeds():

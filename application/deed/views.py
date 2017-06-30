@@ -164,7 +164,6 @@ def create():
     if credentials is None:
         return '', status.HTTP_401_UNAUTHORIZED
 
-    deed.organisation_id = credentials['organisation_id']
     deed.organisation_name = credentials['organisation_name']
 
     schema_errors = validator.validate_payload(deed_json)
@@ -329,7 +328,7 @@ def issue_sms(deed_reference, borrower_token):
                 forenames = ' '.join(filter(bool, (borrower.forename, borrower.middlename)))
 
                 user_id, status_code = esec_client.issue_sms(forenames, borrower.surname,
-                                                             deed.organisation_id, borrower.phonenumber)
+                                                             deed.organisation_name, borrower.phonenumber)
                 if status_code == 200:
                     application.app.logger.info("Created new esec user: %s for borrower[token:%s]",
                                                 str(user_id.decode()), borrower.token)
@@ -379,8 +378,7 @@ def make_effective(deed_reference):
         deed_status = str(result.status)
 
         if deed_status == "ALL-SIGNED":
-            check_result = Akuma.do_check(result.deed, "make effective", result.organisation_id,
-                                          result.organisation_name, result.token)
+            check_result = Akuma.do_check(result.deed, "make effective", result.organisation_id, result.organisation_name, result.token)
             application.app.logger.info("Check ID - Make Effective: " + check_result['id'])
 
             signed_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -456,7 +454,6 @@ def send_error_list(error_list):
 def get_organisation_name(deed_reference):
 
     organisation_interface = make_organisation_adapter_client()
-    organisation_name = organisation_interface.get_organisation_name(deed_adapter(deed_reference).organisation_id,
-                                                                     deed_adapter(deed_reference).organisation_name)
+    organisation_name = organisation_interface.get_organisation_name(deed_adapter(deed_reference).organisation_name)
 
     return jsonify({'result': organisation_name}), status.HTTP_200_OK
