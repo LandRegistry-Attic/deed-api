@@ -24,6 +24,7 @@ class Borrower(db.Model):
     phonenumber = db.Column(db.String, nullable=False)
     address = db.Column(db.String, nullable=False)
     esec_user_name = db.Column(db.String, nullable=True)
+    signing_in_progress = db.Column(db.Boolean, nullable=True)
 
     @staticmethod
     def generate_token():

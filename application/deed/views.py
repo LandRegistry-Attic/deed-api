@@ -1,5 +1,4 @@
 import collections
-import copy
 import json
 import logging
 import sys
@@ -270,7 +269,6 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
 
         try:
             LOGGER.info("getting existing XML")
-            # modify_xml = copy.deepcopy(deed.deed_xml)
             borrower_pos = deed.get_borrower_position(borrower_token)
             borrower = Borrower.get_by_token(borrower_token)
             esec_id = borrower.esec_user_name
@@ -278,6 +276,7 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
             if esec_id:
                 esec_client = make_esec_client()
                 esec_client.auth_sms(deed, borrower_pos, esec_id, borrower_code, borrower_token)
+
                 LOGGER.info("Added deed to esec-signing queue")
 
                 return "", 200
@@ -431,23 +430,16 @@ def update_json_with_signature(deed_reference):
 
     deed = Deed()._get_deed_internal(deed_reference, "*")
 
-    deed.deed_xml = data["deed-xml"].encode("utf-8")
-
-    # def get_pos(deed, borrower_token):
-    #     for idx, borrower in enumerate(deed['borrowers'], start=1):
-    #         if borrower_token == borrower['token']:
-    #             return idx
-    #     return -1
-
     from lxml import etree
     tree = etree.fromstring(data['deed-xml'])
-    deed_data_xml = tree.xpath('.//signatureSlots')[0]
-    # borrower_pos = get_pos(deed_data_xml, data['borrower-token'])
-    LOGGER.info('****************************')
-    LOGGER.info(etree.tostring(deed_data_xml))
-    LOGGER.info('****************************')
+    deed_data_xml = tree.xpath('.//signatureSlots/borrower_signature[position()=%s]' % data['borrower-pos'])[0]
 
-    deed.deed_hash = None
+    # Replace the borrower's element within the deed object's deed_xml
+    new_tree = etree.fromstring(deed.deed_xml)
+    new_tree_signature_element = new_tree.xpath('.//signatureSlots/borrower_signature[position()=%s]' % data['borrower-pos'])[0]
+    new_tree_signature_element.getparent().replace(new_tree_signature_element, deed_data_xml)
+    deed.deed_xml = etree.tostring(new_tree)
+
     deed.save()
     update_deed_signature_timestamp(deed, data['borrower-token'], data['datetime'])
 

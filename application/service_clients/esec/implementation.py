@@ -73,7 +73,7 @@ def auth_sms(deed, borrower_pos, user_id, borrower_auth_code, borrower_token):  
         'borrowers-path': borrower_path,
         'user-id': user_id,
         'otp-code': borrower_auth_code,
-        'service-id': 1,
+        'service-id': 1
     }
 
     extra_parameters = {
@@ -92,16 +92,17 @@ def auth_sms(deed, borrower_pos, user_id, borrower_auth_code, borrower_token):  
         LOGGER.info("Response XML = %s" % resp.content)
 
         LOGGER.info("Hashing deed prior to sending message to queue...")
-        # Check if deed_hash exists on table - if it does, break
-        if deed.deed_hash:
-            return "Hashed deed exists on table", 500
-        else:
-            tree = etree.fromstring(deed.deed_xml)
-            deed_data_xml = tree.xpath('.//deedData')[0]
+        tree = etree.fromstring(deed.deed_xml)
+        deed_data_xml = tree.xpath('.//deedData')[0]
 
-            deed.deed_hash = Deed().generate_hash(etree.tostring(deed_data_xml))
-            extra_parameters.update({'deed-hash': deed.deed_hash})
-            LOGGER.info("Marking deed as in progress immediately prior to sending message to queue...")
+        deed.deed_hash = Deed().generate_hash(etree.tostring(deed_data_xml))
+        extra_parameters.update({'deed-hash': deed.deed_hash})
+
+        LOGGER.info("Marking deed as in progress immediately prior to sending message to queue...")
+        request_url = config.DEED_API_BASE_HOST + "/borrower/update_signing_in_progress/%s" % borrower_token
+
+        resp = requests.post(request_url)
+        if resp.status_code == status.HTTP_200_OK:
             deed.save()
 
             LOGGER.info("Preparing to send message to the queue...")
@@ -114,6 +115,9 @@ def auth_sms(deed, borrower_pos, user_id, borrower_auth_code, borrower_token):  
                     return "", 200
             except Exception as e:
                 LOGGER.info('Error returned when trying to place an item on the queue: %s' % e)
+        else:
+            LOGGER.error("Error when attempting to mark deed signing as in progress... %s" % resp.status_code)
+            abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     else:
         LOGGER.error("ESecurity Client Exception when trying to verify the OTP code")

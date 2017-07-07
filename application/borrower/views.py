@@ -43,7 +43,8 @@ def get_borrower_details_by_verify_pid(verify_pid):
                 "borrower_token": borrower.token,
                 "deed_token": borrower.deed_token,
                 "phone_number": stripped_number,
-                "borrower_id": borrower.id
+                "borrower_id": borrower.id,
+                "signing_in_progress": borrower.signing_in_progress
             }
         ), status.HTTP_200_OK
 
@@ -69,3 +70,20 @@ def delete_verify_match(verify_pid):
 def strip_number_to_four_digits(phone_number):
     stripped_number = phone_number[-4:]
     return stripped_number
+
+
+@borrower_bp.route('/update_signing_in_progress/<borrower_token>', methods=['POST'])
+def update_borrower_signing_in_progress(borrower_token):
+    borrower = Borrower.get_by_token(borrower_token)
+    if borrower is not None:
+        borrower.signing_in_progress = True
+        borrower.save()
+
+        return "Borrower signing_in_progress set to true", status.HTTP_200_OK
+
+
+@borrower_bp.route('/check_signing_in_progress/<borrower_token>')
+def check_borrower_signing_in_progress(borrower_token):
+    borrower = Borrower.get_by_token(borrower_token)
+    if borrower is not None:
+        return jsonify({'result': borrower.signing_in_progress}), status.HTTP_200_OK
