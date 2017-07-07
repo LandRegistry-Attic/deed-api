@@ -17,6 +17,7 @@ from application.deed.deed_validator import Validation
 from flask import Blueprint
 from flask import request, abort, jsonify, Response
 from flask.ext.api import status
+from lxml import etree
 
 LOGGER = logging.getLogger(__name__)
 
@@ -430,7 +431,6 @@ def update_json_with_signature(deed_reference):
 
     deed = Deed()._get_deed_internal(deed_reference, "*")
 
-    from lxml import etree
     tree = etree.fromstring(data['deed-xml'])
     deed_data_xml = tree.xpath('.//signatureSlots/borrower_signature[position()=%s]' % data['borrower-pos'])[0]
 
