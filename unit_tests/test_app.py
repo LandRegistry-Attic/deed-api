@@ -332,6 +332,7 @@ class TestRoutes(TestRoutesBase):
             deed_token = "aaaaaa"
             dob = "02/02/1922"
             phonenumber = "07777777777"
+            signing_in_progress = "Signing in progress"
 
         mock_borrower.return_value = ReturnedBorrower()
         response = self.app.get(self.BORROWER_ENDPOINT + "verify/pid/1234")

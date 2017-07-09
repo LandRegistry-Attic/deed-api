@@ -82,7 +82,7 @@ def update_borrower_signing_in_progress(borrower_token):
         return "Borrower signing_in_progress set to true", status.HTTP_200_OK
 
 
-@borrower_bp.route('/check_signing_in_progress/<borrower_token>')
+@borrower_bp.route('/check_signing_in_progress/<borrower_token>', methods=['GET'])
 def check_borrower_signing_in_progress(borrower_token):
     borrower = Borrower.get_by_token(borrower_token)
     if borrower is not None:
