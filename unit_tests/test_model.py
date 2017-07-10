@@ -47,3 +47,16 @@ class TestDeed(unittest.TestCase):
         self.assertEqual(deed.status, result['status'])
         self.assertEqual('05/07/2016', result['effective_date'])
         self.assertEqual(['0 The Drive', 'This Town', 'This County', 'PL0 0TH'], result['property_address'])
+
+    def test_generate_hash(self):
+        deed = Deed()
+        deed.deed = {"effective_date": "2016-07-05 12:00:05",
+                     "property_address": "0 The Drive, This Town, This County, PL0 0TH"}
+        deed.token = 'token'
+        deed.status = 'status'
+
+        deed_data_xml = '<deedData>Testing</deedData>'
+
+        test = Deed().generate_hash(deed_data_xml.encode('utf-8'))
+
+        self.assertEqual(test, '958b43b5b22169359e3ae383d7c5e0c2223dac44eb2a017ef04234d44420db0a')
