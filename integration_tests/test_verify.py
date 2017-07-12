@@ -1,9 +1,10 @@
-import unittest
-import requests
 import json
-from application import config
+import requests
+import unittest
 
-from integration_tests.helper import setUpApp, insert_verify_match_row, webseal_headers, insert_borrower_row, remove_borrower_row
+from application import config
+from integration_tests.helper import setUpApp, insert_verify_match_row, webseal_headers, insert_borrower_row, \
+    remove_borrower_row, remove_verify_match_row
 
 
 # This class tests the methods that remove the verify match row.
@@ -26,4 +27,5 @@ class TestVerifyMatchRemoval(unittest.TestCase):
         self.assertEquals(json.loads(response)['result'], 'no match found for PID provided. Row has not been removed.')
 
     def tearDown(self):
+        remove_verify_match_row(self, 999)
         remove_borrower_row(self, 999)
