@@ -45,6 +45,7 @@ def insert_verify_match_row(self, verify_pid, borrower_id):
 
 def insert_borrower_row(self, verify_pid, borrower_id):
     with self.app.app_context():
+        remove_verify_match_row(self, 999)
         remove_borrower_row(self, 999)
         borrower = Borrower()
         borrower.id = 999
