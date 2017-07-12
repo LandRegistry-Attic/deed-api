@@ -67,9 +67,9 @@ def remove_borrower_row(self, borrower_id):
         borrower.delete(999)
 
 
-def remove_verify_match_row(self, verify_pid):
+def remove_verify_match_row(self, borrower_id):
     with self.app.app_context():
-        db.engine.execute('DELETE FROM verify_match WHERE verify_pid = %s', verify_pid)
+        db.engine.execute('DELETE FROM verify_match WHERE borrower_id = %s', borrower_id)
 
 
 def setUp_MortgageDocuments(self):
