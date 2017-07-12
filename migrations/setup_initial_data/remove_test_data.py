@@ -1,9 +1,8 @@
 #!/usr/local/bin/python3
 import argparse
+import application
 from sqlalchemy import create_engine
-import logging
 
-LOGGER = logging.getLogger(__name__)
 DB = "postgresql://vagrant:vagrant@localhost:5432/deed_api"
 
 
@@ -22,9 +21,9 @@ def process_input_options():
 
 
 def run_teardown():
-    LOGGER.info("Data Teardown Init")
+    application.app.logger.info("Data Teardown Init")
     settings = process_input_options()
-    LOGGER.info("Settings from command line: %s" % str(settings))
+    application.app.logger.info("Settings from command line: %s" % str(settings))
 
     if settings.confirm is not None:
         engine = create_engine(DB, convert_unicode=True)

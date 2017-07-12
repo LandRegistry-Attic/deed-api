@@ -269,7 +269,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         response_json = create_deed.json()
         get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
-                                        headers=self.webseal_headers_internal)
+                                        headers=self.webseal_headers)
         self.assertEqual(get_created_deed.status_code, 200)
 
     def test_save_make_effective(self):
@@ -339,7 +339,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         deed_model = Deed()
 
-        result = deed_model._get_deed_internal(response_json["path"].replace("/deed/", ""), os.getenv('LR_ORGANISATION_ID'))
+        result = deed_model._get_deed_internal(response_json["path"].replace("/deed/", ""), os.getenv('LR_ORGANISATION_NAME'))
 
         self.assertIsNotNone(result.deed_xml)
 
@@ -504,8 +504,7 @@ class TestDeedRoutes(unittest.TestCase):
         try:
             # Post a new test organisation, which will match the one provided in the test headers
             post_organisation_name = requests.post(config.ORGANISATION_API_BASE_HOST + '/organisation-name',
-                                                   data=json.dumps({"organisation_name": "Test Organisation",
-                                                                    "organisation_id": "1000.1.2"}),
+                                                   data=json.dumps({"organisation_name": "Test Organisation", "legal_organisation_name": "Legal Organisation"}),
                                                    headers=self.webseal_test_organisation_name)
 
             self.assertEqual(post_organisation_name.status_code, 201)
@@ -528,12 +527,12 @@ class TestDeedRoutes(unittest.TestCase):
                 config.DEED_API_BASE_HOST + response_json["path"] + '/organisation-name',
                 headers=self.webseal_test_organisation_name)
             self.assertEqual(get_organisation_name.status_code, 200)
-            self.assertEqual(get_organisation_name.json()['result'], 'Test Organisation')
+            self.assertEqual(get_organisation_name.json()['result'], 'Legal Organisation')
 
         finally:
             # Finally, teardown/delete the test organisation name
             delete_organisation_name = requests.delete(
-                config.ORGANISATION_API_BASE_HOST + '/organisation-name/1000.1.2')
+                config.ORGANISATION_API_BASE_HOST + '/organisation-name/Test Organisation')
 
             self.assertEqual(delete_organisation_name.status_code, 200)
 
@@ -547,7 +546,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         create_deed = Deed()
 
-        deed_returned = create_deed._get_deed_internal(response_path, os.getenv('LR_ORGANISATION_ID'))
+        deed_returned = create_deed._get_deed_internal(response_path, os.getenv('LR_ORGANISATION_NAME'))
 
         self.assertIsInstance(deed_returned.created_date, datetime.datetime)
         self.assertEqual(deed_returned.payload_json, valid_deed)

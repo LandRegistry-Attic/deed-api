@@ -1,9 +1,9 @@
-import logging
 import copy
 import uuid
 import os
 from datetime import datetime
 from builtins import FileNotFoundError
+import pytz
 
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.operators import and_
@@ -14,9 +14,7 @@ from application.deed.deed_status import DeedStatus
 from application.deed.address_utils import format_address_string
 
 from Crypto.Hash import SHA256
-
-
-LOGGER = logging.getLogger(__name__)
+import application
 
 
 class Deed(db.Model):
@@ -73,10 +71,12 @@ class Deed(db.Model):
         return Deed.query.filter(Deed.status.like(status), Deed.organisation_name != os.getenv('LR_ORGANISATION_NAME'),
                                  Deed.organisation_name.isnot(None)).count()
 
-    def _get_deed_internal(self, deed_reference, organisation_id):
-        if organisation_id != os.getenv('LR_ORGANISATION_ID'):
-            LOGGER.debug("Internal request to view deed reference %s" % deed_reference)
-            result = Deed.query.filter_by(token=str(deed_reference), organisation_id=organisation_id).first()
+    def _get_deed_internal(self, deed_reference, organisation_name):
+        if organisation_name == '*':
+            result = Deed.query.filter_by(token=str(deed_reference)).first()
+        elif organisation_name != os.getenv('LR_ORGANISATION_NAME'):
+            application.app.logger.debug("Internal request to view deed reference %s" % deed_reference)
+            result = Deed.query.filter_by(token=str(deed_reference), organisation_name=organisation_name).first()
         else:
             result = Deed.query.filter_by(token=str(deed_reference)).first()
 
@@ -84,9 +84,9 @@ class Deed(db.Model):
 
     def get_deed(self, deed_reference):
         conveyancer_credentials = process_organisation_credentials()
-        organisation_id = conveyancer_credentials[os.getenv('DEED_CONVEYANCER_KEY')][1]
+        organisation_name = conveyancer_credentials[os.getenv('DEED_CONVEYANCER_KEY')][0]
 
-        return self._get_deed_internal(deed_reference, organisation_id)
+        return self._get_deed_internal(deed_reference, organisation_name)
 
     @staticmethod
     def get_signed_deeds():
@@ -147,8 +147,10 @@ def deed_pdf_adapter(deed_reference):
     deed_dict = deed_adapter(deed_reference).deed
     if 'effective_date' in deed_dict:
         temp = datetime.strptime(deed_dict['effective_date'], "%Y-%m-%d %H:%M:%S")
-        deed_dict["effective_date"] = temp.strftime("%d/%m/%Y")
-        deed_dict["effective_time"] = temp.strftime("%H:%M:%S")
+        check_time = check_time_stamp(temp)
+        deed_dict["effective_date"] = check_time.strftime("%d/%m/%Y")
+        deed_dict["effective_time"] = check_time.strftime("%H:%M:%S")
+
     property_address = (deed_dict["property_address"])
     deed_dict["property_address"] = format_address_string(property_address)
     return deed_dict
@@ -159,3 +161,8 @@ def generate_hash(deed_xml):
     hash.update(deed_xml)
 
     return hash.hexdigest()
+
+
+def check_time_stamp(time):
+    time_zone = pytz.timezone('Europe/London')
+    return pytz.utc.localize(time, is_dst=None).astimezone(time_zone)

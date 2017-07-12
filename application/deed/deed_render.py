@@ -6,23 +6,19 @@ test_request_context. See Flask-WeasyPrint documentation if this is required.
 """
 from flask import render_template, Flask
 import flask_weasyprint
-
-
-import logging
-
-LOGGER = logging.getLogger(__name__)
+import application
 
 
 def create_deed_pdf(deed_dict):
     deed_html = create_deed_html(deed_dict)
-    LOGGER.info('Creating pdf for %s', deed_dict['title_number'])
+    application.app.logger.info('Creating pdf for %s', deed_dict['title_number'])
     return flask_weasyprint.HTML(string=deed_html).write_pdf()
 
 
 def create_deed_html(deed_dict):
     deed_data = {'deed': deed_dict}
     template = 'viewdeed.html'
-    LOGGER.info('Creating deed html page for %s', deed_dict['title_number'])
+    application.app.logger.info('Creating deed html page for %s', deed_dict['title_number'])
     borrower_count = 0
     for borrower in deed_data['deed']['borrowers']:
         borrower_count += 1

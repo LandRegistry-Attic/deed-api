@@ -304,6 +304,8 @@ class TestService(unittest.TestCase):
 
         mock_update_md.return_value = None
 
-        res, msg = update_deed(new_deed, DeedHelper._json_doc)
-
-        self.assertFalse(res)
+        with app.app_context() as ac:
+            ac.g.trace_id = None
+            with app.test_request_context():
+                res, msg = update_deed(new_deed, DeedHelper._json_doc)
+                self.assertFalse(res)
