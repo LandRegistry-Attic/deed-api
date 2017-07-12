@@ -184,3 +184,49 @@ class TestAppRoutes(unittest.TestCase):
                                    headers=webseal_headers)
 
         self.assertGreater(int(test_result.text), int(get_existing_deeds.text))
+
+    def test_check_borrower_signing_in_progress(self):
+
+        create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
+                                    data=json.dumps(valid_deed_two_borrowers),
+                                    headers=webseal_headers)
+        self.assertEqual(create_deed.status_code, 201)
+
+        response_json = create_deed.json()
+
+        get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                        headers=webseal_headers)
+
+        self.assertEqual(get_created_deed.status_code, 200)
+
+        created_deed = get_created_deed.json()
+
+        borrower_token = created_deed["deed"]["borrowers"][0]["token"]
+
+        response = requests.get(config.DEED_API_BASE_HOST + '/borrower/check_signing_in_progress/' + borrower_token,
+                                headers=webseal_headers).text
+
+        self.assertEquals(json.loads(response)['result'], None)
+
+    def test_update_borrower_signing_in_progress(self):
+
+        create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
+                                    data=json.dumps(valid_deed_two_borrowers),
+                                    headers=webseal_headers)
+        self.assertEqual(create_deed.status_code, 201)
+
+        response_json = create_deed.json()
+
+        get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                        headers=webseal_headers)
+
+        self.assertEqual(get_created_deed.status_code, 200)
+
+        created_deed = get_created_deed.json()
+
+        borrower_token = created_deed["deed"]["borrowers"][0]["token"]
+
+        response = requests.post(config.DEED_API_BASE_HOST + '/borrower/update_signing_in_progress/' + borrower_token,
+                                 headers=webseal_headers).text
+
+        self.assertEquals(response, 'Borrower signing_in_progress set to true')
