@@ -8,9 +8,9 @@ mortgage_document_bp = Blueprint('mortgage_document', __name__,
                         static_folder='static')
 
 
-@mortgage_document_bp.route('/get-legal-warning', methods=['GET'])
-def get_legal_warning():
+@mortgage_document_bp.route('/get-legal-warning/<md_ref>', methods=['GET'])
+def get_legal_warning(md_ref):
 
-    return "is this fake?"
+    return md_ref
 
 
