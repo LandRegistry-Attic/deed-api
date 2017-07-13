@@ -7,6 +7,7 @@ class MortgageDocument(db.Model):
 
     md_ref = db.Column(db.String, primary_key=True)
     data = db.Column(JSON)
+    legal_warning = db.Column(db.String, nullable=True)
 
     def save(self):  # pragma: no cover
         db.session.add(self)
