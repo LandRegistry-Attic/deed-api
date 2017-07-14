@@ -23,6 +23,17 @@ class TestDeed(unittest.TestCase):
         self.assertEqual(deed.token, result.token)
         self.assertEqual(deed.status, result.status)
 
+    @mock.patch('application.deed.model.Deed.get_deed_system')
+    @mock.patch('application.deed.model.Deed.get_deed')
+    def test_get_deed_adapter_use_system(self, mock_get_deed, mock_get_deed_system):
+        # Check that a use_system value of True calls get_deed_system
+        deed_adapter('1234', True)
+        mock_get_deed_system.assert_called_with('1234')
+
+        # Check that a use_system value of False calls get_deed
+        deed_adapter('1234', False)
+        mock_get_deed.assert_called_with('1234')
+
     @mock.patch('application.deed.model.Deed.get_deed')
     def test_get_deed_json_adapter(self, mock_get_deed):
         deed = Deed()
@@ -47,3 +58,14 @@ class TestDeed(unittest.TestCase):
         self.assertEqual(deed.status, result['status'])
         self.assertEqual('05/07/2016', result['effective_date'])
         self.assertEqual(['0 The Drive', 'This Town', 'This County', 'PL0 0TH'], result['property_address'])
+
+    @mock.patch('application.deed.model.Deed.get_deed_system')
+    @mock.patch('application.deed.model.Deed.get_deed')
+    def test_deed_pdf_adapter_use_system(self, mock_get_deed, mock_get_deed_system):
+        # Check that a use_system value of True calls get_deed_system
+        deed_pdf_adapter('1234', True)
+        mock_get_deed_system.assert_called_with('1234')
+
+        # Check that a use_system value of False calls get_deed
+        deed_pdf_adapter('1234', False)
+        mock_get_deed.assert_called_with('1234')
