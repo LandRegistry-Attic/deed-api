@@ -251,10 +251,8 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
     deed_instance = Deed()
     deed = deed_instance.get_deed(deed_reference)
 
-    import pdb; pdb.set_trace()
-
     if deed is None:
-        #application.app.logger.error("Database Exception 404 for deed reference - %s" % deed_reference)
+        application.app.logger.error("Database Exception 404 for deed reference - %s" % deed_reference)
         abort(status.HTTP_404_NOT_FOUND)
     else:
         application.app.logger.info("Signing deed for borrower_token %s against deed reference %s" %
@@ -297,7 +295,7 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
             application.app.logger.error("Failed to sign Mortgage document: %s" % msg)
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    return jsonify({"deed": deed.deed}), status.HTTP_200_OK
+        return jsonify({"deed": deed.deed}), status.HTTP_200_OK
 
 
 def issue_sms(deed_reference, borrower_token):
