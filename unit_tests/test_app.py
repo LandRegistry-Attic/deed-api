@@ -546,7 +546,7 @@ class TestRoutes(TestRoutesBase):
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.borrower.model.Borrower.get_by_token')
     @mock.patch('application.deed.utils.get_borrower_position')
-    @mock.patch('application.service_clients.esec.interface.EsecClientInterface.auth_sms')
+    @mock.patch('application.deed.views.auth_sms')
     @mock.patch('application.deed.model.Deed.save', autospec=True)
     @mock.patch('application.deed.model.Deed.query', autospec=True)
     def test_add_authenticate_and_sign(self, mock_query, mock_Deed_save,
@@ -993,7 +993,7 @@ class TestUpdateDeed(TestRoutesBase):
 
                 self.assertEqual(organisation_name, "Test Organisation")
 
-    @mock.patch('application.service_clients.esec.interface.EsecClientInterface.auth_sms')
+    @mock.patch('application.deed.views.auth_sms')
     @mock.patch('application.deed.model.Deed.query', autospec=True)
     def test_deed_hash_exists(self, mock_auth, mock_api):
         payload = json.dumps(DeedHelper._verify_and_sign)
