@@ -2,22 +2,22 @@ import collections
 import copy
 import json
 import sys
-import application
-from datetime import datetime
-
-from application import esec_client
 from application.akuma.service import Akuma
-from application.borrower.model import Borrower
 from application.deed.deed_render import create_deed_pdf
+from application.deed.deed_validator import Validation
 from application.deed.model import Deed, deed_json_adapter, deed_pdf_adapter, deed_adapter
 from application.deed.service import update_deed, update_deed_signature_timestamp, apply_registrar_signature, \
     make_deed_effective_date
-from application.service_clients.organisation_adapter import make_organisation_adapter_client
 from application.deed.utils import convert_json_to_xml
-from application.deed.deed_validator import Validation
+from datetime import datetime
 from flask import Blueprint
 from flask import request, abort, jsonify, Response
 from flask.ext.api import status
+
+import application
+from application import esec_client
+from application.borrower.model import Borrower
+from application.service_clients.organisation_adapter import make_organisation_adapter_client
 
 deed_bp = Blueprint('deed', __name__,
                     template_folder='templates',
@@ -172,7 +172,6 @@ def create():
     if credentials is None:
         return '', status.HTTP_401_UNAUTHORIZED
 
-    deed.organisation_id = credentials['organisation_id']
     deed.organisation_name = credentials['organisation_name']
 
     schema_errors = validator.validate_payload(deed_json)
@@ -337,7 +336,7 @@ def issue_sms(deed_reference, borrower_token):
                 forenames = ' '.join(filter(bool, (borrower.forename, borrower.middlename)))
 
                 user_id, status_code = esec_client.issue_sms(forenames, borrower.surname,
-                                                             deed.organisation_id, borrower.phonenumber)
+                                                             deed.organisation_name, borrower.phonenumber)
                 if status_code == 200:
                     application.app.logger.info("Created new esec user: %s for borrower[token:%s]",
                                                 str(user_id.decode()), borrower.token)
@@ -377,6 +376,10 @@ def retrieve_signed_deed():
 
 @deed_bp.route('/<deed_reference>/make-effective', methods=['POST'])
 def make_effective(deed_reference):
+    credentials = Validation().validate_organisation_credentials()
+    if credentials is None:
+        return '', status.HTTP_401_UNAUTHORIZED
+
     deed = Deed()
     result = deed.get_deed(deed_reference)
     if result is None:
@@ -387,8 +390,8 @@ def make_effective(deed_reference):
         deed_status = str(result.status)
 
         if deed_status == "ALL-SIGNED":
-            check_result = Akuma.do_check(result.deed, "make effective", result.organisation_id,
-                                          result.organisation_name, result.token)
+            check_result = Akuma.do_check(result.deed, "make effective", credentials['organisation_name'],
+                                          credentials['organisation_locale'], result.token)
             application.app.logger.info("Check ID - Make Effective: " + check_result['id'])
 
             signed_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -464,7 +467,6 @@ def send_error_list(error_list):
 def get_organisation_name(deed_reference):
 
     organisation_interface = make_organisation_adapter_client()
-    organisation_name = organisation_interface.get_organisation_name(deed_adapter(deed_reference).organisation_id,
-                                                                     deed_adapter(deed_reference).organisation_name)
+    organisation_name = organisation_interface.get_organisation_name(deed_adapter(deed_reference).organisation_name)
 
     return jsonify({'result': organisation_name}), status.HTTP_200_OK

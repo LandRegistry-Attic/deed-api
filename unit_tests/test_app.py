@@ -1,8 +1,8 @@
 import PyPDF2
 import io
-import os
 import json
 import mock
+import os
 import requests  # NOQA
 import unittest
 from application.akuma.service import Akuma
@@ -589,13 +589,28 @@ class TestRoutes(TestRoutesBase):
 
     @mock.patch('application.deed.model.Deed.get_deed')
     @mock.patch('application.deed.views.abort')
-    def test_make_deed_effective_404(self, mock_abort, mock_get_deed):
+    @mock.patch('application.deed.deed_validator.Validation.validate_organisation_credentials')
+    def test_make_deed_effective_404(self, mock_organisation_cred, mock_abort, mock_get_deed):
+        mock_organisation_cred.return_value = {
+            'organisation_id': "Foo", 'organisation_name': "Bar", 'organisation_locale': "FooBar"}
         with app.app_context() as ac:
             ac.g.trace_id = None
             with app.test_request_context():
                 mock_get_deed.return_value = None
                 make_effective(123)
                 mock_abort.assert_called_with(status.HTTP_404_NOT_FOUND)
+
+    @mock.patch('application.deed.model.Deed.get_deed')
+    @mock.patch('application.deed.views.abort')
+    @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
+    def test_make_deed_effective_401(self, mock_organisation_cred, mock_abort, mock_get_deed):
+        # Deliberately mock the credentials as none, then check that a 401 and empty result returned.
+        mock_organisation_cred.return_value = None
+        with app.app_context() as ac:
+            ac.g.trace_id = None
+            with app.test_request_context():
+                mock_get_deed.return_value = None
+                self.assertEqual(make_effective(123), ('', 401))
 
     @mock.patch('application.deed.model.Deed.get_deed')
     @mock.patch('application.deed.views.Akuma.do_check')
@@ -615,7 +630,11 @@ class TestRoutes(TestRoutesBase):
     @mock.patch('application.deed.model.Deed.get_deed')
     @mock.patch('application.deed.views.Akuma.do_check')
     @mock.patch('application.deed.views.jsonify')
-    def test_make_deed_effective_400(self, mock_jsonify, mock_akuma, mock_get_deed):
+    @mock.patch('application.deed.deed_validator.Validation.validate_organisation_credentials')
+    def test_make_deed_effective_400(self, mock_organisation_cred, mock_jsonify, mock_akuma, mock_get_deed):
+        mock_organisation_cred.return_value = {
+            'organisation_id': "Foo", 'organisation_name': "Bar", 'organisation_locale': "FooBar"}
+
         with app.app_context() as ac:
             ac.g.trace_id = None
             with app.test_request_context():
@@ -964,11 +983,11 @@ class TestUpdateDeed(TestRoutesBase):
                 #  returns a "not found" if the call to get the name matches no organisation, or
                 #  the name, if it does match.
                 mock_organisation_name.return_value = "not found"
-                organisation_name = get_organisation_name("1000.1.2", "Test Organisation")
+                organisation_name = get_organisation_name("Test Organisation")
 
                 self.assertEqual(organisation_name, "Test Organisation")
 
                 mock_organisation_name.return_value = "Test Organisation"
-                organisation_name = get_organisation_name("1000.1.2", "Test [22022] Organisation")
+                organisation_name = get_organisation_name("Test [22022] Organisation")
 
                 self.assertEqual(organisation_name, "Test Organisation")

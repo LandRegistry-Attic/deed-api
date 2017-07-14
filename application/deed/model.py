@@ -22,11 +22,9 @@ class Deed(db.Model):
     token = db.Column(db.String, nullable=False)
     deed = db.Column(JSON)
     identity_checked = db.Column(db.String(1), nullable=False)
-
     status = db.Column(db.String(16), default='DRAFT')
     deed_xml = db.Column(db.LargeBinary, nullable=True)
     checksum = db.Column(db.Integer, nullable=True, default=-1)
-    organisation_id = db.Column(db.String, nullable=True)
     organisation_name = db.Column(db.String, nullable=True)
     payload_json = db.Column(JSON)
     created_date = db.Column(db.DateTime, default=datetime.utcnow(),  nullable=False)
@@ -70,7 +68,7 @@ class Deed(db.Model):
 
         if organisation_id != os.getenv('LR_ORGANISATION_ID'):
             application.app.logger.debug("Internal request to view deed reference %s" % deed_reference)
-            result = Deed.query.filter_by(token=str(deed_reference), organisation_id=organisation_id).first()
+            result = Deed.query.filter_by(token=str(deed_reference), organisation_name=organisation_name).first()
         else:
             result = Deed.query.filter_by(token=str(deed_reference)).first()
 
