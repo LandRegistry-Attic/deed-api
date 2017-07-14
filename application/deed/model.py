@@ -64,9 +64,9 @@ class Deed(db.Model):
 
     def get_deed(self, deed_reference):
         conveyancer_credentials = process_organisation_credentials()
-        organisation_id = conveyancer_credentials[os.getenv('DEED_CONVEYANCER_KEY')][1]
+        organisation_name = conveyancer_credentials[os.getenv('DEED_CONVEYANCER_KEY')][0]
 
-        if organisation_id != os.getenv('LR_ORGANISATION_ID'):
+        if organisation_name != os.getenv('LR_ORGANISATION_NAME'):
             application.app.logger.debug("Internal request to view deed reference %s" % deed_reference)
             result = Deed.query.filter_by(token=str(deed_reference), organisation_name=organisation_name).first()
         else:
