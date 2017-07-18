@@ -16,8 +16,8 @@ import requests
 app = Flask(__name__, static_folder="static")
 db = SQLAlchemy(app)
 
-from application.service_clients.esec import make_esec_client # noqa
-from application.service_clients.esec.implementation import EsecException # noqa
+from application.service_clients.esec import make_esec_client  # noqa
+from application.service_clients.esec.implementation import EsecException  # noqa
 
 from .borrower.model import DatabaseException  # noqa
 
