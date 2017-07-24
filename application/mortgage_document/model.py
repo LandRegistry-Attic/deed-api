@@ -13,6 +13,5 @@ class MortgageDocument(db.Model):
         db.session.add(self)
         db.session.commit()
 
-
     def get_by_md(md_):
         return MortgageDocument.query.filter_by(md_ref=md_).first()
