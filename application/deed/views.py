@@ -31,6 +31,14 @@ def get_deed(deed_reference):
     return jsonify(deed_json_adapter(deed_reference)), status.HTTP_200_OK
 
 
+@deed_bp.route('/<deed_reference>/internal', methods=['GET'])
+def get_deed_internal(deed_reference):
+    if 'application/pdf' in request.headers.get("Accept", ""):
+        return create_deed_pdf(deed_pdf_adapter(deed_reference, use_system=True)), status.HTTP_200_OK
+    deed = Deed().get_deed_system(deed_reference)
+    return jsonify({"deed": deed.deed}), status.HTTP_200_OK
+
+
 @deed_bp.route('/<deed_reference>', methods=['PUT'])
 def get_existing_deed_and_update(deed_reference):
     deed = Deed()

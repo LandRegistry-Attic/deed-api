@@ -22,11 +22,9 @@ class Deed(db.Model):
     token = db.Column(db.String, nullable=False)
     deed = db.Column(JSON)
     identity_checked = db.Column(db.String(1), nullable=False)
-
     status = db.Column(db.String(16), default='DRAFT')
     deed_xml = db.Column(db.LargeBinary, nullable=True)
     checksum = db.Column(db.Integer, nullable=True, default=-1)
-    organisation_id = db.Column(db.String, nullable=True)
     organisation_name = db.Column(db.String, nullable=True)
     payload_json = db.Column(JSON)
     created_date = db.Column(db.DateTime, default=datetime.utcnow(),  nullable=False)
@@ -64,7 +62,10 @@ class Deed(db.Model):
         return Deed.query.filter(Deed.status.like(status), Deed.organisation_name != os.getenv('LR_ORGANISATION_NAME'),
                                  Deed.organisation_name.isnot(None)).count()
 
-    def _get_deed_internal(self, deed_reference, organisation_name):
+    def get_deed(self, deed_reference):
+        conveyancer_credentials = process_organisation_credentials()
+        organisation_name = conveyancer_credentials[os.getenv('DEED_CONVEYANCER_KEY')][0]
+
         if organisation_name != os.getenv('LR_ORGANISATION_NAME'):
             application.app.logger.debug("Internal request to view deed reference %s" % deed_reference)
             result = Deed.query.filter_by(token=str(deed_reference), organisation_name=organisation_name).first()
@@ -73,11 +74,11 @@ class Deed(db.Model):
 
         return result
 
-    def get_deed(self, deed_reference):
-        conveyancer_credentials = process_organisation_credentials()
-        organisation_name = conveyancer_credentials[os.getenv('DEED_CONVEYANCER_KEY')][0]
+    def get_deed_system(self, deed_reference):
+        application.app.logger.info("Internal request to get_deed_system to view deed reference %s" % deed_reference)
+        result = Deed.query.filter_by(token=str(deed_reference)).first()
 
-        return self._get_deed_internal(deed_reference, organisation_name)
+        return result
 
     @staticmethod
     def get_signed_deeds():
@@ -99,7 +100,7 @@ class Deed(db.Model):
         return -1
 
 
-def deed_adapter(deed_reference):
+def deed_adapter(deed_reference, use_system=False):
     """
     An adapter for the deed to enhance and return in the required form.
 
@@ -107,7 +108,10 @@ def deed_adapter(deed_reference):
     :return: The deed with status and token attributes set
     :rtype: deed
     """
-    deed = Deed().get_deed(deed_reference)
+    if use_system:
+        deed = Deed().get_deed_system(deed_reference)
+    else:
+        deed = Deed().get_deed(deed_reference)
     if deed is None:
         raise FileNotFoundError("There is no deed associated with deed id '{0}'.".format(deed_reference,))
     deed.deed['token'] = deed.token
@@ -127,7 +131,7 @@ def deed_json_adapter(deed_reference):
     return {'deed': deed.deed}
 
 
-def deed_pdf_adapter(deed_reference):
+def deed_pdf_adapter(deed_reference, use_system=False):
     """
     An adapter for the deed to return as a dictionary for conversion to json.
 
@@ -135,7 +139,7 @@ def deed_pdf_adapter(deed_reference):
     :return: The deed, as a pdf.
     :rtype: pdf
     """
-    deed_dict = deed_adapter(deed_reference).deed
+    deed_dict = deed_adapter(deed_reference, use_system=use_system).deed
     if 'effective_date' in deed_dict:
         temp = datetime.strptime(deed_dict['effective_date'], "%Y-%m-%d %H:%M:%S")
         check_time = check_time_stamp(temp)
