@@ -22,6 +22,7 @@ ENV TITLE_ADAPTOR_URI 'http://title-adapter-stub:8080'
 ENV REGISTER_ADAPTER 'http://register-adapter-stub:8080/'
 ENV DEED_API_ADDRESS 'http://0.0.0.0:8080'
 ENV ORGANISATION_API_ADDRESS 'http://organisation-api:8080/'
+ENV EXCHANGE_NAME 'esec-signing-exchange'
 
 # For logging
 ENV LOG_LEVEL DEBUG

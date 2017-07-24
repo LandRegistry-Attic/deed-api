@@ -19,7 +19,6 @@ DEED_API_BASE_HOST = os.getenv('DEED_API_ADDRESS', 'http://0.0.0.0:9020')
 
 ORGANISATION_API_BASE_HOST = os.getenv('ORGANISATION_API_ADDRESS', 'http://localhost:9060')
 
-EXCHANGE_NAME = os.getenv('EXCHANGE_NAME', 'esec-signing-exchange')
 # For logging
 FLASK_LOG_LEVEL = os.environ['LOG_LEVEL']
 
