@@ -17,7 +17,6 @@ from flask.ext.api import status
 from lxml import etree
 
 import application
-# from application import esec_client
 from application.borrower.model import Borrower
 from application.service_clients.organisation_adapter import make_organisation_adapter_client
 
@@ -292,8 +291,6 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
 
                 application.app.logger.info("Added deed to esec-signing queue")
 
-                return "", 200
-
             else:
                 application.app.logger.error("Failed to sign Mortgage document - unable to create user")
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -450,21 +447,22 @@ def verify_auth_code(deed_reference):
 def update_json_with_signature(deed_reference):
     data = request.form.to_dict()
 
-    deed = Deed()._get_deed_internal(deed_reference, "*")
+    deed = Deed().get_deed_system(deed_reference)
 
     tree = etree.fromstring(data['deed-xml'])
-    deed_data_xml = tree.xpath('.//signatureSlots/borrower_signature[position()=%s]' % data['borrower-pos'])[0]
+    new_signature_element = tree.xpath('.//signatureSlots/borrower_signature[position()=%s]' % data['borrower-pos'])[0]
 
     # Replace the borrower's element within the deed object's deed_xml
-    new_tree = etree.fromstring(deed.deed_xml)
-    new_tree_signature_element = new_tree.xpath('.//signatureSlots/borrower_signature[position()=%s]' % data['borrower-pos'])[0]
-    new_tree_signature_element.getparent().replace(new_tree_signature_element, deed_data_xml)
-    deed.deed_xml = etree.tostring(new_tree)
+    existing_deed_data_xml = etree.fromstring(deed.deed_xml)
+    existing_signature_element = existing_deed_data_xml.xpath('.//signatureSlots/borrower_signature[position()=%s]' % data['borrower-pos'])[0]
+    existing_signature_element.getparent().replace(existing_signature_element, new_signature_element)
+    # Save the deed_xml with the newly replaced borrower's element
+    deed.deed_xml = etree.tostring(existing_deed_data_xml)
 
     deed.save()
     update_deed_signature_timestamp(deed, data['borrower-token'], data['datetime'])
 
-    return "", status.HTTP_200_OK
+    return jsonify({"status": "Successfully updated json with signature"}), status.HTTP_200_OK
 
 
 def send_error_list(error_list):

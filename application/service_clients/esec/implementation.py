@@ -1,6 +1,6 @@
 from application import config
 from flask.ext.api import status
-from flask import abort, g
+from flask import abort, g, jsonify
 from application.dependencies.rabbitmq import Emitter, broker_url
 import datetime
 import base64
@@ -86,7 +86,7 @@ def auth_sms(deed, borrower_pos, user_id, borrower_auth_code, borrower_token):  
 
     resp = requests.post(request_url, params=parameters, data=deed.deed_xml)
 
-    if resp.status_code == status.HTTP_200_OK or resp.status_code == status.HTTP_401_UNAUTHORIZED:
+    if resp.status_code == status.HTTP_200_OK:
         application.app.logger.info("Response XML = %s" % resp.content)
 
         application.app.logger.info("Hashing deed prior to sending message to queue...")
@@ -94,7 +94,6 @@ def auth_sms(deed, borrower_pos, user_id, borrower_auth_code, borrower_token):  
         deed_data_xml = tree.xpath('.//deedData')[0]
 
         deed.deed_hash = Deed().generate_hash(etree.tostring(deed_data_xml))
-        extra_parameters.update({'deed-hash': deed.deed_hash})
 
         application.app.logger.info("Marking deed as in progress immediately prior to sending message to queue...")
         request_url = config.DEED_API_BASE_HOST + "/borrower/update_signing_in_progress/%s" % borrower_token
@@ -110,7 +109,7 @@ def auth_sms(deed, borrower_pos, user_id, borrower_auth_code, borrower_token):  
                 with Emitter(url, config.EXCHANGE_NAME, 'esec-signing-key') as emitter:
                     emitter.send_message({'params': parameters, 'extra-parameters': extra_parameters, 'data': base64.b64encode(deed.deed_xml).decode()})
                     application.app.logger.info("Message sent to the queue...")
-                    return "", 200
+                    return jsonify({"status": "Message successfully sent to the queue"}), status.HTTP_200_OK
             except Exception as e:
                 application.app.logger.info('Error returned when trying to place an item on the queue: %s' % e)
         else:
