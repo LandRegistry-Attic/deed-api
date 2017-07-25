@@ -12,7 +12,7 @@ from application.deed.model import Deed
 from application.deed.service import apply_registrar_signature, check_effective_status, add_effective_date_to_xml
 from application.deed.service import make_effective_text, make_deed_effective_date
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
-from application.deed.views import make_effective, retrieve_signed_deed
+from application.deed.views import make_effective, retrieve_signed_deed, update_json_with_signature
 from datetime import datetime
 from flask.ext.api import status
 from lxml import etree
@@ -1002,3 +1002,31 @@ class TestUpdateDeed(TestRoutesBase):
                                  data=payload,
                                  headers=self.webseal_headers)
         self.assertEqual(response.status_code, 500)
+
+    @mock.patch('application.deed.model.Deed.save')
+    @mock.patch('application.deed.views.update_deed_signature_timestamp')
+    @mock.patch('application.deed.views.Deed.get_deed_system')
+    def test_update_json_with_signature(self, mock_deed, mock_update_deed_signature_timestamp, mock_deed_save):
+
+        with app.app_context() as ac:
+            ac.g.trace_id = None
+            with app.test_request_context():
+
+                mock_deed.return_value = DeedModelMock()
+
+                parameters = {
+                    'borrower-token': 'hello',
+                    'datetime': 'hello',
+                    'deed-xml': DeedModelMock().b64_deed_xml,
+                    'borrower-pos': 1
+                }
+
+                response = self.app.post(self.DEED_ENDPOINT + 'AB1234/update-json-with-signature',
+                                         data=json.dumps(parameters),
+                                         headers=self.webseal_headers)
+
+                # self.assertEqual(mock_deed.deed_xml, 'hello')
+                self.assertTrue(mock_update_deed_signature_timestamp.called)
+                self.assertTrue(mock_deed_save.called)
+
+                self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -1,3 +1,4 @@
+import base64
 import collections
 import json
 import sys
@@ -443,11 +444,13 @@ def verify_auth_code(deed_reference):
 
 @deed_bp.route('/<deed_reference>/update-json-with-signature', methods=['POST'])
 def update_json_with_signature(deed_reference):
-    data = request.form.to_dict()
+    data = request.get_json()
 
     deed = Deed().get_deed_system(deed_reference)
 
-    tree = etree.fromstring(data['deed-xml'])
+    incoming_xml = base64.b64decode(data['deed-xml'])
+
+    tree = etree.fromstring(incoming_xml)
     new_signature_element = tree.xpath('.//signatureSlots/borrower_signature[position()=%s]' % data['borrower-pos'])[0]
 
     # Replace the borrower's element within the deed object's deed_xml
@@ -458,6 +461,7 @@ def update_json_with_signature(deed_reference):
     deed.deed_xml = etree.tostring(existing_deed_data_xml)
 
     deed.save()
+
     update_deed_signature_timestamp(deed, data['borrower-token'], data['datetime'])
 
     return jsonify({"status": "Successfully updated json with signature"}), status.HTTP_200_OK

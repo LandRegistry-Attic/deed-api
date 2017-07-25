@@ -230,3 +230,8 @@ class TestAppRoutes(unittest.TestCase):
                                  headers=webseal_headers).text
 
         self.assertEquals(response, 'Borrower signing_in_progress set to true')
+
+        response = requests.get(config.DEED_API_BASE_HOST + '/borrower/check_signing_in_progress/' + borrower_token,
+                                headers=webseal_headers).text
+
+        self.assertEquals(json.loads(response)['result'], True)
