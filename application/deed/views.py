@@ -289,8 +289,6 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
                 esec_client = make_esec_client()
                 esec_client.auth_sms(deed, borrower_pos, esec_id, borrower_code, borrower_token)
 
-                application.app.logger.info("Added deed to esec-signing queue")
-
             else:
                 application.app.logger.error("Failed to sign Mortgage document - unable to create user")
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -481,3 +479,10 @@ def get_organisation_name(deed_reference):
     organisation_name = organisation_interface.get_organisation_name(deed_adapter(deed_reference).organisation_name)
 
     return jsonify({'result': organisation_name}), status.HTTP_200_OK
+
+
+@deed_bp.route('/<deed_reference>/get-deed-hash', methods=['GET'])
+def get_deed_hash(deed_reference):
+    deed = Deed().get_deed_system(deed_reference)
+
+    return jsonify({'hash': deed.deed_hash})
