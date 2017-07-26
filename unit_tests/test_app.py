@@ -1025,7 +1025,6 @@ class TestUpdateDeed(TestRoutesBase):
                                          data=json.dumps(parameters),
                                          headers=self.webseal_headers)
 
-                # self.assertEqual(mock_deed.deed_xml, 'hello')
                 self.assertTrue(mock_update_deed_signature_timestamp.called)
                 self.assertTrue(mock_deed_save.called)
 
