@@ -288,7 +288,7 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
 
             if esec_id:
                 esec_client = make_esec_client()
-                response, status_code = esec_client.auth_sms(deed, borrower_pos, esec_id, borrower_code, borrower_token)
+                status_code = esec_client.auth_sms(deed, borrower_pos, esec_id, borrower_code, borrower_token)
                 application.app.logger.info("signed status code: %s", str(status_code))
 
                 if status_code == 200:
