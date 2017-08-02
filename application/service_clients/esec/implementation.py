@@ -88,7 +88,7 @@ def auth_sms(deed, borrower_pos, user_id, borrower_auth_code, borrower_token):  
 
     if resp.status_code == status.HTTP_401_UNAUTHORIZED:
         application.app.logger.info("Response XML = %s" % resp.content)
-        return resp.content, resp.status_code
+        return resp.status_code
 
     elif resp.status_code == status.HTTP_200_OK:
         application.app.logger.info("Response XML = %s" % resp.content)

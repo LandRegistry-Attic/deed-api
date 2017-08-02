@@ -288,16 +288,15 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
 
             if esec_id:
                 esec_client = make_esec_client()
-                result_xml, status_code = esec_client.auth_sms(deed, borrower_pos, esec_id, borrower_code, borrower_token)
+                status_code = esec_client.auth_sms(deed, borrower_pos, esec_id, borrower_code, borrower_token)
                 application.app.logger.info("signed status code: %s", str(status_code))
-                application.app.logger.info("signed XML: %s" % result_xml)
 
                 if status_code == 200:
                     return jsonify({"deed": deed.deed}), status.HTTP_200_OK
 
                 else:
                     application.app.logger.error("Failed to authenticate sms code")
-                    return "Failed to authenticate sms code %s" % status_code
+                    return "Failed to authenticate sms code %s" % status_code, status.HTTP_401_UNAUTHORIZED
 
             else:
                 application.app.logger.error("Failed to sign Mortgage document - unable to create user")
@@ -435,7 +434,7 @@ def verify_auth_code(deed_reference):
     borrower_token = request_json['borrower_token']
     borrower_code = request_json['authentication_code']
 
-    deed, status_code = auth_sms(deed_reference, borrower_token, borrower_code)
+    response, status_code = auth_sms(deed_reference, borrower_token, borrower_code)
 
     if status_code == status.HTTP_200_OK:
         application.app.logger.info("Borrower with token %s successfully"
