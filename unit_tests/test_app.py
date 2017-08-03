@@ -485,8 +485,8 @@ class TestRoutes(TestRoutesBase):
     def test_make_effective_clause(self):
 
         effective_clause = make_effective_text("Test Organisation")
-        correct_effective_clause = "This charge takes effect when the registrar receives notification from " + \
-                                   "Test Organisation that the charge is to take effect."
+        correct_effective_clause = "This Charge takes effect when the registrar receives notification from " + \
+                                   "Test Organisation that the Charge is to take effect."
 
         self.assertEqual(effective_clause, correct_effective_clause)
 
