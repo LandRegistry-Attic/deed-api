@@ -288,15 +288,15 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
 
             if esec_id:
                 esec_client = make_esec_client()
-                status_code = esec_client.auth_sms(deed, borrower_pos, esec_id, borrower_code, borrower_token)
-                application.app.logger.info("signed status code: %s", str(status_code))
+                response, status_code = esec_client.auth_sms(deed, borrower_pos, esec_id, borrower_code, borrower_token)
+                application.app.logger.info("auth_sms status code: %s", str(response.status_code))
 
                 if status_code == 200:
                     return jsonify({"deed": deed.deed}), status.HTTP_200_OK
 
                 else:
                     application.app.logger.error("Failed to authenticate sms code")
-                    return "Failed to authenticate sms code %s" % status_code, status.HTTP_401_UNAUTHORIZED
+                    return jsonify({"status": "Failed to authenticate sms code"}), status.HTTP_401_UNAUTHORIZED
 
             else:
                 application.app.logger.error("Failed to sign Mortgage document - unable to create user")
@@ -467,8 +467,6 @@ def update_json_with_signature(deed_reference):
     existing_signature_element.getparent().replace(existing_signature_element, new_signature_element)
     # Save the deed_xml with the newly replaced borrower's element
     deed.deed_xml = etree.tostring(existing_deed_data_xml)
-
-    deed.save()
 
     update_deed_signature_timestamp(deed, data['borrower-token'], data['datetime'])
 

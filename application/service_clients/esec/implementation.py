@@ -87,11 +87,11 @@ def auth_sms(deed, borrower_pos, user_id, borrower_auth_code, borrower_token):  
     resp = requests.post(request_url, params=parameters, data=deed.deed_xml)
 
     if resp.status_code == status.HTTP_401_UNAUTHORIZED:
-        application.app.logger.info("Response XML = %s" % resp.content)
-        return resp.status_code
+        application.app.logger.info("Response status = %s" % resp.status_code)
+        return jsonify({"status": "SMS Invalid"}), resp.status_code
 
     elif resp.status_code == status.HTTP_200_OK:
-        application.app.logger.info("Response XML = %s" % resp.content)
+        application.app.logger.info("Response status = %s" % resp.status_code)
 
         application.app.logger.info("Hashing deed prior to sending message to queue...")
         tree = etree.fromstring(deed.deed_xml)
@@ -109,7 +109,7 @@ def auth_sms(deed, borrower_pos, user_id, borrower_auth_code, borrower_token):  
             application.app.logger.info("Preparing to send message to the queue...")
 
             try:
-                url = broker_url('rabbitmq', 'guest', 'guest', 5672)
+                url = broker_url('rabbitmq', config.EXCHANGE_USER, config.EXCHANGE_PASS, 5672)
                 with Emitter(url, config.EXCHANGE_NAME, 'esec-signing-key') as emitter:
                     emitter.send_message({'params': parameters, 'extra-parameters': extra_parameters, 'data': base64.b64encode(deed.deed_xml).decode()})
                     application.app.logger.info("Message sent to the queue...")
