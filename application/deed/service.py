@@ -195,7 +195,7 @@ def update_deed_signature_timestamp(deed, borrower_token):
 
 
 def make_effective_text(organisation_name):
-    effective_clause = "This Charge takes effect when the registrar receives notification from %s that the Charge" + \
+    effective_clause = "This charge takes effect when the registrar receives notification from %s that the charge" + \
                        " is to take effect."
 
     return effective_clause % organisation_name

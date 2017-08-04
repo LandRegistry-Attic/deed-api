@@ -60,8 +60,8 @@ complete_deed_dict = {
         "date_of_mortgage_offer_heading": "Date of Mortgage Offer",
         "date_of_mortgage_offer_value": "a date string"
     },
-    "effective_clause": "This Charge takes effect when the registrar receives notification from Test Organisation \
-        that the Charge is to take effect.",
+    "effective_clause": "This charge takes effect when the registrar receives notification from Test Organisation \
+        that the charge is to take effect.",
     "lender": {
         "address": "Test House PO Box 0, Test Street CV0 0QN",
         "name": "TEST BUILDING SOCIETY",

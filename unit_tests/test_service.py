@@ -40,8 +40,8 @@ class TestService(unittest.TestCase):
         expected_dict = {'charge_clause': md_dict['charge_clause'],
                          'additional_provisions': md_dict['additional_provisions'],
                          'lender': md_dict['lender'],
-                         'effective_clause': 'This Charge takes effect when the registrar' +
-                                             ' receives notification from Fake Org that the Charge' +
+                         'effective_clause': 'This charge takes effect when the registrar' +
+                                             ' receives notification from Fake Org that the charge' +
                                              ' is to take effect.'}
 
         self.assertEquals(mock_dict, expected_dict)
@@ -63,8 +63,8 @@ class TestService(unittest.TestCase):
         expected_dict = {'charge_clause': md_dict['charge_clause'],
                          'additional_provisions': md_dict['additional_provisions'],
                          'lender': md_dict['lender'],
-                         'effective_clause': 'This Charge takes effect when the registrar' +
-                                             ' receives notification from Fake Org that the Charge' +
+                         'effective_clause': 'This charge takes effect when the registrar' +
+                                             ' receives notification from Fake Org that the charge' +
                                              ' is to take effect.',
                          'reference_details':
                              {'lender_reference_name': md_dict['lender_reference_name'],
@@ -90,8 +90,8 @@ class TestService(unittest.TestCase):
         expected_dict = {'charge_clause': md_dict['charge_clause'],
                          'additional_provisions': md_dict['additional_provisions'],
                          'lender': md_dict['lender'],
-                         'effective_clause': 'This Charge takes effect when the registrar' +
-                                             ' receives notification from Fake Org that the Charge' +
+                         'effective_clause': 'This charge takes effect when the registrar' +
+                                             ' receives notification from Fake Org that the charge' +
                                              ' is to take effect.'}
 
         self.assertEquals(mock_dict, expected_dict)
@@ -113,8 +113,8 @@ class TestService(unittest.TestCase):
         expected_dict = {'charge_clause': md_dict['charge_clause'],
                          'additional_provisions': md_dict['additional_provisions'],
                          'lender': md_dict['lender'],
-                         'effective_clause': 'This Charge takes effect when the registrar' +
-                                             ' receives notification from Fake Org that the Charge' +
+                         'effective_clause': 'This charge takes effect when the registrar' +
+                                             ' receives notification from Fake Org that the charge' +
                                              ' is to take effect.'}
 
         self.assertEquals(mock_dict, expected_dict)
@@ -135,8 +135,8 @@ class TestService(unittest.TestCase):
         expected_dict = {'charge_clause': md_dict['charge_clause'],
                          'additional_provisions': md_dict['additional_provisions'],
                          'lender': md_dict['lender'],
-                         'effective_clause': 'This Charge takes effect when the registrar' +
-                                             ' receives notification from Fake Org that the Charge' +
+                         'effective_clause': 'This charge takes effect when the registrar' +
+                                             ' receives notification from Fake Org that the charge' +
                                              ' is to take effect.',
                          'date_of_mortgage_offer_details':
                              {'date_of_mortgage_offer_heading': md_dict['date_of_mortgage_offer_heading'],
@@ -160,8 +160,8 @@ class TestService(unittest.TestCase):
         expected_dict = {'charge_clause': md_dict['charge_clause'],
                          'additional_provisions': md_dict['additional_provisions'],
                          'lender': md_dict['lender'],
-                         'effective_clause': 'This Charge takes effect when the registrar' +
-                                             ' receives notification from Fake Org that the Charge' +
+                         'effective_clause': 'This charge takes effect when the registrar' +
+                                             ' receives notification from Fake Org that the charge' +
                                              ' is to take effect.'}
 
         self.assertEquals(mock_dict, expected_dict)
@@ -183,8 +183,8 @@ class TestService(unittest.TestCase):
         expected_dict = {'charge_clause': md_dict['charge_clause'],
                          'additional_provisions': md_dict['additional_provisions'],
                          'lender': md_dict['lender'],
-                         'effective_clause': 'This Charge takes effect when the registrar' +
-                                             ' receives notification from Fake Org that the Charge' +
+                         'effective_clause': 'This charge takes effect when the registrar' +
+                                             ' receives notification from Fake Org that the charge' +
                                              ' is to take effect.'}
 
         self.assertEquals(mock_dict, expected_dict)
@@ -205,8 +205,8 @@ class TestService(unittest.TestCase):
         expected_dict = {'charge_clause': md_dict['charge_clause'],
                          'additional_provisions': md_dict['additional_provisions'],
                          'lender': md_dict['lender'],
-                         'effective_clause': 'This Charge takes effect when the registrar' +
-                                             ' receives notification from Fake Org that the Charge' +
+                         'effective_clause': 'This charge takes effect when the registrar' +
+                                             ' receives notification from Fake Org that the charge' +
                                              ' is to take effect.',
                          'miscellaneous_information_details':
                              {'miscellaneous_information_heading': md_dict['miscellaneous_information_heading'],
@@ -230,8 +230,8 @@ class TestService(unittest.TestCase):
         expected_dict = {'charge_clause': md_dict['charge_clause'],
                          'additional_provisions': md_dict['additional_provisions'],
                          'lender': md_dict['lender'],
-                         'effective_clause': 'This Charge takes effect when the registrar' +
-                                             ' receives notification from Fake Org that the Charge' +
+                         'effective_clause': 'This charge takes effect when the registrar' +
+                                             ' receives notification from Fake Org that the charge' +
                                              ' is to take effect.'}
 
         self.assertEquals(mock_dict, expected_dict)
