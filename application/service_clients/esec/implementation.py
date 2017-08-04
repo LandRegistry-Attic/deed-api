@@ -119,6 +119,7 @@ def auth_sms(deed, borrower_pos, user_id, borrower_auth_code, borrower_token):  
 
         except Exception as e:
             application.app.logger.info('Error returned when trying to place an item on the queue: %s' % e)
+            raise Exception
 
     else:
         application.app.logger.error("ESecurity Client Exception when trying to verify the OTP code")
