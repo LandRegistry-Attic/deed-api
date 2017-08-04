@@ -1029,6 +1029,5 @@ class TestUpdateDeed(TestRoutesBase):
                 self.assertEqual(mock_deed.return_value.deed_xml, base64.b64decode(parameters['deed-xml']))
 
                 self.assertTrue(mock_update_deed_signature_timestamp.called)
-                self.assertTrue(mock_deed_save.called)
 
                 self.assertEqual(response.status_code, status.HTTP_200_OK)

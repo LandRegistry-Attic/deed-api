@@ -289,7 +289,7 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
             if esec_id:
                 esec_client = make_esec_client()
                 response, status_code = esec_client.auth_sms(deed, borrower_pos, esec_id, borrower_code, borrower_token)
-                application.app.logger.info("auth_sms status code: %s", str(response.status_code))
+                application.app.logger.info("auth_sms status code: %s", str(status_code))
 
                 if status_code == 200:
                     return jsonify({"deed": deed.deed}), status.HTTP_200_OK
