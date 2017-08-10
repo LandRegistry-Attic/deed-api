@@ -1,5 +1,4 @@
 import copy
-import datetime
 import json
 from application.deed.deed_status import DeedStatus
 from application.deed.utils import valid_dob, is_unique_list
@@ -9,10 +8,10 @@ from functools import partial
 from lxml import etree
 from underscore import _
 
-from application import esec_client
 from application.borrower.model import Borrower as BorrowerModel
 from application.borrower.server import BorrowerService
 from application.mortgage_document.model import MortgageDocument
+from application.service_clients.esec import make_esec_client
 from application.service_clients.organisation_adapter import make_organisation_adapter_client
 import application
 
@@ -51,6 +50,7 @@ def apply_registrar_signature(deed, effective_date):
     effective_xml = add_effective_date_to_xml(deed_xml, effective_date)
 
     application.app.logger.info("Applying registrar's signature to deed {}".format(deed.token))
+    esec_client = make_esec_client()
     deed.deed_xml = esec_client.sign_document_with_authority(effective_xml)
     deed.status = DeedStatus.effective.value
     deed.save()
@@ -176,12 +176,12 @@ def get_organisation_name(deed):
     return organisation_interface.get_organisation_name(deed.organisation_name)
 
 
-def update_deed_signature_timestamp(deed, borrower_token):
+def update_deed_signature_timestamp(deed, borrower_token, datetime):
 
     modify_deed = copy.deepcopy(deed.deed)
     for borrower in modify_deed['borrowers']:
         if str(borrower['token']).upper() == borrower_token:
-            borrower['signature'] = datetime.datetime.now().strftime("%d %B %Y %I:%M%p")
+            borrower['signature'] = datetime
 
     deed.deed = modify_deed
 

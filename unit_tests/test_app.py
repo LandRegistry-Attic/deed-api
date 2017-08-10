@@ -1,3 +1,4 @@
+import base64
 import PyPDF2
 import io
 import json
@@ -12,7 +13,7 @@ from application.deed.model import Deed
 from application.deed.service import apply_registrar_signature, check_effective_status, add_effective_date_to_xml
 from application.deed.service import make_effective_text, make_deed_effective_date
 from application.deed.utils import convert_json_to_xml, validate_generated_xml
-from application.deed.views import make_effective, retrieve_signed_deed
+from application.deed.views import make_effective, retrieve_signed_deed, update_json_with_signature
 from datetime import datetime
 from flask.ext.api import status
 from lxml import etree
@@ -370,6 +371,7 @@ class TestRoutes(TestRoutesBase):
             deed_token = "aaaaaa"
             dob = "02/02/1922"
             phonenumber = "07777777777"
+            signing_in_progress = "Signing in progress"
 
         mock_borrower.return_value = ReturnedBorrower()
         response = self.app.get(self.BORROWER_ENDPOINT + "verify/pid/1234")
@@ -545,7 +547,7 @@ class TestRoutes(TestRoutesBase):
     @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.borrower.model.Borrower.get_by_token')
     @mock.patch('application.deed.utils.get_borrower_position')
-    @mock.patch('application.service_clients.esec.interface.EsecClientInterface.auth_sms')
+    @mock.patch('application.deed.views.auth_sms')
     @mock.patch('application.deed.model.Deed.save', autospec=True)
     @mock.patch('application.deed.model.Deed.query', autospec=True)
     def test_add_authenticate_and_sign(self, mock_query, mock_Deed_save,
@@ -991,3 +993,41 @@ class TestUpdateDeed(TestRoutesBase):
                 organisation_name = get_organisation_name("Test [22022] Organisation")
 
                 self.assertEqual(organisation_name, "Test Organisation")
+
+    @mock.patch('application.deed.views.auth_sms')
+    @mock.patch('application.deed.model.Deed.query', autospec=True)
+    def test_deed_hash_exists(self, mock_auth, mock_api):
+        payload = json.dumps(DeedHelper._verify_and_sign)
+
+        response = self.app.post(self.DEED_ENDPOINT + 'AB1234' + '/verify-auth-code',
+                                 data=payload,
+                                 headers=self.webseal_headers)
+        self.assertEqual(response.status_code, 500)
+
+    @mock.patch('application.deed.model.Deed.save')
+    @mock.patch('application.deed.views.update_deed_signature_timestamp')
+    @mock.patch('application.deed.views.Deed.get_deed_system')
+    def test_update_json_with_signature(self, mock_deed, mock_update_deed_signature_timestamp, mock_deed_save):
+
+        with app.app_context() as ac:
+            ac.g.trace_id = None
+            with app.test_request_context():
+
+                mock_deed.return_value = DeedModelMock()
+
+                parameters = {
+                    'borrower-token': 'hello',
+                    'datetime': 'hello',
+                    'deed-xml': "PGRtLWFwcGxpY2F0aW9uIHhtbG5zOnhzaT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEtaW5zdGFuY2UiIHhzaTpub05hbWVzcGFjZVNjaGVtYUxvY2F0aW9uPSJodHRwOi8vbG9jYWxob3N0OjkwODAvc2NoZW1hcy9kZWVkLXNjaGVtYS12MC0zLnhzZCI+ICAgICAgICAgICAgICAgIDxvcGVyYXRpdmVEZWVkPjxkZWVkRGF0YSBJZD0iZGVlZERhdGEiPjx0aXRsZU51bWJlcj5HUjUxNTgzNTwvdGl0bGVOdW1iZXI+PHByb3BlcnR5RGVzY3JpcHRpb24+MCBUaGUgRHJpdmUsIFRoaXMgVG93biwgVGhpcyBDb3VudHksIFBMMCAwVEg8L3Byb3BlcnR5RGVzY3JpcHRpb24+ICAgICAgICAgICAgICAgIDxib3Jyb3dlcnM+PGJvcnJvd2VyPjxuYW1lPjxwcml2YXRlSW5kaXZpZHVhbD48Zm9yZW5hbWU+UGF1bDwvZm9yZW5hbWU+PG1pZGRsZW5hbWU+SmFtZXM8L21pZGRsZW5hbWU+PHN1cm5hbWU+U215dGhlPC9zdXJuYW1lPiAgICAgICAgICAgICAgICA8L3ByaXZhdGVJbmRpdmlkdWFsPjwvbmFtZT48YWRkcmVzcz5ib3Jyb3dlciBhZGRyZXNzPC9hZGRyZXNzPjwvYm9ycm93ZXI+PGJvcnJvd2VyPjxuYW1lPjxwcml2YXRlSW5kaXZpZHVhbD48Zm9yZW5hbWU+SmFuZTwvZm9yZW5hbWU+PHN1cm5hbWU+U215dGhlPC9zdXJuYW1lPiAgICAgICAgICAgICAgICA8L3ByaXZhdGVJbmRpdmlkdWFsPjwvbmFtZT48YWRkcmVzcz5ib3Jyb3dlciBhZGRyZXNzPC9hZGRyZXNzPjwvYm9ycm93ZXI+PC9ib3Jyb3dlcnM+PG1kUmVmPmUtTUQxMjM0NDwvbWRSZWY+PGNoYXJnZUNsYXVzZT48Y3JlQ29kZT5DUkUwMDE8L2NyZUNvZGU+ICAgICAgICAgICAgICAgIDxlbnRyeVRleHQ+VGhlIGJvcnJvd2VyLCB3aXRoIGZ1bGwgdGl0bGUgZ3VhcmFudGVlLCBjaGFyZ2VzIHRvIHRoZSBsZW5kZXIgdGhlIHByb3BlcnR5IGJ5IHdheSBvZiBsZWdhbCBtb3J0Z2FnZSB3aXRoIHBheW1lbnQgb2YgYWxsIG1vbmV5IHNlY3VyZWQgYnkgdGhpcyBjaGFyZ2UuPC9lbnRyeVRleHQ+ICAgICAgICAgICAgICAgIDwvY2hhcmdlQ2xhdXNlPjxhZGRpdGlvbmFsUHJvdmlzaW9ucz48cHJvdmlzaW9uPjxjb2RlPmFkZHAwMDE8L2NvZGU+PGVudHJ5VGV4dD5UaGlzIE1vcnRnYWdlIERlZWQgaW5jb3Jwb3JhdGVzIHRoZSAmbHQ7YSBocmVmPScjJyByZWw9J2V4dGVybmFsJyZndDtMZW5kZXJzIE1vcnRnYWdlIENvbmRpdGlvbnMgICAgICAgICAgICAgICAgIGFuZCBFeHBsYW5hdGlvbiAyMDA2Jmx0Oy9hJmd0OywgYSBjb3B5IG9mIHdoaWNoIHRoZSBib3Jyb3dlciBoYXMgcmVjZWl2ZWQuPC9lbnRyeVRleHQ+PHNlcXVlbmNlTnVtYmVyPjA8L3NlcXVlbmNlTnVtYmVyPjwvcHJvdmlzaW9uPjxwcm92aXNpb24+PGNvZGU+YWRkcDAwMjwvY29kZT4gICAgICAgICAgICAgICAgIDxlbnRyeVRleHQ+VGhlIGxlbmRlciBpcyBvYmxpZ2VkIHRvIG1ha2UgZnVydGhlciBhZHZhbmNlcyBhbmQgYXBwbGllcyBmb3IgdGhlIG9ibGlnYXRpb24gdG8gYmUgZW50ZXJlZCBpbiB0aGUgcmVnaXN0ZXIuPC9lbnRyeVRleHQ+ICAgICAgICAgICAgICAgICA8c2VxdWVuY2VOdW1iZXI+MTwvc2VxdWVuY2VOdW1iZXI+PC9wcm92aXNpb24+PHByb3Zpc2lvbj48Y29kZT5hZGRwMDAzPC9jb2RlPjxlbnRyeVRleHQ+VGhlIGJvcnJvd2VyIGFwcGxpZXMgdG8gZW50ZXIgYSByZXN0cmljdGlvbiBpbiB0aGUgcmVnaXN0ZXIgdGhhdCBubyBkaXNwb3NpdGlvbiAgICAgICAgICAgICAgICAgIG9mIHRoZSByZWdpc3RlcmVkIGVzdGF0ZSBieSB0aGUgcHJvcHJpZXRvciBvZiB0aGUgcmVnaXN0ZXJlZCBlc3RhdGUgaXMgdG8gYmUgcmVnaXN0ZXJlZCB3aXRob3V0IGEgd3JpdHRlbiBjb25zZW50IHNpZ25lZCBieSB0aGUgcHJvcHJpZXRvciBmb3IgdGhlIHRpbWUgYmVpbmcgb2YgdGhlICAgICAgICAgICAgICAgICAgY2hhcmdlIGRhdGVkIFt0aGUgZGF0ZSBvZiB0aGlzIGNoYXJnZV0gaW4gZmF2b3VyIG9mIEJhbmsgb2YgVGVzdCBQbGMgcmVmZXJyZWQgdG8gaW4gdGhlIGNoYXJnZXMgcmVnaXN0ZXIuPC9lbnRyeVRleHQ+PHNlcXVlbmNlTnVtYmVyPjI8L3NlcXVlbmNlTnVtYmVyPiAgICAgICAgICAgICAgICAgPC9wcm92aXNpb24+PC9hZGRpdGlvbmFsUHJvdmlzaW9ucz48bGVuZGVyPjxvcmdhbmlzYXRpb25OYW1lPjxjb21wYW55PjxuYW1lPkJhbmsgb2YgVGVzdCBQbGM8L25hbWU+PC9jb21wYW55Pjwvb3JnYW5pc2F0aW9uTmFtZT4gICAgICAgICAgICAgICAgIDxhZGRyZXNzPjAgVGVzdCBQbGFjZSwgVGVzdCBTdHJlZXQsIExvbmRvbiBOVzAgMFRRPC9hZGRyZXNzPjxjb21wYW55UmVnaXN0cmF0aW9uRGV0YWlscz5Db21wYW55IHJlZ2lzdHJhdGlvbiBudW1iZXI6IDIzNDc2NzY8L2NvbXBhbnlSZWdpc3RyYXRpb25EZXRhaWxzPiAgICAgICAgICAgICAgICAgPC9sZW5kZXI+PGVmZmVjdGl2ZUNsYXVzZT5UaGlzIGNoYXJnZSB0YWtlcyBlZmZlY3Qgd2hlbiB0aGUgcmVnaXN0cmFyIHJlY2VpdmVzIG5vdGlmaWNhdGlvbiBmcm9tIFRlc3QgT3JnYW5pc2F0aW9uIHRoYXQgdGhlIGNoYXJnZSBpcyB0byB0YWtlIGVmZmVjdC48L2VmZmVjdGl2ZUNsYXVzZT4gICAgICAgICAgICAgICAgIDxyZWZlcmVuY2U+QSB0ZXN0IHJlZmVyZW5jZTwvcmVmZXJlbmNlPjwvZGVlZERhdGE+PHNpZ25hdHVyZVNsb3RzPjxib3Jyb3dlcl9zaWduYXR1cmU+PHNpZ25hdHVyZS8+PHNpZ25hdG9yeT48cHJpdmF0ZUluZGl2aWR1YWw+PGZvcmVuYW1lPlBhdWw8L2ZvcmVuYW1lPjxtaWRkbGVuYW1lPkphbWVzPC9taWRkbGVuYW1lPjxzdXJuYW1lPlNteXRoZTwvc3VybmFtZT4gICAgICAgICAgICAgICAgIDwvcHJpdmF0ZUluZGl2aWR1YWw+PC9zaWduYXRvcnk+PC9ib3Jyb3dlcl9zaWduYXR1cmU+PGJvcnJvd2VyX3NpZ25hdHVyZT48c2lnbmF0dXJlLz48c2lnbmF0b3J5Pjxwcml2YXRlSW5kaXZpZHVhbD48Zm9yZW5hbWU+SmFuZTwvZm9yZW5hbWU+PHN1cm5hbWU+U215dGhlPC9zdXJuYW1lPiAgICAgICAgICAgICAgICAgPC9wcml2YXRlSW5kaXZpZHVhbD48L3NpZ25hdG9yeT48L2JvcnJvd2VyX3NpZ25hdHVyZT48L3NpZ25hdHVyZVNsb3RzPjwvb3BlcmF0aXZlRGVlZD48ZWZmZWN0aXZlRGF0ZS8+PGF1dGhTaWduYXR1cmUvPjwvZG0tYXBwbGljYXRpb24+",
+                    'borrower-pos': 1
+                }
+
+                response = self.app.post(self.DEED_ENDPOINT + 'AB1234/update-json-with-signature',
+                                         data=json.dumps(parameters),
+                                         headers=self.webseal_headers)
+
+                self.assertEqual(mock_deed.return_value.deed_xml, base64.b64decode(parameters['deed-xml']))
+
+                self.assertTrue(mock_update_deed_signature_timestamp.called)
+
+                self.assertEqual(response.status_code, status.HTTP_200_OK)

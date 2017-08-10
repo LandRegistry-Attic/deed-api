@@ -10,6 +10,7 @@ import requests
 class DeedModelMock(Deed):
     token = "ABC1234"
     deed = DEED
+    deed_hash = "d4c220637b3338e0af749d4e1cd276d950973fa9bbff4011f61a757aa4f4f638"
     status = "DRAFT"
     deed_xml = "<dm-application xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"http://localhost:9080/schemas/deed-schema-v0-3.xsd\">\
                 <operativeDeed><deedData Id=\"deedData\"><titleNumber>GR515835</titleNumber><propertyDescription>0 The Drive, This Town, This County, PL0 0TH</propertyDescription>\
@@ -30,6 +31,37 @@ class DeedModelMock(Deed):
                  </privateIndividual></signatory></borrower_signature><borrower_signature><signature/><signatory><privateIndividual><forename>Jane</forename><surname>Smythe</surname>\
                  </privateIndividual></signatory></borrower_signature></signatureSlots></operativeDeed><effectiveDate></effectiveDate><authSignature/></dm-application>"
 
+class BorrowerModelMock(Borrower):
+    token = "AAAA"
+    deed_token = "ABC1234"
+    forename = "Fred"
+    middlename = "Ann"
+    surname = "Bloggs"
+    dob = "23/01/1985"
+    gender = "Male"
+    phonenumber = "666"
+    address = "Test Address, The Place, PL9 8DR"
+    esec_user_name = "dm-fred"
+    signing_in_progress = None
+
+class BorrowerModelMockNoId(Borrower):
+    token = "AAAA"
+    deed_token = "ABC1234"
+    forename = "Fred"
+    middlename = "Ann"
+    surname = "Bloggs"
+    dob = "23/01/1985"
+    gender = "Male"
+    phonenumber = "666"
+    address = "Test Address, The Place, PL9 8DR"
+    esec_user_name = None
+    signing_in_progress = None
+
+
+class EsecClientMock():
+
+    def auth_sms(self, deed, borrower_pos, esec_id, borrower_code, borrower_token):
+        return "", 200
 
 class MortgageDocMock:
     md_ref = "e-MD12121"

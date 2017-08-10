@@ -3,8 +3,6 @@ from builtins import FileNotFoundError
 from flask import Flask, request, jsonify, g
 from flask.ext.sqlalchemy import SQLAlchemy
 
-from application.service_clients.esec import make_esec_client
-from application.service_clients.esec.implementation import EsecException
 from application.service_clients.register_adapter import make_register_adapter_client
 from application.service_clients.title_adaptor import make_title_adaptor_client
 from application.service_clients.organisation_adapter import make_organisation_adapter_client
@@ -18,9 +16,10 @@ import requests
 app = Flask(__name__, static_folder="static")
 db = SQLAlchemy(app)
 
-from .borrower.model import DatabaseException  # noqa
+from application.service_clients.esec import make_esec_client  # noqa
+from application.service_clients.esec.implementation import EsecException  # noqa
 
-esec_client = make_esec_client()
+from .borrower.model import DatabaseException  # noqa
 
 # Register routes after establishing the db prevents improperly loaded modules
 # caused from circular imports
