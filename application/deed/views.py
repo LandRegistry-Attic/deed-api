@@ -1,7 +1,10 @@
+import base64
 import collections
-import copy
 import json
 import sys
+from datetime import datetime
+
+from application.service_clients.esec import make_esec_client
 from application.akuma.service import Akuma
 from application.deed.deed_render import create_deed_pdf
 from application.deed.deed_validator import Validation
@@ -9,13 +12,12 @@ from application.deed.model import Deed, deed_json_adapter, deed_pdf_adapter, de
 from application.deed.service import update_deed, update_deed_signature_timestamp, apply_registrar_signature, \
     make_deed_effective_date
 from application.deed.utils import convert_json_to_xml
-from datetime import datetime
 from flask import Blueprint
 from flask import request, abort, jsonify, Response
 from flask.ext.api import status
+from lxml import etree
 
 import application
-from application import esec_client
 from application.borrower.model import Borrower
 from application.service_clients.organisation_adapter import make_organisation_adapter_client
 
@@ -280,29 +282,22 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
 
         try:
             application.app.logger.info("getting existing XML")
-            modify_xml = copy.deepcopy(deed.deed_xml)
             borrower_pos = deed.get_borrower_position(borrower_token)
             borrower = Borrower.get_by_token(borrower_token)
             esec_id = borrower.esec_user_name
 
             if esec_id:
-                result_xml, status_code = esec_client.auth_sms(modify_xml, borrower_pos,
-                                                               esec_id, borrower_code)
-                application.app.logger.info("signed status code: %s", str(status_code))
-                application.app.logger.info("signed XML: %s" % result_xml)
+                esec_client = make_esec_client()
+                response, status_code = esec_client.auth_sms(deed, borrower_pos, esec_id, borrower_code, borrower_token)
+                application.app.logger.info("auth_sms status code: %s", str(status_code))
 
                 if status_code == 200:
-                    deed.deed_xml = result_xml
-
-                    application.app.logger.info("Saving XML to DB")
-                    deed.save()
-
-                    application.app.logger.info("updating JSON with Signature")
-                    update_deed_signature_timestamp(deed, borrower_token)
+                    return jsonify({"deed": deed.deed}), status.HTTP_200_OK
 
                 else:
-                    application.app.logger.error("Failed to sign Mortgage document")
-                    return "Failed to sign Mortgage document", status_code
+                    application.app.logger.error("Failed to authenticate sms code")
+                    return jsonify({"status": "Failed to authenticate sms code"}), status.HTTP_401_UNAUTHORIZED
+
             else:
                 application.app.logger.error("Failed to sign Mortgage document - unable to create user")
                 abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -312,12 +307,13 @@ def auth_sms(deed_reference, borrower_token, borrower_code):
             application.app.logger.error("Failed to sign Mortgage document: %s" % msg)
             abort(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    return jsonify({"deed": deed.deed}), status.HTTP_200_OK
+        return jsonify({"deed": deed.deed}), status.HTTP_200_OK
 
 
 def issue_sms(deed_reference, borrower_token):
     deed_instance = Deed()
     deed = deed_instance.get_deed(deed_reference)
+    esec_client = make_esec_client()
 
     if deed is None:
         application.app.logger.error("Database Exception 404 for deed reference - %s" % deed_reference)
@@ -438,7 +434,7 @@ def verify_auth_code(deed_reference):
     borrower_token = request_json['borrower_token']
     borrower_code = request_json['authentication_code']
 
-    deed, status_code = auth_sms(deed_reference, borrower_token, borrower_code)
+    response, status_code = auth_sms(deed_reference, borrower_token, borrower_code)
 
     if status_code == status.HTTP_200_OK:
         application.app.logger.info("Borrower with token %s successfully"
@@ -452,6 +448,29 @@ def verify_auth_code(deed_reference):
     else:
         application.app.logger.error("Not able to sign the deed")
         return jsonify({"result": False}), status_code
+
+
+@deed_bp.route('/<deed_reference>/update-json-with-signature', methods=['POST'])
+def update_json_with_signature(deed_reference):
+    data = request.get_json()
+
+    deed = Deed().get_deed_system(deed_reference)
+
+    incoming_xml = base64.b64decode(data['deed-xml'])
+
+    tree = etree.fromstring(incoming_xml)
+    new_signature_element = tree.xpath('.//signatureSlots/borrower_signature[position()=%s]' % data['borrower-pos'])[0]
+
+    # Replace the borrower's element within the deed object's deed_xml
+    existing_deed_data_xml = etree.fromstring(deed.deed_xml)
+    existing_signature_element = existing_deed_data_xml.xpath('.//signatureSlots/borrower_signature[position()=%s]' % data['borrower-pos'])[0]
+    existing_signature_element.getparent().replace(existing_signature_element, new_signature_element)
+    # Save the deed_xml with the newly replaced borrower's element
+    deed.deed_xml = etree.tostring(existing_deed_data_xml)
+
+    update_deed_signature_timestamp(deed, data['borrower-token'], data['datetime'])
+
+    return jsonify({"status": "Successfully updated json with signature"}), status.HTTP_200_OK
 
 
 def send_error_list(error_list):
@@ -470,3 +489,10 @@ def get_organisation_name(deed_reference):
     organisation_name = organisation_interface.get_organisation_name(deed_adapter(deed_reference).organisation_name)
 
     return jsonify({'result': organisation_name}), status.HTTP_200_OK
+
+
+@deed_bp.route('/<deed_reference>/get-deed-hash', methods=['GET'])
+def get_deed_hash(deed_reference):
+    deed = Deed().get_deed_system(deed_reference)
+
+    return jsonify({'hash': deed.deed_hash})

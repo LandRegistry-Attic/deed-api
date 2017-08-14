@@ -17,7 +17,7 @@ def validate_borrower():
 
     if 'borrower_token' in payload:
         borrower = Borrower.get_by_token(payload['borrower_token'].strip())
-        if borrower is not None:
+        if borrower:
             input_dob = datetime.strptime(payload['dob'], "%d/%m/%Y")
             db_dob = datetime.strptime(borrower.dob, "%d/%m/%Y")
 
@@ -41,7 +41,8 @@ def get_borrower_details_by_verify_pid(verify_pid):
                 "borrower_token": borrower.token,
                 "deed_token": borrower.deed_token,
                 "phone_number": borrower.phonenumber,
-                "borrower_id": borrower.id
+                "borrower_id": borrower.id,
+                "signing_in_progress": borrower.signing_in_progress
             }
         ), status.HTTP_200_OK
 
@@ -63,3 +64,24 @@ def delete_verify_match(verify_pid):
         application.app.logger.error("no match found for PID: nothing removed")
 
     return jsonify({'result': match_message}), status.HTTP_200_OK
+
+
+@borrower_bp.route('/update_signing_in_progress/<borrower_token>', methods=['POST'])
+def update_borrower_signing_in_progress(borrower_token):
+    borrower = Borrower.get_by_token(borrower_token)
+    if borrower:
+        borrower.signing_in_progress = True
+        borrower.save()
+
+        return "Borrower signing_in_progress set to true", status.HTTP_200_OK
+
+    return "Matching borrower not found", status.HTTP_404_NOT_FOUND
+
+
+@borrower_bp.route('/check_signing_in_progress/<borrower_token>', methods=['GET'])
+def check_borrower_signing_in_progress(borrower_token):
+    borrower = Borrower.get_by_token(borrower_token)
+    if borrower:
+        return jsonify({'result': borrower.signing_in_progress}), status.HTTP_200_OK
+
+    return "Matching borrower not found", status.HTTP_404_NOT_FOUND

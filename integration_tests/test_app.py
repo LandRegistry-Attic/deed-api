@@ -1,6 +1,7 @@
 import unittest
 import requests
 import json
+import time
 
 from application import config
 from integration_tests.helper import setUpApp, webseal_headers
@@ -69,8 +70,10 @@ class TestAppRoutes(unittest.TestCase):
         self.assertGreater(int(get_all_deeds.text), int(get_existing_deeds.text))
 
     def test_get_signed_deeds(self):
-        get_existing_deeds = requests.get(config.DEED_API_BASE_HOST + '/dashboard/ALL-SIGNED',
+        get_existing_deeds = requests.get(config.DEED_API_BASE_HOST + '/deed/retrieve-signed',
                                           headers=webseal_headers)
+
+        get_existing_deeds = get_existing_deeds.json()
 
         create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
                                     data=json.dumps(valid_deed),
@@ -107,10 +110,24 @@ class TestAppRoutes(unittest.TestCase):
 
         self.assertEqual(sign_deed.status_code, 200)
 
-        test_result = requests.get(config.DEED_API_BASE_HOST + '/dashboard/ALL-SIGNED',
+        get_deed_again = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                      headers=webseal_headers)
+
+        second_deed = get_deed_again.json()
+
+        timer = time.time() + 15
+        while time.time() < timer or second_deed["deed"]["status"] != "ALL-SIGNED":
+            get_deed_again = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                          headers=webseal_headers)
+
+            second_deed = get_deed_again.json()
+
+        test_result = requests.get(config.DEED_API_BASE_HOST + '/deed/retrieve-signed',
                                    headers=webseal_headers)
 
-        self.assertGreater(int(test_result.text), int(get_existing_deeds.text))
+        test_result = test_result.json()
+
+        self.assertGreater(len(test_result["deeds"]), len(get_existing_deeds["deeds"]))
 
     def test_get_partially_signed_deeds(self):
         get_existing_deeds = requests.get(config.DEED_API_BASE_HOST + '/dashboard/PARTIALLY_SIGNED',
@@ -151,7 +168,70 @@ class TestAppRoutes(unittest.TestCase):
 
         self.assertEqual(sign_deed.status_code, 200)
 
+        get_deed_again = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                      headers=webseal_headers)
+
+        second_deed = get_deed_again.json()
+
+        timer = time.time() + 15
+        while time.time() < timer or second_deed["deed"]["status"] != "PARTIALLY-SIGNED":
+            get_deed_again = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                          headers=webseal_headers)
+
+            second_deed = get_deed_again.json()
+
         test_result = requests.get(config.DEED_API_BASE_HOST + '/dashboard/PARTIALLY_SIGNED',
                                    headers=webseal_headers)
 
         self.assertGreater(int(test_result.text), int(get_existing_deeds.text))
+
+    def test_check_borrower_signing_in_progress(self):
+
+        create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
+                                    data=json.dumps(valid_deed_two_borrowers),
+                                    headers=webseal_headers)
+        self.assertEqual(create_deed.status_code, 201)
+
+        response_json = create_deed.json()
+
+        get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                        headers=webseal_headers)
+
+        self.assertEqual(get_created_deed.status_code, 200)
+
+        created_deed = get_created_deed.json()
+
+        borrower_token = created_deed["deed"]["borrowers"][0]["token"]
+
+        response = requests.get(config.DEED_API_BASE_HOST + '/borrower/check_signing_in_progress/' + borrower_token,
+                                headers=webseal_headers).text
+
+        self.assertEquals(json.loads(response)['result'], None)
+
+    def test_update_borrower_signing_in_progress(self):
+
+        create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
+                                    data=json.dumps(valid_deed_two_borrowers),
+                                    headers=webseal_headers)
+        self.assertEqual(create_deed.status_code, 201)
+
+        response_json = create_deed.json()
+
+        get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                        headers=webseal_headers)
+
+        self.assertEqual(get_created_deed.status_code, 200)
+
+        created_deed = get_created_deed.json()
+
+        borrower_token = created_deed["deed"]["borrowers"][0]["token"]
+
+        response = requests.post(config.DEED_API_BASE_HOST + '/borrower/update_signing_in_progress/' + borrower_token,
+                                 headers=webseal_headers).text
+
+        self.assertEquals(response, 'Borrower signing_in_progress set to true')
+
+        response = requests.get(config.DEED_API_BASE_HOST + '/borrower/check_signing_in_progress/' + borrower_token,
+                                headers=webseal_headers).text
+
+        self.assertEquals(json.loads(response)['result'], True)
