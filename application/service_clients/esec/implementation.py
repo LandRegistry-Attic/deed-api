@@ -93,6 +93,8 @@ def auth_sms(deed, borrower_pos, user_id, borrower_auth_code, borrower_token):  
     elif resp.status_code == status.HTTP_200_OK:
         application.app.logger.info("Response status = %s" % resp.status_code)
 
+        deed_xml_to_send = deed.deed_xml.decode('utf-8')
+
         application.app.logger.info("Hashing deed prior to sending message to queue...")
         tree = etree.fromstring(deed.deed_xml)
         deed_data_xml = tree.xpath('.//deedData')[0]
@@ -105,7 +107,7 @@ def auth_sms(deed, borrower_pos, user_id, borrower_auth_code, borrower_token):  
         try:
             url = broker_url('rabbitmq', config.EXCHANGE_USER, config.EXCHANGE_PASS, 5672)
             with Emitter(url, config.EXCHANGE_NAME, 'esec-signing-key') as emitter:
-                emitter.send_message({'params': parameters, 'extra-parameters': extra_parameters, 'data': base64.b64encode(deed.deed_xml).decode()})
+                emitter.send_message({'params': parameters, 'extra-parameters': extra_parameters, 'data': deed_xml_to_send})
                 application.app.logger.info("Message sent to the queue...")
 
             application.app.logger.info("Marking deed as in progress immediately prior to sending message to queue...")
