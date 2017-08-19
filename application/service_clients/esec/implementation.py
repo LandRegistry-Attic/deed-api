@@ -3,7 +3,6 @@ from flask.ext.api import status
 from flask import abort, g, jsonify
 from application.dependencies.rabbitmq import Emitter, broker_url
 import datetime
-import base64
 from lxml import etree
 
 from application.deed.model import Deed
