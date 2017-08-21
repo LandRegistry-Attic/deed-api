@@ -25,6 +25,7 @@ ENV ORGANISATION_API_ADDRESS 'http://organisation-api:8080/'
 ENV EXCHANGE_NAME 'esec-signing-exchange'
 ENV EXCHANGE_USER 'guest'
 ENV EXCHANGE_PASS 'guest'
+ENV ROUTING_KEYS 'esec-signing-key'
 
 # For logging
 ENV LOG_LEVEL DEBUG

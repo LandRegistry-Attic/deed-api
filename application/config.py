@@ -15,6 +15,8 @@ EXCHANGE_USER = os.getenv('EXCHANGE_USER')
 
 EXCHANGE_PASS = os.getenv('EXCHANGE_PASS')
 
+ROUTING_KEYS = os.getenv('ROUTING_KEYS')
+
 ESEC_SCHEMA_LOCATION = os.getenv('ESEC_SCHEMA_LOCATION', 'http://localhost:9080/schemas/')
 
 TITLE_ADAPTOR_BASE_HOST = os.getenv('TITLE_ADAPTOR_URI', 'http://localhost:5010')
