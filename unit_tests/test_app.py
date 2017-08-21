@@ -1025,8 +1025,6 @@ class TestUpdateDeed(TestRoutesBase):
                                          data=json.dumps(parameters),
                                          headers=self.webseal_headers)
 
-                self.maxDiff = 12500
-
                 self.assertEqual(mock_deed.return_value.deed_xml.decode(), parameters['deed-xml'])
 
                 self.assertTrue(mock_update_deed_signature_timestamp.called)
