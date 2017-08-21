@@ -26,6 +26,7 @@ ENV EXCHANGE_NAME 'esec-signing-exchange'
 ENV EXCHANGE_USER 'guest'
 ENV EXCHANGE_PASS 'guest'
 ENV ROUTING_KEYS 'esec-signing-key'
+ENV RABBIT_HOST 'rabbitmq'
 
 # For logging
 ENV LOG_LEVEL DEBUG
