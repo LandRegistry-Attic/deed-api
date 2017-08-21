@@ -1,4 +1,3 @@
-import base64
 import collections
 import json
 import sys
@@ -456,7 +455,7 @@ def update_json_with_signature(deed_reference):
 
     deed = Deed().get_deed_system(deed_reference)
 
-    incoming_xml = base64.b64decode(data['deed-xml'])
+    incoming_xml = data['deed-xml']
 
     tree = etree.fromstring(incoming_xml)
     new_signature_element = tree.xpath('.//signatureSlots/borrower_signature[position()=%s]' % data['borrower-pos'])[0]

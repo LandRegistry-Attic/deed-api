@@ -29,7 +29,7 @@ class DeedModelMock(Deed):
                  </lender><effectiveClause>This charge takes effect when the registrar receives notification from Test Organisation that the charge is to take effect.</effectiveClause>\
                  <reference>A test reference</reference></deedData><signatureSlots><borrower_signature><signature/><signatory><privateIndividual><forename>Paul</forename><middlename>James</middlename><surname>Smythe</surname>\
                  </privateIndividual></signatory></borrower_signature><borrower_signature><signature/><signatory><privateIndividual><forename>Jane</forename><surname>Smythe</surname>\
-                 </privateIndividual></signatory></borrower_signature></signatureSlots></operativeDeed><effectiveDate></effectiveDate><authSignature/></dm-application>"
+                 </privateIndividual></signatory></borrower_signature></signatureSlots></operativeDeed><effectiveDate/><authSignature/></dm-application>"
 
 class BorrowerModelMock(Borrower):
     token = "AAAA"
