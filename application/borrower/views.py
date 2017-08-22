@@ -66,18 +66,6 @@ def delete_verify_match(verify_pid):
     return jsonify({'result': match_message}), status.HTTP_200_OK
 
 
-@borrower_bp.route('/update_signing_in_progress/<borrower_token>', methods=['POST'])
-def update_borrower_signing_in_progress(borrower_token):
-    borrower = Borrower.get_by_token(borrower_token)
-    if borrower:
-        borrower.signing_in_progress = True
-        borrower.save()
-
-        return "Borrower signing_in_progress set to true", status.HTTP_200_OK
-
-    return "Matching borrower not found", status.HTTP_404_NOT_FOUND
-
-
 @borrower_bp.route('/check_signing_in_progress/<borrower_token>', methods=['GET'])
 def check_borrower_signing_in_progress(borrower_token):
     borrower = Borrower.get_by_token(borrower_token)
