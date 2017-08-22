@@ -10,6 +10,10 @@ class DatabaseException(Exception):
     pass
 
 
+class BorrowerNotFoundException(Exception):
+    pass
+
+
 class Borrower(db.Model):
     __tablename__ = 'borrower'
 
@@ -89,7 +93,7 @@ class Borrower(db.Model):
 
             return True
 
-        return False
+        raise BorrowerNotFoundException
 
     def delete_borrowers_not_on_deed(self, ids, deed_reference):
         borrowers = self._get_borrowers_not_on_deed(ids, deed_reference)

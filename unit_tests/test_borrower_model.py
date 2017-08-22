@@ -1,7 +1,7 @@
 import unittest
-from application.borrower.model import Borrower, VerifyMatch, DatabaseException
+from application.borrower.model import Borrower, VerifyMatch, DatabaseException, BorrowerNotFoundException
 import mock
-from unit_tests.helper import DeedHelper, borrower_object_helper
+from unit_tests.helper import DeedHelper, borrower_object_helper, BorrowerModelMock
 from application import app
 import copy
 
@@ -77,9 +77,9 @@ class TestVerifyModel(unittest.TestCase):
             VerifyMatch.remove_verify_match(self, '1')
         self.assertIn('oh no', str(context_manager.exception))
 
-    @mock.patch('application.borrower.views.Borrower.save')
+    @mock.patch('application.borrower.model.Borrower.save')
     @mock.patch('application.borrower.views.Borrower.get_by_token')
-    def test_update_borrower_signing_in_progress(self, mock_borrower_save, mock_borrower):
+    def test_update_borrower_signing_in_progress(self, mock_borrower, mock_borrower_save):
         class ReturnedBorrower:
             id = 0000000
             token = "aaaaaa"
@@ -88,6 +88,11 @@ class TestVerifyModel(unittest.TestCase):
             phonenumber = "07777777777"
             signing_in_progress = False
 
-        mock_borrower.return_value = ReturnedBorrower()
-        mock_borrower_save.signing_in_progress = True
+        mock_borrower.return_value = None
+        mock_borrower_save.signing_in_progress = False
+        with self.assertRaises(BorrowerNotFoundException):
+            Borrower.update_borrower_signing_in_progress('bbbbbb')
+
+        mock_borrower.return_value = BorrowerModelMock()
+        mock_borrower.return_value.signing_in_progress = True
         self.assertEqual(Borrower.update_borrower_signing_in_progress('aaaaaa'), True)
