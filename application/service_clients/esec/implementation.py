@@ -110,12 +110,8 @@ def auth_sms(deed, borrower_pos, user_id, borrower_auth_code, borrower_token):  
                 emitter.send_message({'params': parameters, 'extra-parameters': extra_parameters, 'data': deed_xml_to_send})
                 application.app.logger.info("Message sent to the queue...")
 
-            signing_status = Borrower.update_borrower_signing_in_progress(borrower_token)
-
-            if signing_status:
-                return jsonify({"status": "Message successfully sent to the queue"}), status.HTTP_200_OK
-            else:
-                raise Exception
+            Borrower.update_borrower_signing_in_progress(borrower_token)
+            return jsonify({"status": "Message successfully sent to the queue"}), status.HTTP_200_OK
 
         except Exception as e:
             application.app.logger.info('Error returned when trying to place an item on the queue: %s' % e)
