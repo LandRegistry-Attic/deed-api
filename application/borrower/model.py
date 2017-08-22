@@ -10,6 +10,10 @@ class DatabaseException(Exception):
     pass
 
 
+class BorrowerNotFoundException(Exception):
+    pass
+
+
 class Borrower(db.Model):
     __tablename__ = 'borrower'
 
@@ -79,6 +83,17 @@ class Borrower(db.Model):
             return existing_borrower
         else:
             return "Error No Borrower"
+
+    @staticmethod
+    def update_borrower_signing_in_progress(borrower_token):
+        borrower = Borrower.get_by_token(borrower_token)
+        if borrower:
+            borrower.signing_in_progress = True
+            borrower.save()
+
+            return True
+
+        raise BorrowerNotFoundException
 
     def delete_borrowers_not_on_deed(self, ids, deed_reference):
         borrowers = self._get_borrowers_not_on_deed(ids, deed_reference)
