@@ -28,6 +28,7 @@ from .borrower.views import borrower_bp  # noqa
 from .casework.views import casework_bp  # noqa
 from .naa_audit.views import naa_bp  # noqa
 from .dashboard.views import dashboard_bp  # noqa
+from .mortgage_document.views import mortgage_document_bp  # noqa
 
 app.config.from_pyfile("config.py")
 app.register_blueprint(deed_bp, url_prefix='/deed')
@@ -35,6 +36,7 @@ app.register_blueprint(borrower_bp, url_prefix='/borrower')
 app.register_blueprint(casework_bp, url_prefix='/casework')
 app.register_blueprint(naa_bp, url_prefix='/naa')
 app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
+app.register_blueprint(mortgage_document_bp, url_prefix='/mortgage-document')
 app.url_map.strict_slashes = False
 
 # Register any extensions we use into the app

@@ -75,9 +75,9 @@
         <p class="awaiting-information">[Effective date and time will be shown here]</p>
         {% endif %}
        {% if borrower_count ==1 %}
-       <h3 class="heading-medium">Borrower's digital signature</h3>
+       <h3 class="heading-medium">Borrower's electronic signature</h3>
        {% else %}
-       <h3 class="heading-medium">Borrower's digital signatures</h3>
+       <h3 class="heading-medium">Borrower's electronic signatures</h3>
        {% endif %}
         {% for borrower in deed_data.deed.borrowers %}
         {% if borrower.signature %}
