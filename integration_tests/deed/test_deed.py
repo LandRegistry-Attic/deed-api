@@ -337,8 +337,8 @@ class TestDeedRoutes(unittest.TestCase):
 
         second_deed = get_deed_again.json()
 
-        timer = time.time() + 15
-        while time.time() < timer or second_deed["deed"]["status"] != "ALL-SIGNED":
+        timer = time.time() + 60
+        while time.time() < timer and second_deed["deed"]["status"] != "ALL-SIGNED":
             get_deed_again = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
                                           headers=self.webseal_headers)
 
@@ -409,8 +409,8 @@ class TestDeedRoutes(unittest.TestCase):
 
         second_deed = get_deed_again.json()
 
-        timer = time.time() + 15
-        while time.time() < timer or second_deed["deed"]["status"] != "ALL-SIGNED":
+        timer = time.time() + 60
+        while time.time() < timer and second_deed["deed"]["status"] != "ALL-SIGNED":
             get_deed_again = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
                                           headers=self.webseal_headers)
 
