@@ -384,12 +384,6 @@
                             "pattern": "^(?!\\s*$).+",
                             "description": "Date that the mortgage offer was made.  Can be displayed on the deed if the mortgage document template permits."
                         },
-                        "miscellaneous_information": {
-                            "type": "string",
-                            "maxLength": 250,
-                            "pattern": "^(?!\\s*$).+",
-                            "description": "Values unsuited to other keys. Can be displayed on the deed if the mortgage document template permits."
-                        },
                         "deed_status": {
                             "type": "string",
                             "description": "Current state of the deed"
@@ -444,11 +438,9 @@
                     "pattern": "^(?!\\s*$).+",
                     "description": "Date that the mortgage offer was made.  Can be displayed on the deed if the mortgage document template permits."
                 },
-                "miscellaneous_information": {
+                "deed_effector": {
                     "type": "string",
-                    "maxLength": 250,
-                    "pattern": "^(?!\\s*$).+",
-                    "description": "Values unsuited to other keys. Can be displayed on the deed if the mortgage document template permits."
+                    "description": "Name of the legal deed effector. To be used where the legal deed effector name is different to that of the conveyancer."
                 }
             }
         },

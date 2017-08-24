@@ -47,11 +47,10 @@ valid_deed_with_date_of_mortgage_offer = {
     }],
     "identity_checked": "Y",
     "reference": "123",
-    "date_of_mortgage_offer": "a date string",
-    "miscellaneous_information": "A Conveyancer"
+    "date_of_mortgage_offer": "a date string"
 }
 
-valid_deed_with_miscellaneous_info = {
+valid_deed_with_deed_effector = {
     "title_number": "CYM123457",
     "md_ref": "e-MD1291A",
     "property_address": "0 The Drive, This Town, This County, PL0 0TH",
@@ -66,7 +65,7 @@ valid_deed_with_miscellaneous_info = {
     "identity_checked": "Y",
     "reference": "123",
     "date_of_mortgage_offer": "a date string",
-    "miscellaneous_information": "A Conveyancer"
+    "deed_effector": "A Conveyancer"
 }
 
 new_deed = {

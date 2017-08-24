@@ -96,10 +96,10 @@ class MortgageDocMockWithDateOfMortgageOffer:
     deed = complete_deed_dict
 
 
-class MortgageDocMockWithMiscInfo:
+class MortgageDocMockWithDeedEffector:
     md_ref = "e-MD1291A"
     data = '{"description":"test setup charge clause","lender":{ "name":"a new lender",' \
-           '"address":"no 1 reputable street"}, "miscellaneous_information_heading":"misc info: ",' \
+           '"address":"no 1 reputable street"}, "deed_effector":"Different Name",' \
            '"charge_clause": { "cre_code": "CRE001",' \
            '"description":"This is an example charge clause"}, "additional_provisions": ' \
            '[ { "additional_provision_code":"addp001", "description":"this is additional ' \

@@ -85,7 +85,7 @@ def update_borrower(borrower, idx, borrowers, deed_token):
     return borrower_json
 
 
-def update_md_clauses(json_doc, md_ref, reference, date_of_mortgage_offer, miscellaneous_information,
+def update_md_clauses(json_doc, md_ref, reference, date_of_mortgage_offer, deed_effector,
                       organisation_name):
     mortgage_document = MortgageDocument.query.filter_by(md_ref=str(md_ref)).first()
     if mortgage_document is not None:
@@ -93,7 +93,10 @@ def update_md_clauses(json_doc, md_ref, reference, date_of_mortgage_offer, misce
         json_doc["charge_clause"] = md_json["charge_clause"]
         json_doc["additional_provisions"] = md_json["additional_provisions"]
         json_doc["lender"] = md_json["lender"]
-        json_doc["effective_clause"] = make_effective_text(organisation_name)
+        if deed_effector:
+            json_doc["effective_clause"] = make_effective_text(deed_effector)
+        else:
+            json_doc["effective_clause"] = make_effective_text(organisation_name)
 
         if "lender_reference_name" in md_json and reference.strip():
             json_doc["reference_details"] = {
@@ -104,12 +107,6 @@ def update_md_clauses(json_doc, md_ref, reference, date_of_mortgage_offer, misce
             json_doc["date_of_mortgage_offer_details"] = {
                 "date_of_mortgage_offer_heading": md_json["date_of_mortgage_offer_heading"],
                 "date_of_mortgage_offer_value": date_of_mortgage_offer
-            }
-
-        if "miscellaneous_information_heading" in md_json and miscellaneous_information.strip():
-            json_doc["miscellaneous_information_details"] = {
-                "miscellaneous_information_heading": md_json["miscellaneous_information_heading"],
-                "miscellaneous_information_value": miscellaneous_information
             }
 
     return mortgage_document is not None
@@ -150,12 +147,12 @@ def update_deed(deed, deed_json):
     if "date_of_mortgage_offer" in deed_json:
         date_of_mortgage_offer = deed_json["date_of_mortgage_offer"]
 
-    miscellaneous_information = ""
-    if "miscellaneous_information" in deed_json:
-        miscellaneous_information = deed_json["miscellaneous_information"]
+    deed_effector = ""
+    if "deed_effector" in deed_json:
+        deed_effector = deed_json["deed_effector"]
 
     if not update_md_clauses(json_doc, deed_json["md_ref"], reference, date_of_mortgage_offer,
-                             miscellaneous_information, get_organisation_name(deed)):
+                             deed_effector, get_organisation_name(deed)):
         msg = "mortgage document associated with supplied md_ref is not found"
         application.app.logger.error(msg)
         return False, msg
