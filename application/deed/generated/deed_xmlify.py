@@ -1276,7 +1276,7 @@ class signatureSlotType(GeneratedsSuper):
 class deedDataType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, Id=None, titleNumber=None, propertyDescription=None, borrowers=None, mdRef=None, chargeClause=None, additionalProvisions=None, lender=None, effectiveClause=None, reference=None, date_of_mortgage_offer=None, miscellaneous_information=None):
+    def __init__(self, Id=None, titleNumber=None, propertyDescription=None, borrowers=None, mdRef=None, chargeClause=None, additionalProvisions=None, lender=None, effectiveClause=None, reference=None, date_of_mortgage_offer=None, deed_effector=None):
         self.original_tagname_ = None
         self.Id = _cast(None, Id)
         self.titleNumber = titleNumber
@@ -1289,7 +1289,7 @@ class deedDataType(GeneratedsSuper):
         self.effectiveClause = effectiveClause
         self.reference = reference
         self.date_of_mortgage_offer = date_of_mortgage_offer
-        self.miscellaneous_information = miscellaneous_information
+        self.deed_effector = deed_effector
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -1321,8 +1321,8 @@ class deedDataType(GeneratedsSuper):
     def set_reference(self, reference): self.reference = reference
     def get_date_of_mortgage_offer(self): return self.date_of_mortgage_offer
     def set_date_of_mortgage_offer(self, date_of_mortgage_offer): self.date_of_mortgage_offer = date_of_mortgage_offer
-    def get_miscellaneous_information(self): return self.miscellaneous_information
-    def set_miscellaneous_information(self, miscellaneous_information): self.miscellaneous_information = miscellaneous_information
+    def get_deed_effector(self): return self.deed_effector
+    def set_deed_effector(self, deed_effector): self.deed_effector = deed_effector
     def get_Id(self): return self.Id
     def set_Id(self, Id): self.Id = Id
     def hasContent_(self):
@@ -1337,7 +1337,7 @@ class deedDataType(GeneratedsSuper):
             self.effectiveClause is not None or
             self.reference is not None or
             self.date_of_mortgage_offer is not None or
-            self.miscellaneous_information is not None
+            self.deed_effector is not None
         ):
             return True
         else:
@@ -1395,9 +1395,9 @@ class deedDataType(GeneratedsSuper):
         if self.date_of_mortgage_offer is not None:
             showIndent(outfile, level, pretty_print)
             outfile.write('<%sdate_of_mortgage_offer>%s</%sdate_of_mortgage_offer>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.date_of_mortgage_offer), input_name='date_of_mortgage_offer')), namespace_, eol_))
-        if self.miscellaneous_information is not None:
+        if self.deed_effector is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%smiscellaneous_information>%s</%smiscellaneous_information>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.miscellaneous_information), input_name='miscellaneous_information')), namespace_, eol_))
+            outfile.write('<%sdeed_effector>%s</%sdeed_effector>%s' % (namespace_, self.gds_encode(self.gds_format_string(quote_xml(self.deed_effector), input_name='deed_effector')), namespace_, eol_))
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -1455,10 +1455,10 @@ class deedDataType(GeneratedsSuper):
             date_of_mortgage_offer_ = child_.text
             date_of_mortgage_offer_ = self.gds_validate_string(date_of_mortgage_offer_, node, 'date_of_mortgage_offer')
             self.date_of_mortgage_offer = date_of_mortgage_offer_
-        elif nodeName_ == 'miscellaneous_information':
-            miscellaneous_information_ = child_.text
-            miscellaneous_information_ = self.gds_validate_string(miscellaneous_information_, node, 'miscellaneous_information')
-            self.miscellaneous_information = miscellaneous_information_
+        elif nodeName_ == 'deed_effector':
+            deed_effector_ = child_.text
+            deed_effector_ = self.gds_validate_string(deed_effector_, node, 'deed_effector')
+            self.deed_effector = deed_effector_
 # end class deedDataType
 
 
