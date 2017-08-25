@@ -261,7 +261,6 @@ def process_organisation_credentials():
 
     try:
         header_data = request.headers.get(os.getenv('WEBSEAL_HEADER_KEY'))
-        application.app.logger.info("HELLO " + os.getenv('WEBSEAL_HEADER_KEY'))
 
         for param in header_data.split(','):
             key, value = param.split('=')
