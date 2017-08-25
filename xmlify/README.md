@@ -38,7 +38,7 @@ The classes can then be used in your application:-
 A change of the deed schema requires that:
 
 1) Update to the swagger json in application/deed/schemas/deed-api.json
-2) Consistent updates to deed-schema-v0-1.xsd
+2) Create a new version of deed-schema-v0-X.xsd
 3) Update of the changed schema to the ESecurity business gateway test and assurance servers
 4) Change into the /xmlify directory and re-generate the python xml creation classes (as above)
 5) Matching updates to the XML document generation code in application/deed/utils/convert_json_to_xml.py
