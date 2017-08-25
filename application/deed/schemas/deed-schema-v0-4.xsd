@@ -107,7 +107,7 @@
             <xs:element name="date_of_mortgage_offer" type="xs:string"
                         maxOccurs="1" minOccurs="0">
             </xs:element>
-            <xs:element name="miscellaneous_information" type="xs:string"
+            <xs:element name="deed_effector" type="xs:string"
                         maxOccurs="1" minOccurs="0">
             </xs:element>
         </xs:sequence>
