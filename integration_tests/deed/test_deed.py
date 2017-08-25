@@ -8,7 +8,7 @@ import unittest
 import time
 from application.deed.model import Deed
 from integration_tests.deed.deed_data import valid_deed, new_deed, valid_deed_with_reference, \
-    valid_deed_with_date_of_mortgage_offer, valid_deed_with_miscellaneous_info
+    valid_deed_with_date_of_mortgage_offer, valid_deed_with_deed_effector
 from lxml import etree
 
 from application import config
@@ -92,8 +92,8 @@ class TestDeedRoutes(unittest.TestCase):
     def test_deed_create_and_get_with_optional_date_of_mortgage_offer(self):
         self.deed_create_and_get(valid_deed_with_date_of_mortgage_offer)
 
-    def test_deed_create_and_get_with_optional_miscellaneous_info(self):
-        self.deed_create_and_get(valid_deed_with_miscellaneous_info)
+    def test_deed_create_and_get_with_optional_deed_effector(self):
+        self.deed_create_and_get(valid_deed_with_deed_effector)
 
     def test_bad_get(self):
         fake_token_deed = requests.get(config.DEED_API_BASE_HOST + "/deed/fake",

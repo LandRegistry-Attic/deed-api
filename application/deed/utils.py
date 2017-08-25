@@ -13,7 +13,7 @@ import urllib
 from application import config
 
 
-XML_SCHEMA_FILE = "deed-schema-v0-4.xsd"
+XML_SCHEMA_FILE = "deed-schema-v0-5.xsd"
 
 SCHEMA_LOCATION = config.ESEC_SCHEMA_LOCATION
 
@@ -231,8 +231,8 @@ def convert_json_to_xml(deed_json):
     if 'date_of_mortgage_offer' in deed_json:
         deed_data_xml.set_date_of_mortgage_offer(deed_json["date_of_mortgage_offer"])
 
-    if 'miscellaneous_information' in deed_json:
-        deed_data_xml.set_miscellaneous_information(deed_json["miscellaneous_information"])
+    if 'deed_effector' in deed_json:
+        deed_data_xml.set_deed_effector(deed_json["deed_effector"])
 
     operative_deed_xml.set_deedData(deed_data_xml)
     deed_app_xml.set_effectiveDate("tbc")

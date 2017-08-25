@@ -799,7 +799,7 @@
         "md_ref": "e-MD1291A",
         "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "date_of_mortgage_offer": 123,
-        "miscellaneous_information": false,
+        "deed_effector": false,
         "title_number": "DN12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -813,7 +813,7 @@
           }
         ]
       },
-      "description": "Checking offer date and misc info fails if they are not strings",
+      "description": "Checking offer date and deed_effector fails if they are not strings",
       "expected": 2
     },
     {
@@ -821,7 +821,6 @@
         "md_ref": "e-MD1291A",
         "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "date_of_mortgage_offer": "Making sure that if this sentence is over 50 characters long, that it fails",
-        "miscellaneous_information": "Making sure that if this sentence is over 250 characters long, that it fails. Making sure that if this sentence is over 250 characters long, that it fails. Making sure that if this sentence is over 250 characters long, that it fails. Making sure that if this sentence is over 250 characters long, that it fails. ",
         "title_number": "DN12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -835,15 +834,15 @@
           }
         ]
       },
-      "description": "Checking offer date and misc info fail if they are too long",
-      "expected": 2
+      "description": "Checking offer date fail if it is too long",
+      "expected": 1
     },
     {
       "payload": {
         "md_ref": "e-MD1291A",
         "property_address": "0 The Drive, This Town, This County, PL0 0TH",
         "date_of_mortgage_offer": "a date string",
-        "miscellaneous_information": "A Conveyancer",
+        "deed_effector": "A Conveyancer",
         "title_number": "DN12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -857,7 +856,7 @@
           }
         ]
       },
-      "description": "Check normal offer date and misc info pass",
+      "description": "Check normal offer date and deed_effector pass",
       "expected": 0
     },
     {
@@ -865,7 +864,7 @@
         "md_ref": "e-MD1291A",
         "property_address": "   ",
         "date_of_mortgage_offer": "   ",
-        "miscellaneous_information": "A Conveyancer",
+        "deed_effector": "A Conveyancer",
         "title_number": "DN12345",
         "identity_checked": "Y",
         "borrowers": [
@@ -879,7 +878,7 @@
           }
         ]
       },
-      "description": "Checking offer date and misc info fail if they are both blank",
+      "description": "Checking offer date and property_address fail if they are both blank",
       "expected": 2
     }
   ]

@@ -6,7 +6,7 @@ from application.deed.service import update_md_clauses, update_deed
 
 from application import app
 from unit_tests.helper import MortgageDocMock, MortgageDocMockWithReference, MortgageDocMockWithDateOfMortgageOffer,\
-    MortgageDocMockWithMiscInfo, DeedHelper
+    MortgageDocMockWithDeedEffector, DeedHelper
 
 
 class TestService(unittest.TestCase):
@@ -167,71 +167,21 @@ class TestService(unittest.TestCase):
         self.assertEquals(mock_dict, expected_dict)
 
     @mock.patch('application.deed.service.MortgageDocument.query', autospec=True)
-    def test_update_md_clauses_no_miscellaneous_information(self, mock_query):
-        # The mortgage doc has no misc info - but the function receives some.
-        # As a result, NO misc info should appear in the outputted deed.
+    def test_update_md_clauses_deed_effector(self, mock_query):
         mock_query_response = mock_query.filter_by.return_value
-        mock_query_response.first.return_value = MortgageDocMock()
+        mock_query_response.first.return_value = MortgageDocMockWithDeedEffector()
 
         mock_dict = {}
 
-        self.assertEqual(update_md_clauses(mock_dict, "e-MDTest", "", "", "some misc info", "Fake Org"),
-                         True)
+        self.assertEqual(update_md_clauses(mock_dict, "e-MDTest", "", "", "Different Name", "Fake Org"), True)
 
-        md_dict = json.loads(MortgageDocMock.data)
+        md_dict = json.loads(MortgageDocMockWithDeedEffector.data)
 
         expected_dict = {'charge_clause': md_dict['charge_clause'],
                          'additional_provisions': md_dict['additional_provisions'],
                          'lender': md_dict['lender'],
                          'effective_clause': 'This charge takes effect when the registrar' +
-                                             ' receives notification from Fake Org that the charge' +
-                                             ' is to take effect.'}
-
-        self.assertEquals(mock_dict, expected_dict)
-
-    @mock.patch('application.deed.service.MortgageDocument.query', autospec=True)
-    def test_update_md_clauses_with_misc_info(self, mock_query):
-        # The mortgage doc includes misc info - and a mortgage date offer is provided misc info
-        # As a result, misc info should appear in the outputted deed.
-        mock_query_response = mock_query.filter_by.return_value
-        mock_query_response.first.return_value = MortgageDocMockWithMiscInfo()
-
-        mock_dict = {}
-
-        self.assertEqual(update_md_clauses(mock_dict, "e-MDTest", "", "", "some misc info", "Fake Org"), True)
-
-        md_dict = json.loads(MortgageDocMockWithMiscInfo.data)
-
-        expected_dict = {'charge_clause': md_dict['charge_clause'],
-                         'additional_provisions': md_dict['additional_provisions'],
-                         'lender': md_dict['lender'],
-                         'effective_clause': 'This charge takes effect when the registrar' +
-                                             ' receives notification from Fake Org that the charge' +
-                                             ' is to take effect.',
-                         'miscellaneous_information_details':
-                             {'miscellaneous_information_heading': md_dict['miscellaneous_information_heading'],
-                              'miscellaneous_information_value': 'some misc info'}
-                         }
-        self.assertEquals(mock_dict, expected_dict)
-
-    @mock.patch('application.deed.service.MortgageDocument.query', autospec=True)
-    def test_update_md_clauses_with_misc_info_but_no_info_from_deed(self, mock_query):
-        # The mortgage doc includes the misc info - but no misc is provided to the function.
-        # As a result, misc info should NOT appear in the outputted deed.
-        mock_query_response = mock_query.filter_by.return_value
-        mock_query_response.first.return_value = MortgageDocMockWithMiscInfo()
-
-        mock_dict = {}
-
-        self.assertEqual(update_md_clauses(mock_dict, "e-MDTest", "", "", "", "Fake Org"), True)
-
-        md_dict = json.loads(MortgageDocMockWithMiscInfo.data)
-
-        expected_dict = {'charge_clause': md_dict['charge_clause'],
-                         'additional_provisions': md_dict['additional_provisions'],
-                         'lender': md_dict['lender'],
-                         'effective_clause': 'This charge takes effect when the registrar' +
-                                             ' receives notification from Fake Org that the charge' +
+                                             ' receives notification from Different Name that the charge' +
                                              ' is to take effect.'}
 
         self.assertEquals(mock_dict, expected_dict)
