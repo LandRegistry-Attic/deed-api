@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Fri Aug 25 08:31:13 2017 by generateDS.py version 2.18a.
+# Generated Fri Aug 25 11:00:36 2017 by generateDS.py version 2.18a.
 #
 # Command line options:
 #   ('-f', '')
 #   ('-o', '../application/deed/generated/deed_xmlify.py')
 #
 # Command line arguments:
-#   ../application/deed/schemas/deed-schema-v0-4.xsd
+#   ../application/deed/schemas/deed-schema-v0-5.xsd
 #
 # Command line:
-#   generateDS.py -f -o "../application/deed/generated/deed_xmlify.py" ../application/deed/schemas/deed-schema-v0-4.xsd
+#   generateDS.py -f -o "../application/deed/generated/deed_xmlify.py" ../application/deed/schemas/deed-schema-v0-5.xsd
 #
 # Current working directory (os.getcwd()):
 #   xmlify
