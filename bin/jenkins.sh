@@ -10,8 +10,6 @@ virtualenv $env_dir
 pip3 uninstall -y lxml
 pip3 install -r requirements.txt --no-binary lxml
 
-flake8 --version
-
 mkdir ../logs
 
 ./unit_test.sh
