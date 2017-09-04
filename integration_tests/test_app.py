@@ -128,7 +128,10 @@ class TestAppRoutes(unittest.TestCase):
 
         test_result = test_result.json()
 
-        self.assertGreater(len(test_result["deeds"]), len(get_existing_deeds["deeds"]))
+        if "deeds" in get_existing_deeds:
+            self.assertGreater(len(test_result["deeds"]), len(get_existing_deeds["deeds"]))
+        else:
+            self.assertGreater(len(test_result["deeds"]), 0)
 
     def test_get_partially_signed_deeds(self):
         get_existing_deeds = requests.get(config.DEED_API_BASE_HOST + '/dashboard/PARTIALLY_SIGNED',
