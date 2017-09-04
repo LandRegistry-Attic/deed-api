@@ -816,6 +816,108 @@ class TestCreateDeed(TestRoutesBase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
+    @mock.patch('application.deed.views.Validation.validate_phonenumbers')
+    @mock.patch('application.deed.views.Validation.validate_dob')
+    @mock.patch('application.deed.views.Validation.call_akuma')
+    @mock.patch('application.deed.views.Validation.validate_borrower_names')
+    @mock.patch('application.deed.views.Validation.validate_title_number')
+    @mock.patch('application.deed.views.Validation.validate_payload')
+    @mock.patch('application.deed.views.update_deed')
+    @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
+    @mock.patch('application.deed.views.Deed.get_deed')
+    def test_get_existing_deed_and_update_no_deed(self, mock_deed, mock_org_cred, mock_update, mock_val_payload,
+                                                  mock_val_tn, mock_val_bor, mock_akuma, mock_val_dob,
+                                                  mock_val_phone, mock_query):
+
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = MortgageDocMock()
+        mock_val_payload.return_value = None
+        mock_val_tn.return_value = "title OK"
+        mock_val_bor.return_value = True, ""
+        mock_val_dob.return_value = True, ""
+        mock_val_phone.return_value = True, ""
+        mock_akuma.return_value = {
+            "result": "A",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
+        mock_deed.return_value = None
+
+        payload = json.dumps(DeedHelper._json_doc_update)
+        response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
+                                headers=self.webseal_headers)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
+    @mock.patch('application.deed.views.Validation.validate_phonenumbers')
+    @mock.patch('application.deed.views.Validation.validate_dob')
+    @mock.patch('application.deed.views.Validation.call_akuma')
+    @mock.patch('application.deed.views.Validation.validate_borrower_names')
+    @mock.patch('application.deed.views.Validation.validate_title_number')
+    @mock.patch('application.deed.views.Validation.validate_payload')
+    @mock.patch('application.deed.views.update_deed')
+    @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
+    @mock.patch('application.deed.views.Deed.get_deed')
+    def test_get_existing_deed_and_update_not_draft(self, mock_deed, mock_org_cred, mock_update, mock_val_payload,
+                                                    mock_val_tn, mock_val_bor, mock_akuma, mock_val_dob,
+                                                    mock_val_phone, mock_query):
+
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = MortgageDocMock()
+        mock_val_payload.return_value = None
+        mock_val_tn.return_value = "title OK"
+        mock_val_bor.return_value = True, ""
+        mock_val_dob.return_value = True, ""
+        mock_val_phone.return_value = True, ""
+        mock_akuma.return_value = {
+            "result": "A",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
+
+        deed_with_non_draft_status = DeedModelMock()
+        deed_with_non_draft_status.status = "SIGNED"
+        mock_deed.return_value = deed_with_non_draft_status
+
+        payload = json.dumps(DeedHelper._json_doc_update)
+        response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
+                                headers=self.webseal_headers)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
+    @mock.patch('application.deed.views.Validation.validate_phonenumbers')
+    @mock.patch('application.deed.views.Validation.validate_dob')
+    @mock.patch('application.deed.views.Validation.call_akuma')
+    @mock.patch('application.deed.views.Validation.validate_borrower_names')
+    @mock.patch('application.deed.views.Validation.validate_title_number')
+    @mock.patch('application.deed.views.Validation.validate_payload')
+    @mock.patch('application.deed.views.update_deed')
+    @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
+    @mock.patch('application.deed.views.Deed.get_deed')
+    def test_get_existing_deed_and_update_bad_akuma_response(self, mock_deed, mock_org_cred, mock_update, mock_val_payload, mock_val_tn,
+                                                             mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone, mock_query):
+
+        mock_instance_response = mock_query.filter_by.return_value
+        mock_instance_response.first.return_value = MortgageDocMock()
+        mock_val_payload.return_value = None
+        mock_val_tn.return_value = "title OK"
+        mock_val_bor.return_value = True, ""
+        mock_val_dob.return_value = True, ""
+        mock_val_phone.return_value = True, ""
+        mock_akuma.return_value = {
+            "result": "Z",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
+        mock_deed.return_value = DeedModelMock()
+        mock_update.return_value = True, "OK"
+
+        payload = json.dumps(DeedHelper._json_doc_update)
+        response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
+                                headers=self.webseal_headers)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     @mock.patch('application.deed.views.Validation.validate_phonenumbers')
     @mock.patch('application.deed.views.Validation.validate_dob')
     @mock.patch('application.deed.views.Validation.call_akuma')
@@ -857,7 +959,7 @@ class TestCreateDeed(TestRoutesBase):
                                                     mock_val_tn, mock_val_bor, mock_akuma, mock_val_dob,
                                                     mock_val_phone):
         # test validate_title_number
-        mock_val_payload.return_value = 0, "No error message"
+        mock_val_payload.return_value = None
         mock_val_tn.return_value = "Title does not exist."
         mock_val_bor.return_value = True, ""
         mock_val_dob.return_value = True, ""
@@ -872,6 +974,7 @@ class TestCreateDeed(TestRoutesBase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
     @mock.patch('application.deed.views.Validation.validate_phonenumbers')
     @mock.patch('application.deed.views.Validation.validate_dob')
     @mock.patch('application.deed.views.Validation.call_akuma')
@@ -883,14 +986,17 @@ class TestCreateDeed(TestRoutesBase):
     @mock.patch('application.deed.views.Deed.get_deed')
     def test_get_existing_deed_and_update_bad_borrowers(self, mock_deed, mock_org_cred, mock_update, mock_val_payload,
                                                         mock_val_tn, mock_val_bor, mock_akuma, mock_val_dob,
-                                                        mock_val_phone):
+                                                        mock_val_phone, mock_query):
         # test validate_borrower_names
-        mock_val_payload.return_value = 0, "No error message"
-        mock_val_tn.return_value = "OK"
+        mock_val_payload.return_value = None
+        mock_val_tn.return_value = "title OK"
         mock_val_bor.return_value = False, "fail"
         mock_val_dob.return_value = True, ""
         mock_val_phone.return_value = True, ""
-
+        mock_akuma.return_value = {
+            "result": "A",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
         mock_deed.return_value = DeedModelMock()
         mock_update.return_value = True, "OK"
 
@@ -900,6 +1006,7 @@ class TestCreateDeed(TestRoutesBase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
     @mock.patch('application.deed.views.Validation.validate_phonenumbers')
     @mock.patch('application.deed.views.Validation.validate_dob')
     @mock.patch('application.deed.views.Validation.call_akuma')
@@ -910,13 +1017,17 @@ class TestCreateDeed(TestRoutesBase):
     @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
     @mock.patch('application.deed.views.Deed.get_deed')
     def test_get_existing_deed_and_update_bad_dob(self, mock_deed, mock_org_cred, mock_update, mock_val_payload,
-                                                  mock_val_tn, mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone):
+                                                  mock_val_tn, mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone, mock_query):
         # test validate_dob
-        mock_val_payload.return_value = 0, "No error message"
-        mock_val_tn.return_value = "OK"
+        mock_val_payload.return_value = None
+        mock_val_tn.return_value = "title OK"
         mock_val_bor.return_value = True, ""
         mock_val_dob.return_value = False, "fail"
-
+        mock_val_phone.return_value = True, ""
+        mock_akuma.return_value = {
+            "result": "A",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
         mock_deed.return_value = DeedModelMock()
         mock_update.return_value = True, "OK"
 
@@ -926,6 +1037,7 @@ class TestCreateDeed(TestRoutesBase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
     @mock.patch('application.deed.views.Validation.validate_phonenumbers')
     @mock.patch('application.deed.views.Validation.validate_dob')
     @mock.patch('application.deed.views.Validation.call_akuma')
@@ -937,17 +1049,85 @@ class TestCreateDeed(TestRoutesBase):
     @mock.patch('application.deed.views.Deed.get_deed')
     def test_get_existing_deed_and_update_bad_phone_numbers(self, mock_deed, mock_org_cred, mock_update,
                                                             mock_val_payload, mock_val_tn, mock_val_bor, mock_akuma,
-                                                            mock_val_dob, mock_val_phone):
+                                                            mock_val_dob, mock_val_phone, mock_query):
 
         # test validate_phonenumbers
-        mock_val_payload.return_value = 0, "No error message"
-        mock_val_tn.return_value = "OK"
+        mock_val_payload.return_value = None
+        mock_val_tn.return_value = "title OK"
         mock_val_bor.return_value = True, ""
         mock_val_dob.return_value = True, ""
         mock_val_phone.return_value = False, "fail"
-
+        mock_akuma.return_value = {
+            "result": "A",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
         mock_deed.return_value = DeedModelMock()
         mock_update.return_value = True, "OK"
+
+        payload = json.dumps(DeedHelper._json_doc_update)
+        response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
+                                headers=self.webseal_headers)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @mock.patch('application.deed.views.Validation.validate_phonenumbers')
+    @mock.patch('application.deed.views.Validation.validate_dob')
+    @mock.patch('application.deed.views.Validation.call_akuma')
+    @mock.patch('application.deed.views.Validation.validate_borrower_names')
+    @mock.patch('application.deed.views.Validation.validate_title_number')
+    @mock.patch('application.deed.views.Validation.validate_payload')
+    @mock.patch('application.deed.views.update_deed')
+    @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
+    @mock.patch('application.deed.views.Deed.get_deed')
+    def test_get_existing_deed_and_update_bad_deed(self, mock_deed, mock_org_cred, mock_update,
+                                                   mock_val_payload, mock_val_tn, mock_val_bor, mock_akuma,
+                                                   mock_val_dob, mock_val_phone):
+
+        # test validate_md_exists
+        mock_val_payload.return_value = None
+        mock_val_tn.return_value = "title OK"
+        mock_val_bor.return_value = True, ""
+        mock_val_dob.return_value = True, ""
+        mock_val_phone.return_value = True, ""
+        mock_akuma.return_value = {
+            "result": "A",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
+        mock_deed.return_value = DeedModelMock()
+        mock_update.return_value = True, "OK"
+
+        payload = json.dumps(DeedHelper._json_doc_update)
+        response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
+                                headers=self.webseal_headers)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @mock.patch('application.mortgage_document.model.MortgageDocument.query', autospec=True)
+    @mock.patch('application.deed.views.Validation.validate_phonenumbers')
+    @mock.patch('application.deed.views.Validation.validate_dob')
+    @mock.patch('application.deed.views.Validation.call_akuma')
+    @mock.patch('application.deed.views.Validation.validate_borrower_names')
+    @mock.patch('application.deed.views.Validation.validate_title_number')
+    @mock.patch('application.deed.views.Validation.validate_payload')
+    @mock.patch('application.deed.views.update_deed')
+    @mock.patch('application.deed.views.Validation.validate_organisation_credentials')
+    @mock.patch('application.deed.views.Deed.get_deed')
+    def test_get_existing_deed_and_update_failed(self, mock_deed, mock_org_cred, mock_update,
+                                                 mock_val_payload, mock_val_tn, mock_val_bor, mock_akuma,
+                                                 mock_val_dob, mock_val_phone, mock_query):
+
+        # test validate_md_exists
+        mock_val_payload.return_value = None
+        mock_val_tn.return_value = "title OK"
+        mock_val_bor.return_value = True, ""
+        mock_val_dob.return_value = True, ""
+        mock_val_phone.return_value = True, ""
+        mock_akuma.return_value = {
+            "result": "A",
+            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+        }
+        mock_deed.return_value = DeedModelMock()
+        mock_update.return_value = False, ""
 
         payload = json.dumps(DeedHelper._json_doc_update)
         response = self.app.put(self.DEED_ENDPOINT + 'AAAAAA', data=payload,
