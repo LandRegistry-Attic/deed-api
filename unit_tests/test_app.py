@@ -1051,6 +1051,7 @@ class TestCreateDeed(TestRoutesBase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    @mock.patch('application.deed.views.Validation.validate_md_exists')
     @mock.patch('application.deed.views.Validation.validate_phonenumbers')
     @mock.patch('application.deed.views.Validation.validate_dob')
     @mock.patch('application.deed.views.Validation.call_akuma')
@@ -1062,7 +1063,7 @@ class TestCreateDeed(TestRoutesBase):
     @mock.patch('application.deed.views.Deed.get_deed')
     def test_get_existing_deed_and_update_bad_deed(self, mock_deed, mock_org_cred, mock_update,
                                                    mock_val_payload, mock_val_tn, mock_val_bor, mock_akuma,
-                                                   mock_val_dob, mock_val_phone):
+                                                   mock_val_dob, mock_val_phone, mock_val_md_exists):
 
         # test validate_md_exists
         mock_val_payload.return_value = None
@@ -1070,6 +1071,7 @@ class TestCreateDeed(TestRoutesBase):
         mock_val_bor.return_value = True, ""
         mock_val_dob.return_value = True, ""
         mock_val_phone.return_value = True, ""
+        mock_val_md_exists.return_value = False, ""
         mock_akuma.return_value = DeedHelper._create_deed_and_update_akuma
         mock_deed.return_value = DeedModelMock()
         mock_update.return_value = True, "OK"
