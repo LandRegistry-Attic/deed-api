@@ -460,6 +460,11 @@ class DeedHelper:
         "md_ref": "e-MD12344"
     }
 
+    _create_deed_and_update_akuma = {
+        "result": "A",
+        "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+    }
+
 
 class StatusMock:
     _status_with_mdref_and_titleno = [

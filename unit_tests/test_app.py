@@ -795,7 +795,6 @@ class TestCreateDeed(TestRoutesBase):
     @mock.patch('application.deed.views.Deed.get_deed')
     def test_get_existing_deed_and_update(self, mock_deed, mock_org_cred, mock_update, mock_val_payload, mock_val_tn,
                                           mock_val_bor, mock_akuma, mock_val_dob, mock_val_phone, mock_query):
-
         mock_instance_response = mock_query.filter_by.return_value
         mock_instance_response.first.return_value = MortgageDocMock()
         mock_val_payload.return_value = None
@@ -803,10 +802,7 @@ class TestCreateDeed(TestRoutesBase):
         mock_val_bor.return_value = True, ""
         mock_val_dob.return_value = True, ""
         mock_val_phone.return_value = True, ""
-        mock_akuma.return_value = {
-            "result": "A",
-            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
-        }
+        mock_akuma.return_value = DeedHelper._create_deed_and_update_akuma
         mock_deed.return_value = DeedModelMock()
         mock_update.return_value = True, "OK"
 
@@ -837,10 +833,7 @@ class TestCreateDeed(TestRoutesBase):
         mock_val_bor.return_value = True, ""
         mock_val_dob.return_value = True, ""
         mock_val_phone.return_value = True, ""
-        mock_akuma.return_value = {
-            "result": "A",
-            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
-        }
+        mock_akuma.return_value = DeedHelper._create_deed_and_update_akuma
         mock_deed.return_value = None
 
         payload = json.dumps(DeedHelper._json_doc_update)
@@ -870,10 +863,7 @@ class TestCreateDeed(TestRoutesBase):
         mock_val_bor.return_value = True, ""
         mock_val_dob.return_value = True, ""
         mock_val_phone.return_value = True, ""
-        mock_akuma.return_value = {
-            "result": "A",
-            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
-        }
+        mock_akuma.return_value = DeedHelper._create_deed_and_update_akuma
 
         deed_with_non_draft_status = DeedModelMock()
         deed_with_non_draft_status.status = "SIGNED"
@@ -993,10 +983,7 @@ class TestCreateDeed(TestRoutesBase):
         mock_val_bor.return_value = False, "fail"
         mock_val_dob.return_value = True, ""
         mock_val_phone.return_value = True, ""
-        mock_akuma.return_value = {
-            "result": "A",
-            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
-        }
+        mock_akuma.return_value = DeedHelper._create_deed_and_update_akuma
         mock_deed.return_value = DeedModelMock()
         mock_update.return_value = True, "OK"
 
@@ -1024,10 +1011,7 @@ class TestCreateDeed(TestRoutesBase):
         mock_val_bor.return_value = True, ""
         mock_val_dob.return_value = False, "fail"
         mock_val_phone.return_value = True, ""
-        mock_akuma.return_value = {
-            "result": "A",
-            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
-        }
+        mock_akuma.return_value = DeedHelper._create_deed_and_update_akuma
         mock_deed.return_value = DeedModelMock()
         mock_update.return_value = True, "OK"
 
@@ -1057,10 +1041,7 @@ class TestCreateDeed(TestRoutesBase):
         mock_val_bor.return_value = True, ""
         mock_val_dob.return_value = True, ""
         mock_val_phone.return_value = False, "fail"
-        mock_akuma.return_value = {
-            "result": "A",
-            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
-        }
+        mock_akuma.return_value = DeedHelper._create_deed_and_update_akuma
         mock_deed.return_value = DeedModelMock()
         mock_update.return_value = True, "OK"
 
@@ -1089,10 +1070,7 @@ class TestCreateDeed(TestRoutesBase):
         mock_val_bor.return_value = True, ""
         mock_val_dob.return_value = True, ""
         mock_val_phone.return_value = True, ""
-        mock_akuma.return_value = {
-            "result": "A",
-            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
-        }
+        mock_akuma.return_value = DeedHelper._create_deed_and_update_akuma
         mock_deed.return_value = DeedModelMock()
         mock_update.return_value = True, "OK"
 
@@ -1122,10 +1100,7 @@ class TestCreateDeed(TestRoutesBase):
         mock_val_bor.return_value = True, ""
         mock_val_dob.return_value = True, ""
         mock_val_phone.return_value = True, ""
-        mock_akuma.return_value = {
-            "result": "A",
-            "id": "2b9115b2-d956-11e5-942f-08002719cd16"
-        }
+        mock_akuma.return_value = DeedHelper._create_deed_and_update_akuma
         mock_deed.return_value = DeedModelMock()
         mock_update.return_value = False, ""
 
