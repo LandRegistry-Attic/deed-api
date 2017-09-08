@@ -82,7 +82,7 @@ def setUp_MortgageDocuments(self):
     table = Table('mortgage_document', metadata, autoload=True)
     sql_connection = engine.connect()
 
-    csv_file = open('./integration_tests/deed/test_md.csv', newline='')
+    csv_file = open('./migrations/setup_initial_data/data/mortgage_document/test_md.csv', newline='')
 
     process_file(csv_file, sql_connection, table)
 
