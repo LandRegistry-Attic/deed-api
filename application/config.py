@@ -19,6 +19,8 @@ ROUTING_KEYS = os.getenv('ROUTING_KEYS')
 
 RABBIT_HOST = os.getenv('RABBIT_HOST')
 
+RABBIT_VHOST = os.getenv('RABBIT_VHOST')
+
 ESEC_SCHEMA_LOCATION = os.getenv('ESEC_SCHEMA_LOCATION', 'http://localhost:9080/schemas/')
 
 TITLE_ADAPTOR_BASE_HOST = os.getenv('TITLE_ADAPTOR_URI', 'http://localhost:5010')
