@@ -105,7 +105,7 @@ def auth_sms(deed, borrower_pos, user_id, borrower_auth_code, borrower_token):  
         application.app.logger.info("Preparing to send message to the queue...")
 
         try:
-            url = broker_url(config.RABBIT_HOST, config.EXCHANGE_USER, config.EXCHANGE_PASS, 5672)
+            url = broker_url(config.RABBIT_HOST, config.EXCHANGE_USER, config.EXCHANGE_PASS, 5672, config.RABBIT_VHOST)
             with Emitter(url, config.EXCHANGE_NAME, config.ROUTING_KEYS) as emitter:
                 emitter.send_message({'params': parameters, 'extra-parameters': extra_parameters, 'data': deed_xml_to_send})
                 application.app.logger.info("Message sent to the queue...")
