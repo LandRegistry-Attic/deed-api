@@ -457,8 +457,8 @@ def update_json_with_signature(deed_reference):
 
     incoming_xml = data['deed-xml']
 
-    new_incoming_xml = bytes(incoming_xml, encoding='utf-8')
-    tree = etree.fromstring(new_incoming_xml)
+    incoming_xml_bytes = bytes(incoming_xml, encoding='utf-8')
+    tree = etree.fromstring(incoming_xml_bytes)
     new_signature_element = tree.xpath('.//signatureSlots/borrower_signature[position()=%s]' % data['borrower-pos'])[0]
 
     # Replace the borrower's element within the deed object's deed_xml
