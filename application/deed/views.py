@@ -457,16 +457,22 @@ def update_json_with_signature(deed_reference):
 
     incoming_xml = data['deed-xml']
 
-    tree = etree.fromstring(incoming_xml)
+    new_incoming_xml = bytes(incoming_xml, encoding='utf-8')
+    tree = etree.fromstring(new_incoming_xml)
     new_signature_element = tree.xpath('.//signatureSlots/borrower_signature[position()=%s]' % data['borrower-pos'])[0]
 
     # Replace the borrower's element within the deed object's deed_xml
     existing_deed_data_xml = etree.fromstring(deed.deed_xml)
+
     existing_signature_element = existing_deed_data_xml.xpath('.//signatureSlots/borrower_signature[position()=%s]' % data['borrower-pos'])[0]
     existing_signature_element.getparent().replace(existing_signature_element, new_signature_element)
-    # Save the deed_xml with the newly replaced borrower's element
-    deed.deed_xml = etree.tostring(existing_deed_data_xml)
 
+    existing_deed_data_xml = etree.tostring(existing_deed_data_xml)
+
+    esecurity_parent_element = b'<?xml version=\"1.0\" encoding=\"UTF-8\"?>'
+    deed.deed_xml = esecurity_parent_element + existing_deed_data_xml
+
+    # Save the deed_xml with the newly replaced borrower's element
     update_deed_signature_timestamp(deed, data['borrower-token'], data['datetime'])
 
     return jsonify({"status": "Successfully updated json with signature"}), status.HTTP_200_OK

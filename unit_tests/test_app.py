@@ -1182,7 +1182,11 @@ class TestUpdateDeed(TestRoutesBase):
                                          data=json.dumps(parameters),
                                          headers=self.webseal_headers)
 
-                self.assertEqual(mock_deed.return_value.deed_xml.decode(), parameters['deed-xml'])
+                esecurity_parent_element = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>'
+
+                deed_xml_with_parent_element = esecurity_parent_element + parameters['deed-xml']
+
+                self.assertEqual(mock_deed.return_value.deed_xml.decode(), deed_xml_with_parent_element)
 
                 self.assertTrue(mock_update_deed_signature_timestamp.called)
 
