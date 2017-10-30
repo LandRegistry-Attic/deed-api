@@ -1,5 +1,5 @@
 # Set the base image to the base image
-FROM lr_base_python_flask:2
+FROM hmlandregistry/dev_base_python_flask:4
 
 # ---- Database stuff start
 
