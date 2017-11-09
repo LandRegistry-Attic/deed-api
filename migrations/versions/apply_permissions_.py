@@ -27,7 +27,7 @@ def upgrade():
 def downgrade():
     context.execute("REVOKE SELECT, UPDATE, INSERT, DELETE \
                     ON borrower, deed, mortgage_document, naa_audit, verify_match \
-                    TO " + str(os.getenv('APP_SQL_USERNAME')))
+                    FROM " + str(os.getenv('APP_SQL_USERNAME')))
 
     context.execute("REVOKE USAGE, SELECT ON SEQUENCE borrower_id_seq, deed_id_seq, naa_audit_id_seq \
-                    TO " + str(os.getenv('APP_SQL_USERNAME')))
+                    FROM " + str(os.getenv('APP_SQL_USERNAME')))
