@@ -1,4 +1,3 @@
-from alembic import context
 # flake8: noqa
 """empty message
 
