@@ -1,2 +1,2 @@
 ---
-  commodities: ["postgres"]
+  commodities: ["logging","postgres"]

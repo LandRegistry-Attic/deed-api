@@ -1,12 +1,16 @@
-from sqlalchemy import ForeignKey, not_, func
-from application import db
 import uuid
+from sqlalchemy import not_, func, ForeignKey
 
+from application import db
 
 charset = list("0123456789ABCDEFGHJKLMNPQRSTUVXY")
 
 
 class DatabaseException(Exception):
+    pass
+
+
+class BorrowerNotFoundException(Exception):
     pass
 
 
@@ -24,6 +28,7 @@ class Borrower(db.Model):
     phonenumber = db.Column(db.String, nullable=False)
     address = db.Column(db.String, nullable=False)
     esec_user_name = db.Column(db.String, nullable=True)
+    signing_in_progress = db.Column(db.Boolean, nullable=True)
 
     @staticmethod
     def generate_token():
@@ -79,6 +84,17 @@ class Borrower(db.Model):
         else:
             return "Error No Borrower"
 
+    @staticmethod
+    def update_borrower_signing_in_progress(borrower_token):
+        borrower = Borrower.get_by_token(borrower_token)
+        if borrower:
+            borrower.signing_in_progress = True
+            borrower.save()
+
+            return True
+
+        raise BorrowerNotFoundException
+
     def delete_borrowers_not_on_deed(self, ids, deed_reference):
         borrowers = self._get_borrowers_not_on_deed(ids, deed_reference)
 
@@ -112,11 +128,11 @@ class VerifyMatch(db.Model):
 
     verify_pid = db.Column(db.String, primary_key=True)
     borrower_id = db.Column(db.Integer, ForeignKey("borrower.id"), primary_key=True)
+    confidence_level = db.Column(db.Integer, nullable=False)
 
     def remove_verify_match(self, pid_):
-        match = VerifyMatch.query.filter_by(verify_pid=pid_).first()
-
         try:
+            match = VerifyMatch.query.filter_by(verify_pid=pid_).first()
             if match is None:
                 return False
 

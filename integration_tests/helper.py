@@ -1,10 +1,17 @@
-from functools import wraps
-from application import app
-from application import db
+import os
 from flask.ext.script import Manager
+from functools import wraps
 from migrations.setup_initial_data.data_importer import process_file
 from sqlalchemy import create_engine, MetaData, Table
-import os
+
+from application import app
+from application import db
+from application.borrower.model import Borrower
+
+webseal_headers = {
+    "Content-Type": "application/json",
+    os.getenv("WEBSEAL_HEADER_KEY"): os.getenv("WEBSEAL_HEADER_INT_TEST_4")
+}
 
 
 def with_client(test):
@@ -25,6 +32,45 @@ def setUpApp(self):
 def setUpDB(self):
     with self.app.app_context():
         db.create_all()
+        manager = Manager(db)
+        self.db = manager.db
+
+
+def insert_verify_match_row(self, verify_pid, borrower_id):
+    with self.app.app_context():
+        db.engine.execute('DELETE FROM verify_match WHERE verify_pid = %s', verify_pid)
+        db.engine.execute('INSERT INTO verify_match (verify_pid, borrower_id, confidence_level)' +
+                          'VALUES (%s, %s, %s)', verify_pid, borrower_id, 3)
+
+
+def insert_borrower_row(self, verify_pid, borrower_id):
+    with self.app.app_context():
+        remove_verify_match_row(self, 999)
+        remove_borrower_row(self, 999)
+        borrower = Borrower()
+        borrower.id = 999
+        borrower.forename = 'some'
+        borrower.middlename = 'nice'
+        borrower.surname = 'guy'
+        borrower.dob = 'a date'
+        borrower.gender = 'a gender'
+        borrower.phonenumber = '07777777777'
+        borrower.address = 'an address'
+        borrower.token = 'a token'
+        borrower.deed_token = 'a deed token'
+        borrower.esec_user_name = 'an esec user name'
+        borrower.save()
+
+
+def remove_borrower_row(self, borrower_id):
+    with self.app.app_context():
+        borrower = Borrower()
+        borrower.delete(999)
+
+
+def remove_verify_match_row(self, borrower_id):
+    with self.app.app_context():
+        db.engine.execute('DELETE FROM verify_match WHERE borrower_id = %s', borrower_id)
 
 
 def setUp_MortgageDocuments(self):
@@ -36,7 +82,7 @@ def setUp_MortgageDocuments(self):
     table = Table('mortgage_document', metadata, autoload=True)
     sql_connection = engine.connect()
 
-    csv_file = open('./integration_tests/deed/test_md.csv', newline='')
+    csv_file = open('./migrations/setup_initial_data/data/mortgage_document/test_md.csv', newline='')
 
     process_file(csv_file, sql_connection, table)
 

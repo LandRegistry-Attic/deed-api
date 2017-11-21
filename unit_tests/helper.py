@@ -2,6 +2,7 @@ from application.deed.model import Deed
 from application.borrower.model import Borrower
 from .deed_dict import DEED
 from .complete_deed_dict import complete_deed_dict
+import requests
 
 # flake8: noqa
 
@@ -9,6 +10,7 @@ from .complete_deed_dict import complete_deed_dict
 class DeedModelMock(Deed):
     token = "ABC1234"
     deed = DEED
+    deed_hash = "d4c220637b3338e0af749d4e1cd276d950973fa9bbff4011f61a757aa4f4f638"
     status = "DRAFT"
     deed_xml = "<dm-application xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"http://localhost:9080/schemas/deed-schema-v0-3.xsd\">\
                 <operativeDeed><deedData Id=\"deedData\"><titleNumber>GR515835</titleNumber><propertyDescription>0 The Drive, This Town, This County, PL0 0TH</propertyDescription>\
@@ -27,8 +29,39 @@ class DeedModelMock(Deed):
                  </lender><effectiveClause>This charge takes effect when the registrar receives notification from Test Organisation that the charge is to take effect.</effectiveClause>\
                  <reference>A test reference</reference></deedData><signatureSlots><borrower_signature><signature/><signatory><privateIndividual><forename>Paul</forename><middlename>James</middlename><surname>Smythe</surname>\
                  </privateIndividual></signatory></borrower_signature><borrower_signature><signature/><signatory><privateIndividual><forename>Jane</forename><surname>Smythe</surname>\
-                 </privateIndividual></signatory></borrower_signature></signatureSlots></operativeDeed><effectiveDate></effectiveDate><authSignature/></dm-application>"
+                 </privateIndividual></signatory></borrower_signature></signatureSlots></operativeDeed><effectiveDate/><authSignature/></dm-application>"
 
+class BorrowerModelMock(Borrower):
+    token = "AAAA"
+    deed_token = "ABC1234"
+    forename = "Fred"
+    middlename = "Ann"
+    surname = "Bloggs"
+    dob = "23/01/1985"
+    gender = "Male"
+    phonenumber = "666"
+    address = "Test Address, The Place, PL9 8DR"
+    esec_user_name = "dm-fred"
+    signing_in_progress = None
+
+class BorrowerModelMockNoId(Borrower):
+    token = "AAAA"
+    deed_token = "ABC1234"
+    forename = "Fred"
+    middlename = "Ann"
+    surname = "Bloggs"
+    dob = "23/01/1985"
+    gender = "Male"
+    phonenumber = "666"
+    address = "Test Address, The Place, PL9 8DR"
+    esec_user_name = None
+    signing_in_progress = None
+
+
+class EsecClientMock():
+
+    def auth_sms(self, deed, borrower_pos, esec_id, borrower_code, borrower_token):
+        return "", 200
 
 class MortgageDocMock:
     md_ref = "e-MD12121"
@@ -63,10 +96,10 @@ class MortgageDocMockWithDateOfMortgageOffer:
     deed = complete_deed_dict
 
 
-class MortgageDocMockWithMiscInfo:
+class MortgageDocMockWithDeedEffector:
     md_ref = "e-MD1291A"
     data = '{"description":"test setup charge clause","lender":{ "name":"a new lender",' \
-           '"address":"no 1 reputable street"}, "miscellaneous_information_heading":"misc info: ",' \
+           '"address":"no 1 reputable street"}, "deed_effector":"Different Name",' \
            '"charge_clause": { "cre_code": "CRE001",' \
            '"description":"This is an example charge clause"}, "additional_provisions": ' \
            '[ { "additional_provision_code":"addp001", "description":"this is additional ' \
@@ -427,6 +460,11 @@ class DeedHelper:
         "md_ref": "e-MD12344"
     }
 
+    _create_deed_and_update_akuma = {
+        "result": "A",
+        "id": "2b9115b2-d956-11e5-942f-08002719cd16"
+    }
+
 
 class StatusMock:
     _status_with_mdref_and_titleno = [
@@ -476,6 +514,15 @@ class AkumaMock:
         "activity": "create deed"
 
     }
+
+
+class FakeResponse(requests.Response):
+
+    def __init__(self, content='', status_code=200):
+        super(FakeResponse, self).__init__()
+        self._content = content
+        self._content_consumed = True
+        self.status_code = status_code
 
 
 def borrower_object_helper(borrower):

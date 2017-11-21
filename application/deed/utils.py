@@ -3,7 +3,7 @@ import io
 import json
 import os
 import sys
-import logging
+import application
 from jsonschema.validators import validator_for
 from lxml import etree
 from underscore import _
@@ -13,10 +13,7 @@ import urllib
 from application import config
 
 
-LOGGER = logging.getLogger(__name__)
-
-
-XML_SCHEMA_FILE = "deed-schema-v0-4.xsd"
+XML_SCHEMA_FILE = "deed-schema-v0-5.xsd"
 
 SCHEMA_LOCATION = config.ESEC_SCHEMA_LOCATION
 
@@ -104,7 +101,7 @@ def get_obj_by_path(schema, path):
             res = schema[key]
             return res
         except:
-            LOGGER.error(
+            application.app.logger.error(
                 "ACCESS ERROR:\nlocation in schema: %s\n with key: %s \n%s."
                 % (schema, key, sys.exc_info()[0]))
             raise
@@ -234,8 +231,8 @@ def convert_json_to_xml(deed_json):
     if 'date_of_mortgage_offer' in deed_json:
         deed_data_xml.set_date_of_mortgage_offer(deed_json["date_of_mortgage_offer"])
 
-    if 'miscellaneous_information' in deed_json:
-        deed_data_xml.set_miscellaneous_information(deed_json["miscellaneous_information"])
+    if 'deed_effector' in deed_json:
+        deed_data_xml.set_deed_effector(deed_json["deed_effector"])
 
     operative_deed_xml.set_deedData(deed_data_xml)
     deed_app_xml.set_effectiveDate("tbc")
@@ -274,7 +271,7 @@ def process_organisation_credentials():
                 header_dict[key] = [value]
     except:
         msg = str(sys.exc_info())
-        LOGGER.error("unable to process organisation credentials %s" % msg)
+        application.app.logger.error("unable to process organisation credentials %s" % msg)
         header_dict = None
 
     return header_dict

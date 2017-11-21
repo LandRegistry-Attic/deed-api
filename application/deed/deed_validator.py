@@ -1,4 +1,3 @@
-import logging
 import os
 
 from underscore import _
@@ -10,8 +9,7 @@ from application.deed.validate_borrowers import all_borrower_names_present, Borr
 from application.deed.validate_borrowers import compare_borrower_names, BorrowerNamesDifferException
 from application.mortgage_document.model import MortgageDocument
 from application.title_adaptor.service import TitleAdaptor
-
-LOGGER = logging.getLogger(__name__)
+import application
 
 
 class Validation():
@@ -25,18 +23,17 @@ class Validation():
         organisation_credentials = process_organisation_credentials()
 
         if organisation_credentials is not None:
-            organisation_credentials = {'organisation_id': organisation_credentials[os.getenv('DEED_CONVEYANCER_KEY')][1],
-                                        'organisation_name': organisation_credentials[os.getenv('DEED_CONVEYANCER_KEY')][0],
+            organisation_credentials = {'organisation_name': organisation_credentials[os.getenv('DEED_CONVEYANCER_KEY')][0],
                                         'organisation_locale': organisation_credentials[os.getenv('DEED_WEBSEAL_LOCALE')][0]}
             return organisation_credentials
         else:
-            LOGGER.error("Unable to process organisation credentials")
+            application.app.logger.error("Unable to process organisation credentials")
             return None
 
     def validate_payload(self, deed_json):
         error_message = validate_helper(deed_json)
         if error_message:
-            LOGGER.error("Schema validation 400_BAD_REQUEST")
+            application.app.logger.error("Schema validation 400_BAD_REQUEST")
         return error_message
 
     def validate_borrower_ids(self, deed_json):
@@ -51,7 +48,7 @@ class Validation():
     def validate_title_number(self, deed_json):
         return_val = TitleAdaptor.do_check(deed_json['title_number'])
         if return_val != "title OK":
-            LOGGER.error("Title Validation Error: " + str(return_val))
+            application.app.logger.error("Title Validation Error: " + str(return_val))
         return return_val
 
     def validate_borrower_names(self, deed_json):
@@ -73,9 +70,9 @@ class Validation():
                                       organisation_name,
                                       organisation_locale, deed_token)
         if deed_type == "create deed":
-            LOGGER.info("Check ID: " + check_result['id'])
+            application.app.logger.info("Check ID: " + check_result['id'])
         elif deed_type == "modify deed":
-            LOGGER.info("Check ID - MODIFY: " + check_result['id'])
+            application.app.logger.info("Check ID - MODIFY: " + check_result['id'])
 
         return check_result
 
@@ -88,7 +85,7 @@ class Validation():
 
         if not valid:
             msg = "A date of birth must not be a date in the future."
-            LOGGER.error(msg)
+            application.app.logger.error(msg)
             return valid, msg
         else:
             return True, ""
@@ -104,7 +101,7 @@ class Validation():
 
         if not valid:
             msg = "A mobile phone number must be unique to an individual."
-            LOGGER.error(msg)
+            application.app.logger.error(msg)
             return valid, msg
         else:
             return True, ""
@@ -119,7 +116,7 @@ class Validation():
         if mortgage_document is None:
 
             msg = "MD Ref cannot be found."
-            LOGGER.error(msg)
+            application.app.logger.error(msg)
             return False, msg
         else:
             return True, mortgage_document

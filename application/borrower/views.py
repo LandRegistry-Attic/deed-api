@@ -1,11 +1,10 @@
-from application.borrower.model import Borrower, VerifyMatch
-from flask import Blueprint, request
-from flask.ext.api import status
 import json
-import logging
 from datetime import datetime
+from flask import Blueprint, request, jsonify
+from flask.ext.api import status
+import application
 
-LOGGER = logging.getLogger(__name__)
+from application.borrower.model import Borrower, VerifyMatch
 
 borrower_bp = Blueprint('borrower', __name__,
                         template_folder='templates',
@@ -18,15 +17,16 @@ def validate_borrower():
 
     if 'borrower_token' in payload:
         borrower = Borrower.get_by_token(payload['borrower_token'].strip())
-        if borrower is not None:
+        if borrower:
             input_dob = datetime.strptime(payload['dob'], "%d/%m/%Y")
             db_dob = datetime.strptime(borrower.dob, "%d/%m/%Y")
 
             if input_dob == db_dob:
-                stripped_number = strip_number_to_four_digits(borrower.phonenumber)
                 borrower_id = borrower.id
-                return json.dumps({"deed_token": borrower.deed_token, "phone_number": stripped_number, "borrower_id": borrower_id}),\
+                return json.dumps({"deed_token": borrower.deed_token, "phone_number": borrower.phonenumber, "borrower_id": borrower_id}),\
                     status.HTTP_200_OK
+            else:
+                application.app.logger.error("Matching DOB not found for provided borrower.")
 
     return "Matching deed not found", status.HTTP_404_NOT_FOUND
 
@@ -36,13 +36,13 @@ def get_borrower_details_by_verify_pid(verify_pid):
     borrower = Borrower.get_by_verify_pid(verify_pid)
 
     if borrower is not None:
-        stripped_number = strip_number_to_four_digits(borrower.phonenumber)
         return json.dumps(
             {
                 "borrower_token": borrower.token,
                 "deed_token": borrower.deed_token,
-                "phone_number": stripped_number,
-                "borrower_id": borrower.id
+                "phone_number": borrower.phonenumber,
+                "borrower_id": borrower.id,
+                "signing_in_progress": borrower.signing_in_progress
             }
         ), status.HTTP_200_OK
 
@@ -51,23 +51,25 @@ def get_borrower_details_by_verify_pid(verify_pid):
 
 @borrower_bp.route('/verify-match/delete/<verify_pid>', methods=['DELETE'])
 def delete_verify_match(verify_pid):
-    LOGGER.info("Removing Verify Match entry - PID = " + verify_pid)
-    match = None
     verify_match_model = VerifyMatch()
 
-    try:
-        LOGGER.info("In Try")
-        match = verify_match_model.remove_verify_match(verify_pid)
-    except Exception as inst:
-        LOGGER.info("DB exception when removing verify-match")
-        LOGGER.error(str(type(inst)) + ":" + str(inst))
+    application.app.logger.info("Removing Verify Match Entry")
+    application.app.logger.debug("Attempting to remove verify match entry with PID = %s" % verify_pid)
 
-    if match is None:
-        LOGGER.error("no match found on verify-matcher: continue as normal")
+    if verify_match_model.remove_verify_match(verify_pid):
+        match_message = "match found for PID provided. Row has been removed."
+        application.app.logger.debug("match found for PID: row removed")
+    else:
+        match_message = "no match found for PID provided. Row has not been removed."
+        application.app.logger.error("no match found for PID: nothing removed")
 
-    return status.HTTP_200_OK
+    return jsonify({'result': match_message}), status.HTTP_200_OK
 
 
-def strip_number_to_four_digits(phone_number):
-    stripped_number = phone_number[-4:]
-    return stripped_number
+@borrower_bp.route('/check_signing_in_progress/<borrower_token>', methods=['GET'])
+def check_borrower_signing_in_progress(borrower_token):
+    borrower = Borrower.get_by_token(borrower_token)
+    if borrower:
+        return jsonify({'result': borrower.signing_in_progress}), status.HTTP_200_OK
+
+    return "Matching borrower not found", status.HTTP_404_NOT_FOUND

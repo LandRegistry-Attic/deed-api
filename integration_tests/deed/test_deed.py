@@ -5,13 +5,16 @@ import os
 import json
 import requests
 import unittest
+import time
 from application.deed.model import Deed
 from integration_tests.deed.deed_data import valid_deed, new_deed, valid_deed_with_reference, \
-    valid_deed_with_date_of_mortgage_offer, valid_deed_with_miscellaneous_info
+    valid_deed_with_date_of_mortgage_offer, valid_deed_with_deed_effector
 from lxml import etree
 
 from application import config
 from integration_tests.helper import setUpApp, setUp_MortgageDocuments
+
+import datetime
 
 
 class TestDeedRoutes(unittest.TestCase):
@@ -89,8 +92,8 @@ class TestDeedRoutes(unittest.TestCase):
     def test_deed_create_and_get_with_optional_date_of_mortgage_offer(self):
         self.deed_create_and_get(valid_deed_with_date_of_mortgage_offer)
 
-    def test_deed_create_and_get_with_optional_miscellaneous_info(self):
-        self.deed_create_and_get(valid_deed_with_miscellaneous_info)
+    def test_deed_create_and_get_with_optional_deed_effector(self):
+        self.deed_create_and_get(valid_deed_with_deed_effector)
 
     def test_bad_get(self):
         fake_token_deed = requests.get(config.DEED_API_BASE_HOST + "/deed/fake",
@@ -118,6 +121,25 @@ class TestDeedRoutes(unittest.TestCase):
         self.assertIn("status", str(get_deed_data))
         self.assertIn("DRAFT", str(get_deed_data))
         self.assertIn(response_json["path"][-6:], str(get_deed_data))
+
+    def deed_internal_create_and_get(self, deed):
+        create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
+                                    data=json.dumps(deed),
+                                    headers=self.webseal_headers)
+        self.assertEqual(create_deed.status_code, 201)
+
+        response_json = create_deed.json()
+
+        self.assertIn("/deed/", str(response_json))
+
+        get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"] + '/internal')
+        self.assertEqual(get_created_deed.status_code, 200)
+
+        created_deed = get_created_deed.json()
+        self.assertIn("deed", str(created_deed))
+
+    def test_deed_internal_create_and_get(self):
+        self.deed_internal_create_and_get(valid_deed)
 
     def test_invalid_params_on_get_with_mdref_and_titleno(self):
         fake_token_deed = requests.get(config.DEED_API_BASE_HOST + "/deed?invalid_query_parameter=invalid",
@@ -266,10 +288,15 @@ class TestDeedRoutes(unittest.TestCase):
 
         response_json = create_deed.json()
         get_created_deed = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
-                                        headers=self.webseal_headers_internal)
+                                        headers=self.webseal_headers)
         self.assertEqual(get_created_deed.status_code, 200)
 
     def test_save_make_effective(self):
+        get_existing_deeds = requests.get(config.DEED_API_BASE_HOST + '/deed/retrieve-signed',
+                                          headers=self.webseal_headers)
+
+        get_existing_deeds = get_existing_deeds.json()
+
         create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
                                     data=json.dumps(valid_deed),
                                     headers=self.webseal_headers)
@@ -305,6 +332,25 @@ class TestDeedRoutes(unittest.TestCase):
 
         self.assertEqual(sign_deed.status_code, 200)
 
+        get_deed_again = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                      headers=self.webseal_headers)
+
+        second_deed = get_deed_again.json()
+
+        timer = time.time() + 60
+        while time.time() < timer and second_deed["deed"]["status"] != "ALL-SIGNED":
+            get_deed_again = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                          headers=self.webseal_headers)
+
+            second_deed = get_deed_again.json()
+
+        test_result = requests.get(config.DEED_API_BASE_HOST + '/deed/retrieve-signed',
+                                   headers=self.webseal_headers)
+
+        test_result = test_result.json()
+
+        self.assertGreater(len(test_result["deeds"]), len(get_existing_deeds["deeds"]))
+
         make_effective = requests.post(config.DEED_API_BASE_HOST + response_json["path"] + '/make-effective',
                                        headers=self.webseal_headers)
 
@@ -312,7 +358,7 @@ class TestDeedRoutes(unittest.TestCase):
 
         deed_model = Deed()
 
-        result = deed_model._get_deed_internal(response_json["path"].replace("/deed/", ""), os.getenv('LR_ORGANISATION_ID'))
+        result = deed_model.get_deed_system(response_json["path"].replace("/deed/", ""))
 
         self.assertIsNotNone(result.deed_xml)
 
@@ -358,11 +404,24 @@ class TestDeedRoutes(unittest.TestCase):
 
         self.assertEqual(sign_deed.status_code, 200)
 
+        get_deed_again = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                      headers=self.webseal_headers)
+
+        second_deed = get_deed_again.json()
+
+        timer = time.time() + 60
+        while time.time() < timer and second_deed["deed"]["status"] != "ALL-SIGNED":
+            get_deed_again = requests.get(config.DEED_API_BASE_HOST + response_json["path"],
+                                          headers=self.webseal_headers)
+
+            second_deed = get_deed_again.json()
+
         test_result = requests.get(config.DEED_API_BASE_HOST + '/deed/retrieve-signed',
                                    headers=self.webseal_headers)
 
         signed_deeds = test_result.json()
         self.assertIn("deeds", str(signed_deeds))
+        self.assertIn(created_deed["deed"]["token"], str(signed_deeds))
 
     def test_get_signed_deeds_not_found(self):
         create_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/',
@@ -464,8 +523,7 @@ class TestDeedRoutes(unittest.TestCase):
         try:
             # Post a new test organisation, which will match the one provided in the test headers
             post_organisation_name = requests.post(config.ORGANISATION_API_BASE_HOST + '/organisation-name',
-                                                   data=json.dumps({"organisation_name": "Test Organisation",
-                                                                    "organisation_id": "1000.1.2"}),
+                                                   data=json.dumps({"organisation_name": "Test Organisation", "legal_organisation_name": "Legal Organisation"}),
                                                    headers=self.webseal_test_organisation_name)
 
             self.assertEqual(post_organisation_name.status_code, 201)
@@ -488,11 +546,26 @@ class TestDeedRoutes(unittest.TestCase):
                 config.DEED_API_BASE_HOST + response_json["path"] + '/organisation-name',
                 headers=self.webseal_test_organisation_name)
             self.assertEqual(get_organisation_name.status_code, 200)
-            self.assertEqual(get_organisation_name.json()['result'], 'Test Organisation')
+            self.assertEqual(get_organisation_name.json()['result'], 'Legal Organisation')
 
         finally:
             # Finally, teardown/delete the test organisation name
             delete_organisation_name = requests.delete(
-                config.ORGANISATION_API_BASE_HOST + '/organisation-name/1000.1.2')
+                config.ORGANISATION_API_BASE_HOST + '/organisation-name/Test Organisation')
 
             self.assertEqual(delete_organisation_name.status_code, 200)
+
+    def test_additional_columns(self):
+
+        our_deed = requests.post(config.DEED_API_BASE_HOST + '/deed/', data=json.dumps(valid_deed), headers=self.webseal_headers)
+
+        response_json = our_deed.json()
+
+        response_path = response_json['path'].replace('/deed/', '')
+
+        create_deed = Deed()
+
+        deed_returned = create_deed.get_deed_system(response_path)
+
+        self.assertIsInstance(deed_returned.created_date, datetime.datetime)
+        self.assertEqual(deed_returned.payload_json, valid_deed)
